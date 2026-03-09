@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// TimeRange represents a time interval.
+message TimeRange {
+  google.protobuf.Timestamp start = 1;
+  google.protobuf.Timestamp end = 2;
+}
+
+// DateRange represents a date-only interval (YYYY-MM-DD).
+message DateRange {
+  string start_date = 1;
+  string end_date = 2;
+}

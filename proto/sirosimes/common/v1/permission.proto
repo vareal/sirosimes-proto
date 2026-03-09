@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+// Permission defines an access control entry.
+message Permission {
+  string resource = 1;
+  string action = 2;
+  string scope = 3;
+}
+
+// Role groups permissions with a trust level.
+message Role {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated Permission permissions = 4;
+  int32 trust_level = 5;
+}
+
+// AccessDecision represents the result of an authorization check.
+message AccessDecision {
+  bool allowed = 1;
+  string reason = 2;
+  string evaluated_by = 3;
+}

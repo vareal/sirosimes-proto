@@ -1,13 +1,15 @@
-.PHONY: lint generate breaking clean
+.PHONY: lint breaking generate clean all
 
 lint:
 	buf lint
 
-generate:
-	buf generate
-
 breaking:
 	buf breaking --against '.git#branch=main'
 
+generate:
+	buf generate
+
 clean:
 	rm -rf gen/
+
+all: lint generate

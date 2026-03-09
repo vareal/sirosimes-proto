@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+// SortOrder specifies the sort direction.
+enum SortOrder {
+  SORT_ORDER_UNSPECIFIED = 0;
+  SORT_ORDER_ASC = 1;
+  SORT_ORDER_DESC = 2;
+}
+
+// PaginationRequest is the standard pagination input.
+message PaginationRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string sort_by = 3;
+  SortOrder sort_order = 4;
+}
+
+// PaginationResponse is the standard pagination output.
+message PaginationResponse {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total_items = 3;
+  int32 total_pages = 4;
+  bool has_next = 5;
+  bool has_prev = 6;
+}

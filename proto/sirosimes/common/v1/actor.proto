@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// ActorType classifies the entity performing actions.
+enum ActorType {
+  ACTOR_TYPE_UNSPECIFIED = 0;
+  ACTOR_TYPE_HUMAN = 1;
+  ACTOR_TYPE_AI_EMPLOYEE = 2;
+  ACTOR_TYPE_SYSTEM = 3;
+  ACTOR_TYPE_EXTERNAL_SERVICE = 4;
+}
+
+// ActorStatus represents the current state of an actor.
+enum ActorStatus {
+  ACTOR_STATUS_UNSPECIFIED = 0;
+  ACTOR_STATUS_ACTIVE = 1;
+  ACTOR_STATUS_INACTIVE = 2;
+  ACTOR_STATUS_SUSPENDED = 3;
+}
+
+// Actor represents any entity that can perform actions in the system.
+message Actor {
+  string id = 1;
+  ActorType type = 2;
+  string display_name = 3;
+  string email = 4;
+  string username = 5;
+  ActorStatus status = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// ActorRef is a lightweight reference to an Actor (for embedding in other messages).
+message ActorRef {
+  string id = 1;
+  ActorType type = 2;
+  string display_name = 3;
+}

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+// Error represents a structured API error response.
+message Error {
+  string code = 1;
+  string message = 2;
+  int32 http_status = 3;
+  repeated ErrorDetail details = 4;
+  string request_id = 5;
+}
+
+// ErrorDetail provides field-level error information.
+message ErrorDetail {
+  string field = 1;
+  string description = 2;
+  string constraint = 3;
+}

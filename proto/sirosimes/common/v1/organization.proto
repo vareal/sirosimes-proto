@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// OrganizationType classifies the organizational unit.
+enum OrganizationType {
+  ORGANIZATION_TYPE_UNSPECIFIED = 0;
+  ORGANIZATION_TYPE_GROUP = 1;
+  ORGANIZATION_TYPE_COMPANY = 2;
+  ORGANIZATION_TYPE_DEPARTMENT = 3;
+  ORGANIZATION_TYPE_TEAM = 4;
+  ORGANIZATION_TYPE_TENANT = 5;
+}
+
+// Organization represents an organizational unit within the Vareal Group.
+message Organization {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  OrganizationType type = 4;
+  string parent_id = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}

@@ -5,6 +5,14 @@ modules:
 lint:
   use:
     - STANDARD
+    - COMMENTS
+  except:
+    - PACKAGE_VERSION_SUFFIX
+    - COMMENT_FIELD
+    - COMMENT_ENUM_VALUE
+    - COMMENT_ONEOF
+    - COMMENT_RPC
+    - COMMENT_SERVICE
 breaking:
   use:
     - FILE

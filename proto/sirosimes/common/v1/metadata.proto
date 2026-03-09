@@ -1,23 +1,27 @@
 syntax = "proto3";
+
 package sirosimes.common.v1;
-option go_package = "github.com/vareal/sirosimes-proto/gen/go/common/v1;commonv1";
 
-import "sirosimes/common/v1/types.proto";
+import "google/protobuf/timestamp.proto";
 
-message RequestMetadata {
-  string trace_id = 1;
-  string actor_id = 2;
-  string actor_type = 3;
-  string tenant_id = 4;
-  Timestamp request_time = 5;
+// SecurityLevel classifies data sensitivity per CISO directive.
+enum SecurityLevel {
+  SECURITY_LEVEL_UNSPECIFIED = 0;
+  SECURITY_LEVEL_PUBLIC = 1;
+  SECURITY_LEVEL_INTERNAL = 2;
+  SECURITY_LEVEL_CONFIDENTIAL = 3;
+  SECURITY_LEVEL_RESTRICTED = 4;
 }
 
-message AuditEntry {
-  string actor_id = 1;
-  string actor_type = 2;
-  string action = 3;
-  string resource_type = 4;
-  string resource_id = 5;
-  Timestamp timestamp = 6;
-  map<string, string> changes = 7;
+// ResourceMetadata provides standard metadata for all Sirosimes resources.
+message ResourceMetadata {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+  string created_by = 5;
+  string updated_by = 6;
+  int64 version = 7;
+  map<string, string> labels = 8;
+  map<string, string> annotations = 9;
 }

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/actor.proto";
+
+// AuditSeverity classifies the importance of an audit event.
+enum AuditSeverity {
+  AUDIT_SEVERITY_UNSPECIFIED = 0;
+  AUDIT_SEVERITY_INFO = 1;
+  AUDIT_SEVERITY_WARNING = 2;
+  AUDIT_SEVERITY_CRITICAL = 3;
+}
+
+// AuditLog records a single auditable event.
+message AuditLog {
+  string id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  ActorRef actor = 3;
+  string action = 4;
+  string resource_type = 5;
+  string resource_id = 6;
+  string product = 7;
+  google.protobuf.Struct before = 8;
+  google.protobuf.Struct after = 9;
+  string ip_address = 10;
+  string user_agent = 11;
+  AuditSeverity severity = 12;
+}
