@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package sirosimes.hataori.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// workflow.proto — Workflow definition and management for the Hataori workflow engine.
+//
+// Workflows represent reusable automation definitions that can be versioned,
+// tagged, and configured with LLM settings. Each workflow can have multiple
+// versions, each containing the DSL definition as a flexible Struct.
+
+// WorkflowStatus represents the lifecycle state of a workflow definition.
+enum WorkflowStatus {
+  WORKFLOW_STATUS_UNSPECIFIED = 0;
+  // Workflow is being designed and is not yet available for execution.
+  WORKFLOW_STATUS_DRAFT = 1;
+  // Workflow is published and available for execution.
+  WORKFLOW_STATUS_ACTIVE = 2;
+  // Workflow is temporarily disabled.
+  WORKFLOW_STATUS_INACTIVE = 3;
+  // Workflow is retired and preserved for historical reference only.
+  WORKFLOW_STATUS_ARCHIVED = 4;
+}
+
+// Workflow represents a reusable automation definition.
+message Workflow {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Human-readable workflow name.
+  string name = 2;
+  // Detailed description of the workflow purpose and behavior.
+  string description = 3;
+  // Current lifecycle status.
+  WorkflowStatus status = 4;
+  // Tags for categorization and filtering.
+  repeated string tags = 5;
+  // LLM configuration for AI-powered steps (model, temperature, etc.).
+  google.protobuf.Struct llm_config = 6;
+  // Actor ID who created this workflow.
+  string created_by = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+// WorkflowVersion represents an immutable snapshot of a workflow definition.
+message WorkflowVersion {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Parent workflow ID.
+  string workflow_id = 2;
+  // Monotonically increasing version number.
+  int32 version = 3;
+  // Workflow DSL definition as a flexible JSON structure.
+  google.protobuf.Struct dsl = 4;
+  // SHA-256 checksum of the DSL for integrity verification.
+  string checksum = 5;
+  // Actor ID who created this version.
+  string created_by = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// CreateWorkflowRequest is the request for creating a new workflow.
+message CreateWorkflowRequest {
+  string name = 1;
+  string description = 2;
+  repeated string tags = 3;
+  google.protobuf.Struct llm_config = 4;
+  string created_by = 5;
+}
+
+// CreateWorkflowResponse is the response after creating a workflow.
+message CreateWorkflowResponse {
+  Workflow workflow = 1;
+}
+
+// ListWorkflowsRequest is the request for listing workflows with filters.
+message ListWorkflowsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  // Filter by workflow status.
+  WorkflowStatus status = 2;
+  // Filter by tag (any match).
+  repeated string tags = 3;
+  // Full-text search query.
+  string search = 4;
+}
+
+// ListWorkflowsResponse is the response for listing workflows.
+message ListWorkflowsResponse {
+  repeated Workflow workflows = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetWorkflowRequest is the request for retrieving a single workflow.
+message GetWorkflowRequest {
+  string id = 1;
+}
+
+// GetWorkflowResponse is the response containing a single workflow.
+message GetWorkflowResponse {
+  Workflow workflow = 1;
+}
+
+// UpdateWorkflowRequest is the request for updating an existing workflow.
+message UpdateWorkflowRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  WorkflowStatus status = 4;
+  repeated string tags = 5;
+  google.protobuf.Struct llm_config = 6;
+}
+
+// UpdateWorkflowResponse is the response after updating a workflow.
+message UpdateWorkflowResponse {
+  Workflow workflow = 1;
+}
+
+// DeleteWorkflowRequest is the request for deleting a workflow.
+message DeleteWorkflowRequest {
+  string id = 1;
+}
+
+// DeleteWorkflowResponse is the response after deleting a workflow.
+message DeleteWorkflowResponse {}
+
+// CreateVersionRequest is the request for creating a new workflow version.
+message CreateVersionRequest {
+  string workflow_id = 1;
+  google.protobuf.Struct dsl = 2;
+  string created_by = 3;
+}
+
+// CreateVersionResponse is the response after creating a workflow version.
+message CreateVersionResponse {
+  WorkflowVersion version = 1;
+}
+
+// ListVersionsRequest is the request for listing versions of a workflow.
+message ListVersionsRequest {
+  string workflow_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+// ListVersionsResponse is the response for listing workflow versions.
+message ListVersionsResponse {
+  repeated WorkflowVersion versions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// WorkflowService provides workflow definition and version management operations.
+service WorkflowService {
+  rpc ListWorkflows(ListWorkflowsRequest) returns (ListWorkflowsResponse);
+  rpc CreateWorkflow(CreateWorkflowRequest) returns (CreateWorkflowResponse);
+  rpc GetWorkflow(GetWorkflowRequest) returns (GetWorkflowResponse);
+  rpc UpdateWorkflow(UpdateWorkflowRequest) returns (UpdateWorkflowResponse);
+  rpc DeleteWorkflow(DeleteWorkflowRequest) returns (DeleteWorkflowResponse);
+  rpc CreateVersion(CreateVersionRequest) returns (CreateVersionResponse);
+  rpc ListVersions(ListVersionsRequest) returns (ListVersionsResponse);
+}

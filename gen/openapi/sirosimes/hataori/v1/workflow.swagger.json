@@ -1,0 +1,284 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/hataori/v1/workflow.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "WorkflowService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateVersionResponse": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/v1WorkflowVersion"
+        }
+      },
+      "description": "CreateVersionResponse is the response after creating a workflow version."
+    },
+    "v1CreateWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "workflow": {
+          "$ref": "#/definitions/v1Workflow"
+        }
+      },
+      "description": "CreateWorkflowResponse is the response after creating a workflow."
+    },
+    "v1DeleteWorkflowResponse": {
+      "type": "object",
+      "description": "DeleteWorkflowResponse is the response after deleting a workflow."
+    },
+    "v1GetWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "workflow": {
+          "$ref": "#/definitions/v1Workflow"
+        }
+      },
+      "description": "GetWorkflowResponse is the response containing a single workflow."
+    },
+    "v1ListVersionsResponse": {
+      "type": "object",
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WorkflowVersion"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListVersionsResponse is the response for listing workflow versions."
+    },
+    "v1ListWorkflowsResponse": {
+      "type": "object",
+      "properties": {
+        "workflows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Workflow"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListWorkflowsResponse is the response for listing workflows."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "workflow": {
+          "$ref": "#/definitions/v1Workflow"
+        }
+      },
+      "description": "UpdateWorkflowResponse is the response after updating a workflow."
+    },
+    "v1Workflow": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable workflow name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the workflow purpose and behavior."
+        },
+        "status": {
+          "$ref": "#/definitions/v1WorkflowStatus",
+          "description": "Current lifecycle status."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for categorization and filtering."
+        },
+        "llmConfig": {
+          "type": "object",
+          "description": "LLM configuration for AI-powered steps (model, temperature, etc.)."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this workflow."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Workflow represents a reusable automation definition."
+    },
+    "v1WorkflowStatus": {
+      "type": "string",
+      "enum": [
+        "WORKFLOW_STATUS_UNSPECIFIED",
+        "WORKFLOW_STATUS_DRAFT",
+        "WORKFLOW_STATUS_ACTIVE",
+        "WORKFLOW_STATUS_INACTIVE",
+        "WORKFLOW_STATUS_ARCHIVED"
+      ],
+      "default": "WORKFLOW_STATUS_UNSPECIFIED",
+      "description": "WorkflowStatus represents the lifecycle state of a workflow definition.\n\n - WORKFLOW_STATUS_DRAFT: Workflow is being designed and is not yet available for execution.\n - WORKFLOW_STATUS_ACTIVE: Workflow is published and available for execution.\n - WORKFLOW_STATUS_INACTIVE: Workflow is temporarily disabled.\n - WORKFLOW_STATUS_ARCHIVED: Workflow is retired and preserved for historical reference only."
+    },
+    "v1WorkflowVersion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "workflowId": {
+          "type": "string",
+          "description": "Parent workflow ID."
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Monotonically increasing version number."
+        },
+        "dsl": {
+          "type": "object",
+          "description": "Workflow DSL definition as a flexible JSON structure."
+        },
+        "checksum": {
+          "type": "string",
+          "description": "SHA-256 checksum of the DSL for integrity verification."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this version."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "WorkflowVersion represents an immutable snapshot of a workflow definition."
+    }
+  }
+}

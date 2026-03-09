@@ -1,0 +1,203 @@
+syntax = "proto3";
+
+package sirosimes.hataori.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// approval.proto — Human-in-the-Loop (HITL) approval management for the Hataori workflow engine.
+//
+// Provides approval request tracking, delegation chains, and escalation
+// management. When a workflow step requires human approval, an ApprovalRequest
+// is created and the execution is paused until the request is resolved.
+
+// ApprovalStatus represents the lifecycle state of an approval request.
+enum ApprovalStatus {
+  APPROVAL_STATUS_UNSPECIFIED = 0;
+  // Approval is awaiting a decision.
+  APPROVAL_STATUS_PENDING = 1;
+  // Approval was granted.
+  APPROVAL_STATUS_APPROVED = 2;
+  // Approval was denied.
+  APPROVAL_STATUS_REJECTED = 3;
+  // Approval was delegated to another actor.
+  APPROVAL_STATUS_DELEGATED = 4;
+  // Approval was escalated due to policy or timeout.
+  APPROVAL_STATUS_ESCALATED = 5;
+  // Approval expired without a response.
+  APPROVAL_STATUS_TIMED_OUT = 6;
+}
+
+// ApprovalRequest represents a pending human decision within a workflow execution.
+message ApprovalRequest {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Execution that is waiting for this approval.
+  string execution_id = 2;
+  // Name of the workflow step requesting approval.
+  string step_name = 3;
+  // Actor ID assigned to approve this request.
+  string assignee = 4;
+  // Actor ID to whom this request was delegated (if any).
+  string delegated_to = 5;
+  // Current approval status.
+  ApprovalStatus status = 6;
+  // Comment or reason provided by the approver.
+  string comment = 7;
+  // Deadline for the approval response.
+  google.protobuf.Timestamp timeout_at = 8;
+  // Actor ID to escalate to if the timeout is reached.
+  string escalate_to = 9;
+  // When the approval decision was made.
+  google.protobuf.Timestamp responded_at = 10;
+  google.protobuf.Timestamp created_at = 11;
+}
+
+// DelegationStep represents a single step in a delegation chain.
+message DelegationStep {
+  // Actor ID for this delegation step.
+  string actor_id = 1;
+  // Maximum time allowed for this step before moving to the next.
+  google.protobuf.Struct config = 2;
+}
+
+// EscalationPolicy defines what happens when all delegation steps are exhausted.
+message EscalationPolicy {
+  // Actor ID to receive the final escalation.
+  string escalate_to = 1;
+  // Notification channel (e.g., "mattermost", "email").
+  string notify_via = 2;
+}
+
+// DelegationChain defines a reusable sequence of approvers with escalation policy.
+message DelegationChain {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Human-readable name for this chain.
+  string name = 2;
+  // Ordered sequence of delegation steps.
+  repeated DelegationStep steps = 3;
+  // Escalation policy when all steps are exhausted.
+  EscalationPolicy escalation = 4;
+  // Actor ID who created this chain.
+  string created_by = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+// ListApprovalsRequest is the request for listing approval requests with filters.
+message ListApprovalsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  // Filter by execution ID.
+  string execution_id = 2;
+  // Filter by assignee actor ID.
+  string assignee = 3;
+  // Filter by approval status.
+  ApprovalStatus status = 4;
+}
+
+// ListApprovalsResponse is the response for listing approval requests.
+message ListApprovalsResponse {
+  repeated ApprovalRequest approvals = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetApprovalRequest is the request for retrieving a single approval request.
+message GetApprovalRequest {
+  string id = 1;
+}
+
+// GetApprovalResponse is the response containing a single approval request.
+message GetApprovalResponse {
+  ApprovalRequest approval = 1;
+}
+
+// ApproveRequestRequest is the request for granting an approval.
+message ApproveRequestRequest {
+  string id = 1;
+  // Actor ID making the decision.
+  string actor_id = 2;
+  // Optional comment.
+  string comment = 3;
+}
+
+// ApproveRequestResponse is the response after granting an approval.
+message ApproveRequestResponse {
+  ApprovalRequest approval = 1;
+}
+
+// RejectRequestRequest is the request for denying an approval.
+message RejectRequestRequest {
+  string id = 1;
+  // Actor ID making the decision.
+  string actor_id = 2;
+  // Reason for rejection.
+  string comment = 3;
+}
+
+// RejectRequestResponse is the response after denying an approval.
+message RejectRequestResponse {
+  ApprovalRequest approval = 1;
+}
+
+// DelegateRequestRequest is the request for delegating an approval to another actor.
+message DelegateRequestRequest {
+  string id = 1;
+  // Actor ID performing the delegation.
+  string actor_id = 2;
+  // Actor ID to delegate to.
+  string delegate_to = 3;
+  // Optional comment.
+  string comment = 4;
+}
+
+// DelegateRequestResponse is the response after delegating an approval.
+message DelegateRequestResponse {
+  ApprovalRequest approval = 1;
+}
+
+// ListDelegationChainsRequest is the request for listing delegation chains.
+message ListDelegationChainsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+}
+
+// ListDelegationChainsResponse is the response for listing delegation chains.
+message ListDelegationChainsResponse {
+  repeated DelegationChain chains = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateDelegationChainRequest is the request for creating a new delegation chain.
+message CreateDelegationChainRequest {
+  string name = 1;
+  repeated DelegationStep steps = 2;
+  EscalationPolicy escalation = 3;
+  string created_by = 4;
+}
+
+// CreateDelegationChainResponse is the response after creating a delegation chain.
+message CreateDelegationChainResponse {
+  DelegationChain chain = 1;
+}
+
+// GetDelegationChainRequest is the request for retrieving a single delegation chain.
+message GetDelegationChainRequest {
+  string id = 1;
+}
+
+// GetDelegationChainResponse is the response containing a single delegation chain.
+message GetDelegationChainResponse {
+  DelegationChain chain = 1;
+}
+
+// ApprovalService provides HITL approval and delegation chain management operations.
+service ApprovalService {
+  rpc ListApprovals(ListApprovalsRequest) returns (ListApprovalsResponse);
+  rpc GetApproval(GetApprovalRequest) returns (GetApprovalResponse);
+  rpc ApproveRequest(ApproveRequestRequest) returns (ApproveRequestResponse);
+  rpc RejectRequest(RejectRequestRequest) returns (RejectRequestResponse);
+  rpc DelegateRequest(DelegateRequestRequest) returns (DelegateRequestResponse);
+  rpc ListDelegationChains(ListDelegationChainsRequest) returns (ListDelegationChainsResponse);
+  rpc CreateDelegationChain(CreateDelegationChainRequest) returns (CreateDelegationChainResponse);
+  rpc GetDelegationChain(GetDelegationChainRequest) returns (GetDelegationChainResponse);
+}

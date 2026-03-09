@@ -1,0 +1,308 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/hataori/v1/execution.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ExecutionService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CancelExecutionResponse": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "$ref": "#/definitions/v1Execution"
+        }
+      },
+      "description": "CancelExecutionResponse is the response after cancelling an execution."
+    },
+    "v1Execution": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "workflowId": {
+          "type": "string",
+          "description": "Workflow that was executed."
+        },
+        "versionId": {
+          "type": "string",
+          "description": "Specific version that was executed."
+        },
+        "status": {
+          "$ref": "#/definitions/v1ExecutionStatus",
+          "description": "Current execution status."
+        },
+        "input": {
+          "type": "object",
+          "description": "Input data provided to the workflow."
+        },
+        "output": {
+          "type": "object",
+          "description": "Output data produced by the workflow."
+        },
+        "error": {
+          "type": "string",
+          "description": "Error details if the execution failed."
+        },
+        "triggeredBy": {
+          "type": "string",
+          "description": "Actor ID or trigger ID that initiated this execution."
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Execution represents a single run of a workflow."
+    },
+    "v1ExecutionStatus": {
+      "type": "string",
+      "enum": [
+        "EXECUTION_STATUS_UNSPECIFIED",
+        "EXECUTION_STATUS_PENDING",
+        "EXECUTION_STATUS_RUNNING",
+        "EXECUTION_STATUS_COMPLETED",
+        "EXECUTION_STATUS_FAILED",
+        "EXECUTION_STATUS_CANCELLED",
+        "EXECUTION_STATUS_PAUSED"
+      ],
+      "default": "EXECUTION_STATUS_UNSPECIFIED",
+      "description": "ExecutionStatus represents the lifecycle state of a workflow execution.\n\n - EXECUTION_STATUS_PENDING: Execution is queued and waiting to start.\n - EXECUTION_STATUS_RUNNING: Execution is actively running.\n - EXECUTION_STATUS_COMPLETED: Execution completed successfully.\n - EXECUTION_STATUS_FAILED: Execution failed with an error.\n - EXECUTION_STATUS_CANCELLED: Execution was cancelled by a user or system.\n - EXECUTION_STATUS_PAUSED: Execution is paused (e.g., waiting for approval)."
+    },
+    "v1ExecutionStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "executionId": {
+          "type": "string",
+          "description": "Parent execution ID."
+        },
+        "stepName": {
+          "type": "string",
+          "description": "Name of this step as defined in the workflow DSL."
+        },
+        "stepType": {
+          "type": "string",
+          "description": "Type of step (e.g., \"llm\", \"http\", \"transform\", \"approval\")."
+        },
+        "status": {
+          "$ref": "#/definitions/v1ExecutionStepStatus",
+          "description": "Current step status."
+        },
+        "input": {
+          "type": "object",
+          "description": "Input data provided to this step."
+        },
+        "output": {
+          "type": "object",
+          "description": "Output data produced by this step."
+        },
+        "error": {
+          "type": "string",
+          "description": "Error details if the step failed."
+        },
+        "retries": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of retry attempts performed."
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "ExecutionStep represents a single step within a workflow execution."
+    },
+    "v1ExecutionStepStatus": {
+      "type": "string",
+      "enum": [
+        "EXECUTION_STEP_STATUS_UNSPECIFIED",
+        "EXECUTION_STEP_STATUS_PENDING",
+        "EXECUTION_STEP_STATUS_RUNNING",
+        "EXECUTION_STEP_STATUS_COMPLETED",
+        "EXECUTION_STEP_STATUS_FAILED",
+        "EXECUTION_STEP_STATUS_SKIPPED",
+        "EXECUTION_STEP_STATUS_WAITING"
+      ],
+      "default": "EXECUTION_STEP_STATUS_UNSPECIFIED",
+      "description": "ExecutionStepStatus represents the lifecycle state of an individual step.\n\n - EXECUTION_STEP_STATUS_PENDING: Step is queued and waiting to start.\n - EXECUTION_STEP_STATUS_RUNNING: Step is actively running.\n - EXECUTION_STEP_STATUS_COMPLETED: Step completed successfully.\n - EXECUTION_STEP_STATUS_FAILED: Step failed with an error.\n - EXECUTION_STEP_STATUS_SKIPPED: Step was skipped due to conditional logic.\n - EXECUTION_STEP_STATUS_WAITING: Step is waiting for an external event (e.g., approval, callback)."
+    },
+    "v1GetExecutionResponse": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "$ref": "#/definitions/v1Execution"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExecutionStep"
+          }
+        }
+      },
+      "description": "GetExecutionResponse is the response containing a single execution with its steps."
+    },
+    "v1ListExecutionsResponse": {
+      "type": "object",
+      "properties": {
+        "executions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Execution"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListExecutionsResponse is the response for listing executions."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ResumeExecutionResponse": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "$ref": "#/definitions/v1Execution"
+        }
+      },
+      "description": "ResumeExecutionResponse is the response after resuming an execution."
+    },
+    "v1RunWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "$ref": "#/definitions/v1Execution"
+        }
+      },
+      "description": "RunWorkflowResponse is the response after starting a workflow execution."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    }
+  }
+}

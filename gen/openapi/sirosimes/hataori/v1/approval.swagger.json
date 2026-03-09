@@ -1,0 +1,334 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/hataori/v1/approval.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ApprovalService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ApprovalRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "executionId": {
+          "type": "string",
+          "description": "Execution that is waiting for this approval."
+        },
+        "stepName": {
+          "type": "string",
+          "description": "Name of the workflow step requesting approval."
+        },
+        "assignee": {
+          "type": "string",
+          "description": "Actor ID assigned to approve this request."
+        },
+        "delegatedTo": {
+          "type": "string",
+          "description": "Actor ID to whom this request was delegated (if any)."
+        },
+        "status": {
+          "$ref": "#/definitions/v1ApprovalStatus",
+          "description": "Current approval status."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Comment or reason provided by the approver."
+        },
+        "timeoutAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Deadline for the approval response."
+        },
+        "escalateTo": {
+          "type": "string",
+          "description": "Actor ID to escalate to if the timeout is reached."
+        },
+        "respondedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the approval decision was made."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "ApprovalRequest represents a pending human decision within a workflow execution."
+    },
+    "v1ApprovalStatus": {
+      "type": "string",
+      "enum": [
+        "APPROVAL_STATUS_UNSPECIFIED",
+        "APPROVAL_STATUS_PENDING",
+        "APPROVAL_STATUS_APPROVED",
+        "APPROVAL_STATUS_REJECTED",
+        "APPROVAL_STATUS_DELEGATED",
+        "APPROVAL_STATUS_ESCALATED",
+        "APPROVAL_STATUS_TIMED_OUT"
+      ],
+      "default": "APPROVAL_STATUS_UNSPECIFIED",
+      "description": "ApprovalStatus represents the lifecycle state of an approval request.\n\n - APPROVAL_STATUS_PENDING: Approval is awaiting a decision.\n - APPROVAL_STATUS_APPROVED: Approval was granted.\n - APPROVAL_STATUS_REJECTED: Approval was denied.\n - APPROVAL_STATUS_DELEGATED: Approval was delegated to another actor.\n - APPROVAL_STATUS_ESCALATED: Approval was escalated due to policy or timeout.\n - APPROVAL_STATUS_TIMED_OUT: Approval expired without a response."
+    },
+    "v1ApproveRequestResponse": {
+      "type": "object",
+      "properties": {
+        "approval": {
+          "$ref": "#/definitions/v1ApprovalRequest"
+        }
+      },
+      "description": "ApproveRequestResponse is the response after granting an approval."
+    },
+    "v1CreateDelegationChainResponse": {
+      "type": "object",
+      "properties": {
+        "chain": {
+          "$ref": "#/definitions/v1DelegationChain"
+        }
+      },
+      "description": "CreateDelegationChainResponse is the response after creating a delegation chain."
+    },
+    "v1DelegateRequestResponse": {
+      "type": "object",
+      "properties": {
+        "approval": {
+          "$ref": "#/definitions/v1ApprovalRequest"
+        }
+      },
+      "description": "DelegateRequestResponse is the response after delegating an approval."
+    },
+    "v1DelegationChain": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for this chain."
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DelegationStep"
+          },
+          "description": "Ordered sequence of delegation steps."
+        },
+        "escalation": {
+          "$ref": "#/definitions/v1EscalationPolicy",
+          "description": "Escalation policy when all steps are exhausted."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this chain."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "DelegationChain defines a reusable sequence of approvers with escalation policy."
+    },
+    "v1DelegationStep": {
+      "type": "object",
+      "properties": {
+        "actorId": {
+          "type": "string",
+          "description": "Actor ID for this delegation step."
+        },
+        "config": {
+          "type": "object",
+          "description": "Maximum time allowed for this step before moving to the next."
+        }
+      },
+      "description": "DelegationStep represents a single step in a delegation chain."
+    },
+    "v1EscalationPolicy": {
+      "type": "object",
+      "properties": {
+        "escalateTo": {
+          "type": "string",
+          "description": "Actor ID to receive the final escalation."
+        },
+        "notifyVia": {
+          "type": "string",
+          "description": "Notification channel (e.g., \"mattermost\", \"email\")."
+        }
+      },
+      "description": "EscalationPolicy defines what happens when all delegation steps are exhausted."
+    },
+    "v1GetApprovalResponse": {
+      "type": "object",
+      "properties": {
+        "approval": {
+          "$ref": "#/definitions/v1ApprovalRequest"
+        }
+      },
+      "description": "GetApprovalResponse is the response containing a single approval request."
+    },
+    "v1GetDelegationChainResponse": {
+      "type": "object",
+      "properties": {
+        "chain": {
+          "$ref": "#/definitions/v1DelegationChain"
+        }
+      },
+      "description": "GetDelegationChainResponse is the response containing a single delegation chain."
+    },
+    "v1ListApprovalsResponse": {
+      "type": "object",
+      "properties": {
+        "approvals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ApprovalRequest"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListApprovalsResponse is the response for listing approval requests."
+    },
+    "v1ListDelegationChainsResponse": {
+      "type": "object",
+      "properties": {
+        "chains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DelegationChain"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListDelegationChainsResponse is the response for listing delegation chains."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1RejectRequestResponse": {
+      "type": "object",
+      "properties": {
+        "approval": {
+          "$ref": "#/definitions/v1ApprovalRequest"
+        }
+      },
+      "description": "RejectRequestResponse is the response after denying an approval."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    }
+  }
+}

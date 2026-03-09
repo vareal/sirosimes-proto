@@ -1,0 +1,240 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/hataori/v1/trigger.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "TriggerService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateTriggerResponse": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "$ref": "#/definitions/v1Trigger"
+        }
+      },
+      "description": "CreateTriggerResponse is the response after creating a trigger."
+    },
+    "v1DeleteTriggerResponse": {
+      "type": "object",
+      "description": "DeleteTriggerResponse is the response after deleting a trigger."
+    },
+    "v1GetTriggerResponse": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "$ref": "#/definitions/v1Trigger"
+        }
+      },
+      "description": "GetTriggerResponse is the response containing a single trigger."
+    },
+    "v1HandleWebhookResponse": {
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "type": "string",
+          "description": "Execution started by the webhook (if any)."
+        },
+        "accepted": {
+          "type": "boolean",
+          "description": "Whether the webhook was accepted and processed."
+        }
+      },
+      "description": "HandleWebhookResponse is the response after processing a webhook."
+    },
+    "v1ListTriggersResponse": {
+      "type": "object",
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Trigger"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListTriggersResponse is the response for listing triggers."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1Trigger": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "workflowId": {
+          "type": "string",
+          "description": "Workflow to execute when this trigger fires."
+        },
+        "type": {
+          "$ref": "#/definitions/v1TriggerType",
+          "description": "Classification of the trigger source."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable trigger name."
+        },
+        "config": {
+          "type": "object",
+          "description": "Type-specific configuration (e.g., cron expression, webhook path, filter rules)."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether this trigger is currently active."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Trigger defines a condition that automatically starts a workflow."
+    },
+    "v1TriggerType": {
+      "type": "string",
+      "enum": [
+        "TRIGGER_TYPE_UNSPECIFIED",
+        "TRIGGER_TYPE_WEBHOOK",
+        "TRIGGER_TYPE_CRON",
+        "TRIGGER_TYPE_DB_CHANGE",
+        "TRIGGER_TYPE_MATTERMOST",
+        "TRIGGER_TYPE_MANUAL",
+        "TRIGGER_TYPE_FILE_CHANGE",
+        "TRIGGER_TYPE_MAIL",
+        "TRIGGER_TYPE_PUBSUB",
+        "TRIGGER_TYPE_WEBRTC",
+        "TRIGGER_TYPE_TSUKASA_EVENT",
+        "TRIGGER_TYPE_CONTAINER",
+        "TRIGGER_TYPE_PROCESS",
+        "TRIGGER_TYPE_VM_EVENT"
+      ],
+      "default": "TRIGGER_TYPE_UNSPECIFIED",
+      "description": "TriggerType classifies the event source that initiates a workflow.\n\n - TRIGGER_TYPE_WEBHOOK: HTTP webhook callback.\n - TRIGGER_TYPE_CRON: Cron-based scheduled execution.\n - TRIGGER_TYPE_DB_CHANGE: Database change event (CDC).\n - TRIGGER_TYPE_MATTERMOST: Mattermost message or event.\n - TRIGGER_TYPE_MANUAL: Manual user-initiated trigger.\n - TRIGGER_TYPE_FILE_CHANGE: File system change event.\n - TRIGGER_TYPE_MAIL: Incoming email event.\n - TRIGGER_TYPE_PUBSUB: Pub/Sub message event.\n - TRIGGER_TYPE_WEBRTC: WebRTC signaling event.\n - TRIGGER_TYPE_TSUKASA_EVENT: Tsukasa platform event (employee, task, wiki changes).\n - TRIGGER_TYPE_CONTAINER: Container lifecycle event (start, stop, crash).\n - TRIGGER_TYPE_PROCESS: OS process event (start, exit, signal).\n - TRIGGER_TYPE_VM_EVENT: Virtual machine lifecycle event."
+    },
+    "v1UpdateTriggerResponse": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "$ref": "#/definitions/v1Trigger"
+        }
+      },
+      "description": "UpdateTriggerResponse is the response after updating a trigger."
+    }
+  }
+}
