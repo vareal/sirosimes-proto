@@ -13,9 +13,12 @@ lint:
     - COMMENT_ONEOF
     - COMMENT_RPC
     - COMMENT_SERVICE
+  ignore_only:
     # External gateway services intentionally re-use Internal message types.
-    # This is by design: security boundary (separate service) not type boundary.
-    - RPC_REQUEST_RESPONSE_UNIQUE
+    # Scoped to external/ only — internal protos retain full RPC uniqueness check.
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - proto/sirosimes/mizugaki/external
+      - proto/sirosimes/mizugaki/v1
 breaking:
   use:
     - FILE

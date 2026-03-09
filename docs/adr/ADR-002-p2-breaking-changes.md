@@ -110,3 +110,21 @@ For Phase 2 implementation of the opaque token architecture:
 - All product teams must allocate client migration effort during 2b.
 - After Phase 2c, all entities have a uniform metadata access pattern.
 - SecurityLevel on all entities enables field-level access control in Phase 3.
+
+## Appendix: Field Naming Exception
+
+### Project.resource_metadata
+
+`Project` uses `resource_metadata` (field 19) instead of the standard `metadata` name
+because `Project` already has a `map<string, string> metadata` field (field 16) for
+arbitrary key-value project metadata.
+
+Protobuf does not allow two fields with the same name in one message, so the
+ResourceMetadata field is named `resource_metadata` for this entity only.
+
+All other entities use `metadata` as the field name.
+
+This naming divergence is documented here to prevent developer confusion.
+In Phase 2c (old field deprecation), the `map<string, string> metadata` field will
+be renamed to `labels` (aligning with ResourceMetadata.labels), and
+`resource_metadata` will be renamed back to `metadata` for full consistency.
