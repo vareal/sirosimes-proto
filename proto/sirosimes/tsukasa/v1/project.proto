@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sirosimes.tsukasa.v1;
 
+import "sirosimes/common/v1/metadata.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
@@ -60,6 +61,8 @@ message Project {
   map<string, string> metadata = 16;
   google.protobuf.Timestamp created_at = 17;
   google.protobuf.Timestamp updated_at = 18;
+  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  sirosimes.common.v1.ResourceMetadata resource_metadata = 19;
 }
 
 // ProjectDetail bundles a project with resolved actor references.

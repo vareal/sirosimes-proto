@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sirosimes.hataori.v1;
 
+import "sirosimes/common/v1/metadata.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -34,6 +35,8 @@ message Workflow {
   string created_by = 7;
   google.protobuf.Timestamp created_at = 8;
   google.protobuf.Timestamp updated_at = 9;
+  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  sirosimes.common.v1.ResourceMetadata metadata = 10;
 }
 
 // WorkflowVersion represents an immutable snapshot of a workflow definition.

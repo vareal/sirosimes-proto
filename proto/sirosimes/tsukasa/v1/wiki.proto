@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sirosimes.tsukasa.v1;
 
+import "sirosimes/common/v1/metadata.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
@@ -63,6 +64,8 @@ message WikiDocument {
   int32 sort_order = 9;
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
+  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  sirosimes.common.v1.ResourceMetadata metadata = 12;
 }
 
 // WikiDocumentDetail bundles a document with resolved actor references.

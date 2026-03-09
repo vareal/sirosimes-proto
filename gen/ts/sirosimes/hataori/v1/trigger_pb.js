@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
+import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
@@ -65,6 +66,7 @@ export const Trigger = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "webhook_config", kind: "message", T: WebhookConfig },
     { no: 7, name: "created_at", kind: "message", T: Timestamp },
     { no: 8, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 10, name: "metadata", kind: "message", T: ResourceMetadata },
   ],
 );
 

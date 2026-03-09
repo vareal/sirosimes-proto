@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sirosimes.hataori.v1;
 
+import "sirosimes/common/v1/metadata.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/pagination.proto";
@@ -47,6 +48,8 @@ message Execution {
   google.protobuf.Timestamp started_at = 9;
   google.protobuf.Timestamp finished_at = 10;
   google.protobuf.Timestamp created_at = 11;
+  // [Phase 2a] Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O).
+  sirosimes.common.v1.ResourceMetadata metadata = 12;
 }
 
 // ExecutionStep represents a single step within a workflow execution.

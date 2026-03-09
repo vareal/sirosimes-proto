@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { ActorRef } from "../../common/v1/actor_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
@@ -137,6 +138,13 @@ export declare class DailyReport extends Message<DailyReport> {
    * @generated from field: google.protobuf.Timestamp updated_at = 15;
    */
   updatedAt?: Timestamp;
+
+  /**
+   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   *
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 16;
+   */
+  metadata?: ResourceMetadata;
 
   constructor(data?: PartialMessage<DailyReport>);
 

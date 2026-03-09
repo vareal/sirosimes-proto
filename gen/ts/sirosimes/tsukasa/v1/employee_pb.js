@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3, Timestamp } from "@bufbuild/protobuf";
+import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { ActorRef } from "../../common/v1/actor_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
@@ -60,6 +61,7 @@ export const Employee = /*@__PURE__*/ proto3.makeMessageType(
     { no: 15, name: "last_heartbeat_at", kind: "message", T: Timestamp },
     { no: 16, name: "created_at", kind: "message", T: Timestamp },
     { no: 17, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 18, name: "metadata", kind: "message", T: ResourceMetadata },
   ],
 );
 

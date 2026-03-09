@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { PageToken, PageTokenResponse } from "../../common/v1/pagination_pb.js";
 
 /**
@@ -151,6 +152,13 @@ export declare class Execution extends Message<Execution> {
    * @generated from field: google.protobuf.Timestamp created_at = 11;
    */
   createdAt?: Timestamp;
+
+  /**
+   * [Phase 2a] Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O).
+   *
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 12;
+   */
+  metadata?: ResourceMetadata;
 
   constructor(data?: PartialMessage<Execution>);
 

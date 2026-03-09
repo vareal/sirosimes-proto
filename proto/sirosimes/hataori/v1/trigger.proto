@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sirosimes.hataori.v1;
 
+import "sirosimes/common/v1/metadata.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/pagination.proto";
@@ -62,6 +63,8 @@ message Trigger {
   WebhookConfig webhook_config = 9;
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
+  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  sirosimes.common.v1.ResourceMetadata metadata = 10;
 }
 
 // CreateTriggerRequest is the request for creating a new trigger.

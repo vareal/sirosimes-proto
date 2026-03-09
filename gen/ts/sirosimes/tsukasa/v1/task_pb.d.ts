@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { ActorRef } from "../../common/v1/actor_pb.js";
 import type { PageToken, PageTokenResponse } from "../../common/v1/pagination_pb.js";
 
@@ -111,6 +112,8 @@ export declare enum ApprovalAction {
  */
 export declare class Task extends Message<Task> {
   /**
+   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -200,6 +203,13 @@ export declare class Task extends Message<Task> {
    */
   updatedAt?: Timestamp;
 
+  /**
+   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   *
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 19;
+   */
+  metadata?: ResourceMetadata;
+
   constructor(data?: PartialMessage<Task>);
 
   static readonly runtime: typeof proto3;
@@ -258,6 +268,8 @@ export declare class TaskDetail extends Message<TaskDetail> {
  */
 export declare class TaskComment extends Message<TaskComment> {
   /**
+   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -340,6 +352,8 @@ export declare class TaskCommentDetail extends Message<TaskCommentDetail> {
  */
 export declare class TaskApproval extends Message<TaskApproval> {
   /**
+   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -581,6 +595,8 @@ export declare class ListTasksResponse extends Message<ListTasksResponse> {
  */
 export declare class GetTaskRequest extends Message<GetTaskRequest> {
   /**
+   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -638,6 +654,8 @@ export declare class GetTaskResponse extends Message<GetTaskResponse> {
  */
 export declare class UpdateTaskRequest extends Message<UpdateTaskRequest> {
   /**
+   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   *
    * @generated from field: string id = 1;
    */
   id: string;

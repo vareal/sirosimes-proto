@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { FieldMask, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
+import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
@@ -39,6 +40,7 @@ export const Workflow = /*@__PURE__*/ proto3.makeMessageType(
     { no: 7, name: "created_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "created_at", kind: "message", T: Timestamp },
     { no: 9, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 10, name: "metadata", kind: "message", T: ResourceMetadata },
   ],
 );
 

@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
+import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { PageToken, PageTokenResponse } from "../../common/v1/pagination_pb.js";
 
 /**
@@ -61,6 +62,7 @@ export const Execution = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "started_at", kind: "message", T: Timestamp },
     { no: 10, name: "finished_at", kind: "message", T: Timestamp },
     { no: 11, name: "created_at", kind: "message", T: Timestamp },
+    { no: 12, name: "metadata", kind: "message", T: ResourceMetadata },
   ],
 );
 

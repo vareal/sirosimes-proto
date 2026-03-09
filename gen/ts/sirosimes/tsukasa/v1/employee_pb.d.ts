@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { ActorRef } from "../../common/v1/actor_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
@@ -69,6 +70,9 @@ export declare enum EmployeeStatus {
  */
 export declare class Employee extends Message<Employee> {
   /**
+   * [Phase 2a dual-write] Individual id — will be deprecated in Phase 2c.
+   * Prefer metadata.id for new code.
+   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -94,6 +98,8 @@ export declare class Employee extends Message<Employee> {
   status: EmployeeStatus;
 
   /**
+   * SecurityLevel: CONFIDENTIAL — PII.
+   *
    * @generated from field: string email = 6;
    */
   email: string;
@@ -134,6 +140,9 @@ export declare class Employee extends Message<Employee> {
   lastHeartbeatAt?: Timestamp;
 
   /**
+   * [Phase 2a dual-write] Individual timestamps — will be deprecated in Phase 2c.
+   * Prefer metadata.created_at / metadata.updated_at for new code.
+   *
    * @generated from field: google.protobuf.Timestamp created_at = 16;
    */
   createdAt?: Timestamp;
@@ -142,6 +151,14 @@ export declare class Employee extends Message<Employee> {
    * @generated from field: google.protobuf.Timestamp updated_at = 17;
    */
   updatedAt?: Timestamp;
+
+  /**
+   * [Phase 2a] Standard resource metadata (id, timestamps, version, security_level).
+   * Default security_level: CONFIDENTIAL (contains PII: email, position).
+   *
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 18;
+   */
+  metadata?: ResourceMetadata;
 
   constructor(data?: PartialMessage<Employee>);
 
@@ -167,29 +184,21 @@ export declare class Employee extends Message<Employee> {
  */
 export declare class EmployeeInfraConfig extends Message<EmployeeInfraConfig> {
   /**
-   * Container host where the AI employee runs.
-   *
    * @generated from field: string container_host = 1;
    */
   containerHost: string;
 
   /**
-   * Container name.
-   *
    * @generated from field: string container_name = 2;
    */
   containerName: string;
 
   /**
-   * Gateway port.
-   *
    * @generated from field: int32 gateway_port = 3;
    */
   gatewayPort: number;
 
   /**
-   * Last known container status.
-   *
    * @generated from field: string container_status = 4;
    */
   containerStatus: string;
@@ -477,8 +486,6 @@ export declare class GetEmployeeResponse extends Message<GetEmployeeResponse> {
   departments: Department[];
 
   /**
-   * Infrastructure configuration (only populated for administrators).
-   *
    * @generated from field: sirosimes.tsukasa.v1.EmployeeInfraConfig infra_config = 3;
    */
   infraConfig?: EmployeeInfraConfig;

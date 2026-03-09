@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
+import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { ActorRef } from "../../common/v1/actor_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 import { TaskDetail } from "./task_pb.js";
@@ -83,6 +84,7 @@ export const Project = /*@__PURE__*/ proto3.makeMessageType(
     { no: 16, name: "metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 17, name: "created_at", kind: "message", T: Timestamp },
     { no: 18, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 19, name: "resource_metadata", kind: "message", T: ResourceMetadata },
   ],
 );
 

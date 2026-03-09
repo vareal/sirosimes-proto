@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sirosimes.tsukasa.v1;
 
+import "sirosimes/common/v1/metadata.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
 import "sirosimes/common/v1/pagination.proto";
@@ -49,6 +50,8 @@ message DailyReport {
   repeated string emotion_tags = 19;
   google.protobuf.Timestamp created_at = 14;
   google.protobuf.Timestamp updated_at = 15;
+  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  sirosimes.common.v1.ResourceMetadata metadata = 16;
 }
 
 // DailyReportDetail bundles a report with resolved actor references.

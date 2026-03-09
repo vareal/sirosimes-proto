@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
+import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { ActorRef } from "../../common/v1/actor_pb.js";
 import { PageToken, PageTokenResponse, PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
@@ -82,6 +83,7 @@ export const WikiDocument = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "sort_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 10, name: "created_at", kind: "message", T: Timestamp },
     { no: 11, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 12, name: "metadata", kind: "message", T: ResourceMetadata },
   ],
 );
 

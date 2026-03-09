@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
@@ -197,6 +198,13 @@ export declare class Trigger extends Message<Trigger> {
    * @generated from field: google.protobuf.Timestamp updated_at = 8;
    */
   updatedAt?: Timestamp;
+
+  /**
+   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   *
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 10;
+   */
+  metadata?: ResourceMetadata;
 
   constructor(data?: PartialMessage<Trigger>);
 
