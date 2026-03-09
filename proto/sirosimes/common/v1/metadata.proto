@@ -1,0 +1,23 @@
+syntax = "proto3";
+package sirosimes.common.v1;
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/common/v1;commonv1";
+
+import "sirosimes/common/v1/types.proto";
+
+message RequestMetadata {
+  string trace_id = 1;
+  string actor_id = 2;
+  string actor_type = 3;
+  string tenant_id = 4;
+  Timestamp request_time = 5;
+}
+
+message AuditEntry {
+  string actor_id = 1;
+  string actor_type = 2;
+  string action = 3;
+  string resource_type = 4;
+  string resource_id = 5;
+  Timestamp timestamp = 6;
+  map<string, string> changes = 7;
+}
