@@ -1,0 +1,205 @@
+syntax = "proto3";
+
+package sirosimes.mitama.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// guardrail.proto — Safety rules and quality gates for AI agent behavior.
+
+// GuardrailCategory classifies the type of guardrail rule.
+enum GuardrailCategory {
+  GUARDRAIL_CATEGORY_UNSPECIFIED = 0;
+  GUARDRAIL_CATEGORY_SECURITY = 1;
+  GUARDRAIL_CATEGORY_COMPLIANCE = 2;
+  GUARDRAIL_CATEGORY_QUALITY = 3;
+  GUARDRAIL_CATEGORY_PERFORMANCE = 4;
+}
+
+// GuardrailSeverity indicates the impact level.
+enum GuardrailSeverity {
+  GUARDRAIL_SEVERITY_UNSPECIFIED = 0;
+  GUARDRAIL_SEVERITY_CRITICAL = 1;
+  GUARDRAIL_SEVERITY_HIGH = 2;
+  GUARDRAIL_SEVERITY_MEDIUM = 3;
+  GUARDRAIL_SEVERITY_LOW = 4;
+}
+
+// GuardrailAction defines what happens when a rule triggers.
+enum GuardrailAction {
+  GUARDRAIL_ACTION_UNSPECIFIED = 0;
+  GUARDRAIL_ACTION_BLOCK = 1;
+  GUARDRAIL_ACTION_BLOCK_AND_MASK = 2;
+  GUARDRAIL_ACTION_WARN = 3;
+  GUARDRAIL_ACTION_LOG = 4;
+}
+
+// GuardrailStatus indicates the operational state of a rule.
+enum GuardrailStatus {
+  GUARDRAIL_STATUS_UNSPECIFIED = 0;
+  GUARDRAIL_STATUS_ENABLED = 1;
+  GUARDRAIL_STATUS_TEST_MODE = 2;
+  GUARDRAIL_STATUS_DISABLED = 3;
+}
+
+// DetectionType classifies the detection mechanism.
+enum DetectionType {
+  DETECTION_TYPE_UNSPECIFIED = 0;
+  DETECTION_TYPE_REGEX = 1;
+  DETECTION_TYPE_SLM = 2;
+  DETECTION_TYPE_HYBRID = 3;
+  DETECTION_TYPE_KEYWORD = 4;
+}
+
+// Guardrail defines a safety or quality rule.
+message Guardrail {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  GuardrailCategory category = 4;
+  GuardrailSeverity severity = 5;
+  GuardrailStatus status = 6;
+  DetectionConfig detection = 7;
+  GuardrailAction action = 8;
+  repeated string notify_agent_ids = 9;
+  repeated string applicable_agent_ids = 10;
+  repeated string excluded_agent_ids = 11;
+  GuardrailStats stats = 12;
+}
+
+// DetectionConfig defines how the guardrail detects violations.
+message DetectionConfig {
+  DetectionType type = 1;
+  repeated string patterns = 2;
+  repeated string keywords = 3;
+  float slm_confidence_threshold = 4;
+  string masking_format = 5;
+}
+
+// GuardrailStats tracks trigger statistics.
+message GuardrailStats {
+  int64 total_triggers = 1;
+  int64 triggers_last_24h = 2;
+  float false_positive_rate = 3;
+  float detection_accuracy = 4;
+  google.protobuf.Timestamp last_triggered_at = 5;
+}
+
+// GuardrailTriggerEvent records a single trigger occurrence.
+message GuardrailTriggerEvent {
+  string id = 1;
+  string guardrail_id = 2;
+  string agent_id = 3;
+  GuardrailAction action_taken = 4;
+  string detected_content = 5;
+  string masked_content = 6;
+  float confidence = 7;
+  bool false_positive = 8;
+  google.protobuf.Timestamp triggered_at = 9;
+}
+
+// GuardrailService manages guardrail rules and trigger events.
+service GuardrailService {
+  rpc ListGuardrails(ListGuardrailsRequest) returns (ListGuardrailsResponse);
+  rpc GetGuardrail(GetGuardrailRequest) returns (GetGuardrailResponse);
+  rpc CreateGuardrail(CreateGuardrailRequest) returns (CreateGuardrailResponse);
+  rpc UpdateGuardrail(UpdateGuardrailRequest) returns (UpdateGuardrailResponse);
+  rpc DeleteGuardrail(DeleteGuardrailRequest) returns (DeleteGuardrailResponse);
+  rpc TestGuardrail(TestGuardrailRequest) returns (TestGuardrailResponse);
+  rpc ListTriggerEvents(ListTriggerEventsRequest) returns (ListTriggerEventsResponse);
+}
+
+// ListGuardrailsRequest filters and paginates guardrail rules.
+message ListGuardrailsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  GuardrailCategory category_filter = 2;
+  GuardrailStatus status_filter = 3;
+}
+
+// ListGuardrailsResponse contains paginated guardrail results.
+message ListGuardrailsResponse {
+  repeated Guardrail guardrails = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetGuardrailRequest identifies the guardrail to retrieve.
+message GetGuardrailRequest {
+  string id = 1;
+}
+
+// GetGuardrailResponse wraps the retrieved guardrail.
+message GetGuardrailResponse {
+  Guardrail guardrail = 1;
+}
+
+// CreateGuardrailRequest contains fields for a new guardrail rule.
+message CreateGuardrailRequest {
+  string name = 1;
+  string description = 2;
+  GuardrailCategory category = 3;
+  GuardrailSeverity severity = 4;
+  DetectionConfig detection = 5;
+  GuardrailAction action = 6;
+  repeated string notify_agent_ids = 7;
+  repeated string applicable_agent_ids = 8;
+}
+
+// CreateGuardrailResponse wraps the newly created guardrail.
+message CreateGuardrailResponse {
+  Guardrail guardrail = 1;
+}
+
+// UpdateGuardrailRequest contains fields to modify an existing guardrail.
+message UpdateGuardrailRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  GuardrailSeverity severity = 4;
+  GuardrailStatus status = 5;
+  DetectionConfig detection = 6;
+  GuardrailAction action = 7;
+  repeated string notify_agent_ids = 8;
+}
+
+// UpdateGuardrailResponse wraps the updated guardrail.
+message UpdateGuardrailResponse {
+  Guardrail guardrail = 1;
+}
+
+// DeleteGuardrailRequest identifies the guardrail to delete.
+message DeleteGuardrailRequest {
+  string id = 1;
+}
+
+// DeleteGuardrailResponse confirms deletion.
+message DeleteGuardrailResponse {}
+
+// TestGuardrailRequest tests a guardrail with sample input.
+message TestGuardrailRequest {
+  string id = 1;
+  string test_input = 2;
+}
+
+// TestGuardrailResponse returns the test detection result.
+message TestGuardrailResponse {
+  bool triggered = 1;
+  string detected_content = 2;
+  string masked_output = 3;
+  float confidence = 4;
+}
+
+// ListTriggerEventsRequest filters trigger event history.
+message ListTriggerEventsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string guardrail_id = 2;
+  string agent_id = 3;
+  google.protobuf.Timestamp from = 4;
+  google.protobuf.Timestamp to = 5;
+}
+
+// ListTriggerEventsResponse contains paginated trigger events.
+message ListTriggerEventsResponse {
+  repeated GuardrailTriggerEvent events = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}

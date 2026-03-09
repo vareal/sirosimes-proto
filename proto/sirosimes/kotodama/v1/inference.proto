@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+// inference.proto — Language model inference API (OpenAI-compatible).
+
+// Role in a chat message.
+enum MessageRole {
+  MESSAGE_ROLE_UNSPECIFIED = 0;
+  MESSAGE_ROLE_SYSTEM = 1;
+  MESSAGE_ROLE_USER = 2;
+  MESSAGE_ROLE_ASSISTANT = 3;
+  MESSAGE_ROLE_TOOL = 4;
+}
+
+// FinishReason indicates why the model stopped generating.
+enum FinishReason {
+  FINISH_REASON_UNSPECIFIED = 0;
+  FINISH_REASON_STOP = 1;
+  FINISH_REASON_LENGTH = 2;
+  FINISH_REASON_TOOL_CALLS = 3;
+  FINISH_REASON_CONTENT_FILTER = 4;
+}
+
+// ChatMessage represents a single message in a conversation.
+message ChatMessage {
+  MessageRole role = 1;
+  string content = 2;
+  repeated ContentPart content_parts = 3;
+  string name = 4;
+}
+
+// ContentPart supports multi-modal input (text + images).
+message ContentPart {
+  oneof part {
+    string text = 1;
+    ImageUrl image_url = 2;
+  }
+}
+
+// ImageUrl references an image for vision requests.
+message ImageUrl {
+  string url = 1;
+  string detail = 2;
+}
+
+// InferenceMetadata provides Sirosimes-specific context for routing/tracing.
+message InferenceMetadata {
+  string agent_id = 1;
+  string task_id = 2;
+  string priority = 3;
+  string route_type = 4;
+  float kokoro_confidence = 5;
+}
+
+// Usage tracks token consumption.
+message Usage {
+  int32 prompt_tokens = 1;
+  int32 completion_tokens = 2;
+  int32 total_tokens = 3;
+}
+
+// ChatChoice represents one completion candidate.
+message ChatChoice {
+  int32 index = 1;
+  ChatMessage message = 2;
+  FinishReason finish_reason = 3;
+}
+
+// ChatChoiceDelta represents a streaming delta.
+message ChatChoiceDelta {
+  int32 index = 1;
+  ChatMessageDelta delta = 2;
+  FinishReason finish_reason = 3;
+}
+
+// ChatMessageDelta is a partial message in streaming.
+message ChatMessageDelta {
+  MessageRole role = 1;
+  string content = 2;
+}
+
+// RouteInfo provides Michishirube routing details.
+message RouteInfo {
+  string provider = 1;
+  float route_latency_ms = 2;
+  float estimated_cost_jpy = 3;
+  bool fallback_used = 4;
+}
+
+// InferenceService provides chat completions (unary and streaming).
+service InferenceService {
+  rpc ChatCompletion(ChatCompletionRequest) returns (ChatCompletionResponse);
+  rpc ChatCompletionStream(ChatCompletionStreamRequest) returns (stream ChatCompletionStreamResponse);
+}
+
+// ChatCompletionRequest is the primary inference request.
+message ChatCompletionRequest {
+  string model = 1;
+  repeated ChatMessage messages = 2;
+  float temperature = 3;
+  int32 max_tokens = 4;
+  float top_p = 5;
+  float frequency_penalty = 6;
+  float presence_penalty = 7;
+  repeated string stop = 8;
+  int32 n = 9;
+  InferenceMetadata metadata = 10;
+}
+
+// ChatCompletionResponse returns generated text.
+message ChatCompletionResponse {
+  string id = 1;
+  string object = 2;
+  int64 created = 3;
+  string model = 4;
+  repeated ChatChoice choices = 5;
+  Usage usage = 6;
+  string system_fingerprint = 7;
+  RouteInfo route_info = 8;
+}
+
+// ChatCompletionStreamRequest configures streaming inference.
+message ChatCompletionStreamRequest {
+  string model = 1;
+  repeated ChatMessage messages = 2;
+  float temperature = 3;
+  int32 max_tokens = 4;
+  float top_p = 5;
+  float frequency_penalty = 6;
+  float presence_penalty = 7;
+  repeated string stop = 8;
+  InferenceMetadata metadata = 9;
+}
+
+// ChatCompletionStreamResponse wraps a single streaming chunk.
+message ChatCompletionStreamResponse {
+  string id = 1;
+  string object = 2;
+  int64 created = 3;
+  string model = 4;
+  repeated ChatChoiceDelta choices = 5;
+}

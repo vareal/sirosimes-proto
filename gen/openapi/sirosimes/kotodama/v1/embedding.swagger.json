@@ -1,0 +1,105 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kotodama/v1/embedding.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EmbeddingService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateEmbeddingResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmbeddingData"
+          }
+        },
+        "model": {
+          "type": "string"
+        },
+        "usage": {
+          "$ref": "#/definitions/v1EmbeddingUsage"
+        }
+      },
+      "description": "CreateEmbeddingResponse contains the generated embeddings."
+    },
+    "v1EmbeddingData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "embedding": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "description": "EmbeddingData contains a single embedding vector."
+    },
+    "v1EmbeddingUsage": {
+      "type": "object",
+      "properties": {
+        "promptTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalTokens": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "description": "EmbeddingUsage tracks token consumption for embedding requests."
+    }
+  }
+}

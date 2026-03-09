@@ -1,0 +1,284 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kotodama/v1/inference.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "InferenceService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ChatChoice": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "$ref": "#/definitions/v1ChatMessage"
+        },
+        "finishReason": {
+          "$ref": "#/definitions/v1FinishReason"
+        }
+      },
+      "description": "ChatChoice represents one completion candidate."
+    },
+    "v1ChatChoiceDelta": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "delta": {
+          "$ref": "#/definitions/v1ChatMessageDelta"
+        },
+        "finishReason": {
+          "$ref": "#/definitions/v1FinishReason"
+        }
+      },
+      "description": "ChatChoiceDelta represents a streaming delta."
+    },
+    "v1ChatCompletionResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "int64"
+        },
+        "model": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChatChoice"
+          }
+        },
+        "usage": {
+          "$ref": "#/definitions/v1Usage"
+        },
+        "systemFingerprint": {
+          "type": "string"
+        },
+        "routeInfo": {
+          "$ref": "#/definitions/v1RouteInfo"
+        }
+      },
+      "description": "ChatCompletionResponse returns generated text."
+    },
+    "v1ChatCompletionStreamResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "int64"
+        },
+        "model": {
+          "type": "string"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChatChoiceDelta"
+          }
+        }
+      },
+      "description": "ChatCompletionStreamResponse wraps a single streaming chunk."
+    },
+    "v1ChatMessage": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v1MessageRole"
+        },
+        "content": {
+          "type": "string"
+        },
+        "contentParts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ContentPart"
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "description": "ChatMessage represents a single message in a conversation."
+    },
+    "v1ChatMessageDelta": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v1MessageRole"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "description": "ChatMessageDelta is a partial message in streaming."
+    },
+    "v1ContentPart": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "$ref": "#/definitions/v1ImageUrl"
+        }
+      },
+      "description": "ContentPart supports multi-modal input (text + images)."
+    },
+    "v1FinishReason": {
+      "type": "string",
+      "enum": [
+        "FINISH_REASON_UNSPECIFIED",
+        "FINISH_REASON_STOP",
+        "FINISH_REASON_LENGTH",
+        "FINISH_REASON_TOOL_CALLS",
+        "FINISH_REASON_CONTENT_FILTER"
+      ],
+      "default": "FINISH_REASON_UNSPECIFIED",
+      "description": "FinishReason indicates why the model stopped generating."
+    },
+    "v1ImageUrl": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        }
+      },
+      "description": "ImageUrl references an image for vision requests."
+    },
+    "v1InferenceMetadata": {
+      "type": "object",
+      "properties": {
+        "agentId": {
+          "type": "string"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "routeType": {
+          "type": "string"
+        },
+        "kokoroConfidence": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "description": "InferenceMetadata provides Sirosimes-specific context for routing/tracing."
+    },
+    "v1MessageRole": {
+      "type": "string",
+      "enum": [
+        "MESSAGE_ROLE_UNSPECIFIED",
+        "MESSAGE_ROLE_SYSTEM",
+        "MESSAGE_ROLE_USER",
+        "MESSAGE_ROLE_ASSISTANT",
+        "MESSAGE_ROLE_TOOL"
+      ],
+      "default": "MESSAGE_ROLE_UNSPECIFIED",
+      "description": "Role in a chat message."
+    },
+    "v1RouteInfo": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "routeLatencyMs": {
+          "type": "number",
+          "format": "float"
+        },
+        "estimatedCostJpy": {
+          "type": "number",
+          "format": "float"
+        },
+        "fallbackUsed": {
+          "type": "boolean"
+        }
+      },
+      "description": "RouteInfo provides Michishirube routing details."
+    },
+    "v1Usage": {
+      "type": "object",
+      "properties": {
+        "promptTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "completionTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalTokens": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "description": "Usage tracks token consumption."
+    }
+  }
+}

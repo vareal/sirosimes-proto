@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package sirosimes.mitama.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// event.proto — Agent activity events, system health, and metrics.
+
+// EventType classifies the kind of event.
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_INFERENCE = 1;
+  EVENT_TYPE_TOOL_EXECUTE = 2;
+  EVENT_TYPE_GUARDRAIL_TRIGGER = 3;
+  EVENT_TYPE_ERROR = 4;
+  EVENT_TYPE_TASK_COMPLETE = 5;
+  EVENT_TYPE_SYSTEM = 6;
+  EVENT_TYPE_SESSION = 7;
+}
+
+// EventSeverity indicates the importance of an event.
+enum EventSeverity {
+  EVENT_SEVERITY_UNSPECIFIED = 0;
+  EVENT_SEVERITY_DEBUG = 1;
+  EVENT_SEVERITY_INFO = 2;
+  EVENT_SEVERITY_WARN = 3;
+  EVENT_SEVERITY_ERROR = 4;
+  EVENT_SEVERITY_CRITICAL = 5;
+}
+
+// Event represents a single agent activity event.
+message Event {
+  string id = 1;
+  string agent_id = 2;
+  EventType type = 3;
+  EventSeverity severity = 4;
+  string message = 5;
+  string details_json = 6;
+  repeated string related_ids = 7;
+  google.protobuf.Timestamp timestamp = 8;
+}
+
+// SystemHealth represents the overall system status.
+message SystemHealth {
+  string status = 1;
+  repeated SubsystemHealth subsystems = 2;
+  int64 uptime_seconds = 3;
+  int32 active_agents = 4;
+  int32 total_agents = 5;
+  google.protobuf.Timestamp checked_at = 6;
+}
+
+// SubsystemHealth represents a single subsystem status.
+message SubsystemHealth {
+  string name = 1;
+  string status = 2;
+  float latency_ms = 3;
+  string message = 4;
+}
+
+// MetricsSummary provides dashboard-level metrics.
+message MetricsSummary {
+  int32 active_agents = 1;
+  int32 tasks_per_hour = 2;
+  float avg_response_ms = 3;
+  int32 guardrail_triggers = 4;
+  float active_agents_delta = 5;
+  float tasks_delta_percent = 6;
+  float response_delta_percent = 7;
+  int32 guardrail_triggers_delta = 8;
+  google.protobuf.Timestamp period_start = 9;
+  google.protobuf.Timestamp period_end = 10;
+}
+
+// EventService provides event queries, health checks, and streaming.
+service EventService {
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
+  rpc GetEvent(GetEventRequest) returns (GetEventResponse);
+  rpc GetSystemHealth(GetSystemHealthRequest) returns (GetSystemHealthResponse);
+  rpc GetMetricsSummary(GetMetricsSummaryRequest) returns (GetMetricsSummaryResponse);
+  rpc StreamEvents(StreamEventsRequest) returns (stream StreamEventsResponse);
+}
+
+// ListEventsRequest filters and paginates the event list.
+message ListEventsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string agent_id = 2;
+  repeated EventType type_filter = 3;
+  repeated EventSeverity severity_filter = 4;
+  google.protobuf.Timestamp from = 5;
+  google.protobuf.Timestamp to = 6;
+  string search = 7;
+}
+
+// ListEventsResponse contains paginated event results.
+message ListEventsResponse {
+  repeated Event events = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetEventRequest identifies the event to retrieve.
+message GetEventRequest {
+  string id = 1;
+}
+
+// GetEventResponse wraps the retrieved event.
+message GetEventResponse {
+  Event event = 1;
+}
+
+// GetSystemHealthRequest is empty; returns current system health.
+message GetSystemHealthRequest {}
+
+// GetSystemHealthResponse wraps the system health status.
+message GetSystemHealthResponse {
+  SystemHealth health = 1;
+}
+
+// GetMetricsSummaryRequest specifies the metrics period.
+message GetMetricsSummaryRequest {
+  int32 duration_hours = 1;
+}
+
+// GetMetricsSummaryResponse wraps the metrics summary.
+message GetMetricsSummaryResponse {
+  MetricsSummary summary = 1;
+}
+
+// StreamEventsRequest configures real-time event streaming filters.
+message StreamEventsRequest {
+  string agent_id = 1;
+  repeated EventType type_filter = 2;
+  EventSeverity min_severity = 3;
+}
+
+// StreamEventsResponse wraps a single streamed event.
+message StreamEventsResponse {
+  Event event = 1;
+}

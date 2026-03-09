@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+// embedding.proto — Text embedding API for RAG and semantic search.
+
+// EmbeddingData contains a single embedding vector.
+message EmbeddingData {
+  string object = 1;
+  int32 index = 2;
+  repeated float embedding = 3;
+}
+
+// EmbeddingUsage tracks token consumption for embedding requests.
+message EmbeddingUsage {
+  int32 prompt_tokens = 1;
+  int32 total_tokens = 2;
+}
+
+// EmbeddingService generates vector embeddings from text.
+service EmbeddingService {
+  rpc CreateEmbedding(CreateEmbeddingRequest) returns (CreateEmbeddingResponse);
+}
+
+// CreateEmbeddingRequest specifies the model and input text.
+message CreateEmbeddingRequest {
+  string model = 1;
+  repeated string input = 2;
+  string encoding_format = 3;
+}
+
+// CreateEmbeddingResponse contains the generated embeddings.
+message CreateEmbeddingResponse {
+  string object = 1;
+  repeated EmbeddingData data = 2;
+  string model = 3;
+  EmbeddingUsage usage = 4;
+}

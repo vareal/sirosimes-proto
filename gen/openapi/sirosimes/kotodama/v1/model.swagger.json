@@ -1,0 +1,196 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kotodama/v1/model.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ModelService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1GetHealthResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "modelsLoaded": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "uptimeSeconds": {
+          "type": "string",
+          "format": "int64"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NodeHealth"
+          }
+        },
+        "checkedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "GetHealthResponse wraps the health status."
+    },
+    "v1GetModelResponse": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "$ref": "#/definitions/v1Model"
+        }
+      },
+      "description": "GetModelResponse wraps the retrieved model."
+    },
+    "v1ListModelsResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Model"
+          }
+        }
+      },
+      "description": "ListModelsResponse contains the list of available models."
+    },
+    "v1Model": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "object": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "int64"
+        },
+        "ownedBy": {
+          "type": "string"
+        },
+        "capabilities": {
+          "$ref": "#/definitions/v1ModelCapabilities"
+        },
+        "contextLength": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "quantization": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "string"
+        },
+        "hardware": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ModelStatus"
+        }
+      },
+      "description": "Model represents a loaded or available language model."
+    },
+    "v1ModelCapabilities": {
+      "type": "object",
+      "properties": {
+        "chat": {
+          "type": "boolean"
+        },
+        "vision": {
+          "type": "boolean"
+        },
+        "embeddings": {
+          "type": "boolean"
+        },
+        "fineTuning": {
+          "type": "boolean"
+        }
+      },
+      "description": "ModelCapabilities defines what a model can do."
+    },
+    "v1ModelStatus": {
+      "type": "string",
+      "enum": [
+        "MODEL_STATUS_UNSPECIFIED",
+        "MODEL_STATUS_READY",
+        "MODEL_STATUS_LOADING",
+        "MODEL_STATUS_UNLOADED",
+        "MODEL_STATUS_ERROR"
+      ],
+      "default": "MODEL_STATUS_UNSPECIFIED",
+      "description": "ModelStatus indicates the runtime state of a model."
+    },
+    "v1NodeHealth": {
+      "type": "object",
+      "properties": {
+        "nodeId": {
+          "type": "string"
+        },
+        "memoryTotalGb": {
+          "type": "number",
+          "format": "float"
+        },
+        "memoryUsedGb": {
+          "type": "number",
+          "format": "float"
+        },
+        "loadedModels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "description": "NodeHealth represents a hardware node in the cluster."
+    }
+  }
+}

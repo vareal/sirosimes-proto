@@ -1,0 +1,323 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mitama/v1/event.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EventService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1EventType"
+        },
+        "severity": {
+          "$ref": "#/definitions/v1EventSeverity"
+        },
+        "message": {
+          "type": "string"
+        },
+        "detailsJson": {
+          "type": "string"
+        },
+        "relatedIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Event represents a single agent activity event."
+    },
+    "v1EventSeverity": {
+      "type": "string",
+      "enum": [
+        "EVENT_SEVERITY_UNSPECIFIED",
+        "EVENT_SEVERITY_DEBUG",
+        "EVENT_SEVERITY_INFO",
+        "EVENT_SEVERITY_WARN",
+        "EVENT_SEVERITY_ERROR",
+        "EVENT_SEVERITY_CRITICAL"
+      ],
+      "default": "EVENT_SEVERITY_UNSPECIFIED",
+      "description": "EventSeverity indicates the importance of an event."
+    },
+    "v1EventType": {
+      "type": "string",
+      "enum": [
+        "EVENT_TYPE_UNSPECIFIED",
+        "EVENT_TYPE_INFERENCE",
+        "EVENT_TYPE_TOOL_EXECUTE",
+        "EVENT_TYPE_GUARDRAIL_TRIGGER",
+        "EVENT_TYPE_ERROR",
+        "EVENT_TYPE_TASK_COMPLETE",
+        "EVENT_TYPE_SYSTEM",
+        "EVENT_TYPE_SESSION"
+      ],
+      "default": "EVENT_TYPE_UNSPECIFIED",
+      "description": "EventType classifies the kind of event."
+    },
+    "v1GetEventResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/definitions/v1Event"
+        }
+      },
+      "description": "GetEventResponse wraps the retrieved event."
+    },
+    "v1GetMetricsSummaryResponse": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "$ref": "#/definitions/v1MetricsSummary"
+        }
+      },
+      "description": "GetMetricsSummaryResponse wraps the metrics summary."
+    },
+    "v1GetSystemHealthResponse": {
+      "type": "object",
+      "properties": {
+        "health": {
+          "$ref": "#/definitions/v1SystemHealth"
+        }
+      },
+      "description": "GetSystemHealthResponse wraps the system health status."
+    },
+    "v1ListEventsResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Event"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListEventsResponse contains paginated event results."
+    },
+    "v1MetricsSummary": {
+      "type": "object",
+      "properties": {
+        "activeAgents": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tasksPerHour": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "avgResponseMs": {
+          "type": "number",
+          "format": "float"
+        },
+        "guardrailTriggers": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "activeAgentsDelta": {
+          "type": "number",
+          "format": "float"
+        },
+        "tasksDeltaPercent": {
+          "type": "number",
+          "format": "float"
+        },
+        "responseDeltaPercent": {
+          "type": "number",
+          "format": "float"
+        },
+        "guardrailTriggersDelta": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "periodStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "periodEnd": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "MetricsSummary provides dashboard-level metrics."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1StreamEventsResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/definitions/v1Event"
+        }
+      },
+      "description": "StreamEventsResponse wraps a single streamed event."
+    },
+    "v1SubsystemHealth": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "latencyMs": {
+          "type": "number",
+          "format": "float"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "description": "SubsystemHealth represents a single subsystem status."
+    },
+    "v1SystemHealth": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "subsystems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SubsystemHealth"
+          }
+        },
+        "uptimeSeconds": {
+          "type": "string",
+          "format": "int64"
+        },
+        "activeAgents": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalAgents": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "checkedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "SystemHealth represents the overall system status."
+    }
+  }
+}

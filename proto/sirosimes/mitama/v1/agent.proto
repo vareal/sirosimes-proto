@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package sirosimes.mitama.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// agent.proto — AI Agent lifecycle management.
+//
+// Defines the core Agent entity and service for managing AI employees
+// within the Mitama AI Agent Engine. Each agent has a personality (SOUL),
+// memory, tools, and a Kokoro router configuration.
+
+// AgentStatus represents the runtime state of an agent.
+enum AgentStatus {
+  AGENT_STATUS_UNSPECIFIED = 0;
+  AGENT_STATUS_ACTIVE = 1;
+  AGENT_STATUS_IDLE = 2;
+  AGENT_STATUS_STARTING = 3;
+  AGENT_STATUS_STOPPED = 4;
+  AGENT_STATUS_TERMINATED = 5;
+  AGENT_STATUS_ERROR = 6;
+}
+
+// KokoroMode configures the routing strategy for the Kokoro router.
+enum KokoroMode {
+  KOKORO_MODE_UNSPECIFIED = 0;
+  KOKORO_MODE_HYBRID = 1;
+  KOKORO_MODE_RULE_ONLY = 2;
+  KOKORO_MODE_SLM_ONLY = 3;
+}
+
+// Agent represents an AI employee managed by Mitama.
+message Agent {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string username = 2;
+  string display_name = 3;
+  string role = 4;
+  string team = 5;
+  AgentStatus status = 6;
+  KokoroConfig kokoro_config = 7;
+  ResourceLimits resource_limits = 8;
+  repeated string guardrail_preset_ids = 9;
+  repeated string authorized_tool_ids = 10;
+  google.protobuf.Timestamp last_activity_at = 11;
+  SessionInfo session = 12;
+}
+
+// KokoroConfig defines the Kokoro router settings for an agent.
+message KokoroConfig {
+  KokoroMode mode = 1;
+  string slm_model = 2;
+  int32 max_context_tokens = 3;
+  float temperature = 4;
+  float confidence_threshold = 5;
+}
+
+// ResourceLimits defines compute constraints for an agent instance.
+message ResourceLimits {
+  int32 memory_limit_gb = 1;
+  int32 cpu_limit_cores = 2;
+  int32 max_concurrent_tasks = 3;
+}
+
+// SessionInfo provides runtime session details.
+message SessionInfo {
+  string session_id = 1;
+  int64 token_usage = 2;
+  int64 token_limit = 3;
+  google.protobuf.Timestamp started_at = 4;
+}
+
+// AgentMetrics provides runtime performance metrics for an agent.
+message AgentMetrics {
+  string agent_id = 1;
+  float cpu_usage_percent = 2;
+  float memory_usage_gb = 3;
+  int64 tokens_today = 4;
+  int32 tasks_completed_today = 5;
+  float avg_latency_ms = 6;
+  int32 error_count_today = 7;
+  google.protobuf.Timestamp collected_at = 8;
+}
+
+// AgentService manages AI agent lifecycle.
+service AgentService {
+  rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse);
+  rpc GetAgent(GetAgentRequest) returns (GetAgentResponse);
+  rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse);
+  rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse);
+  rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse);
+  rpc RestartAgent(RestartAgentRequest) returns (RestartAgentResponse);
+  rpc StopAgent(StopAgentRequest) returns (StopAgentResponse);
+  rpc ClearSession(ClearSessionRequest) returns (ClearSessionResponse);
+  rpc GetAgentMetrics(GetAgentMetricsRequest) returns (GetAgentMetricsResponse);
+}
+
+// ListAgentsRequest filters and paginates the agent list.
+message ListAgentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  repeated AgentStatus status_filter = 2;
+  string team_filter = 3;
+  string role_filter = 4;
+  string search = 5;
+}
+
+// ListAgentsResponse contains paginated agent results.
+message ListAgentsResponse {
+  repeated Agent agents = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetAgentRequest identifies the agent to retrieve.
+message GetAgentRequest {
+  string id = 1;
+}
+
+// GetAgentResponse wraps the retrieved agent.
+message GetAgentResponse {
+  Agent agent = 1;
+}
+
+// CreateAgentRequest contains fields for a new agent.
+message CreateAgentRequest {
+  string username = 1;
+  string display_name = 2;
+  string role = 3;
+  string team = 4;
+  KokoroConfig kokoro_config = 5;
+  ResourceLimits resource_limits = 6;
+  repeated string guardrail_preset_ids = 7;
+  repeated string authorized_tool_ids = 8;
+}
+
+// CreateAgentResponse wraps the newly created agent.
+message CreateAgentResponse {
+  Agent agent = 1;
+}
+
+// UpdateAgentRequest contains fields to modify an existing agent.
+message UpdateAgentRequest {
+  string id = 1;
+  string display_name = 2;
+  string role = 3;
+  string team = 4;
+  KokoroConfig kokoro_config = 5;
+  ResourceLimits resource_limits = 6;
+  repeated string guardrail_preset_ids = 7;
+  repeated string authorized_tool_ids = 8;
+}
+
+// UpdateAgentResponse wraps the updated agent.
+message UpdateAgentResponse {
+  Agent agent = 1;
+}
+
+// DeleteAgentRequest identifies the agent to delete.
+message DeleteAgentRequest {
+  string id = 1;
+}
+
+// DeleteAgentResponse confirms deletion.
+message DeleteAgentResponse {}
+
+// RestartAgentRequest identifies the agent to restart.
+message RestartAgentRequest {
+  string id = 1;
+}
+
+// RestartAgentResponse returns the new status after restart.
+message RestartAgentResponse {
+  AgentStatus new_status = 1;
+}
+
+// StopAgentRequest identifies the agent to stop.
+message StopAgentRequest {
+  string id = 1;
+}
+
+// StopAgentResponse returns the new status after stop.
+message StopAgentResponse {
+  AgentStatus new_status = 1;
+}
+
+// ClearSessionRequest identifies the agent whose session to clear.
+message ClearSessionRequest {
+  string id = 1;
+}
+
+// ClearSessionResponse returns the new session ID.
+message ClearSessionResponse {
+  string new_session_id = 1;
+}
+
+// GetAgentMetricsRequest identifies the agent to get metrics for.
+message GetAgentMetricsRequest {
+  string id = 1;
+}
+
+// GetAgentMetricsResponse wraps agent performance metrics.
+message GetAgentMetricsResponse {
+  AgentMetrics metrics = 1;
+}
