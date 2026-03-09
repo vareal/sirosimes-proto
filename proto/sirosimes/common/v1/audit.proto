@@ -10,7 +10,10 @@ import "sirosimes/common/v1/actor.proto";
 //
 // AuditLog records immutable events for all significant actions across
 // Sirosimes products. Logs are append-only with integrity verification
-// via chained hashes.
+// via HMAC-SHA256 chained hashes.
+//
+// Access control: AuditLog records contain CONFIDENTIAL-level data
+// (ip_address, user_agent). See SECURITY.md for access requirements.
 //
 // Relationship to other types:
 //   - ActorRef (actor.proto): Identifies who performed the action.
@@ -48,12 +51,13 @@ message AuditLog {
   google.protobuf.Struct before = 8;
   // State after the action (for create/update events).
   google.protobuf.Struct after = 9;
-  // Client IP address.
+  // Client IP address (CONFIDENTIAL — requires access control, masking for external exposure).
   string ip_address = 10;
-  // Client user agent string.
+  // Client user agent string (CONFIDENTIAL — requires access control, masking for external exposure).
   string user_agent = 11;
   // Severity classification.
   AuditSeverity severity = 12;
-  // SHA-256 hash of the previous audit log entry for tamper detection (chain integrity).
+  // HMAC-SHA256 hash of the previous audit log entry for tamper detection (chain integrity).
+  // Each record includes hash(previous_record) to form an append-only verified chain.
   string integrity_hash = 13;
 }

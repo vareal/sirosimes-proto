@@ -110,14 +110,14 @@ export declare class AuditLog extends Message<AuditLog> {
   after?: Struct;
 
   /**
-   * Client IP address.
+   * Client IP address (CONFIDENTIAL — requires access control, masking for external exposure).
    *
    * @generated from field: string ip_address = 10;
    */
   ipAddress: string;
 
   /**
-   * Client user agent string.
+   * Client user agent string (CONFIDENTIAL — requires access control, masking for external exposure).
    *
    * @generated from field: string user_agent = 11;
    */
@@ -131,7 +131,8 @@ export declare class AuditLog extends Message<AuditLog> {
   severity: AuditSeverity;
 
   /**
-   * SHA-256 hash of the previous audit log entry for tamper detection (chain integrity).
+   * HMAC-SHA256 hash of the previous audit log entry for tamper detection (chain integrity).
+   * Each record includes hash(previous_record) to form an append-only verified chain.
    *
    * @generated from field: string integrity_hash = 13;
    */

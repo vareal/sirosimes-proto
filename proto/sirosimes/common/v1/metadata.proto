@@ -4,14 +4,41 @@ package sirosimes.common.v1;
 
 import "google/protobuf/timestamp.proto";
 
-// SecurityLevel classifies data sensitivity per CISO directive.
-// Used to enforce access control, encryption requirements, and audit policies
-// across all Sirosimes products. See SECURITY.md for control requirements per level.
+// metadata.proto — Resource metadata and security classification.
+//
+// Provides standard metadata (ownership, versioning, timestamps) and
+// security classification for all resources across Sirosimes products.
+//
+// Related types:
+//   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.
+//   - AuditLog (audit.proto): Changes to resources are tracked via audit events.
+//   - Permission/Role (permission.proto): Access control checks use SecurityLevel.
+//
+// SecurityLevel changes (adding/removing/redefining values) are treated as
+// breaking changes and require CISO approval. See SECURITY.md.
+
+// SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).
+//
+// Classification guide:
+//   PUBLIC (1)       — Marketing content, public documentation, open-source code.
+//                      Encryption: transit only. Logging: optional. Retention: unlimited.
+//   INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.
+//                      Encryption: transit required. Logging: optional. Retention: 3 years.
+//   CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.
+//                      Encryption: transit + at-rest. Logging: required. Retention: 1 year.
+//                      Masking required when exposed externally.
+//   RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.
+//                      Encryption: transit + at-rest + field-level. Logging: required + tamper detection.
+//                      Retention: 6 months. Masking: always required.
 enum SecurityLevel {
   SECURITY_LEVEL_UNSPECIFIED = 0;
+  // Open data, no access restrictions. Marketing, public docs.
   SECURITY_LEVEL_PUBLIC = 1;
+  // Internal use only. Team wikis, non-sensitive business data.
   SECURITY_LEVEL_INTERNAL = 2;
+  // Business-sensitive, need-to-know basis. Financial, HR, customer data.
   SECURITY_LEVEL_CONFIDENTIAL = 3;
+  // Highest sensitivity. PII, credentials, tokens, audit trails.
   SECURITY_LEVEL_RESTRICTED = 4;
 }
 
@@ -20,9 +47,15 @@ enum SecurityLevel {
 // consistent tracking, versioning, and security classification.
 //
 // Related types:
-//   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs
-//   - AuditLog (audit.proto): changes to resources are tracked via audit events
-//   - SecurityLevel: controls access, encryption, and retention policies
+//   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.
+//   - AuditLog (audit.proto): changes to resources are tracked via audit events.
+//   - SecurityLevel: controls access, encryption, and retention policies.
+//
+// Default behavior for security_level:
+//   When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource
+//   as INTERNAL (level 2) by default. This ensures that resources without explicit
+//   classification are not accidentally treated as PUBLIC. Services MAY override this
+//   default with stricter levels based on their domain requirements.
 message ResourceMetadata {
   // Unique identifier (UUID format recommended).
   string id = 1;
@@ -31,6 +64,7 @@ message ResourceMetadata {
   // Timestamp of the last update.
   google.protobuf.Timestamp updated_at = 3;
   // Soft-delete timestamp (null if not deleted).
+  // For RESTRICTED resources, see SECURITY.md for physical deletion policy.
   google.protobuf.Timestamp deleted_at = 4;
   // Actor ID who created this resource.
   string created_by = 5;
@@ -43,5 +77,6 @@ message ResourceMetadata {
   // Arbitrary key-value annotations for tooling metadata.
   map<string, string> annotations = 9;
   // Security classification level for this resource (CISO directive).
+  // Default when unspecified: treated as INTERNAL.
   SecurityLevel security_level = 10;
 }

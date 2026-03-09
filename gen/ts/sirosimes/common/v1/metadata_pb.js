@@ -6,9 +6,19 @@
 import { proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
- * SecurityLevel classifies data sensitivity per CISO directive.
- * Used to enforce access control, encryption requirements, and audit policies
- * across all Sirosimes products. See SECURITY.md for control requirements per level.
+ * SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).
+ *
+ * Classification guide:
+ *   PUBLIC (1)       — Marketing content, public documentation, open-source code.
+ *                      Encryption: transit only. Logging: optional. Retention: unlimited.
+ *   INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.
+ *                      Encryption: transit required. Logging: optional. Retention: 3 years.
+ *   CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.
+ *                      Encryption: transit + at-rest. Logging: required. Retention: 1 year.
+ *                      Masking required when exposed externally.
+ *   RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.
+ *                      Encryption: transit + at-rest + field-level. Logging: required + tamper detection.
+ *                      Retention: 6 months. Masking: always required.
  *
  * @generated from enum sirosimes.common.v1.SecurityLevel
  */
@@ -29,9 +39,15 @@ export const SecurityLevel = /*@__PURE__*/ proto3.makeEnum(
  * consistent tracking, versioning, and security classification.
  *
  * Related types:
- *   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs
- *   - AuditLog (audit.proto): changes to resources are tracked via audit events
- *   - SecurityLevel: controls access, encryption, and retention policies
+ *   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.
+ *   - AuditLog (audit.proto): changes to resources are tracked via audit events.
+ *   - SecurityLevel: controls access, encryption, and retention policies.
+ *
+ * Default behavior for security_level:
+ *   When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource
+ *   as INTERNAL (level 2) by default. This ensures that resources without explicit
+ *   classification are not accidentally treated as PUBLIC. Services MAY override this
+ *   default with stricter levels based on their domain requirements.
  *
  * @generated from message sirosimes.common.v1.ResourceMetadata
  */

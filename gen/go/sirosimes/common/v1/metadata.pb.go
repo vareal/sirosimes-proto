@@ -21,17 +21,32 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// SecurityLevel classifies data sensitivity per CISO directive.
-// Used to enforce access control, encryption requirements, and audit policies
-// across all Sirosimes products. See SECURITY.md for control requirements per level.
+// SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).
+//
+// Classification guide:
+//
+//	PUBLIC (1)       — Marketing content, public documentation, open-source code.
+//	                   Encryption: transit only. Logging: optional. Retention: unlimited.
+//	INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.
+//	                   Encryption: transit required. Logging: optional. Retention: 3 years.
+//	CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.
+//	                   Encryption: transit + at-rest. Logging: required. Retention: 1 year.
+//	                   Masking required when exposed externally.
+//	RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.
+//	                   Encryption: transit + at-rest + field-level. Logging: required + tamper detection.
+//	                   Retention: 6 months. Masking: always required.
 type SecurityLevel int32
 
 const (
-	SecurityLevel_SECURITY_LEVEL_UNSPECIFIED  SecurityLevel = 0
-	SecurityLevel_SECURITY_LEVEL_PUBLIC       SecurityLevel = 1
-	SecurityLevel_SECURITY_LEVEL_INTERNAL     SecurityLevel = 2
+	SecurityLevel_SECURITY_LEVEL_UNSPECIFIED SecurityLevel = 0
+	// Open data, no access restrictions. Marketing, public docs.
+	SecurityLevel_SECURITY_LEVEL_PUBLIC SecurityLevel = 1
+	// Internal use only. Team wikis, non-sensitive business data.
+	SecurityLevel_SECURITY_LEVEL_INTERNAL SecurityLevel = 2
+	// Business-sensitive, need-to-know basis. Financial, HR, customer data.
 	SecurityLevel_SECURITY_LEVEL_CONFIDENTIAL SecurityLevel = 3
-	SecurityLevel_SECURITY_LEVEL_RESTRICTED   SecurityLevel = 4
+	// Highest sensitivity. PII, credentials, tokens, audit trails.
+	SecurityLevel_SECURITY_LEVEL_RESTRICTED SecurityLevel = 4
 )
 
 // Enum value maps for SecurityLevel.
@@ -84,9 +99,16 @@ func (SecurityLevel) EnumDescriptor() ([]byte, []int) {
 // consistent tracking, versioning, and security classification.
 //
 // Related types:
-//   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs
-//   - AuditLog (audit.proto): changes to resources are tracked via audit events
-//   - SecurityLevel: controls access, encryption, and retention policies
+//   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.
+//   - AuditLog (audit.proto): changes to resources are tracked via audit events.
+//   - SecurityLevel: controls access, encryption, and retention policies.
+//
+// Default behavior for security_level:
+//
+//	When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource
+//	as INTERNAL (level 2) by default. This ensures that resources without explicit
+//	classification are not accidentally treated as PUBLIC. Services MAY override this
+//	default with stricter levels based on their domain requirements.
 type ResourceMetadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -99,6 +121,7 @@ type ResourceMetadata struct {
 	// Timestamp of the last update.
 	UpdatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	// Soft-delete timestamp (null if not deleted).
+	// For RESTRICTED resources, see SECURITY.md for physical deletion policy.
 	DeletedAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
 	// Actor ID who created this resource.
 	CreatedBy string `protobuf:"bytes,5,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
@@ -111,6 +134,7 @@ type ResourceMetadata struct {
 	// Arbitrary key-value annotations for tooling metadata.
 	Annotations map[string]string `protobuf:"bytes,9,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Security classification level for this resource (CISO directive).
+	// Default when unspecified: treated as INTERNAL.
 	SecurityLevel SecurityLevel `protobuf:"varint,10,opt,name=security_level,json=securityLevel,proto3,enum=sirosimes.common.v1.SecurityLevel" json:"security_level,omitempty"`
 }
 

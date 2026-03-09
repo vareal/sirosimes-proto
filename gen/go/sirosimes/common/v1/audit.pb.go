@@ -102,13 +102,14 @@ type AuditLog struct {
 	Before *structpb.Struct `protobuf:"bytes,8,opt,name=before,proto3" json:"before,omitempty"`
 	// State after the action (for create/update events).
 	After *structpb.Struct `protobuf:"bytes,9,opt,name=after,proto3" json:"after,omitempty"`
-	// Client IP address.
+	// Client IP address (CONFIDENTIAL — requires access control, masking for external exposure).
 	IpAddress string `protobuf:"bytes,10,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
-	// Client user agent string.
+	// Client user agent string (CONFIDENTIAL — requires access control, masking for external exposure).
 	UserAgent string `protobuf:"bytes,11,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
 	// Severity classification.
 	Severity AuditSeverity `protobuf:"varint,12,opt,name=severity,proto3,enum=sirosimes.common.v1.AuditSeverity" json:"severity,omitempty"`
-	// SHA-256 hash of the previous audit log entry for tamper detection (chain integrity).
+	// HMAC-SHA256 hash of the previous audit log entry for tamper detection (chain integrity).
+	// Each record includes hash(previous_record) to form an append-only verified chain.
 	IntegrityHash string `protobuf:"bytes,13,opt,name=integrity_hash,json=integrityHash,proto3" json:"integrity_hash,omitempty"`
 }
 
