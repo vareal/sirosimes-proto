@@ -1,0 +1,282 @@
+syntax = "proto3";
+
+package sirosimes.mikura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// object.proto — 御蔵（Mikura）オブジェクトストレージ。
+//
+// バケット管理、オブジェクトのアップロード・ダウンロード・検索、
+// ACL管理、オブジェクト間参照を提供する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// BucketACLPermission defines the access level for a bucket ACL entry.
+enum BucketACLPermission {
+  BUCKET_ACL_PERMISSION_UNSPECIFIED = 0;
+  BUCKET_ACL_PERMISSION_READ = 1;
+  BUCKET_ACL_PERMISSION_WRITE = 2;
+  BUCKET_ACL_PERMISSION_ADMIN = 3;
+}
+
+// Bucket represents a logical container for objects.
+message Bucket {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // Human-readable bucket name (unique within the system).
+  string name = 2;
+  // Optional description of the bucket purpose.
+  string description = 3;
+  // Actor ID who created this bucket.
+  string created_by = 4;
+  // Whether this is the default bucket for unspecified uploads.
+  bool is_default = 5;
+}
+
+// BucketACL defines an access control entry for a bucket.
+message BucketACL {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Bucket this ACL entry belongs to.
+  string bucket_id = 2;
+  // Actor or group ID granted access.
+  string actor_id = 3;
+  // Type of the actor (human, AI, system, etc.).
+  string actor_type = 4;
+  // Permission level granted.
+  BucketACLPermission permission = 5;
+  // Actor ID who granted this permission.
+  string granted_by = 6;
+}
+
+// Object represents a stored object in a bucket.
+message Object {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // Bucket this object belongs to.
+  string bucket_id = 2;
+  // Unique key within the bucket (path-like).
+  string key = 3;
+  // Original filename at upload time.
+  string filename = 4;
+  // MIME content type (e.g., application/pdf).
+  string content_type = 5;
+  // Size of the object in bytes.
+  int64 size_bytes = 6;
+  // SHA-256 hash of the object content.
+  string sha256_hash = 7;
+  // Storage backend identifier (e.g., s3, local, gcs).
+  string storage_backend = 8;
+  // Internal storage path within the backend.
+  string storage_path = 9;
+  // Actor ID who uploaded this object.
+  string uploaded_by = 10;
+  // Whether the object is encrypted at rest.
+  bool is_encrypted = 11;
+  // Encryption key ID if encrypted.
+  string encryption_key_id = 12;
+  // Arbitrary key-value metadata attached to the object.
+  map<string, string> object_metadata = 13;
+}
+
+// ObjectReference represents a directed reference between two objects.
+message ObjectReference {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Source object ID.
+  string source_object_id = 2;
+  // Target object ID.
+  string target_object_id = 3;
+  // Type of reference (e.g., "derived_from", "thumbnail", "version").
+  string reference_type = 4;
+  // Actor ID who created this reference.
+  string created_by = 5;
+}
+
+// UploadObjectRequest is the request for uploading an object.
+message UploadObjectRequest {
+  string bucket_id = 1;
+  string key = 2;
+  string filename = 3;
+  string content_type = 4;
+  bytes content = 5;
+  map<string, string> object_metadata = 6;
+}
+
+// UploadObjectResponse is the response after uploading an object.
+message UploadObjectResponse {
+  Object object = 1;
+}
+
+// DownloadObjectRequest is the request for downloading an object.
+message DownloadObjectRequest {
+  string bucket_id = 1;
+  string key = 2;
+}
+
+// DownloadObjectResponse is the response containing object content.
+message DownloadObjectResponse {
+  Object object = 1;
+  bytes content = 2;
+}
+
+// GetObjectMetaRequest is the request for retrieving object metadata.
+message GetObjectMetaRequest {
+  string id = 1;
+}
+
+// GetObjectMetaResponse is the response containing object metadata.
+message GetObjectMetaResponse {
+  Object object = 1;
+}
+
+// UpdateObjectMetaRequest is the request for updating object metadata.
+message UpdateObjectMetaRequest {
+  string id = 1;
+  map<string, string> object_metadata = 2;
+}
+
+// UpdateObjectMetaResponse is the response after updating object metadata.
+message UpdateObjectMetaResponse {
+  Object object = 1;
+}
+
+// DeleteObjectRequest is the request for deleting an object.
+message DeleteObjectRequest {
+  string id = 1;
+}
+
+// DeleteObjectResponse is the response after deleting an object.
+message DeleteObjectResponse {}
+
+// SearchObjectsRequest is the request for searching objects.
+message SearchObjectsRequest {
+  string bucket_id = 1;
+  string query = 2;
+  string content_type = 3;
+  sirosimes.common.v1.PaginationRequest pagination = 4;
+}
+
+// SearchObjectsResponse is the response containing search results.
+message SearchObjectsResponse {
+  repeated Object objects = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// ListBucketsRequest is the request for listing buckets.
+message ListBucketsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+}
+
+// ListBucketsResponse is the response for listing buckets.
+message ListBucketsResponse {
+  repeated Bucket buckets = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateBucketRequest is the request for creating a bucket.
+message CreateBucketRequest {
+  string name = 1;
+  string description = 2;
+  bool is_default = 3;
+}
+
+// CreateBucketResponse is the response after creating a bucket.
+message CreateBucketResponse {
+  Bucket bucket = 1;
+}
+
+// GetBucketRequest is the request for retrieving a bucket.
+message GetBucketRequest {
+  string id = 1;
+}
+
+// GetBucketResponse is the response containing a bucket.
+message GetBucketResponse {
+  Bucket bucket = 1;
+}
+
+// ListBucketObjectsRequest is the request for listing objects in a bucket.
+message ListBucketObjectsRequest {
+  string bucket_id = 1;
+  string prefix = 2;
+  sirosimes.common.v1.PaginationRequest pagination = 3;
+}
+
+// ListBucketObjectsResponse is the response for listing objects in a bucket.
+message ListBucketObjectsResponse {
+  repeated Object objects = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// DeleteBucketRequest is the request for deleting a bucket.
+message DeleteBucketRequest {
+  string id = 1;
+}
+
+// DeleteBucketResponse is the response after deleting a bucket.
+message DeleteBucketResponse {}
+
+// ObjectService manages buckets and objects in Mikura storage.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service ObjectService {
+  rpc UploadObject(UploadObjectRequest) returns (UploadObjectResponse) {
+    option (google.api.http) = {
+      post: "/v1/buckets/{bucket_id}/objects"
+      body: "*"
+    };
+  }
+  rpc DownloadObject(DownloadObjectRequest) returns (DownloadObjectResponse) {
+    option (google.api.http) = {
+      get: "/v1/buckets/{bucket_id}/objects/{key}"
+    };
+  }
+  rpc GetObjectMeta(GetObjectMetaRequest) returns (GetObjectMetaResponse) {
+    option (google.api.http) = {
+      get: "/v1/objects/{id}/meta"
+    };
+  }
+  rpc UpdateObjectMeta(UpdateObjectMetaRequest) returns (UpdateObjectMetaResponse) {
+    option (google.api.http) = {
+      patch: "/v1/objects/{id}/meta"
+      body: "*"
+    };
+  }
+  rpc DeleteObject(DeleteObjectRequest) returns (DeleteObjectResponse) {
+    option (google.api.http) = {
+      delete: "/v1/objects/{id}"
+    };
+  }
+  rpc SearchObjects(SearchObjectsRequest) returns (SearchObjectsResponse) {
+    option (google.api.http) = {
+      get: "/v1/objects/search"
+    };
+  }
+  rpc ListBuckets(ListBucketsRequest) returns (ListBucketsResponse) {
+    option (google.api.http) = {
+      get: "/v1/buckets"
+    };
+  }
+  rpc CreateBucket(CreateBucketRequest) returns (CreateBucketResponse) {
+    option (google.api.http) = {
+      post: "/v1/buckets"
+      body: "*"
+    };
+  }
+  rpc GetBucket(GetBucketRequest) returns (GetBucketResponse) {
+    option (google.api.http) = {
+      get: "/v1/buckets/{id}"
+    };
+  }
+  rpc ListBucketObjects(ListBucketObjectsRequest) returns (ListBucketObjectsResponse) {
+    option (google.api.http) = {
+      get: "/v1/buckets/{bucket_id}/objects"
+    };
+  }
+  rpc DeleteBucket(DeleteBucketRequest) returns (DeleteBucketResponse) {
+    option (google.api.http) = {
+      delete: "/v1/buckets/{id}"
+    };
+  }
+}

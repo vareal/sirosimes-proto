@@ -3,16 +3,27 @@ syntax = "proto3";
 package sirosimes.tamanoya.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
 
-// skill.proto — 玉の舎（Tamanoya）スキル定義・カテゴリ管理。
+// skill.proto — スキル定義・タグ管理
 //
-// スキルとカテゴリのCRUD、階層構造の管理を提供する。
+// 玉の舎のスキル定義ドメイン。CSVインポート由来のスキル項目、
+// タグベース分類システム、測定方法を管理する。
 //
-// Exposure: INTERNAL（全RPC）
+// 関連:
+//   - question.proto: スキルに紐づく問題
+//   - assessment.proto: スキル別アセスメント
+//   - evaluation.proto: スキル別評価結果
 
-// SkillLevel classifies the proficiency level of a skill.
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// SkillDifficulty はスキルの難易度を表す。
+// SkillLevel は習熟度レベルを表す。
 enum SkillLevel {
   SKILL_LEVEL_UNSPECIFIED = 0;
   SKILL_LEVEL_BEGINNER = 1;
@@ -21,215 +32,322 @@ enum SkillLevel {
   SKILL_LEVEL_EXPERT = 4;
 }
 
-// SkillStatus represents the lifecycle state of a skill.
-enum SkillStatus {
-  SKILL_STATUS_UNSPECIFIED = 0;
-  SKILL_STATUS_ACTIVE = 1;
-  SKILL_STATUS_DRAFT = 2;
-  SKILL_STATUS_ARCHIVED = 3;
+enum SkillDifficulty {
+  SKILL_DIFFICULTY_UNSPECIFIED = 0;
+  SKILL_DIFFICULTY_BEGINNER = 1;
+  SKILL_DIFFICULTY_ELEMENTARY = 2;
+  SKILL_DIFFICULTY_INTERMEDIATE = 3;
+  SKILL_DIFFICULTY_ADVANCED = 4;
+  SKILL_DIFFICULTY_EXPERT = 5;
 }
 
-// SkillCategory represents a grouping of related skills.
-message SkillCategory {
+// MeasurementMethodType はスキルの測定方法を表す。
+enum MeasurementMethodType {
+  MEASUREMENT_METHOD_TYPE_UNSPECIFIED = 0;
+  MEASUREMENT_METHOD_TYPE_CODING = 1;
+  MEASUREMENT_METHOD_TYPE_MULTIPLE_CHOICE = 2;
+  MEASUREMENT_METHOD_TYPE_FREE_TEXT = 3;
+  MEASUREMENT_METHOD_TYPE_VIDEO = 4;
+  MEASUREMENT_METHOD_TYPE_PRESENTATION = 5;
+  MEASUREMENT_METHOD_TYPE_ROLE_PLAY = 6;
+  MEASUREMENT_METHOD_TYPE_DOCUMENT = 7;
+  MEASUREMENT_METHOD_TYPE_INTERVIEW = 8;
+}
+
+// SkillTagCategory はスキルタグのカテゴリを表す。
+enum SkillTagCategory {
+  SKILL_TAG_CATEGORY_UNSPECIFIED = 0;
+  // スキルタイプ（ハード/ソフト/AI等）
+  SKILL_TAG_CATEGORY_SKILL_TYPE = 1;
+  // ドメイン（セキュリティ、会計等）
+  SKILL_TAG_CATEGORY_DOMAIN = 2;
+  // 役割（上流/コーディング）
+  SKILL_TAG_CATEGORY_ROLE = 3;
+  // カスタムタグ
+  SKILL_TAG_CATEGORY_CUSTOM = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+// SkillTag はスキルタグマスタ。
+message SkillTag {
   sirosimes.common.v1.ResourceMetadata metadata = 1;
-  string name = 2;
-  string slug = 3;
-  string description = 4;
-  string parent_category_id = 5;
-  int32 sort_order = 6;
+  // タグコード（例: hard_skill, soft_skill）
+  string code = 2;
+  // 表示名（日本語）
+  string name = 3;
+  // 英語表示名
+  string name_en = 4;
+  // カテゴリ
+  SkillTagCategory category = 5;
+  // 説明
+  string description = 6;
+  // 表示順序
+  int32 display_order = 7;
+  // アクティブフラグ
+  bool is_active = 8;
 }
 
-// Skill represents a defined competency or capability.
-message Skill {
+// SkillDefinition はスキル定義。
+message SkillDefinition {
   sirosimes.common.v1.ResourceMetadata metadata = 1;
-  string name = 2;
-  string slug = 3;
-  string description = 4;
-  string category_id = 5;
-  SkillLevel default_level = 6;
-  SkillStatus status = 7;
-  repeated string prerequisite_skill_ids = 8;
-  repeated string tags = 9;
+  // スキルコード（例: TH-001）
+  string skill_code = 2;
+  // 大分類
+  string large_category = 3;
+  // 中分類
+  string medium_category = 4;
+  // 小分類
+  string small_category = 5;
+  // スキル項目詳細
+  string skill_detail = 6;
+  // 難易度
+  SkillDifficulty difficulty = 7;
+  // アクティブフラグ
+  bool is_active = 8;
+  // バージョン（インポートバージョン）
+  int32 version = 9;
+  // インポート元ファイル名
+  string source_file = 10;
+  // 付与されたタグ
+  repeated SkillTag tags = 11;
+  // 測定方法
+  repeated SkillMeasurementMethod measurement_methods = 12;
 }
 
-// ListSkillCategoriesRequest is the request for listing skill categories.
-message ListSkillCategoriesRequest {
+// SkillMeasurementMethod はスキル測定方法。
+message SkillMeasurementMethod {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // スキル定義ID
+  string skill_definition_id = 2;
+  // 測定方法タイプ
+  MeasurementMethodType method_type = 3;
+  // 表示名
+  string display_name = 4;
+  // 説明
+  string description = 5;
+  // 優先度（推奨度）
+  int32 priority = 6;
+  // 推奨フラグ
+  bool is_recommended = 7;
+  // 除外フラグ（このスキルには適用不可）
+  bool is_excluded = 8;
+  // 除外理由
+  string exclusion_reason = 9;
+}
+
+// ---------------------------------------------------------------------------
+// Request / Response
+// ---------------------------------------------------------------------------
+
+// --- SkillTag CRUD ---
+
+message GetSkillTagRequest {
+  string id = 1;
+}
+message GetSkillTagResponse {
+  SkillTag tag = 1;
+}
+
+message ListSkillTagsRequest {
   sirosimes.common.v1.PaginationRequest pagination = 1;
-  string parent_category_id = 2;
+  SkillTagCategory category = 2;
+  bool active_only = 3;
 }
-
-// ListSkillCategoriesResponse is the response for listing skill categories.
-message ListSkillCategoriesResponse {
-  repeated SkillCategory categories = 1;
+message ListSkillTagsResponse {
+  repeated SkillTag tags = 1;
   sirosimes.common.v1.PaginationResponse pagination = 2;
 }
 
-// GetSkillCategoryRequest is the request for retrieving a single skill category.
-message GetSkillCategoryRequest {
-  string id = 1;
-}
-
-// GetSkillCategoryResponse is the response containing a single skill category.
-message GetSkillCategoryResponse {
-  SkillCategory category = 1;
-}
-
-// CreateSkillCategoryRequest is the request for creating a skill category.
-message CreateSkillCategoryRequest {
-  string name = 1;
-  string slug = 2;
-  string description = 3;
-  string parent_category_id = 4;
-  int32 sort_order = 5;
-}
-
-// CreateSkillCategoryResponse is the response after creating a skill category.
-message CreateSkillCategoryResponse {
-  SkillCategory category = 1;
-}
-
-// UpdateSkillCategoryRequest is the request for updating a skill category.
-message UpdateSkillCategoryRequest {
-  string id = 1;
+message CreateSkillTagRequest {
+  string code = 1;
   string name = 2;
-  string description = 3;
-  int32 sort_order = 4;
+  string name_en = 3;
+  SkillTagCategory category = 4;
+  string description = 5;
+  int32 display_order = 6;
+}
+message CreateSkillTagResponse {
+  SkillTag tag = 1;
 }
 
-// UpdateSkillCategoryResponse is the response after updating a skill category.
-message UpdateSkillCategoryResponse {
-  SkillCategory category = 1;
+message UpdateSkillTagRequest {
+  string id = 1;
+  google.protobuf.FieldMask update_mask = 2;
+  string name = 3;
+  string name_en = 4;
+  SkillTagCategory category = 5;
+  string description = 6;
+  int32 display_order = 7;
+  bool is_active = 8;
+}
+message UpdateSkillTagResponse {
+  SkillTag tag = 1;
 }
 
-// DeleteSkillCategoryRequest is the request for deleting a skill category.
-message DeleteSkillCategoryRequest {
+message DeleteSkillTagRequest {
   string id = 1;
 }
+message DeleteSkillTagResponse {}
 
-// DeleteSkillCategoryResponse is the response after deleting a skill category.
-message DeleteSkillCategoryResponse {}
+// --- SkillDefinition CRUD ---
 
-// ListSkillsRequest is the request for listing skills.
-message ListSkillsRequest {
-  sirosimes.common.v1.PaginationRequest pagination = 1;
-  string category_id = 2;
-  SkillStatus status = 3;
-  SkillLevel level = 4;
-  string search = 5;
+message GetSkillDefinitionRequest {
+  string id = 1;
+}
+message GetSkillDefinitionResponse {
+  SkillDefinition skill = 1;
 }
 
-// ListSkillsResponse is the response for listing skills.
-message ListSkillsResponse {
-  repeated Skill skills = 1;
+message ListSkillDefinitionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  // フィルタ
+  string large_category = 2;
+  string medium_category = 3;
+  SkillDifficulty difficulty = 4;
+  // タグコードでフィルタ
+  repeated string tag_codes = 5;
+  bool active_only = 6;
+  // 検索クエリ（カテゴリ名/詳細部分一致）
+  string query = 7;
+}
+message ListSkillDefinitionsResponse {
+  repeated SkillDefinition skills = 1;
   sirosimes.common.v1.PaginationResponse pagination = 2;
 }
 
-// GetSkillRequest is the request for retrieving a single skill.
-message GetSkillRequest {
-  string id = 1;
+message CreateSkillDefinitionRequest {
+  string skill_code = 1;
+  string large_category = 2;
+  string medium_category = 3;
+  string small_category = 4;
+  string skill_detail = 5;
+  SkillDifficulty difficulty = 6;
+  repeated string tag_ids = 7;
+  repeated MeasurementMethodInput measurement_methods = 8;
 }
 
-// GetSkillResponse is the response containing a single skill.
-message GetSkillResponse {
-  Skill skill = 1;
-}
-
-// CreateSkillRequest is the request for creating a skill.
-message CreateSkillRequest {
-  string name = 1;
-  string slug = 2;
+// MeasurementMethodInput は測定方法の入力用メッセージ。
+message MeasurementMethodInput {
+  MeasurementMethodType method_type = 1;
+  string display_name = 2;
   string description = 3;
-  string category_id = 4;
-  SkillLevel default_level = 5;
-  repeated string prerequisite_skill_ids = 6;
-  repeated string tags = 7;
+  int32 priority = 4;
+  bool is_recommended = 5;
 }
 
-// CreateSkillResponse is the response after creating a skill.
-message CreateSkillResponse {
-  Skill skill = 1;
+message CreateSkillDefinitionResponse {
+  SkillDefinition skill = 1;
 }
 
-// UpdateSkillRequest is the request for updating a skill.
-message UpdateSkillRequest {
+message UpdateSkillDefinitionRequest {
   string id = 1;
-  string name = 2;
-  string description = 3;
-  string category_id = 4;
-  SkillLevel default_level = 5;
-  SkillStatus status = 6;
-  repeated string prerequisite_skill_ids = 7;
-  repeated string tags = 8;
+  google.protobuf.FieldMask update_mask = 2;
+  string large_category = 3;
+  string medium_category = 4;
+  string small_category = 5;
+  string skill_detail = 6;
+  SkillDifficulty difficulty = 7;
+  repeated string tag_ids = 8;
+  bool is_active = 9;
+}
+message UpdateSkillDefinitionResponse {
+  SkillDefinition skill = 1;
 }
 
-// UpdateSkillResponse is the response after updating a skill.
-message UpdateSkillResponse {
-  Skill skill = 1;
-}
-
-// DeleteSkillRequest is the request for deleting a skill.
-message DeleteSkillRequest {
+message DeleteSkillDefinitionRequest {
   string id = 1;
 }
+message DeleteSkillDefinitionResponse {}
 
-// DeleteSkillResponse is the response after deleting a skill.
-message DeleteSkillResponse {}
+// --- CSV Import ---
 
-// SkillService manages skills and skill categories.
-// Exposure: INTERNAL — all RPCs are for internal use only.
+message ImportSkillsFromCsvRequest {
+  // CSVファイルのバイナリデータ
+  bytes csv_data = 1;
+  // カテゴリ（hard_skills, soft_skills, ai_skills）
+  string category = 2;
+  // インポート者
+  string imported_by = 3;
+}
+message ImportSkillsFromCsvResponse {
+  int32 imported_count = 1;
+  int32 skipped_count = 2;
+  repeated string errors = 3;
+  int32 version = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
+// SkillService はスキル定義・タグの管理サービス。
 service SkillService {
-  rpc ListSkillCategories(ListSkillCategoriesRequest) returns (ListSkillCategoriesResponse) {
+  // --- タグ ---
+  rpc GetSkillTag(GetSkillTagRequest) returns (GetSkillTagResponse) {
     option (google.api.http) = {
-      get: "/v1/skill-categories"
+      get: "/api/v1/skill-tags/{id}"
     };
   }
-  rpc GetSkillCategory(GetSkillCategoryRequest) returns (GetSkillCategoryResponse) {
+  rpc ListSkillTags(ListSkillTagsRequest) returns (ListSkillTagsResponse) {
     option (google.api.http) = {
-      get: "/v1/skill-categories/{id}"
+      get: "/api/v1/skill-tags"
     };
   }
-  rpc CreateSkillCategory(CreateSkillCategoryRequest) returns (CreateSkillCategoryResponse) {
+  rpc CreateSkillTag(CreateSkillTagRequest) returns (CreateSkillTagResponse) {
     option (google.api.http) = {
-      post: "/v1/skill-categories"
+      post: "/api/v1/skill-tags"
       body: "*"
     };
   }
-  rpc UpdateSkillCategory(UpdateSkillCategoryRequest) returns (UpdateSkillCategoryResponse) {
+  rpc UpdateSkillTag(UpdateSkillTagRequest) returns (UpdateSkillTagResponse) {
     option (google.api.http) = {
-      patch: "/v1/skill-categories/{id}"
+      patch: "/api/v1/skill-tags/{id}"
       body: "*"
     };
   }
-  rpc DeleteSkillCategory(DeleteSkillCategoryRequest) returns (DeleteSkillCategoryResponse) {
+  rpc DeleteSkillTag(DeleteSkillTagRequest) returns (DeleteSkillTagResponse) {
     option (google.api.http) = {
-      delete: "/v1/skill-categories/{id}"
+      delete: "/api/v1/skill-tags/{id}"
     };
   }
-  rpc ListSkills(ListSkillsRequest) returns (ListSkillsResponse) {
+
+  // --- スキル定義 ---
+  rpc GetSkillDefinition(GetSkillDefinitionRequest) returns (GetSkillDefinitionResponse) {
     option (google.api.http) = {
-      get: "/v1/skills"
+      get: "/api/v1/skill-definitions/{id}"
     };
   }
-  rpc GetSkill(GetSkillRequest) returns (GetSkillResponse) {
+  rpc ListSkillDefinitions(ListSkillDefinitionsRequest) returns (ListSkillDefinitionsResponse) {
     option (google.api.http) = {
-      get: "/v1/skills/{id}"
+      get: "/api/v1/skill-definitions"
     };
   }
-  rpc CreateSkill(CreateSkillRequest) returns (CreateSkillResponse) {
+  rpc CreateSkillDefinition(CreateSkillDefinitionRequest) returns (CreateSkillDefinitionResponse) {
     option (google.api.http) = {
-      post: "/v1/skills"
+      post: "/api/v1/skill-definitions"
       body: "*"
     };
   }
-  rpc UpdateSkill(UpdateSkillRequest) returns (UpdateSkillResponse) {
+  rpc UpdateSkillDefinition(UpdateSkillDefinitionRequest) returns (UpdateSkillDefinitionResponse) {
     option (google.api.http) = {
-      patch: "/v1/skills/{id}"
+      patch: "/api/v1/skill-definitions/{id}"
       body: "*"
     };
   }
-  rpc DeleteSkill(DeleteSkillRequest) returns (DeleteSkillResponse) {
+  rpc DeleteSkillDefinition(DeleteSkillDefinitionRequest) returns (DeleteSkillDefinitionResponse) {
     option (google.api.http) = {
-      delete: "/v1/skills/{id}"
+      delete: "/api/v1/skill-definitions/{id}"
+    };
+  }
+
+  // --- CSV Import ---
+  rpc ImportSkillsFromCsv(ImportSkillsFromCsvRequest) returns (ImportSkillsFromCsvResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/skill-definitions/import"
+      body: "*"
     };
   }
 }

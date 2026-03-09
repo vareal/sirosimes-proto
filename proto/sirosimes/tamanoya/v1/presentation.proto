@@ -1,0 +1,362 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// presentation.proto — プレゼンテーションテスト、音声/動画
+//
+// 玉の舎のプレゼンテーションアセスメントドメイン。
+// プレゼンテーションお題管理、音声回答アップロード、
+// 音声→テキスト変換、動画提出・解析を扱う。
+//
+// 関連:
+//   - assessment.proto: プレゼンテーションアセスメントのセッション管理
+//   - evaluation.proto: プレゼンテーションのAI評価
+//   - user.proto: 受験者情報
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// TranscriptionStatus は音声→テキスト変換の処理状態。
+enum TranscriptionStatus {
+  TRANSCRIPTION_STATUS_UNSPECIFIED = 0;
+  TRANSCRIPTION_STATUS_PENDING = 1;
+  TRANSCRIPTION_STATUS_PROCESSING = 2;
+  TRANSCRIPTION_STATUS_COMPLETED = 3;
+  TRANSCRIPTION_STATUS_FAILED = 4;
+}
+
+// VideoProcessingStatus は動画の処理状態。
+enum VideoProcessingStatus {
+  VIDEO_PROCESSING_STATUS_UNSPECIFIED = 0;
+  VIDEO_PROCESSING_STATUS_PENDING = 1;
+  VIDEO_PROCESSING_STATUS_PROCESSING = 2;
+  VIDEO_PROCESSING_STATUS_COMPLETED = 3;
+  VIDEO_PROCESSING_STATUS_FAILED = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+// PresentationTopic はプレゼンテーションのお題。
+message PresentationTopic {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // お題タイトル
+  string title = 2;
+  // お題の詳細説明
+  string description = 3;
+  // 回答例やヒント
+  string examples = 4;
+  // 対象部門
+  repeated string target_departments = 5;
+  // 対象グレード
+  repeated string target_grades = 6;
+  // 難易度（easy/medium/hard）
+  string difficulty = 7;
+  // 制限時間（分）
+  int32 time_limit_minutes = 8;
+  // 有効フラグ
+  bool is_active = 9;
+  // 有効期間
+  google.protobuf.Timestamp valid_from = 10;
+  google.protobuf.Timestamp valid_until = 11;
+}
+
+// AudioResponse は音声回答データ。
+message AudioResponse {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // セッションID
+  string session_id = 2;
+  // ユーザーID
+  string user_id = 3;
+  // 関連する問題ID
+  string question_id = 4;
+  // 関連するお題ID
+  string topic_id = 5;
+  // 音声ファイルパス
+  string audio_file_path = 6;
+  // 音声フォーマット（mp3, wav等）
+  string audio_format = 7;
+  // 音声の長さ（秒）
+  double duration_seconds = 8;
+  // ファイルサイズ（バイト）
+  int64 file_size_bytes = 9;
+  // 文字起こしステータス
+  TranscriptionStatus transcription_status = 10;
+  // 文字起こし結果（完了時）
+  AudioTranscription transcription = 11;
+}
+
+// AudioTranscription は音声→テキスト変換結果。
+message AudioTranscription {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string audio_response_id = 2;
+  // 文字起こしテキスト
+  string transcribed_text = 3;
+  // 信頼度スコア（0.0-1.0）
+  double confidence_score = 4;
+  // 言語コード
+  string language = 5;
+  // APIプロバイダー
+  string api_provider = 6;
+  // 使用モデル
+  string api_model = 7;
+  // 処理時間（ミリ秒）
+  int32 processing_time_ms = 8;
+  // セグメント情報（タイムスタンプ付き）
+  repeated TranscriptionSegment segments = 9;
+  // エラーメッセージ（失敗時）
+  string error_message = 10;
+  google.protobuf.Timestamp completed_at = 11;
+}
+
+// TranscriptionSegment はタイムスタンプ付きセグメント。
+message TranscriptionSegment {
+  double start_seconds = 1;
+  double end_seconds = 2;
+  string text = 3;
+  double confidence = 4;
+}
+
+// VideoSubmission は動画提出データ。
+message VideoSubmission {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string evaluation_session_id = 2;
+  // ファイル情報
+  string original_filename = 3;
+  string storage_path = 4;
+  int64 file_size_bytes = 5;
+  double duration_seconds = 6;
+  string format = 7;
+  string resolution = 8;
+  // 処理ステータス
+  VideoProcessingStatus processing_status = 9;
+  google.protobuf.Timestamp processing_started_at = 10;
+  google.protobuf.Timestamp processing_completed_at = 11;
+  string processing_error = 12;
+  // OCR結果
+  string ocr_text = 13;
+  double ocr_confidence = 14;
+  google.protobuf.Struct ocr_extracted_code = 15;
+  // 音声→テキスト結果
+  string transcript = 16;
+  double transcript_confidence = 17;
+  // アクションログ
+  google.protobuf.Struct action_log = 18;
+}
+
+// ---------------------------------------------------------------------------
+// Request / Response
+// ---------------------------------------------------------------------------
+
+// --- Presentation Topic ---
+
+message GetPresentationTopicRequest {
+  string id = 1;
+}
+message GetPresentationTopicResponse {
+  PresentationTopic topic = 1;
+}
+
+message ListPresentationTopicsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  repeated string target_departments = 2;
+  repeated string target_grades = 3;
+  string difficulty = 4;
+  bool active_only = 5;
+}
+message ListPresentationTopicsResponse {
+  repeated PresentationTopic topics = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreatePresentationTopicRequest {
+  string title = 1;
+  string description = 2;
+  string examples = 3;
+  repeated string target_departments = 4;
+  repeated string target_grades = 5;
+  string difficulty = 6;
+  int32 time_limit_minutes = 7;
+  google.protobuf.Timestamp valid_from = 8;
+  google.protobuf.Timestamp valid_until = 9;
+}
+message CreatePresentationTopicResponse {
+  PresentationTopic topic = 1;
+}
+
+message UpdatePresentationTopicRequest {
+  string id = 1;
+  google.protobuf.FieldMask update_mask = 2;
+  string title = 3;
+  string description = 4;
+  string examples = 5;
+  repeated string target_departments = 6;
+  repeated string target_grades = 7;
+  string difficulty = 8;
+  int32 time_limit_minutes = 9;
+  bool is_active = 10;
+}
+message UpdatePresentationTopicResponse {
+  PresentationTopic topic = 1;
+}
+
+message DeletePresentationTopicRequest {
+  string id = 1;
+}
+message DeletePresentationTopicResponse {}
+
+// --- Audio Upload & Response ---
+
+message UploadAudioRequest {
+  string session_id = 1;
+  string user_id = 2;
+  string question_id = 3;
+  string topic_id = 4;
+  // 音声データ（バイナリ）
+  bytes audio_data = 5;
+  string audio_format = 6;
+  string filename = 7;
+}
+message UploadAudioResponse {
+  AudioResponse audio_response = 1;
+}
+
+message GetAudioResponseRequest {
+  string id = 1;
+}
+message GetAudioResponseResponse {
+  AudioResponse audio_response = 1;
+}
+
+message ListAudioResponsesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string session_id = 2;
+  string user_id = 3;
+  TranscriptionStatus transcription_status = 4;
+}
+message ListAudioResponsesResponse {
+  repeated AudioResponse audio_responses = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// 文字起こしの再実行リクエスト
+message RetryTranscriptionRequest {
+  string audio_response_id = 1;
+}
+message RetryTranscriptionResponse {
+  AudioResponse audio_response = 1;
+}
+
+// --- Video ---
+
+message GetVideoSubmissionRequest {
+  string id = 1;
+}
+message GetVideoSubmissionResponse {
+  VideoSubmission video = 1;
+}
+
+message ListVideoSubmissionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string evaluation_session_id = 2;
+  VideoProcessingStatus processing_status = 3;
+}
+message ListVideoSubmissionsResponse {
+  repeated VideoSubmission videos = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// 動画処理の再実行リクエスト
+message RetryVideoProcessingRequest {
+  string video_id = 1;
+}
+message RetryVideoProcessingResponse {
+  VideoSubmission video = 1;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
+// PresentationService はプレゼンテーションテスト・音声/動画の管理サービス。
+service PresentationService {
+  // --- お題管理 ---
+  rpc GetPresentationTopic(GetPresentationTopicRequest) returns (GetPresentationTopicResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/presentations/topics/{id}"
+    };
+  }
+  rpc ListPresentationTopics(ListPresentationTopicsRequest) returns (ListPresentationTopicsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/presentations/topics"
+    };
+  }
+  rpc CreatePresentationTopic(CreatePresentationTopicRequest) returns (CreatePresentationTopicResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/presentations/topics"
+      body: "*"
+    };
+  }
+  rpc UpdatePresentationTopic(UpdatePresentationTopicRequest) returns (UpdatePresentationTopicResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/presentations/topics/{id}"
+      body: "*"
+    };
+  }
+  rpc DeletePresentationTopic(DeletePresentationTopicRequest) returns (DeletePresentationTopicResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/presentations/topics/{id}"
+    };
+  }
+
+  // --- 音声アップロード・管理 ---
+  rpc UploadAudio(UploadAudioRequest) returns (UploadAudioResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/presentations/audio/upload"
+      body: "*"
+    };
+  }
+  rpc GetAudioResponse(GetAudioResponseRequest) returns (GetAudioResponseResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/presentations/audio/{id}"
+    };
+  }
+  rpc ListAudioResponses(ListAudioResponsesRequest) returns (ListAudioResponsesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/presentations/audio"
+    };
+  }
+  rpc RetryTranscription(RetryTranscriptionRequest) returns (RetryTranscriptionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/presentations/audio/{audio_response_id}/retry-transcription"
+      body: "*"
+    };
+  }
+
+  // --- 動画管理 ---
+  rpc GetVideoSubmission(GetVideoSubmissionRequest) returns (GetVideoSubmissionResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/presentations/videos/{id}"
+    };
+  }
+  rpc ListVideoSubmissions(ListVideoSubmissionsRequest) returns (ListVideoSubmissionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/presentations/videos"
+    };
+  }
+  rpc RetryVideoProcessing(RetryVideoProcessingRequest) returns (RetryVideoProcessingResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/presentations/videos/{video_id}/retry"
+      body: "*"
+    };
+  }
+}

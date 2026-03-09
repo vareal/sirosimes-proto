@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package sirosimes.mikura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// catalog.proto — 御蔵（Mikura）データカタログ・リネージ。
+//
+// データカタログエントリの管理、メタデータ付与、
+// データリネージ（来歴）追跡を提供する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// CatalogEntry represents a data catalog entry describing an object.
+message CatalogEntry {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // Object this catalog entry describes.
+  string object_id = 2;
+  // Human-readable title.
+  string title = 3;
+  // Detailed description of the data.
+  string description = 4;
+  // Data type classification (e.g., "csv", "json", "parquet", "image").
+  string data_type = 5;
+  // Schema information (e.g., column definitions, JSON schema).
+  string schema_info = 6;
+  // Data classification label (e.g., "PII", "financial", "public").
+  string classification = 7;
+  // Actor ID who created this catalog entry.
+  string created_by = 8;
+}
+
+// CatalogTag represents a key-value tag on a catalog entry.
+message CatalogTag {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Catalog entry this tag belongs to.
+  string catalog_id = 2;
+  // Tag key.
+  string key = 3;
+  // Tag value.
+  string value = 4;
+}
+
+// DataLineage represents a transformation link between data sources.
+message DataLineage {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Source catalog entry or object ID.
+  string source_id = 2;
+  // Target catalog entry or object ID.
+  string target_id = 3;
+  // Type of transformation (e.g., "etl", "copy", "aggregate", "filter").
+  string transformation_type = 4;
+  // Pipeline that produced this lineage link (optional).
+  string pipeline_id = 5;
+  // When this lineage link was created.
+  google.protobuf.Timestamp created_at = 6;
+}
+
+// SearchCatalogRequest is the request for searching catalog entries.
+message SearchCatalogRequest {
+  string query = 1;
+  string data_type = 2;
+  string classification = 3;
+  sirosimes.common.v1.PaginationRequest pagination = 4;
+}
+
+// SearchCatalogResponse is the response for searching catalog entries.
+message SearchCatalogResponse {
+  repeated CatalogEntry entries = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetLineageRequest is the request for retrieving data lineage.
+message GetLineageRequest {
+  // Object or catalog entry ID to get lineage for.
+  string entry_id = 1;
+  // Maximum depth of lineage traversal.
+  int32 max_depth = 2;
+}
+
+// GetLineageResponse is the response containing data lineage.
+message GetLineageResponse {
+  repeated DataLineage lineage = 1;
+}
+
+// CatalogService manages data catalog and lineage in Mikura.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service CatalogService {
+  rpc SearchCatalog(SearchCatalogRequest) returns (SearchCatalogResponse) {
+    option (google.api.http) = {
+      get: "/v1/catalog/search"
+    };
+  }
+  rpc GetLineage(GetLineageRequest) returns (GetLineageResponse) {
+    option (google.api.http) = {
+      get: "/v1/catalog/{entry_id}/lineage"
+    };
+  }
+}

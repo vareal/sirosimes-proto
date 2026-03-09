@@ -1,0 +1,297 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// user.proto — Tamanoya ユーザー/受講者/管理者
+//
+// 玉の舎（技術スキルアセスメントシステム）のユーザー管理ドメイン。
+// 社員認証、ロール管理、組織情報を扱う。
+//
+// 関連:
+//   - assessment.proto: ユーザーがアセスメントを受験
+//   - evaluation.proto: ユーザーの評価結果を管理
+//   - content.proto: ユーザーの学習進捗を管理
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// UserRole はシステム内のユーザー権限を表す。
+enum UserRole {
+  USER_ROLE_UNSPECIFIED = 0;
+  // 被評価者（一般社員）
+  USER_ROLE_EMPLOYEE = 1;
+  // 評価者（レビュアー）
+  USER_ROLE_REVIEWER = 2;
+  // 人事管理者
+  USER_ROLE_ADMIN = 3;
+  // 経営層
+  USER_ROLE_EXECUTIVE = 4;
+}
+
+// DepartmentCode は部門コードを表す。
+enum DepartmentCode {
+  DEPARTMENT_CODE_UNSPECIFIED = 0;
+  DEPARTMENT_CODE_ENGINEERING = 1;
+  DEPARTMENT_CODE_SALES = 2;
+  DEPARTMENT_CODE_ADMINISTRATION = 3;
+  DEPARTMENT_CODE_MANAGEMENT = 4;
+}
+
+// SSOProvider はSSO認証プロバイダーを表す。
+enum SSOProvider {
+  SSO_PROVIDER_UNSPECIFIED = 0;
+  SSO_PROVIDER_GOOGLE = 1;
+  // 瑞垣SSO（将来の標準プロバイダー）
+  SSO_PROVIDER_MIZUGAKI = 2;
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+// User は玉の舎システムのユーザーを表す。
+message User {
+  // リソースメタデータ（ID, 作成日時, バージョン等）
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+
+  // --- 認証情報 ---
+  string email = 2;
+  // パスワードハッシュ（レスポンスには含めない）
+  string password_hash = 3;
+  // Google Subject ID（Google SSO用）
+  string google_id = 4;
+  // SSO プロバイダー
+  SSOProvider sso_provider = 5;
+  // TOTP 2FA が有効か
+  bool totp_enabled = 6;
+
+  // --- プロフィール ---
+  string name = 7;
+  string avatar_url = 8;
+
+  // --- ロール ---
+  // ユーザーが持つロール一覧（複数ロール可）
+  repeated UserRole roles = 9;
+
+  // --- 組織情報 ---
+  DepartmentCode department = 10;
+  string job_type = 11;
+  // 等級（G1-G11）
+  string grade = 12;
+  // ロール軸（upstream/coding 等）
+  string role_axis = 13;
+
+  // --- 状態 ---
+  bool is_active = 14;
+}
+
+// UserView はAPI応答用のユーザー情報（機密フィールドを除外）。
+message UserView {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string avatar_url = 4;
+  repeated UserRole roles = 5;
+  DepartmentCode department = 6;
+  string job_type = 7;
+  string grade = 8;
+  string role_axis = 9;
+  bool is_active = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// ---------------------------------------------------------------------------
+// Request / Response Messages
+// ---------------------------------------------------------------------------
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  UserView user = 1;
+}
+
+message ListUsersRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  // フィルタ: 部門
+  DepartmentCode department = 2;
+  // フィルタ: ロール
+  UserRole role = 3;
+  // フィルタ: 等級
+  string grade = 4;
+  // フィルタ: アクティブのみ
+  bool active_only = 5;
+  // フィルタ: 検索クエリ（名前/メール部分一致）
+  string query = 6;
+}
+
+message ListUsersResponse {
+  repeated UserView users = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string name = 2;
+  string password = 3;
+  repeated UserRole roles = 4;
+  DepartmentCode department = 5;
+  string job_type = 6;
+  string grade = 7;
+  string role_axis = 8;
+}
+
+message CreateUserResponse {
+  UserView user = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  google.protobuf.FieldMask update_mask = 2;
+  // 更新可能フィールド
+  string name = 3;
+  string avatar_url = 4;
+  repeated UserRole roles = 5;
+  DepartmentCode department = 6;
+  string job_type = 7;
+  string grade = 8;
+  string role_axis = 9;
+  bool is_active = 10;
+}
+
+message UpdateUserResponse {
+  UserView user = 1;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserResponse {}
+
+// ---------------------------------------------------------------------------
+// Auth Messages
+// ---------------------------------------------------------------------------
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+  // TOTP コード（2FA有効時）
+  string totp_code = 3;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  string token_type = 3;
+  int32 expires_in = 4;
+  UserView user = 5;
+  // ロール選択が必要か
+  bool requires_role_selection = 6;
+  repeated UserRole available_roles = 7;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  int32 expires_in = 3;
+}
+
+message GoogleLoginRequest {
+  // Google ID Token
+  string credential = 1;
+  // 選択されたロール（マルチロール時）
+  UserRole role = 2;
+}
+
+message GoogleLoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  string token_type = 3;
+  int32 expires_in = 4;
+  UserView user = 5;
+  bool is_new_user = 6;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
+// UserService は玉の舎のユーザー管理サービス。
+service UserService {
+  // ユーザー取得
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/{id}"
+    };
+  }
+
+  // ユーザー一覧
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users"
+    };
+  }
+
+  // ユーザー作成
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users"
+      body: "*"
+    };
+  }
+
+  // ユーザー更新
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/users/{id}"
+      body: "*"
+    };
+  }
+
+  // ユーザー削除（論理削除）
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/users/{id}"
+    };
+  }
+
+  // --- 認証 ---
+
+  // メール/パスワードログイン
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  // トークンリフレッシュ
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/refresh"
+      body: "*"
+    };
+  }
+
+  // Google SSO ログイン
+  rpc GoogleLogin(GoogleLoginRequest) returns (GoogleLoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/google"
+      body: "*"
+    };
+  }
+}

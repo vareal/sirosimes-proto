@@ -1,0 +1,536 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// content.proto — 学習コンテンツ、ロードマップ
+//
+// 玉の舎の学習コンテンツ管理ドメイン。スキル分野ベースの学習ドメイン、
+// トピック、読み物コンテンツ、知識定着テスト、学習進捗を管理する。
+//
+// 関連:
+//   - skill.proto: 学習対象のスキル定義
+//   - evaluation.proto: 評価結果に基づく学習推奨（SAD）
+//   - user.proto: 学習者の情報
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// LearningDomainCategory は学習ドメインのカテゴリ。
+enum LearningDomainCategory {
+  LEARNING_DOMAIN_CATEGORY_UNSPECIFIED = 0;
+  LEARNING_DOMAIN_CATEGORY_MATHEMATICS = 1;
+  LEARNING_DOMAIN_CATEGORY_MACHINE_LEARNING = 2;
+  LEARNING_DOMAIN_CATEGORY_COMPUTER_SCIENCE = 3;
+  LEARNING_DOMAIN_CATEGORY_PROGRAMMING = 4;
+  LEARNING_DOMAIN_CATEGORY_DATA_SCIENCE = 5;
+  LEARNING_DOMAIN_CATEGORY_STATISTICS = 6;
+  LEARNING_DOMAIN_CATEGORY_BUSINESS = 7;
+  LEARNING_DOMAIN_CATEGORY_SECURITY = 8;
+  LEARNING_DOMAIN_CATEGORY_ACCOUNTING = 9;
+  LEARNING_DOMAIN_CATEGORY_MANAGEMENT = 10;
+  LEARNING_DOMAIN_CATEGORY_OTHER = 11;
+}
+
+// TopicDifficulty はトピック難易度。
+enum TopicDifficulty {
+  TOPIC_DIFFICULTY_UNSPECIFIED = 0;
+  TOPIC_DIFFICULTY_BEGINNER = 1;
+  TOPIC_DIFFICULTY_INTERMEDIATE = 2;
+  TOPIC_DIFFICULTY_ADVANCED = 3;
+  TOPIC_DIFFICULTY_EXPERT = 4;
+}
+
+// ContentStatus はコンテンツステータス。
+enum ContentStatus {
+  CONTENT_STATUS_UNSPECIFIED = 0;
+  CONTENT_STATUS_DRAFT = 1;
+  CONTENT_STATUS_REVIEW = 2;
+  CONTENT_STATUS_PUBLISHED = 3;
+  CONTENT_STATUS_ARCHIVED = 4;
+}
+
+// TestQuestionType は知識テストの問題タイプ。
+enum TestQuestionType {
+  TEST_QUESTION_TYPE_UNSPECIFIED = 0;
+  TEST_QUESTION_TYPE_MULTIPLE_CHOICE = 1;
+  TEST_QUESTION_TYPE_TRUE_FALSE = 2;
+  TEST_QUESTION_TYPE_FILL_IN_BLANK = 3;
+  TEST_QUESTION_TYPE_SHORT_ANSWER = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+// LearningDomain はスキル学習ドメイン（分野）。
+message LearningDomain {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // ドメインコード（例: math, ml, cs）
+  string code = 2;
+  string name = 3;
+  string name_en = 4;
+  LearningDomainCategory category = 5;
+  string description = 6;
+  string description_en = 7;
+  // UIアイコン名
+  string icon = 8;
+  // UIテーマ色
+  string color = 9;
+  int32 display_order = 10;
+  bool is_active = 11;
+  // 配下のトピック数（リスト表示用）
+  int32 topic_count = 12;
+}
+
+// LearningTopic は学習トピック。
+message LearningTopic {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string domain_id = 2;
+  // トピックコード（例: calculus, linear_algebra）
+  string code = 3;
+  string name = 4;
+  string name_en = 5;
+  string description = 6;
+  string description_en = 7;
+  TopicDifficulty difficulty = 8;
+  // 推定学習時間（分）
+  int32 estimated_minutes = 9;
+  int32 display_order = 10;
+  bool is_active = 11;
+  // 対象グレード
+  repeated string target_grades = 12;
+  // 前提トピックID
+  repeated string prerequisite_topic_ids = 13;
+  repeated string tags = 14;
+  // 配下コンテンツ数
+  int32 material_count = 15;
+  int32 test_count = 16;
+}
+
+// ReadingMaterial は読み物コンテンツ。
+message ReadingMaterial {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string topic_id = 2;
+  string title = 3;
+  string title_en = 4;
+  string summary = 5;
+  // 本文（Markdown形式）
+  string content = 6;
+  string content_type = 7;
+  int32 estimated_minutes = 8;
+  int32 display_order = 9;
+  ContentStatus status = 10;
+  bool is_active = 11;
+  // 添付ファイル
+  repeated Attachment attachments = 12;
+  // 参考リンク
+  repeated Reference references = 13;
+}
+
+// Attachment は添付ファイル情報。
+message Attachment {
+  string url = 1;
+  string type = 2;
+  string caption = 3;
+}
+
+// Reference は参考リンク。
+message Reference {
+  string url = 1;
+  string title = 2;
+  string description = 3;
+}
+
+// KnowledgeTest は知識定着テスト。
+message KnowledgeTest {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string topic_id = 2;
+  string title = 3;
+  string description = 4;
+  int32 time_limit_minutes = 5;
+  // 合格ライン（%）
+  int32 passing_score = 6;
+  int32 question_count = 7;
+  int32 display_order = 8;
+  ContentStatus status = 9;
+  bool is_active = 10;
+  // 再受験可能回数（-1 = 無制限）
+  int32 max_attempts = 11;
+  // テスト問題
+  repeated KnowledgeTestQuestion questions = 12;
+}
+
+// KnowledgeTestQuestion は知識テストの問題。
+message KnowledgeTestQuestion {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string test_id = 2;
+  TestQuestionType question_type = 3;
+  string question_text = 4;
+  // 選択肢（多肢選択の場合）
+  repeated TestOption options = 5;
+  // 正解（短答式用）
+  string correct_answer = 6;
+  string explanation = 7;
+  int32 points = 8;
+  int32 display_order = 9;
+  bool is_active = 10;
+}
+
+// TestOption はテストの選択肢。
+message TestOption {
+  string id = 1;
+  string text = 2;
+  bool is_correct = 3;
+}
+
+// LearningProgress はユーザーの学習進捗。
+message LearningProgress {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string user_id = 2;
+  string topic_id = 3;
+  // 読了済みの読み物ID
+  repeated string completed_material_ids = 4;
+  // 合格済みのテストID
+  repeated string passed_test_ids = 5;
+  // 進捗率（%）
+  int32 progress_percent = 6;
+  google.protobuf.Timestamp last_accessed_at = 7;
+  google.protobuf.Timestamp completed_at = 8;
+}
+
+// KnowledgeTestResult はテスト受験結果。
+message KnowledgeTestResult {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string user_id = 2;
+  string test_id = 3;
+  google.protobuf.Timestamp started_at = 4;
+  google.protobuf.Timestamp completed_at = 5;
+  int32 score = 6;
+  bool is_passed = 7;
+  int32 attempt_number = 8;
+  // 回答詳細
+  repeated TestAnswerDetail answers = 9;
+}
+
+// TestAnswerDetail はテスト回答の詳細。
+message TestAnswerDetail {
+  string question_id = 1;
+  string user_answer = 2;
+  bool is_correct = 3;
+  int32 points = 4;
+}
+
+// LearningRoadmap はスキル評価に基づく学習ロードマップ。
+message LearningRoadmap {
+  string user_id = 1;
+  string evaluation_period = 2;
+  // 推奨学習パス
+  repeated RoadmapStep steps = 3;
+  // 全体の推定学習時間（分）
+  int32 total_estimated_minutes = 4;
+  google.protobuf.Timestamp generated_at = 5;
+}
+
+// RoadmapStep はロードマップの1ステップ。
+message RoadmapStep {
+  int32 order = 1;
+  string domain_id = 2;
+  string domain_name = 3;
+  string topic_id = 4;
+  string topic_name = 5;
+  // なぜこのトピックが推奨されるか
+  string reason = 6;
+  // 優先度（high/medium/low）
+  string priority = 7;
+  int32 estimated_minutes = 8;
+  // 関連する弱点スキルエリア
+  repeated string related_weakness_areas = 9;
+}
+
+// ---------------------------------------------------------------------------
+// Request / Response
+// ---------------------------------------------------------------------------
+
+// --- Domain ---
+
+message GetLearningDomainRequest {
+  string id = 1;
+}
+message GetLearningDomainResponse {
+  LearningDomain domain = 1;
+  repeated LearningTopic topics = 2;
+}
+
+message ListLearningDomainsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  LearningDomainCategory category = 2;
+  bool active_only = 3;
+}
+message ListLearningDomainsResponse {
+  repeated LearningDomain domains = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateLearningDomainRequest {
+  string code = 1;
+  string name = 2;
+  string name_en = 3;
+  LearningDomainCategory category = 4;
+  string description = 5;
+  string description_en = 6;
+  string icon = 7;
+  string color = 8;
+}
+message CreateLearningDomainResponse {
+  LearningDomain domain = 1;
+}
+
+message UpdateLearningDomainRequest {
+  string id = 1;
+  google.protobuf.FieldMask update_mask = 2;
+  string name = 3;
+  string name_en = 4;
+  LearningDomainCategory category = 5;
+  string description = 6;
+  string description_en = 7;
+  string icon = 8;
+  string color = 9;
+  int32 display_order = 10;
+  bool is_active = 11;
+}
+message UpdateLearningDomainResponse {
+  LearningDomain domain = 1;
+}
+
+// --- Topic ---
+
+message GetLearningTopicRequest {
+  string id = 1;
+}
+message GetLearningTopicResponse {
+  LearningTopic topic = 1;
+  repeated ReadingMaterial materials = 2;
+  repeated KnowledgeTest tests = 3;
+}
+
+message ListLearningTopicsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string domain_id = 2;
+  TopicDifficulty difficulty = 3;
+  bool active_only = 4;
+  string query = 5;
+}
+message ListLearningTopicsResponse {
+  repeated LearningTopic topics = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateLearningTopicRequest {
+  string domain_id = 1;
+  string code = 2;
+  string name = 3;
+  string name_en = 4;
+  string description = 5;
+  string description_en = 6;
+  TopicDifficulty difficulty = 7;
+  int32 estimated_minutes = 8;
+  repeated string target_grades = 9;
+  repeated string prerequisite_topic_ids = 10;
+  repeated string tags = 11;
+}
+message CreateLearningTopicResponse {
+  LearningTopic topic = 1;
+}
+
+// --- Reading Material ---
+
+message GetReadingMaterialRequest {
+  string id = 1;
+}
+message GetReadingMaterialResponse {
+  ReadingMaterial material = 1;
+}
+
+message CreateReadingMaterialRequest {
+  string topic_id = 1;
+  string title = 2;
+  string title_en = 3;
+  string summary = 4;
+  string content = 5;
+  string content_type = 6;
+  int32 estimated_minutes = 7;
+}
+message CreateReadingMaterialResponse {
+  ReadingMaterial material = 1;
+}
+
+// --- Knowledge Test ---
+
+message GetKnowledgeTestRequest {
+  string id = 1;
+}
+message GetKnowledgeTestResponse {
+  KnowledgeTest test = 1;
+}
+
+message SubmitKnowledgeTestRequest {
+  string test_id = 1;
+  string user_id = 2;
+  repeated TestAnswerInput answers = 3;
+}
+
+message TestAnswerInput {
+  string question_id = 1;
+  string answer = 2;
+}
+
+message SubmitKnowledgeTestResponse {
+  KnowledgeTestResult result = 1;
+}
+
+// --- Progress ---
+
+message GetLearningProgressRequest {
+  string user_id = 1;
+  string topic_id = 2;
+}
+message GetLearningProgressResponse {
+  LearningProgress progress = 1;
+}
+
+message ListLearningProgressRequest {
+  string user_id = 1;
+  string domain_id = 2;
+}
+message ListLearningProgressResponse {
+  repeated LearningProgress progress_list = 1;
+  // 全体進捗率
+  int32 overall_progress_percent = 2;
+}
+
+message MarkMaterialReadRequest {
+  string user_id = 1;
+  string material_id = 2;
+}
+message MarkMaterialReadResponse {
+  LearningProgress progress = 1;
+}
+
+// --- Roadmap ---
+
+message GetLearningRoadmapRequest {
+  string user_id = 1;
+  // 最新の評価期間から自動生成する場合は空
+  string evaluation_period = 2;
+}
+message GetLearningRoadmapResponse {
+  LearningRoadmap roadmap = 1;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
+// ContentService は学習コンテンツ・ロードマップの管理サービス。
+service ContentService {
+  // --- ドメイン ---
+  rpc GetLearningDomain(GetLearningDomainRequest) returns (GetLearningDomainResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/domains/{id}"
+    };
+  }
+  rpc ListLearningDomains(ListLearningDomainsRequest) returns (ListLearningDomainsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/domains"
+    };
+  }
+  rpc CreateLearningDomain(CreateLearningDomainRequest) returns (CreateLearningDomainResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/learning/domains"
+      body: "*"
+    };
+  }
+  rpc UpdateLearningDomain(UpdateLearningDomainRequest) returns (UpdateLearningDomainResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/learning/domains/{id}"
+      body: "*"
+    };
+  }
+
+  // --- トピック ---
+  rpc GetLearningTopic(GetLearningTopicRequest) returns (GetLearningTopicResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/topics/{id}"
+    };
+  }
+  rpc ListLearningTopics(ListLearningTopicsRequest) returns (ListLearningTopicsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/topics"
+    };
+  }
+  rpc CreateLearningTopic(CreateLearningTopicRequest) returns (CreateLearningTopicResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/learning/topics"
+      body: "*"
+    };
+  }
+
+  // --- 読み物 ---
+  rpc GetReadingMaterial(GetReadingMaterialRequest) returns (GetReadingMaterialResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/materials/{id}"
+    };
+  }
+  rpc CreateReadingMaterial(CreateReadingMaterialRequest) returns (CreateReadingMaterialResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/learning/materials"
+      body: "*"
+    };
+  }
+
+  // --- 知識テスト ---
+  rpc GetKnowledgeTest(GetKnowledgeTestRequest) returns (GetKnowledgeTestResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/tests/{id}"
+    };
+  }
+  rpc SubmitKnowledgeTest(SubmitKnowledgeTestRequest) returns (SubmitKnowledgeTestResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/learning/tests/{test_id}/submit"
+      body: "*"
+    };
+  }
+
+  // --- 進捗 ---
+  rpc GetLearningProgress(GetLearningProgressRequest) returns (GetLearningProgressResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/progress/{user_id}/{topic_id}"
+    };
+  }
+  rpc ListLearningProgress(ListLearningProgressRequest) returns (ListLearningProgressResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/progress/{user_id}"
+    };
+  }
+  rpc MarkMaterialRead(MarkMaterialReadRequest) returns (MarkMaterialReadResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/learning/progress/mark-read"
+      body: "*"
+    };
+  }
+
+  // --- ロードマップ ---
+  rpc GetLearningRoadmap(GetLearningRoadmapRequest) returns (GetLearningRoadmapResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/learning/roadmap/{user_id}"
+    };
+  }
+}

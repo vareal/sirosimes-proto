@@ -1,0 +1,900 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mikura/v1/object.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ObjectService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/buckets": {
+      "get": {
+        "operationId": "ObjectService_ListBuckets",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBucketsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      },
+      "post": {
+        "operationId": "ObjectService_CreateBucket",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateBucketResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateBucketRequest is the request for creating a bucket.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateBucketRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      }
+    },
+    "/v1/buckets/{bucketId}/objects": {
+      "get": {
+        "operationId": "ObjectService_ListBucketObjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBucketObjectsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bucketId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      },
+      "post": {
+        "operationId": "ObjectService_UploadObject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadObjectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bucketId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ObjectServiceUploadObjectBody"
+            }
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      }
+    },
+    "/v1/buckets/{bucketId}/objects/{key}": {
+      "get": {
+        "operationId": "ObjectService_DownloadObject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DownloadObjectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bucketId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      }
+    },
+    "/v1/buckets/{id}": {
+      "get": {
+        "operationId": "ObjectService_GetBucket",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetBucketResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      },
+      "delete": {
+        "operationId": "ObjectService_DeleteBucket",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteBucketResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      }
+    },
+    "/v1/objects/search": {
+      "get": {
+        "operationId": "ObjectService_SearchObjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SearchObjectsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "bucketId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contentType",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      }
+    },
+    "/v1/objects/{id}": {
+      "delete": {
+        "operationId": "ObjectService_DeleteObject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteObjectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      }
+    },
+    "/v1/objects/{id}/meta": {
+      "get": {
+        "operationId": "ObjectService_GetObjectMeta",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetObjectMetaResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      },
+      "patch": {
+        "operationId": "ObjectService_UpdateObjectMeta",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateObjectMetaResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ObjectServiceUpdateObjectMetaBody"
+            }
+          }
+        ],
+        "tags": [
+          "ObjectService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ObjectServiceUpdateObjectMetaBody": {
+      "type": "object",
+      "properties": {
+        "objectMetadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "UpdateObjectMetaRequest is the request for updating object metadata."
+    },
+    "ObjectServiceUploadObjectBody": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string",
+          "format": "byte"
+        },
+        "objectMetadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "UploadObjectRequest is the request for uploading an object."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Bucket": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable bucket name (unique within the system)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the bucket purpose."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this bucket."
+        },
+        "isDefault": {
+          "type": "boolean",
+          "description": "Whether this is the default bucket for unspecified uploads."
+        }
+      },
+      "description": "Bucket represents a logical container for objects."
+    },
+    "v1CreateBucketRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      },
+      "description": "CreateBucketRequest is the request for creating a bucket."
+    },
+    "v1CreateBucketResponse": {
+      "type": "object",
+      "properties": {
+        "bucket": {
+          "$ref": "#/definitions/v1Bucket"
+        }
+      },
+      "description": "CreateBucketResponse is the response after creating a bucket."
+    },
+    "v1DeleteBucketResponse": {
+      "type": "object",
+      "description": "DeleteBucketResponse is the response after deleting a bucket."
+    },
+    "v1DeleteObjectResponse": {
+      "type": "object",
+      "description": "DeleteObjectResponse is the response after deleting an object."
+    },
+    "v1DownloadObjectResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Object"
+        },
+        "content": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "description": "DownloadObjectResponse is the response containing object content."
+    },
+    "v1GetBucketResponse": {
+      "type": "object",
+      "properties": {
+        "bucket": {
+          "$ref": "#/definitions/v1Bucket"
+        }
+      },
+      "description": "GetBucketResponse is the response containing a bucket."
+    },
+    "v1GetObjectMetaResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Object"
+        }
+      },
+      "description": "GetObjectMetaResponse is the response containing object metadata."
+    },
+    "v1ListBucketObjectsResponse": {
+      "type": "object",
+      "properties": {
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Object"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListBucketObjectsResponse is the response for listing objects in a bucket."
+    },
+    "v1ListBucketsResponse": {
+      "type": "object",
+      "properties": {
+        "buckets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Bucket"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListBucketsResponse is the response for listing buckets."
+    },
+    "v1Object": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "bucketId": {
+          "type": "string",
+          "description": "Bucket this object belongs to."
+        },
+        "key": {
+          "type": "string",
+          "description": "Unique key within the bucket (path-like)."
+        },
+        "filename": {
+          "type": "string",
+          "description": "Original filename at upload time."
+        },
+        "contentType": {
+          "type": "string",
+          "description": "MIME content type (e.g., application/pdf)."
+        },
+        "sizeBytes": {
+          "type": "string",
+          "format": "int64",
+          "description": "Size of the object in bytes."
+        },
+        "sha256Hash": {
+          "type": "string",
+          "description": "SHA-256 hash of the object content."
+        },
+        "storageBackend": {
+          "type": "string",
+          "description": "Storage backend identifier (e.g., s3, local, gcs)."
+        },
+        "storagePath": {
+          "type": "string",
+          "description": "Internal storage path within the backend."
+        },
+        "uploadedBy": {
+          "type": "string",
+          "description": "Actor ID who uploaded this object."
+        },
+        "isEncrypted": {
+          "type": "boolean",
+          "description": "Whether the object is encrypted at rest."
+        },
+        "encryptionKeyId": {
+          "type": "string",
+          "description": "Encryption key ID if encrypted."
+        },
+        "objectMetadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value metadata attached to the object."
+        }
+      },
+      "description": "Object represents a stored object in a bucket."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SearchObjectsResponse": {
+      "type": "object",
+      "properties": {
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Object"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "SearchObjectsResponse is the response containing search results."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateObjectMetaResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Object"
+        }
+      },
+      "description": "UpdateObjectMetaResponse is the response after updating object metadata."
+    },
+    "v1UploadObjectResponse": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "$ref": "#/definitions/v1Object"
+        }
+      },
+      "description": "UploadObjectResponse is the response after uploading an object."
+    }
+  }
+}

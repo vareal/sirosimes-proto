@@ -1,0 +1,211 @@
+syntax = "proto3";
+
+package sirosimes.mikura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// governance.proto — 御蔵（Mikura）ガバナンス・アクセス制御。
+//
+// ガバナンスポリシー管理、アクセス判定ログ、
+// DLP（Data Loss Prevention）スキャン結果を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// RiskLevel classifies the risk severity from a DLP scan.
+enum RiskLevel {
+  RISK_LEVEL_UNSPECIFIED = 0;
+  RISK_LEVEL_LOW = 1;
+  RISK_LEVEL_MEDIUM = 2;
+  RISK_LEVEL_HIGH = 3;
+  RISK_LEVEL_CRITICAL = 4;
+}
+
+// GovernancePolicy defines an access governance policy with flexible rules.
+message GovernancePolicy {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // Human-readable policy name.
+  string name = 2;
+  // Description of the policy purpose and scope.
+  string description = 3;
+  // Flexible JSON rules defining the policy logic.
+  google.protobuf.Struct rules = 4;
+  // Whether this policy is actively enforced.
+  bool is_active = 5;
+  // Actor ID who created this policy.
+  string created_by = 6;
+}
+
+// AccessDecision records the result of an access check against a policy.
+message AccessDecision {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Policy that was evaluated.
+  string policy_id = 2;
+  // Object the access was checked for.
+  string object_id = 3;
+  // Actor who requested access.
+  string actor_id = 4;
+  // Action that was requested (e.g., "read", "write", "delete").
+  string action = 5;
+  // Whether access was allowed.
+  bool allowed = 6;
+  // Human-readable reason for the decision.
+  string reason = 7;
+  // When the access check was performed.
+  google.protobuf.Timestamp checked_at = 8;
+}
+
+// DLPFinding represents a single finding from a DLP scan.
+message DLPFinding {
+  // Type of sensitive data found (e.g., "PII", "CREDIT_CARD", "API_KEY").
+  string finding_type = 1;
+  // Description of the finding.
+  string description = 2;
+  // Location within the object (e.g., byte range, field name).
+  string location = 3;
+  // Confidence score (0.0-1.0).
+  float confidence = 4;
+}
+
+// DLPScanResult contains the results of a DLP scan on an object.
+message DLPScanResult {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Object that was scanned.
+  string object_id = 2;
+  // Individual findings from the scan.
+  repeated DLPFinding findings = 3;
+  // Overall risk level based on findings.
+  RiskLevel risk_level = 4;
+  // When the scan was performed.
+  google.protobuf.Timestamp scanned_at = 5;
+}
+
+// ListPoliciesRequest is the request for listing governance policies.
+message ListPoliciesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  bool active_only = 2;
+}
+
+// ListPoliciesResponse is the response for listing governance policies.
+message ListPoliciesResponse {
+  repeated GovernancePolicy policies = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreatePolicyRequest is the request for creating a governance policy.
+message CreatePolicyRequest {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Struct rules = 3;
+  bool is_active = 4;
+}
+
+// CreatePolicyResponse is the response after creating a policy.
+message CreatePolicyResponse {
+  GovernancePolicy policy = 1;
+}
+
+// GetPolicyRequest is the request for retrieving a governance policy.
+message GetPolicyRequest {
+  string id = 1;
+}
+
+// GetPolicyResponse is the response containing a governance policy.
+message GetPolicyResponse {
+  GovernancePolicy policy = 1;
+}
+
+// UpdatePolicyRequest is the request for updating a governance policy.
+message UpdatePolicyRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Struct rules = 4;
+  bool is_active = 5;
+}
+
+// UpdatePolicyResponse is the response after updating a policy.
+message UpdatePolicyResponse {
+  GovernancePolicy policy = 1;
+}
+
+// DeletePolicyRequest is the request for deleting a governance policy.
+message DeletePolicyRequest {
+  string id = 1;
+}
+
+// DeletePolicyResponse is the response after deleting a policy.
+message DeletePolicyResponse {}
+
+// CheckAccessRequest is the request for checking access against policies.
+message CheckAccessRequest {
+  string object_id = 1;
+  string actor_id = 2;
+  string action = 3;
+}
+
+// CheckAccessResponse is the response containing the access decision.
+message CheckAccessResponse {
+  AccessDecision decision = 1;
+}
+
+// ListDecisionsRequest is the request for listing access decisions.
+message ListDecisionsRequest {
+  string object_id = 1;
+  string actor_id = 2;
+  sirosimes.common.v1.PaginationRequest pagination = 3;
+}
+
+// ListDecisionsResponse is the response for listing access decisions.
+message ListDecisionsResponse {
+  repeated AccessDecision decisions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GovernanceService manages policies and access decisions in Mikura.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service GovernanceService {
+  rpc ListPolicies(ListPoliciesRequest) returns (ListPoliciesResponse) {
+    option (google.api.http) = {
+      get: "/v1/governance/policies"
+    };
+  }
+  rpc CreatePolicy(CreatePolicyRequest) returns (CreatePolicyResponse) {
+    option (google.api.http) = {
+      post: "/v1/governance/policies"
+      body: "*"
+    };
+  }
+  rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse) {
+    option (google.api.http) = {
+      get: "/v1/governance/policies/{id}"
+    };
+  }
+  rpc UpdatePolicy(UpdatePolicyRequest) returns (UpdatePolicyResponse) {
+    option (google.api.http) = {
+      patch: "/v1/governance/policies/{id}"
+      body: "*"
+    };
+  }
+  rpc DeletePolicy(DeletePolicyRequest) returns (DeletePolicyResponse) {
+    option (google.api.http) = {
+      delete: "/v1/governance/policies/{id}"
+    };
+  }
+  rpc CheckAccess(CheckAccessRequest) returns (CheckAccessResponse) {
+    option (google.api.http) = {
+      post: "/v1/governance/check-access"
+      body: "*"
+    };
+  }
+  rpc ListDecisions(ListDecisionsRequest) returns (ListDecisionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/governance/decisions"
+    };
+  }
+}

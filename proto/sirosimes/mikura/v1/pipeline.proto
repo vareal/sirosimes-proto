@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package sirosimes.mikura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// pipeline.proto — 御蔵（Mikura）データパイプライン。
+//
+// ETLパイプラインの定義・実行・ステップ管理を提供する。
+// パイプラインはスケジュール実行または手動トリガーが可能。
+//
+// Exposure: INTERNAL（全RPC）
+
+// PipelineRunStatus represents the execution state of a pipeline run.
+enum PipelineRunStatus {
+  PIPELINE_RUN_STATUS_UNSPECIFIED = 0;
+  PIPELINE_RUN_STATUS_PENDING = 1;
+  PIPELINE_RUN_STATUS_RUNNING = 2;
+  PIPELINE_RUN_STATUS_COMPLETED = 3;
+  PIPELINE_RUN_STATUS_FAILED = 4;
+}
+
+// PipelineStepStatus represents the execution state of a pipeline step.
+enum PipelineStepStatus {
+  PIPELINE_STEP_STATUS_UNSPECIFIED = 0;
+  PIPELINE_STEP_STATUS_PENDING = 1;
+  PIPELINE_STEP_STATUS_RUNNING = 2;
+  PIPELINE_STEP_STATUS_COMPLETED = 3;
+  PIPELINE_STEP_STATUS_FAILED = 4;
+  PIPELINE_STEP_STATUS_SKIPPED = 5;
+}
+
+// PipelineDefinition defines an ETL/data pipeline.
+message PipelineDefinition {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // Human-readable pipeline name.
+  string name = 2;
+  // Description of the pipeline purpose.
+  string description = 3;
+  // Flexible JSON definition of pipeline steps.
+  google.protobuf.Struct steps = 4;
+  // Cron-like schedule expression (empty for manual-only).
+  string schedule = 5;
+  // Whether this pipeline is actively scheduled.
+  bool is_active = 6;
+  // Actor ID who created this pipeline.
+  string created_by = 7;
+}
+
+// PipelineRun represents a single execution of a pipeline.
+message PipelineRun {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Pipeline definition this run belongs to.
+  string pipeline_id = 2;
+  // Current execution status.
+  PipelineRunStatus status = 3;
+  // Input parameters for this run.
+  google.protobuf.Struct input = 4;
+  // Output data from this run.
+  google.protobuf.Struct output = 5;
+  // When the run started.
+  google.protobuf.Timestamp started_at = 6;
+  // When the run finished (null if still running).
+  google.protobuf.Timestamp finished_at = 7;
+}
+
+// PipelineStep represents a single step within a pipeline run.
+message PipelineStep {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Pipeline run this step belongs to.
+  string run_id = 2;
+  // Name of the step.
+  string step_name = 3;
+  // Current execution status.
+  PipelineStepStatus status = 4;
+  // Input data for this step.
+  google.protobuf.Struct input = 5;
+  // Output data from this step.
+  google.protobuf.Struct output = 6;
+  // Error message if the step failed.
+  string error = 7;
+  google.protobuf.Timestamp started_at = 8;
+  google.protobuf.Timestamp finished_at = 9;
+}
+
+// ListPipelinesRequest is the request for listing pipeline definitions.
+message ListPipelinesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  bool active_only = 2;
+}
+
+// ListPipelinesResponse is the response for listing pipeline definitions.
+message ListPipelinesResponse {
+  repeated PipelineDefinition pipelines = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreatePipelineRequest is the request for creating a pipeline definition.
+message CreatePipelineRequest {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Struct steps = 3;
+  string schedule = 4;
+  bool is_active = 5;
+}
+
+// CreatePipelineResponse is the response after creating a pipeline.
+message CreatePipelineResponse {
+  PipelineDefinition pipeline = 1;
+}
+
+// RunPipelineRequest is the request for triggering a pipeline run.
+message RunPipelineRequest {
+  string pipeline_id = 1;
+  google.protobuf.Struct input = 2;
+}
+
+// RunPipelineResponse is the response after triggering a pipeline run.
+message RunPipelineResponse {
+  PipelineRun run = 1;
+}
+
+// GetPipelineStatusRequest is the request for retrieving a pipeline run status.
+message GetPipelineStatusRequest {
+  string run_id = 1;
+}
+
+// GetPipelineStatusResponse is the response containing a pipeline run with steps.
+message GetPipelineStatusResponse {
+  PipelineRun run = 1;
+  repeated PipelineStep steps = 2;
+}
+
+// PipelineService manages data pipelines in Mikura.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service PipelineService {
+  rpc ListPipelines(ListPipelinesRequest) returns (ListPipelinesResponse) {
+    option (google.api.http) = {
+      get: "/v1/pipelines"
+    };
+  }
+  rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse) {
+    option (google.api.http) = {
+      post: "/v1/pipelines"
+      body: "*"
+    };
+  }
+  rpc RunPipeline(RunPipelineRequest) returns (RunPipelineResponse) {
+    option (google.api.http) = {
+      post: "/v1/pipelines/{pipeline_id}/run"
+      body: "*"
+    };
+  }
+  rpc GetPipelineStatus(GetPipelineStatusRequest) returns (GetPipelineStatusResponse) {
+    option (google.api.http) = {
+      get: "/v1/pipeline-runs/{run_id}"
+    };
+  }
+}

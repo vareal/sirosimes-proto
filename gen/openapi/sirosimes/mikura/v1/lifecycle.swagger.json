@@ -1,0 +1,403 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mikura/v1/lifecycle.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "LifecycleService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/lifecycle/expired": {
+      "get": {
+        "operationId": "LifecycleService_ListExpired",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListExpiredResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "unprocessedOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "LifecycleService"
+        ]
+      }
+    },
+    "/v1/lifecycle/process-expired": {
+      "post": {
+        "operationId": "LifecycleService_ProcessExpired",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProcessExpiredResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProcessExpiredRequest is the request for processing expired objects.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProcessExpiredRequest"
+            }
+          }
+        ],
+        "tags": [
+          "LifecycleService"
+        ]
+      }
+    },
+    "/v1/objects/{objectId}/lifecycle": {
+      "get": {
+        "operationId": "LifecycleService_GetLifecycle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetLifecycleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "objectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LifecycleService"
+        ]
+      },
+      "put": {
+        "operationId": "LifecycleService_SetLifecycle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SetLifecycleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "objectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LifecycleServiceSetLifecycleBody"
+            }
+          }
+        ],
+        "tags": [
+          "LifecycleService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "LifecycleServiceSetLifecycleBody": {
+      "type": "object",
+      "properties": {
+        "retentionDays": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "expiryAction": {
+          "$ref": "#/definitions/v1ExpiryAction"
+        }
+      },
+      "description": "SetLifecycleRequest is the request for setting an object lifecycle."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ExpiryAction": {
+      "type": "string",
+      "enum": [
+        "EXPIRY_ACTION_UNSPECIFIED",
+        "EXPIRY_ACTION_DELETE",
+        "EXPIRY_ACTION_ARCHIVE",
+        "EXPIRY_ACTION_NOTIFY"
+      ],
+      "default": "EXPIRY_ACTION_UNSPECIFIED",
+      "description": "ExpiryAction defines what happens when an object reaches its expiry date."
+    },
+    "v1GetLifecycleResponse": {
+      "type": "object",
+      "properties": {
+        "lifecycle": {
+          "$ref": "#/definitions/v1ObjectLifecycle"
+        }
+      },
+      "description": "GetLifecycleResponse is the response containing an object lifecycle."
+    },
+    "v1ListExpiredResponse": {
+      "type": "object",
+      "properties": {
+        "lifecycles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ObjectLifecycle"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListExpiredResponse is the response for listing expired objects."
+    },
+    "v1ObjectLifecycle": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format)."
+        },
+        "objectId": {
+          "type": "string",
+          "description": "Object this lifecycle rule applies to."
+        },
+        "retentionDays": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of days to retain the object."
+        },
+        "expiryAction": {
+          "$ref": "#/definitions/v1ExpiryAction",
+          "description": "Action to take when the object expires."
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Calculated expiry timestamp."
+        },
+        "isProcessed": {
+          "type": "boolean",
+          "description": "Whether the expiry action has been processed."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "ObjectLifecycle defines the retention and expiry policy for an object."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ProcessExpiredRequest": {
+      "type": "object",
+      "properties": {
+        "batchSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum number of expired objects to process in this batch."
+        }
+      },
+      "description": "ProcessExpiredRequest is the request for processing expired objects."
+    },
+    "v1ProcessExpiredResponse": {
+      "type": "object",
+      "properties": {
+        "processedCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of objects processed."
+        },
+        "failedCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of objects that failed processing."
+        }
+      },
+      "description": "ProcessExpiredResponse is the response after processing expired objects."
+    },
+    "v1SetLifecycleResponse": {
+      "type": "object",
+      "properties": {
+        "lifecycle": {
+          "$ref": "#/definitions/v1ObjectLifecycle"
+        }
+      },
+      "description": "SetLifecycleResponse is the response after setting a lifecycle."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    }
+  }
+}

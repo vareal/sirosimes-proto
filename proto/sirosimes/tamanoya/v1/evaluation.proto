@@ -1,0 +1,567 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// evaluation.proto — AI評価、レビュー、承認ワークフロー
+//
+// 玉の舎の評価ドメイン。AI自動評価、コード解析、LLM評価、
+// 人事管理者による承認ワークフロー、SAD（スキル評価データ）を管理する。
+//
+// 関連:
+//   - assessment.proto: 評価対象の提出物
+//   - user.proto: 評価対象の社員、レビュアー、管理者
+//   - skill.proto: 評価基準のスキル定義
+//   - question.proto: 出題された問題の評価ルーブリック
+//   - content.proto: 評価結果に基づく学習推奨
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// EvaluationStatus は評価セッションのステータス。
+enum EvaluationStatus {
+  EVALUATION_STATUS_UNSPECIFIED = 0;
+  EVALUATION_STATUS_PENDING = 1;
+  EVALUATION_STATUS_PROCESSING = 2;
+  EVALUATION_STATUS_ANALYZING = 3;
+  EVALUATION_STATUS_EVALUATING = 4;
+  EVALUATION_STATUS_COMPLETED = 5;
+  EVALUATION_STATUS_FAILED = 6;
+  EVALUATION_STATUS_CANCELLED = 7;
+}
+
+// EvaluationTier は評価ティア（等級）。
+enum EvaluationTier {
+  EVALUATION_TIER_UNSPECIFIED = 0;
+  EVALUATION_TIER_S = 1;
+  EVALUATION_TIER_A = 2;
+  EVALUATION_TIER_B = 3;
+  EVALUATION_TIER_C = 4;
+  EVALUATION_TIER_D = 5;
+}
+
+// ApprovalStatus は承認ワークフローのステータス。
+enum ApprovalStatus {
+  APPROVAL_STATUS_UNSPECIFIED = 0;
+  // AI評価完了、人事管理者の承認待ち
+  APPROVAL_STATUS_PENDING_REVIEW = 1;
+  // 人事管理者が承認済み
+  APPROVAL_STATUS_APPROVED = 2;
+  // 人事管理者が却下（再評価必要）
+  APPROVAL_STATUS_REJECTED = 3;
+  // 人事管理者が一部変更後承認
+  APPROVAL_STATUS_MODIFIED = 4;
+}
+
+// EvaluationChangeType は評価変更の種別（監査ログ用）。
+enum EvaluationChangeType {
+  EVALUATION_CHANGE_TYPE_UNSPECIFIED = 0;
+  EVALUATION_CHANGE_TYPE_SCORE_MODIFIED = 1;
+  EVALUATION_CHANGE_TYPE_TIER_MODIFIED = 2;
+  EVALUATION_CHANGE_TYPE_FEEDBACK_MODIFIED = 3;
+  EVALUATION_CHANGE_TYPE_APPROVAL_STATUS_CHANGED = 4;
+  EVALUATION_CHANGE_TYPE_ANSWER_SCORE_MODIFIED = 5;
+}
+
+// SkillType はスキルタイプ（ハード/ソフト）。
+enum SkillType {
+  SKILL_TYPE_UNSPECIFIED = 0;
+  SKILL_TYPE_HARD = 1;
+  SKILL_TYPE_SOFT = 2;
+}
+
+// GradeGroup はグレードグループ。
+enum GradeGroup {
+  GRADE_GROUP_UNSPECIFIED = 0;
+  // G1-G3: 基礎育成期～自律期
+  GRADE_GROUP_JUNIOR = 1;
+  // G4-G5: 専門性発揮期
+  GRADE_GROUP_MIDDLE = 2;
+  // G6-G7: 管理職期/専門職
+  GRADE_GROUP_SENIOR = 3;
+  // G8-G9: 部門責任者期
+  GRADE_GROUP_EXPERT = 4;
+  // G10-G11: 経営層
+  GRADE_GROUP_EXECUTIVE = 5;
+}
+
+// RubricLevel は評価ルーブリックの5段階レベル。
+enum RubricLevel {
+  RUBRIC_LEVEL_UNSPECIFIED = 0;
+  RUBRIC_LEVEL_L1 = 1;
+  RUBRIC_LEVEL_L2 = 2;
+  RUBRIC_LEVEL_L3 = 3;
+  RUBRIC_LEVEL_L4 = 4;
+  RUBRIC_LEVEL_L5 = 5;
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+// EvaluationSession は評価セッション（1回の評価プロセス全体）。
+message EvaluationSession {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+
+  // --- 社員情報 ---
+  string employee_id = 2;
+  string employee_name = 3;
+  string department = 4;
+  string job_title = 5;
+  string grade = 6;
+  string role_type = 7;
+
+  // --- 評価メタデータ ---
+  string evaluation_period = 8;
+  google.protobuf.Timestamp scheduled_date = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp completed_at = 11;
+
+  // --- 状態 ---
+  EvaluationStatus status = 12;
+  string error_message = 13;
+
+  // --- スコア ---
+  double total_score = 14;
+  EvaluationTier tier = 15;
+  double hard_skill_score = 16;
+  double soft_skill_score = 17;
+
+  // --- 人間レビュー ---
+  bool requires_human_review = 18;
+  bool human_reviewed = 19;
+  string human_reviewer_id = 20;
+  google.protobuf.Timestamp human_review_at = 21;
+  string human_review_notes = 22;
+
+  // --- SAD参照 ---
+  string sad_id = 23;
+}
+
+// CodeAnalysisResult はコード静的解析結果。
+message CodeAnalysisResult {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string evaluation_session_id = 2;
+  string language = 3;
+  int32 total_lines = 4;
+  int32 code_lines = 5;
+  int32 comment_lines = 6;
+  // 循環的複雑度（平均）
+  double cyclomatic_complexity_avg = 7;
+  int32 cyclomatic_complexity_max = 8;
+  double cognitive_complexity_avg = 9;
+  double maintainability_index = 10;
+  // リンター結果
+  int32 linter_errors = 11;
+  int32 linter_warnings = 12;
+  // セキュリティ問題数（重要度別）
+  int32 security_issues_critical = 13;
+  int32 security_issues_high = 14;
+  int32 security_issues_medium = 15;
+  int32 security_issues_low = 16;
+  // スコア
+  double complexity_score = 17;
+  double quality_score = 18;
+  double security_score = 19;
+  double total_score = 20;
+}
+
+// LLMEvaluation はLLMによる評価結果。
+message LLMEvaluation {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string evaluation_session_id = 2;
+  // LLMプロバイダー/モデル
+  string llm_provider = 3;
+  string llm_model = 4;
+  string evaluation_type = 5;
+  SkillType skill_type = 6;
+  // スコア
+  double score = 7;
+  double confidence = 8;
+  EvaluationTier tier = 9;
+  // 詳細
+  google.protobuf.Struct evaluation_criteria = 10;
+  repeated string strengths = 11;
+  repeated string weaknesses = 12;
+  repeated string recommendations = 13;
+  // XAI（説明可能AI）
+  string explanation = 14;
+  repeated string reasoning_chain = 15;
+  // トークン使用量
+  int32 input_tokens = 16;
+  int32 output_tokens = 17;
+  int32 processing_time_ms = 18;
+}
+
+// SkillAssessmentData (SAD) は最終評価出力。
+message SkillAssessmentData {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 社員情報
+  string employee_id = 2;
+  string employee_name = 3;
+  string department = 4;
+  string current_grade = 5;
+  string role_type = 6;
+  // 評価期間
+  string evaluation_period = 7;
+  google.protobuf.Timestamp evaluation_date = 8;
+  string evaluation_session_id = 9;
+  // 総合スコア
+  double total_score = 10;
+  EvaluationTier tier = 11;
+  // ハード/ソフトスキル
+  double hard_skill_score = 12;
+  google.protobuf.Struct hard_skill_details = 13;
+  double soft_skill_score = 14;
+  google.protobuf.Struct soft_skill_details = 15;
+  // 個別スキルスコア
+  map<string, double> skill_scores = 16;
+  // 強み・弱み
+  repeated string strengths = 17;
+  repeated string weaknesses = 18;
+  // 推奨事項
+  repeated DevelopmentRecommendation recommendations = 19;
+  // 等級推奨
+  string recommended_grade = 20;
+  string grade_change_rationale = 21;
+  // HR連携
+  string hr_sync_status = 22;
+  google.protobuf.Timestamp hr_synced_at = 23;
+  // SADバージョン
+  string sad_version = 24;
+}
+
+// DevelopmentRecommendation は育成推奨。
+message DevelopmentRecommendation {
+  string skill_area = 1;
+  string recommendation = 2;
+  string priority = 3;
+  string suggested_action = 4;
+}
+
+// EvaluationAuditLog は評価変更の監査ログ。
+message EvaluationAuditLog {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string submission_id = 2;
+  EvaluationChangeType change_type = 3;
+  string changed_by = 4;
+  google.protobuf.Timestamp changed_at = 5;
+  string field_name = 6;
+  google.protobuf.Struct old_value = 7;
+  google.protobuf.Struct new_value = 8;
+  string reason = 9;
+  string ip_address = 10;
+}
+
+// GradeCriteria は等級別評価基準。
+message GradeCriteria {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string grade = 2;
+  GradeGroup grade_group = 3;
+  string grade_label = 4;
+  RubricLevel rubric_level = 5;
+  int32 min_level = 6;
+  int32 max_level = 7;
+  int32 weight_performance = 8;
+  int32 weight_skill = 9;
+  string expectations = 10;
+  string career_stage = 11;
+  bool is_active = 12;
+}
+
+// DepartmentCriteria は部門別評価基準。
+message DepartmentCriteria {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string department = 2;
+  string display_name = 3;
+  string description = 4;
+  google.protobuf.Struct weight_adjustments = 5;
+  google.protobuf.Struct skill_categories = 6;
+  google.protobuf.Struct measurement_methods = 7;
+  bool is_active = 8;
+}
+
+// EvaluationRubric は評価ルーブリック定義。
+message EvaluationRubric {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string criterion_name = 2;
+  string criterion_code = 3;
+  RubricLevel level = 4;
+  string level_name = 5;
+  string description = 6;
+  google.protobuf.Struct behavioral_indicators = 7;
+  google.protobuf.Struct scoring_guide = 8;
+  int32 display_order = 9;
+  bool is_active = 10;
+}
+
+// EvaluationPromptLog はAI評価プロンプト履歴。
+message EvaluationPromptLog {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string evaluation_session_id = 2;
+  string llm_evaluation_id = 3;
+  string prompt_type = 4;
+  string prompt_template_name = 5;
+  string system_prompt = 6;
+  string user_prompt = 7;
+  google.protobuf.Struct prompt_parameters = 8;
+  string llm_provider = 9;
+  string llm_model = 10;
+  double temperature = 11;
+  int32 max_tokens = 12;
+  string llm_response = 13;
+  google.protobuf.Struct llm_response_parsed = 14;
+  int32 input_tokens = 15;
+  int32 output_tokens = 16;
+  int32 processing_time_ms = 17;
+  bool is_successful = 18;
+  string error_message = 19;
+}
+
+// ---------------------------------------------------------------------------
+// Request / Response
+// ---------------------------------------------------------------------------
+
+// --- Evaluation Session ---
+
+message GetEvaluationSessionRequest {
+  string id = 1;
+}
+message GetEvaluationSessionResponse {
+  EvaluationSession session = 1;
+  repeated CodeAnalysisResult code_analyses = 2;
+  repeated LLMEvaluation llm_evaluations = 3;
+}
+
+message ListEvaluationSessionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string employee_id = 2;
+  string evaluation_period = 3;
+  EvaluationStatus status = 4;
+  string department = 5;
+}
+message ListEvaluationSessionsResponse {
+  repeated EvaluationSession sessions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// --- 承認ワークフロー ---
+
+message ApproveEvaluationRequest {
+  string submission_id = 1;
+  string comment = 2;
+}
+message ApproveEvaluationResponse {
+  ApprovalStatus status = 1;
+}
+
+message RejectEvaluationRequest {
+  string submission_id = 1;
+  string reason = 2;
+}
+message RejectEvaluationResponse {
+  ApprovalStatus status = 1;
+}
+
+message ModifyEvaluationRequest {
+  string submission_id = 1;
+  // 変更後のスコア（空の場合は変更なし）
+  double total_score = 2;
+  string evaluation_tier = 3;
+  string feedback = 4;
+  string reason = 5;
+  // 個別回答のスコア変更
+  repeated AnswerScoreModification answer_modifications = 6;
+}
+
+message AnswerScoreModification {
+  string answer_id = 1;
+  double new_score = 2;
+  string reason = 3;
+}
+
+message ModifyEvaluationResponse {
+  ApprovalStatus status = 1;
+}
+
+// --- SAD ---
+
+message GetSADRequest {
+  string id = 1;
+}
+message GetSADResponse {
+  SkillAssessmentData sad = 1;
+}
+
+message ListSADsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string employee_id = 2;
+  string evaluation_period = 3;
+  string department = 4;
+}
+message ListSADsResponse {
+  repeated SkillAssessmentData sads = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// --- 評価基準マスタ ---
+
+message ListGradeCriteriaRequest {
+  bool active_only = 1;
+}
+message ListGradeCriteriaResponse {
+  repeated GradeCriteria criteria = 1;
+}
+
+message ListDepartmentCriteriaRequest {
+  bool active_only = 1;
+}
+message ListDepartmentCriteriaResponse {
+  repeated DepartmentCriteria criteria = 1;
+}
+
+message ListEvaluationRubricsRequest {
+  string criterion_code = 1;
+  RubricLevel level = 2;
+  bool active_only = 3;
+}
+message ListEvaluationRubricsResponse {
+  repeated EvaluationRubric rubrics = 1;
+}
+
+// --- 監査ログ ---
+
+message ListAuditLogsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string submission_id = 2;
+  string changed_by = 3;
+  EvaluationChangeType change_type = 4;
+}
+message ListAuditLogsResponse {
+  repeated EvaluationAuditLog logs = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// --- プロンプトログ ---
+
+message ListPromptLogsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string evaluation_session_id = 2;
+}
+message ListPromptLogsResponse {
+  repeated EvaluationPromptLog logs = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// --- Dashboard ---
+
+message GetAdminDashboardRequest {
+  string period_id = 1;
+  string department = 2;
+}
+message GetAdminDashboardResponse {
+  int32 total_submissions = 1;
+  int32 evaluated_count = 2;
+  int32 pending_approval_count = 3;
+  int32 approved_count = 4;
+  // ティア別分布
+  map<string, int32> tier_distribution = 5;
+  // 部門別平均スコア
+  map<string, double> department_avg_scores = 6;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
+// EvaluationService はAI評価・レビュー・承認の管理サービス。
+service EvaluationService {
+  // --- 評価セッション ---
+  rpc GetEvaluationSession(GetEvaluationSessionRequest) returns (GetEvaluationSessionResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/evaluations/{id}"
+    };
+  }
+  rpc ListEvaluationSessions(ListEvaluationSessionsRequest) returns (ListEvaluationSessionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/evaluations"
+    };
+  }
+
+  // --- 承認ワークフロー ---
+  rpc ApproveEvaluation(ApproveEvaluationRequest) returns (ApproveEvaluationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/evaluations/{submission_id}/approve"
+      body: "*"
+    };
+  }
+  rpc RejectEvaluation(RejectEvaluationRequest) returns (RejectEvaluationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/evaluations/{submission_id}/reject"
+      body: "*"
+    };
+  }
+  rpc ModifyEvaluation(ModifyEvaluationRequest) returns (ModifyEvaluationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/evaluations/{submission_id}/modify"
+      body: "*"
+    };
+  }
+
+  // --- SAD（スキル評価データ） ---
+  rpc GetSAD(GetSADRequest) returns (GetSADResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/sads/{id}"
+    };
+  }
+  rpc ListSADs(ListSADsRequest) returns (ListSADsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/sads"
+    };
+  }
+
+  // --- 評価基準マスタ ---
+  rpc ListGradeCriteria(ListGradeCriteriaRequest) returns (ListGradeCriteriaResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/criteria/grades"
+    };
+  }
+  rpc ListDepartmentCriteria(ListDepartmentCriteriaRequest) returns (ListDepartmentCriteriaResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/criteria/departments"
+    };
+  }
+  rpc ListEvaluationRubrics(ListEvaluationRubricsRequest) returns (ListEvaluationRubricsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/criteria/rubrics"
+    };
+  }
+
+  // --- 監査ログ ---
+  rpc ListAuditLogs(ListAuditLogsRequest) returns (ListAuditLogsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/evaluations/audit-logs"
+    };
+  }
+
+  // --- プロンプトログ ---
+  rpc ListPromptLogs(ListPromptLogsRequest) returns (ListPromptLogsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/evaluations/prompt-logs"
+    };
+  }
+
+  // --- ダッシュボード ---
+  rpc GetAdminDashboard(GetAdminDashboardRequest) returns (GetAdminDashboardResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/dashboard"
+    };
+  }
+}

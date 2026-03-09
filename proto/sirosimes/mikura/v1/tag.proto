@@ -1,0 +1,199 @@
+syntax = "proto3";
+
+package sirosimes.mikura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// tag.proto — 御蔵（Mikura）タグ・分類管理。
+//
+// タクソノミーベースのタグ管理、オブジェクトへのタグ付け、
+// タグによる検索を提供する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// TagTaxonomy defines a classification scheme with predefined tag values.
+message TagTaxonomy {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // Human-readable taxonomy name (e.g., "Document Type", "Department").
+  string name = 2;
+  // Description of what this taxonomy classifies.
+  string description = 3;
+  // Allowed tag values within this taxonomy.
+  repeated string tags = 4;
+  // Whether this is a system-managed taxonomy (immutable by users).
+  bool is_system = 5;
+  // Actor ID who created this taxonomy.
+  string created_by = 6;
+}
+
+// ObjectTag represents a tag applied to an object.
+message ObjectTag {
+  // Unique identifier (UUID format).
+  string id = 1;
+  // Object this tag is applied to.
+  string object_id = 2;
+  // Taxonomy this tag belongs to.
+  string taxonomy_id = 3;
+  // Tag value from the taxonomy.
+  string tag_value = 4;
+  // Actor ID who applied this tag.
+  string created_by = 5;
+  // Confidence score (0.0-1.0) for auto-classified tags.
+  float confidence = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// ListTaxonomiesRequest is the request for listing taxonomies.
+message ListTaxonomiesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+}
+
+// ListTaxonomiesResponse is the response for listing taxonomies.
+message ListTaxonomiesResponse {
+  repeated TagTaxonomy taxonomies = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateTaxonomyRequest is the request for creating a taxonomy.
+message CreateTaxonomyRequest {
+  string name = 1;
+  string description = 2;
+  repeated string tags = 3;
+  bool is_system = 4;
+}
+
+// CreateTaxonomyResponse is the response after creating a taxonomy.
+message CreateTaxonomyResponse {
+  TagTaxonomy taxonomy = 1;
+}
+
+// GetTaxonomyRequest is the request for retrieving a taxonomy.
+message GetTaxonomyRequest {
+  string id = 1;
+}
+
+// GetTaxonomyResponse is the response containing a taxonomy.
+message GetTaxonomyResponse {
+  TagTaxonomy taxonomy = 1;
+}
+
+// UpdateTaxonomyRequest is the request for updating a taxonomy.
+message UpdateTaxonomyRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string tags = 4;
+}
+
+// UpdateTaxonomyResponse is the response after updating a taxonomy.
+message UpdateTaxonomyResponse {
+  TagTaxonomy taxonomy = 1;
+}
+
+// DeleteTaxonomyRequest is the request for deleting a taxonomy.
+message DeleteTaxonomyRequest {
+  string id = 1;
+}
+
+// DeleteTaxonomyResponse is the response after deleting a taxonomy.
+message DeleteTaxonomyResponse {}
+
+// ListObjectTagsRequest is the request for listing tags on an object.
+message ListObjectTagsRequest {
+  string object_id = 1;
+}
+
+// ListObjectTagsResponse is the response for listing tags on an object.
+message ListObjectTagsResponse {
+  repeated ObjectTag tags = 1;
+}
+
+// AddObjectTagRequest is the request for adding a tag to an object.
+message AddObjectTagRequest {
+  string object_id = 1;
+  string taxonomy_id = 2;
+  string tag_value = 3;
+  float confidence = 4;
+}
+
+// AddObjectTagResponse is the response after adding a tag.
+message AddObjectTagResponse {
+  ObjectTag tag = 1;
+}
+
+// DeleteObjectTagRequest is the request for removing a tag from an object.
+message DeleteObjectTagRequest {
+  string id = 1;
+}
+
+// DeleteObjectTagResponse is the response after removing a tag.
+message DeleteObjectTagResponse {}
+
+// SearchByTagsRequest is the request for searching objects by tags.
+message SearchByTagsRequest {
+  string taxonomy_id = 1;
+  repeated string tag_values = 2;
+  sirosimes.common.v1.PaginationRequest pagination = 3;
+}
+
+// SearchByTagsResponse is the response for tag-based search.
+message SearchByTagsResponse {
+  repeated ObjectTag tags = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// TagService manages taxonomies and object tagging in Mikura.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service TagService {
+  rpc ListTaxonomies(ListTaxonomiesRequest) returns (ListTaxonomiesResponse) {
+    option (google.api.http) = {
+      get: "/v1/taxonomies"
+    };
+  }
+  rpc CreateTaxonomy(CreateTaxonomyRequest) returns (CreateTaxonomyResponse) {
+    option (google.api.http) = {
+      post: "/v1/taxonomies"
+      body: "*"
+    };
+  }
+  rpc GetTaxonomy(GetTaxonomyRequest) returns (GetTaxonomyResponse) {
+    option (google.api.http) = {
+      get: "/v1/taxonomies/{id}"
+    };
+  }
+  rpc UpdateTaxonomy(UpdateTaxonomyRequest) returns (UpdateTaxonomyResponse) {
+    option (google.api.http) = {
+      patch: "/v1/taxonomies/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteTaxonomy(DeleteTaxonomyRequest) returns (DeleteTaxonomyResponse) {
+    option (google.api.http) = {
+      delete: "/v1/taxonomies/{id}"
+    };
+  }
+  rpc ListObjectTags(ListObjectTagsRequest) returns (ListObjectTagsResponse) {
+    option (google.api.http) = {
+      get: "/v1/objects/{object_id}/tags"
+    };
+  }
+  rpc AddObjectTag(AddObjectTagRequest) returns (AddObjectTagResponse) {
+    option (google.api.http) = {
+      post: "/v1/objects/{object_id}/tags"
+      body: "*"
+    };
+  }
+  rpc DeleteObjectTag(DeleteObjectTagRequest) returns (DeleteObjectTagResponse) {
+    option (google.api.http) = {
+      delete: "/v1/tags/{id}"
+    };
+  }
+  rpc SearchByTags(SearchByTagsRequest) returns (SearchByTagsResponse) {
+    option (google.api.http) = {
+      get: "/v1/tags/search"
+    };
+  }
+}

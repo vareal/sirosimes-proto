@@ -1,0 +1,300 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// question.proto — 問題バンク
+//
+// 玉の舎のアセスメント問題管理ドメイン。コーディング、多肢選択、
+// 自由記述、プレゼンテーション等の問題を管理する。
+// AI自動生成問題もサポート。
+//
+// 関連:
+//   - skill.proto: 問題が評価するスキル
+//   - assessment.proto: 問題がアセスメントで出題される
+//   - evaluation.proto: 回答のAI評価で参照
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// QuestionCategory は問題のカテゴリ。
+enum QuestionCategory {
+  QUESTION_CATEGORY_UNSPECIFIED = 0;
+  QUESTION_CATEGORY_TECHNICAL = 1;
+  QUESTION_CATEGORY_LOGICAL = 2;
+  QUESTION_CATEGORY_BUSINESS = 3;
+  QUESTION_CATEGORY_PRESENTATION = 4;
+}
+
+// QuestionType は問題の種別。
+enum QuestionType {
+  QUESTION_TYPE_UNSPECIFIED = 0;
+  QUESTION_TYPE_CODING = 1;
+  QUESTION_TYPE_SHORT_ANSWER = 2;
+  QUESTION_TYPE_FREE_TEXT = 3;
+  QUESTION_TYPE_SCENARIO = 4;
+  QUESTION_TYPE_AUDIO_RESPONSE = 5;
+}
+
+// QuestionDifficulty は問題の難易度。
+enum QuestionDifficulty {
+  QUESTION_DIFFICULTY_UNSPECIFIED = 0;
+  QUESTION_DIFFICULTY_EASY = 1;
+  QUESTION_DIFFICULTY_MEDIUM = 2;
+  QUESTION_DIFFICULTY_HARD = 3;
+}
+
+// QuestionStatus は問題の管理ステータス。
+enum QuestionStatus {
+  QUESTION_STATUS_UNSPECIFIED = 0;
+  QUESTION_STATUS_DRAFT = 1;
+  QUESTION_STATUS_REVIEW = 2;
+  QUESTION_STATUS_APPROVED = 3;
+  QUESTION_STATUS_ARCHIVED = 4;
+}
+
+// TargetDepartment は出題対象の部門。
+enum TargetDepartment {
+  TARGET_DEPARTMENT_UNSPECIFIED = 0;
+  TARGET_DEPARTMENT_DEVELOPMENT = 1;
+  TARGET_DEPARTMENT_MANAGEMENT = 2;
+  TARGET_DEPARTMENT_SALES = 3;
+  TARGET_DEPARTMENT_COMMON = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Messages
+// ---------------------------------------------------------------------------
+
+// TestCase はコーディング問題のテストケース。
+message TestCase {
+  string input = 1;
+  string expected_output = 2;
+  bool is_hidden = 3;
+  string description = 4;
+}
+
+// Option は選択肢。
+message Option {
+  string id = 1;
+  string text = 2;
+  bool is_correct = 3;
+}
+
+// RubricItem は評価ルーブリックの項目。
+message RubricItem {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 max_points = 4;
+  string evaluation_guide = 5;
+}
+
+// Question は問題バンクの問題。
+message Question {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 問題管理コード（例: TH-G5-H-001）
+  string question_code = 2;
+
+  // --- 分類 ---
+  QuestionCategory category = 3;
+  // アセスメント種別（assessment.proto の AssessmentType と対応）
+  string assessment_type = 4;
+  QuestionType question_type = 5;
+  QuestionDifficulty difficulty = 6;
+
+  // --- ターゲット ---
+  repeated string target_grades = 7;
+  repeated TargetDepartment target_departments = 8;
+  string target_language = 9;
+
+  // --- 問題内容 ---
+  string title = 10;
+  string description = 11;
+  int32 points = 12;
+  int32 time_limit_minutes = 13;
+
+  // --- コーディング問題固有 ---
+  string language = 14;
+  string starter_code = 15;
+  repeated TestCase test_cases = 16;
+
+  // --- 選択問題固有 ---
+  repeated Option options = 17;
+
+  // --- 評価基準 ---
+  repeated RubricItem rubric = 18;
+  string model_answer = 19;
+
+  // --- 管理情報 ---
+  QuestionStatus status = 20;
+  bool is_active = 21;
+  int32 usage_count = 22;
+  repeated string tags = 23;
+
+  // --- AI生成情報 ---
+  bool is_ai_generated = 24;
+  google.protobuf.Struct generation_params = 25;
+}
+
+// ---------------------------------------------------------------------------
+// Request / Response
+// ---------------------------------------------------------------------------
+
+message GetQuestionRequest {
+  string id = 1;
+}
+message GetQuestionResponse {
+  Question question = 1;
+}
+
+message ListQuestionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  QuestionCategory category = 2;
+  string assessment_type = 3;
+  QuestionType question_type = 4;
+  QuestionDifficulty difficulty = 5;
+  QuestionStatus status = 6;
+  repeated string target_grades = 7;
+  string target_language = 8;
+  bool active_only = 9;
+  string query = 10;
+  repeated string tags = 11;
+}
+message ListQuestionsResponse {
+  repeated Question questions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateQuestionRequest {
+  string question_code = 1;
+  QuestionCategory category = 2;
+  string assessment_type = 3;
+  QuestionType question_type = 4;
+  QuestionDifficulty difficulty = 5;
+  repeated string target_grades = 6;
+  repeated TargetDepartment target_departments = 7;
+  string target_language = 8;
+  string title = 9;
+  string description = 10;
+  int32 points = 11;
+  int32 time_limit_minutes = 12;
+  string language = 13;
+  string starter_code = 14;
+  repeated TestCase test_cases = 15;
+  repeated Option options = 16;
+  repeated RubricItem rubric = 17;
+  string model_answer = 18;
+  repeated string tags = 19;
+}
+message CreateQuestionResponse {
+  Question question = 1;
+}
+
+message UpdateQuestionRequest {
+  string id = 1;
+  google.protobuf.FieldMask update_mask = 2;
+  string title = 3;
+  string description = 4;
+  QuestionDifficulty difficulty = 5;
+  int32 points = 6;
+  int32 time_limit_minutes = 7;
+  string starter_code = 8;
+  repeated TestCase test_cases = 9;
+  repeated Option options = 10;
+  repeated RubricItem rubric = 11;
+  string model_answer = 12;
+  QuestionStatus status = 13;
+  bool is_active = 14;
+  repeated string tags = 15;
+}
+message UpdateQuestionResponse {
+  Question question = 1;
+}
+
+message DeleteQuestionRequest {
+  string id = 1;
+}
+message DeleteQuestionResponse {}
+
+// BatchUpdateStatusRequest はステータス一括変更。
+message BatchUpdateQuestionStatusRequest {
+  repeated string ids = 1;
+  QuestionStatus status = 2;
+}
+message BatchUpdateQuestionStatusResponse {
+  int32 updated_count = 1;
+}
+
+// AI問題生成リクエスト
+message GenerateQuestionsRequest {
+  QuestionCategory category = 1;
+  string assessment_type = 2;
+  QuestionType question_type = 3;
+  QuestionDifficulty difficulty = 4;
+  repeated string target_grades = 5;
+  string target_language = 6;
+  int32 count = 7;
+  // 追加指示（プロンプトに追加）
+  string additional_instructions = 8;
+}
+message GenerateQuestionsResponse {
+  repeated Question questions = 1;
+  int32 generated_count = 2;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
+// QuestionService は問題バンクの管理サービス。
+service QuestionService {
+  rpc GetQuestion(GetQuestionRequest) returns (GetQuestionResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/questions/{id}"
+    };
+  }
+  rpc ListQuestions(ListQuestionsRequest) returns (ListQuestionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/questions"
+    };
+  }
+  rpc CreateQuestion(CreateQuestionRequest) returns (CreateQuestionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/questions"
+      body: "*"
+    };
+  }
+  rpc UpdateQuestion(UpdateQuestionRequest) returns (UpdateQuestionResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/questions/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteQuestion(DeleteQuestionRequest) returns (DeleteQuestionResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/questions/{id}"
+    };
+  }
+  rpc BatchUpdateQuestionStatus(BatchUpdateQuestionStatusRequest) returns (BatchUpdateQuestionStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/questions/batch-status"
+      body: "*"
+    };
+  }
+
+  // AI問題自動生成
+  rpc GenerateQuestions(GenerateQuestionsRequest) returns (GenerateQuestionsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/questions/generate"
+      body: "*"
+    };
+  }
+}
