@@ -1,0 +1,311 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.v1;
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// oauth2.proto — OAuth2 / OIDC クライアント管理。
+//
+// 瑞垣 SSO の OAuth2 Authorization Server 機能を定義する。
+// OIDC Discovery (https://auth.vareal.group/.well-known/openid-configuration) に準拠し、
+// Authorization Code Grant、Refresh Token Grant、Client Credentials Grant をサポートする。
+//
+// 登録済みクライアント:
+//   - tsukasa: 司（社員管理・Wiki・日報）
+//   - hataori: 機織（ワークフローエンジン）
+//   - mikura: 御倉（ストレージ）
+//   - chakai: 茶会（チャットUI）
+//   - paws: PAWS（AI業務自動化）
+//   - voice: Nexia Voice（音声インターフェース）
+//
+// 関連型:
+//   - SecurityLevel (common/v1/metadata.proto): クライアントシークレットは RESTRICTED レベル。
+//   - ResourceMetadata (common/v1/metadata.proto): 標準メタデータ。
+//   - TokenClaims (token.proto): OAuth2 トークンに含まれるクレーム。
+
+// GrantType は OAuth2 の認可タイプを分類する。
+enum GrantType {
+  GRANT_TYPE_UNSPECIFIED = 0;
+  // Authorization Code Grant — ユーザー認証を伴うフロー。
+  GRANT_TYPE_AUTHORIZATION_CODE = 1;
+  // Refresh Token Grant — トークン更新。
+  GRANT_TYPE_REFRESH_TOKEN = 2;
+  // Client Credentials Grant — サービス間認証。
+  GRANT_TYPE_CLIENT_CREDENTIALS = 3;
+}
+
+// ResponseType は OAuth2 の応答タイプを分類する。
+enum ResponseType {
+  RESPONSE_TYPE_UNSPECIFIED = 0;
+  // Authorization Code Flow で使用。
+  RESPONSE_TYPE_CODE = 1;
+}
+
+// TokenEndpointAuthMethod はトークンエンドポイントの認証方法を分類する。
+enum TokenEndpointAuthMethod {
+  TOKEN_ENDPOINT_AUTH_METHOD_UNSPECIFIED = 0;
+  // リクエストボディで client_secret を送信。
+  TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_POST = 1;
+  // HTTP Basic 認証で client_id:client_secret を送信。
+  TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_BASIC = 2;
+}
+
+// ClientStatus は OAuth2 クライアントの状態を表す。
+enum ClientStatus {
+  CLIENT_STATUS_UNSPECIFIED = 0;
+  // クライアントは有効で認可リクエストを受け付ける。
+  CLIENT_STATUS_ACTIVE = 1;
+  // クライアントは無効化されている。
+  CLIENT_STATUS_INACTIVE = 2;
+  // クライアントは管理者によって停止されている。
+  CLIENT_STATUS_SUSPENDED = 3;
+}
+
+// OAuth2Client は登録された OAuth2/OIDC クライアントアプリケーションを表す。
+message OAuth2Client {
+  // リソースメタデータ（ID、タイムスタンプ、バージョン、セキュリティレベル）。
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // クライアントID（一意、公開値）。
+  string client_id = 2;
+  // クライアント表示名（例: "司", "機織"）。
+  string client_name = 3;
+  // クライアントの説明。
+  string description = 4;
+  // 許可されたリダイレクトURI。
+  repeated string redirect_uris = 5;
+  // 許可された認可タイプ。
+  repeated GrantType grant_types = 6;
+  // 許可されたレスポンスタイプ。
+  repeated ResponseType response_types = 7;
+  // 許可されたスコープ（openid, profile, email, roles）。
+  repeated string scopes = 8;
+  // トークンエンドポイント認証方法。
+  TokenEndpointAuthMethod token_endpoint_auth_method = 9;
+  // 現在の状態。
+  ClientStatus status = 10;
+  // クライアントの Web サイトURL。
+  string client_uri = 11;
+  // クライアントのロゴURL。
+  string logo_uri = 12;
+  // アクセストークンの有効期間（秒）。
+  int32 access_token_ttl_seconds = 13;
+  // リフレッシュトークンの有効期間（秒）。
+  int32 refresh_token_ttl_seconds = 14;
+}
+
+// RegisterClientRequest は OAuth2 クライアント登録リクエストを表す。
+message RegisterClientRequest {
+  // クライアントID（一意、必須）。
+  string client_id = 1;
+  // クライアント表示名。
+  string client_name = 2;
+  // クライアントの説明。
+  string description = 3;
+  // リダイレクトURI。
+  repeated string redirect_uris = 4;
+  // 許可する認可タイプ。
+  repeated GrantType grant_types = 5;
+  // 許可するスコープ。
+  repeated string scopes = 6;
+  // トークンエンドポイント認証方法。
+  TokenEndpointAuthMethod token_endpoint_auth_method = 7;
+  // クライアントの Web サイトURL。
+  string client_uri = 8;
+  // アクセストークンの有効期間（秒）。
+  int32 access_token_ttl_seconds = 9;
+  // リフレッシュトークンの有効期間（秒）。
+  int32 refresh_token_ttl_seconds = 10;
+}
+
+// RegisterClientResponse は OAuth2 クライアント登録レスポンスを表す。
+message RegisterClientResponse {
+  // 登録されたクライアント。
+  OAuth2Client client = 1;
+  // クライアントシークレット（RESTRICTED — 登録時のみ返却、以降は取得不可）。
+  string client_secret = 2;
+}
+
+// GetClientRequest は OAuth2 クライアント取得リクエストを表す。
+message GetClientRequest {
+  // 取得するクライアントID。
+  string client_id = 1;
+}
+
+// GetClientResponse は OAuth2 クライアント取得レスポンスを表す。
+message GetClientResponse {
+  // 取得したクライアント（シークレットは含まない）。
+  OAuth2Client client = 1;
+}
+
+// UpdateClientRequest は OAuth2 クライアント更新リクエストを表す。
+message UpdateClientRequest {
+  // 更新対象のクライアントID。
+  string client_id = 1;
+  // 新しい表示名（空の場合は変更なし）。
+  string client_name = 2;
+  // 新しい説明（空の場合は変更なし）。
+  string description = 3;
+  // 新しいリダイレクトURI（空の場合は変更なし）。
+  repeated string redirect_uris = 4;
+  // 新しい認可タイプ（空の場合は変更なし）。
+  repeated GrantType grant_types = 5;
+  // 新しいスコープ（空の場合は変更なし）。
+  repeated string scopes = 6;
+  // 新しいステータス。
+  ClientStatus status = 7;
+  // アクセストークンの有効期間（秒）。
+  int32 access_token_ttl_seconds = 8;
+  // リフレッシュトークンの有効期間（秒）。
+  int32 refresh_token_ttl_seconds = 9;
+}
+
+// UpdateClientResponse は OAuth2 クライアント更新レスポンスを表す。
+message UpdateClientResponse {
+  // 更新されたクライアント。
+  OAuth2Client client = 1;
+}
+
+// DeleteClientRequest は OAuth2 クライアント削除リクエストを表す。
+message DeleteClientRequest {
+  // 削除するクライアントID。
+  string client_id = 1;
+}
+
+// DeleteClientResponse は OAuth2 クライアント削除レスポンスを表す。
+message DeleteClientResponse {}
+
+// ListClientsRequest は OAuth2 クライアント一覧取得リクエストを表す。
+message ListClientsRequest {
+  // ページネーション設定。
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  // ステータスでフィルタ。
+  ClientStatus status = 2;
+  // 全文検索クエリ。
+  string search = 3;
+}
+
+// ListClientsResponse は OAuth2 クライアント一覧取得レスポンスを表す。
+message ListClientsResponse {
+  // クライアント一覧。
+  repeated OAuth2Client clients = 1;
+  // ページネーション情報。
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// RotateClientSecretRequest はクライアントシークレットローテーションリクエストを表す。
+message RotateClientSecretRequest {
+  // 対象クライアントID。
+  string client_id = 1;
+}
+
+// RotateClientSecretResponse はクライアントシークレットローテーションレスポンスを表す。
+message RotateClientSecretResponse {
+  // 新しいクライアントシークレット（RESTRICTED — この応答でのみ返却）。
+  string client_secret = 1;
+}
+
+// AuthorizeRequest は OAuth2 認可リクエストを表す。
+message AuthorizeRequest {
+  // クライアントID。
+  string client_id = 1;
+  // レスポンスタイプ（通常は "code"）。
+  ResponseType response_type = 2;
+  // リダイレクトURI。
+  string redirect_uri = 3;
+  // 要求するスコープ（スペース区切り）。
+  string scope = 4;
+  // CSRF対策用ステート値。
+  string state = 5;
+  // PKCE code_challenge（推奨）。
+  string code_challenge = 6;
+  // PKCE code_challenge_method（"S256" 推奨）。
+  string code_challenge_method = 7;
+}
+
+// AuthorizeResponse は OAuth2 認可レスポンスを表す。
+message AuthorizeResponse {
+  // 発行された認可コード。
+  string code = 1;
+  // リクエストで送信されたステート値（そのまま返却）。
+  string state = 2;
+  // リダイレクト先URI（code と state を含む）。
+  string redirect_uri = 3;
+}
+
+// TokenRequest は OAuth2 トークンリクエストを表す。
+message TokenRequest {
+  // 認可タイプ。
+  GrantType grant_type = 1;
+  // クライアントID。
+  string client_id = 2;
+  // クライアントシークレット（RESTRICTED）。
+  string client_secret = 3;
+  // 認可コード（authorization_code grant の場合）。
+  string code = 4;
+  // リダイレクトURI（authorization_code grant の場合）。
+  string redirect_uri = 5;
+  // リフレッシュトークン（refresh_token grant の場合）。
+  string refresh_token = 6;
+  // 要求するスコープ。
+  string scope = 7;
+  // PKCE code_verifier。
+  string code_verifier = 8;
+}
+
+// TokenResponse は OAuth2 トークンレスポンスを表す。
+message TokenResponse {
+  // アクセストークン。
+  string access_token = 1;
+  // トークンタイプ（通常は "Bearer"）。
+  string token_type = 2;
+  // アクセストークンの有効期間（秒）。
+  int32 expires_in = 3;
+  // リフレッシュトークン。
+  string refresh_token = 4;
+  // 付与されたスコープ。
+  string scope = 5;
+  // OIDC IDトークン（openid スコープが要求された場合）。
+  string id_token = 6;
+}
+
+// UserinfoRequest は OIDC UserInfo リクエストを表す。
+message UserinfoRequest {
+  // アクセストークン（Bearer トークン）。
+  string access_token = 1;
+}
+
+// UserinfoResponse は OIDC UserInfo レスポンスを表す。
+message UserinfoResponse {
+  // Subject — ユーザーID。
+  string sub = 1;
+  // ユーザー表示名。
+  string name = 2;
+  // メールアドレス。
+  string email = 3;
+  // メールアドレスが確認済みかどうか。
+  bool email_verified = 4;
+  // 付与されたロール一覧。
+  repeated string roles = 5;
+  // 信頼レベル。
+  int32 trust_level = 6;
+  // アクター種別。
+  string actor_type = 7;
+  // ユーザー識別子。
+  string identifier = 8;
+  // アバター画像URL。
+  string picture = 9;
+}
+
+// OAuth2Service は OAuth2/OIDC クライアント管理と認可操作を提供する。
+service OAuth2Service {
+  rpc RegisterClient(RegisterClientRequest) returns (RegisterClientResponse);
+  rpc GetClient(GetClientRequest) returns (GetClientResponse);
+  rpc UpdateClient(UpdateClientRequest) returns (UpdateClientResponse);
+  rpc DeleteClient(DeleteClientRequest) returns (DeleteClientResponse);
+  rpc ListClients(ListClientsRequest) returns (ListClientsResponse);
+  rpc RotateClientSecret(RotateClientSecretRequest) returns (RotateClientSecretResponse);
+  rpc Authorize(AuthorizeRequest) returns (AuthorizeResponse);
+  rpc Token(TokenRequest) returns (TokenResponse);
+  rpc Userinfo(UserinfoRequest) returns (UserinfoResponse);
+}

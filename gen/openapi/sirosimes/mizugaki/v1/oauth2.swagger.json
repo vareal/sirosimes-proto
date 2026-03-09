@@ -1,0 +1,462 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mizugaki/v1/oauth2.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "OAuth2Service"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AuthorizeResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "title": "発行された認可コード。"
+        },
+        "state": {
+          "type": "string",
+          "title": "リクエストで送信されたステート値（そのまま返却）。"
+        },
+        "redirectUri": {
+          "type": "string",
+          "title": "リダイレクト先URI（code と state を含む）。"
+        }
+      },
+      "title": "AuthorizeResponse は OAuth2 認可レスポンスを表す。"
+    },
+    "v1ClientStatus": {
+      "type": "string",
+      "enum": [
+        "CLIENT_STATUS_UNSPECIFIED",
+        "CLIENT_STATUS_ACTIVE",
+        "CLIENT_STATUS_INACTIVE",
+        "CLIENT_STATUS_SUSPENDED"
+      ],
+      "default": "CLIENT_STATUS_UNSPECIFIED",
+      "description": "- CLIENT_STATUS_ACTIVE: クライアントは有効で認可リクエストを受け付ける。\n - CLIENT_STATUS_INACTIVE: クライアントは無効化されている。\n - CLIENT_STATUS_SUSPENDED: クライアントは管理者によって停止されている。",
+      "title": "ClientStatus は OAuth2 クライアントの状態を表す。"
+    },
+    "v1DeleteClientResponse": {
+      "type": "object",
+      "title": "DeleteClientResponse は OAuth2 クライアント削除レスポンスを表す。"
+    },
+    "v1GetClientResponse": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "$ref": "#/definitions/v1OAuth2Client",
+          "title": "取得したクライアント（シークレットは含まない）。"
+        }
+      },
+      "title": "GetClientResponse は OAuth2 クライアント取得レスポンスを表す。"
+    },
+    "v1GrantType": {
+      "type": "string",
+      "enum": [
+        "GRANT_TYPE_UNSPECIFIED",
+        "GRANT_TYPE_AUTHORIZATION_CODE",
+        "GRANT_TYPE_REFRESH_TOKEN",
+        "GRANT_TYPE_CLIENT_CREDENTIALS"
+      ],
+      "default": "GRANT_TYPE_UNSPECIFIED",
+      "description": "- GRANT_TYPE_AUTHORIZATION_CODE: Authorization Code Grant — ユーザー認証を伴うフロー。\n - GRANT_TYPE_REFRESH_TOKEN: Refresh Token Grant — トークン更新。\n - GRANT_TYPE_CLIENT_CREDENTIALS: Client Credentials Grant — サービス間認証。",
+      "title": "GrantType は OAuth2 の認可タイプを分類する。"
+    },
+    "v1ListClientsResponse": {
+      "type": "object",
+      "properties": {
+        "clients": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OAuth2Client"
+          },
+          "title": "クライアント一覧。"
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "ページネーション情報。"
+        }
+      },
+      "title": "ListClientsResponse は OAuth2 クライアント一覧取得レスポンスを表す。"
+    },
+    "v1OAuth2Client": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata",
+          "title": "リソースメタデータ（ID、タイムスタンプ、バージョン、セキュリティレベル）。"
+        },
+        "clientId": {
+          "type": "string",
+          "title": "クライアントID（一意、公開値）。"
+        },
+        "clientName": {
+          "type": "string",
+          "title": "クライアント表示名（例: \"司\", \"機織\"）。"
+        },
+        "description": {
+          "type": "string",
+          "title": "クライアントの説明。"
+        },
+        "redirectUris": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "許可されたリダイレクトURI。"
+        },
+        "grantTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1GrantType"
+          },
+          "title": "許可された認可タイプ。"
+        },
+        "responseTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ResponseType"
+          },
+          "title": "許可されたレスポンスタイプ。"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "許可されたスコープ（openid, profile, email, roles）。"
+        },
+        "tokenEndpointAuthMethod": {
+          "$ref": "#/definitions/v1TokenEndpointAuthMethod",
+          "title": "トークンエンドポイント認証方法。"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ClientStatus",
+          "title": "現在の状態。"
+        },
+        "clientUri": {
+          "type": "string",
+          "title": "クライアントの Web サイトURL。"
+        },
+        "logoUri": {
+          "type": "string",
+          "title": "クライアントのロゴURL。"
+        },
+        "accessTokenTtlSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "アクセストークンの有効期間（秒）。"
+        },
+        "refreshTokenTtlSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "リフレッシュトークンの有効期間（秒）。"
+        }
+      },
+      "title": "OAuth2Client は登録された OAuth2/OIDC クライアントアプリケーションを表す。"
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1RegisterClientResponse": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "$ref": "#/definitions/v1OAuth2Client",
+          "title": "登録されたクライアント。"
+        },
+        "clientSecret": {
+          "type": "string",
+          "title": "クライアントシークレット（RESTRICTED — 登録時のみ返却、以降は取得不可）。"
+        }
+      },
+      "title": "RegisterClientResponse は OAuth2 クライアント登録レスポンスを表す。"
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1ResponseType": {
+      "type": "string",
+      "enum": [
+        "RESPONSE_TYPE_UNSPECIFIED",
+        "RESPONSE_TYPE_CODE"
+      ],
+      "default": "RESPONSE_TYPE_UNSPECIFIED",
+      "description": "- RESPONSE_TYPE_CODE: Authorization Code Flow で使用。",
+      "title": "ResponseType は OAuth2 の応答タイプを分類する。"
+    },
+    "v1RotateClientSecretResponse": {
+      "type": "object",
+      "properties": {
+        "clientSecret": {
+          "type": "string",
+          "title": "新しいクライアントシークレット（RESTRICTED — この応答でのみ返却）。"
+        }
+      },
+      "title": "RotateClientSecretResponse はクライアントシークレットローテーションレスポンスを表す。"
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1TokenEndpointAuthMethod": {
+      "type": "string",
+      "enum": [
+        "TOKEN_ENDPOINT_AUTH_METHOD_UNSPECIFIED",
+        "TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_POST",
+        "TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_BASIC"
+      ],
+      "default": "TOKEN_ENDPOINT_AUTH_METHOD_UNSPECIFIED",
+      "description": "- TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_POST: リクエストボディで client_secret を送信。\n - TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_BASIC: HTTP Basic 認証で client_id:client_secret を送信。",
+      "title": "TokenEndpointAuthMethod はトークンエンドポイントの認証方法を分類する。"
+    },
+    "v1TokenResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "title": "アクセストークン。"
+        },
+        "tokenType": {
+          "type": "string",
+          "title": "トークンタイプ（通常は \"Bearer\"）。"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int32",
+          "title": "アクセストークンの有効期間（秒）。"
+        },
+        "refreshToken": {
+          "type": "string",
+          "title": "リフレッシュトークン。"
+        },
+        "scope": {
+          "type": "string",
+          "title": "付与されたスコープ。"
+        },
+        "idToken": {
+          "type": "string",
+          "title": "OIDC IDトークン（openid スコープが要求された場合）。"
+        }
+      },
+      "title": "TokenResponse は OAuth2 トークンレスポンスを表す。"
+    },
+    "v1UpdateClientResponse": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "$ref": "#/definitions/v1OAuth2Client",
+          "title": "更新されたクライアント。"
+        }
+      },
+      "title": "UpdateClientResponse は OAuth2 クライアント更新レスポンスを表す。"
+    },
+    "v1UserinfoResponse": {
+      "type": "object",
+      "properties": {
+        "sub": {
+          "type": "string",
+          "title": "Subject — ユーザーID。"
+        },
+        "name": {
+          "type": "string",
+          "title": "ユーザー表示名。"
+        },
+        "email": {
+          "type": "string",
+          "title": "メールアドレス。"
+        },
+        "emailVerified": {
+          "type": "boolean",
+          "title": "メールアドレスが確認済みかどうか。"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "付与されたロール一覧。"
+        },
+        "trustLevel": {
+          "type": "integer",
+          "format": "int32",
+          "title": "信頼レベル。"
+        },
+        "actorType": {
+          "type": "string",
+          "title": "アクター種別。"
+        },
+        "identifier": {
+          "type": "string",
+          "title": "ユーザー識別子。"
+        },
+        "picture": {
+          "type": "string",
+          "title": "アバター画像URL。"
+        }
+      },
+      "title": "UserinfoResponse は OIDC UserInfo レスポンスを表す。"
+    }
+  }
+}

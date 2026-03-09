@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+
+// token.proto — JWT / JWKS トークン管理。
+//
+// Ed25519 (EdDSA) で署名された JWT の発行・検証・失効管理と、
+// JWKS (JSON Web Key Set) の公開鍵管理を提供する。
+//
+// 瑞垣のトークンは以下の標準クレームを含む:
+//   - sub: ユーザーID
+//   - iss: https://auth.vareal.group
+//   - aud: クライアントID
+//   - exp/iat: 有効期限・発行時刻
+//   - name, email, roles, trust_level, actor_type, identifier: カスタムクレーム
+//
+// 関連型:
+//   - SecurityLevel (common/v1/metadata.proto): トークンは RESTRICTED レベル。
+//   - AuthSession (auth.proto): セッションがトークンを保持する。
+
+// TokenType はトークンの種別を分類する。
+enum TokenType {
+  TOKEN_TYPE_UNSPECIFIED = 0;
+  // 短命のアクセストークン（APIアクセス用）。
+  TOKEN_TYPE_ACCESS = 1;
+  // 長命のリフレッシュトークン（アクセストークン再発行用）。
+  TOKEN_TYPE_REFRESH = 2;
+  // OIDC IDトークン（ユーザー情報を含む）。
+  TOKEN_TYPE_ID = 3;
+}
+
+// KeyAlgorithm は署名アルゴリズムを分類する。
+enum KeyAlgorithm {
+  KEY_ALGORITHM_UNSPECIFIED = 0;
+  // Ed25519 (EdDSA) — 瑞垣のデフォルト署名アルゴリズム。
+  KEY_ALGORITHM_EDDSA = 1;
+  // RSA-256 — レガシー互換用。
+  KEY_ALGORITHM_RS256 = 2;
+}
+
+// KeyStatus は署名鍵の状態を表す。
+enum KeyStatus {
+  KEY_STATUS_UNSPECIFIED = 0;
+  // 鍵は有効でトークン署名に使用中。
+  KEY_STATUS_ACTIVE = 1;
+  // 鍵はローテーション中（検証のみ、新規署名には使用しない）。
+  KEY_STATUS_ROTATED = 2;
+  // 鍵は失効済み。
+  KEY_STATUS_REVOKED = 3;
+}
+
+// JsonWebKey は JWKS エンドポイントで公開される個別の公開鍵を表す。
+message JsonWebKey {
+  // 鍵ID (kid)。
+  string kid = 1;
+  // 鍵タイプ (kty)。例: "OKP" (Ed25519), "RSA"。
+  string kty = 2;
+  // 署名アルゴリズム。
+  KeyAlgorithm algorithm = 3;
+  // 用途 (use)。例: "sig"。
+  string use = 4;
+  // 鍵の状態。
+  KeyStatus status = 5;
+  // Base64url エンコードされた公開鍵パラメータ (Ed25519: x パラメータ)。
+  string public_key = 6;
+  // 楕円曲線名 (Ed25519 の場合: "Ed25519")。
+  string curve = 7;
+  // 鍵の作成日時。
+  google.protobuf.Timestamp created_at = 8;
+  // 鍵の有効期限。
+  google.protobuf.Timestamp expires_at = 9;
+}
+
+// JsonWebKeySet は JWKS 公開鍵セットを表す。
+message JsonWebKeySet {
+  // 公開鍵の一覧。
+  repeated JsonWebKey keys = 1;
+}
+
+// TokenClaims は JWT トークンに含まれるクレーム情報を表す。
+message TokenClaims {
+  // Subject — ユーザーID。
+  string sub = 1;
+  // Issuer — 発行者 (https://auth.vareal.group)。
+  string iss = 2;
+  // Audience — 対象クライアントID。
+  repeated string aud = 3;
+  // トークン発行時刻。
+  google.protobuf.Timestamp issued_at = 4;
+  // トークン有効期限。
+  google.protobuf.Timestamp expires_at = 5;
+  // Not Before — この時刻より前はトークン無効。
+  google.protobuf.Timestamp not_before = 6;
+  // JWT ID — トークンの一意識別子。
+  string jti = 7;
+  // ユーザー表示名。
+  string name = 8;
+  // ユーザーメールアドレス。
+  string email = 9;
+  // 付与されたロール一覧。
+  repeated string roles = 10;
+  // 信頼レベル（Role.trust_level に対応）。
+  int32 trust_level = 11;
+  // アクター種別 (human, ai_employee, system, external_service)。
+  string actor_type = 12;
+  // ユーザー識別子（ログイン名）。
+  string identifier = 13;
+  // 許可されたスコープ。
+  repeated string scopes = 14;
+}
+
+// RevokedToken は失効したトークンの記録を表す。
+message RevokedToken {
+  // JWT ID (jti)。
+  string jti = 1;
+  // トークン種別。
+  TokenType token_type = 2;
+  // 失効日時。
+  google.protobuf.Timestamp revoked_at = 3;
+  // 失効理由。
+  string reason = 4;
+  // 元のトークン有効期限（キャッシュ期限算出用）。
+  google.protobuf.Timestamp original_expires_at = 5;
+  // セキュリティ分類レベル。
+  sirosimes.common.v1.SecurityLevel security_level = 6;
+}
+
+// IntrospectTokenRequest はトークンイントロスペクションリクエストを表す。
+message IntrospectTokenRequest {
+  // イントロスペクション対象のトークン。
+  string token = 1;
+  // トークン種別のヒント。
+  TokenType token_type_hint = 2;
+}
+
+// IntrospectTokenResponse はトークンイントロスペクションレスポンスを表す。
+message IntrospectTokenResponse {
+  // トークンが有効かどうか。
+  bool active = 1;
+  // トークンのクレーム情報（active の場合のみ設定）。
+  TokenClaims claims = 2;
+  // トークン種別。
+  TokenType token_type = 3;
+}
+
+// GetJwksRequest は JWKS 取得リクエストを表す。
+message GetJwksRequest {}
+
+// GetJwksResponse は JWKS 取得レスポンスを表す。
+message GetJwksResponse {
+  // 公開鍵セット。
+  JsonWebKeySet jwks = 1;
+}
+
+// RotateKeysRequest は鍵ローテーションリクエストを表す。
+message RotateKeysRequest {
+  // ローテーション対象の鍵ID。空の場合は現在のアクティブ鍵をローテーション。
+  string kid = 1;
+  // 新しい鍵のアルゴリズム。
+  KeyAlgorithm algorithm = 2;
+}
+
+// RotateKeysResponse は鍵ローテーションレスポンスを表す。
+message RotateKeysResponse {
+  // 新しく作成された鍵。
+  JsonWebKey new_key = 1;
+  // ローテーションされた旧鍵。
+  JsonWebKey rotated_key = 2;
+}
+
+// RevokeTokenRequest はトークン失効リクエストを表す。
+message RevokeTokenRequest {
+  // 失効させるトークン。
+  string token = 1;
+  // トークン種別のヒント。
+  TokenType token_type_hint = 2;
+  // 失効理由。
+  string reason = 3;
+}
+
+// RevokeTokenResponse はトークン失効レスポンスを表す。
+message RevokeTokenResponse {}
+
+// TokenService はトークン管理操作を提供する。
+service TokenService {
+  rpc IntrospectToken(IntrospectTokenRequest) returns (IntrospectTokenResponse);
+  rpc GetJwks(GetJwksRequest) returns (GetJwksResponse);
+  rpc RotateKeys(RotateKeysRequest) returns (RotateKeysResponse);
+  rpc RevokeToken(RevokeTokenRequest) returns (RevokeTokenResponse);
+}
