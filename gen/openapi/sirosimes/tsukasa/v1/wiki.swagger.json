@@ -1,0 +1,459 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tsukasa/v1/wiki.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "WikiService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ActorType"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "ActorRef is a lightweight reference to an Actor (for embedding in other messages).\nUse this instead of full Actor when only identity info is needed (e.g., in audit logs)."
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1CreateDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1WikiDocumentDetail"
+        }
+      },
+      "description": "CreateDocumentResponse is the response after creating a wiki document."
+    },
+    "v1CreateWikiCommentResponse": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "$ref": "#/definitions/v1WikiCommentDetail"
+        }
+      },
+      "description": "CreateWikiCommentResponse is the response after creating a wiki document comment."
+    },
+    "v1GetBookResponse": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "$ref": "#/definitions/v1WikiBook"
+        }
+      },
+      "description": "GetBookResponse is the response containing a single wiki book."
+    },
+    "v1GetDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1WikiDocumentDetail"
+        }
+      },
+      "description": "GetDocumentResponse is the response containing a single wiki document."
+    },
+    "v1ListBooksResponse": {
+      "type": "object",
+      "properties": {
+        "books": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WikiBook"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListBooksResponse is the response for listing wiki books."
+    },
+    "v1ListDocumentsResponse": {
+      "type": "object",
+      "properties": {
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WikiDocumentDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListDocumentsResponse is the response for listing wiki documents."
+    },
+    "v1ListRevisionsResponse": {
+      "type": "object",
+      "properties": {
+        "revisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WikiRevisionDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListRevisionsResponse is the response for listing document revisions."
+    },
+    "v1ListShelvesResponse": {
+      "type": "object",
+      "properties": {
+        "shelves": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WikiShelf"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListShelvesResponse is the response for listing wiki shelves."
+    },
+    "v1ListWikiCommentsResponse": {
+      "type": "object",
+      "properties": {
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WikiCommentDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListWikiCommentsResponse is the response for listing wiki document comments."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1WikiDocumentDetail"
+        }
+      },
+      "description": "UpdateDocumentResponse is the response after updating a wiki document."
+    },
+    "v1WikiBook": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "shelfId": {
+          "type": "string"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "WikiBook represents a collection of wiki documents within a shelf."
+    },
+    "v1WikiComment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "documentId": {
+          "type": "string"
+        },
+        "authorId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "WikiComment represents a comment on a wiki document."
+    },
+    "v1WikiCommentDetail": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "$ref": "#/definitions/v1WikiComment"
+        },
+        "author": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "WikiCommentDetail bundles a wiki comment with the author reference."
+    },
+    "v1WikiDocument": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "bookId": {
+          "type": "string"
+        },
+        "chapterId": {
+          "type": "string"
+        },
+        "createdById": {
+          "type": "string"
+        },
+        "updatedById": {
+          "type": "string"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "WikiDocument represents a single wiki page with markdown content."
+    },
+    "v1WikiDocumentDetail": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1WikiDocument"
+        },
+        "createdBy": {
+          "$ref": "#/definitions/v1ActorRef"
+        },
+        "updatedBy": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "WikiDocumentDetail bundles a document with resolved actor references."
+    },
+    "v1WikiRevision": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "documentId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "changedById": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "WikiRevision records a historical version of a wiki document."
+    },
+    "v1WikiRevisionDetail": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "$ref": "#/definitions/v1WikiRevision"
+        },
+        "changedBy": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "WikiRevisionDetail bundles a revision with the author reference."
+    },
+    "v1WikiShelf": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "WikiShelf represents a top-level grouping of wiki books."
+    }
+  }
+}

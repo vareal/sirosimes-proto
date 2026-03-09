@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+package sirosimes.tsukasa.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/actor.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "sirosimes/tsukasa/v1/task.proto";
+
+// ProjectStatus represents the lifecycle state of a project.
+enum ProjectStatus {
+  PROJECT_STATUS_UNSPECIFIED = 0;
+  PROJECT_STATUS_PLANNING = 1;
+  PROJECT_STATUS_ACTIVE = 2;
+  PROJECT_STATUS_PAUSED = 3;
+  PROJECT_STATUS_COMPLETED = 4;
+  PROJECT_STATUS_ARCHIVED = 5;
+}
+
+// ProjectPriority indicates the urgency level of a project.
+enum ProjectPriority {
+  PROJECT_PRIORITY_UNSPECIFIED = 0;
+  PROJECT_PRIORITY_LOW = 1;
+  PROJECT_PRIORITY_MEDIUM = 2;
+  PROJECT_PRIORITY_HIGH = 3;
+  PROJECT_PRIORITY_URGENT = 4;
+}
+
+// ProjectMemberRole defines the role of a member within a project.
+enum ProjectMemberRole {
+  PROJECT_MEMBER_ROLE_UNSPECIFIED = 0;
+  PROJECT_MEMBER_ROLE_OWNER = 1;
+  PROJECT_MEMBER_ROLE_LEAD = 2;
+  PROJECT_MEMBER_ROLE_MEMBER = 3;
+  PROJECT_MEMBER_ROLE_OBSERVER = 4;
+}
+
+// Project represents a managed project with metadata and hierarchy.
+message Project {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  ProjectStatus status = 5;
+  string owner_id = 6;
+  string lead_id = 7;
+  google.protobuf.Timestamp started_at = 8;
+  google.protobuf.Timestamp target_date = 9;
+  google.protobuf.Timestamp completed_at = 10;
+  string git_repo_url = 11;
+  string github_mirror_url = 12;
+  string parent_id = 13;
+  ProjectPriority priority = 14;
+  repeated string tags = 15;
+  map<string, string> metadata = 16;
+  google.protobuf.Timestamp created_at = 17;
+  google.protobuf.Timestamp updated_at = 18;
+}
+
+// ProjectDetail bundles a project with resolved actor references.
+message ProjectDetail {
+  Project project = 1;
+  sirosimes.common.v1.ActorRef owner = 2;
+  sirosimes.common.v1.ActorRef lead = 3;
+}
+
+// ProjectMember represents a member assigned to a project.
+message ProjectMember {
+  string id = 1;
+  string project_id = 2;
+  string employee_id = 3;
+  ProjectMemberRole role = 4;
+  google.protobuf.Timestamp joined_at = 5;
+}
+
+// ProjectMemberDetail bundles a project member with the employee reference.
+message ProjectMemberDetail {
+  ProjectMember member = 1;
+  sirosimes.common.v1.ActorRef employee = 2;
+}
+
+// ListProjectsRequest is the request for listing projects.
+message ListProjectsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ProjectStatus status = 2;
+  string owner_id = 3;
+  string search = 4;
+}
+
+// ListProjectsResponse is the response for listing projects.
+message ListProjectsResponse {
+  repeated ProjectDetail projects = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateProjectRequest is the request for creating a new project.
+message CreateProjectRequest {
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  string owner_id = 4;
+  string lead_id = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp target_date = 7;
+  string git_repo_url = 8;
+  string github_mirror_url = 9;
+  string parent_id = 10;
+  ProjectPriority priority = 11;
+  repeated string tags = 12;
+  map<string, string> metadata = 13;
+}
+
+// CreateProjectResponse is the response after creating a project.
+message CreateProjectResponse {
+  ProjectDetail project = 1;
+}
+
+// GetProjectRequest is the request for retrieving a single project.
+message GetProjectRequest {
+  string id = 1;
+}
+
+// GetProjectResponse is the response containing a single project.
+message GetProjectResponse {
+  ProjectDetail project = 1;
+  repeated ProjectMemberDetail members = 2;
+}
+
+// UpdateProjectRequest is the request for updating an existing project.
+message UpdateProjectRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  ProjectStatus status = 4;
+  string lead_id = 5;
+  google.protobuf.Timestamp target_date = 6;
+  string git_repo_url = 7;
+  string github_mirror_url = 8;
+  ProjectPriority priority = 9;
+  repeated string tags = 10;
+  map<string, string> metadata = 11;
+}
+
+// UpdateProjectResponse is the response after updating a project.
+message UpdateProjectResponse {
+  ProjectDetail project = 1;
+}
+
+// GetProjectTasksRequest is the request for listing tasks in a project.
+message GetProjectTasksRequest {
+  string project_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+// GetProjectTasksResponse is the response containing tasks in a project.
+message GetProjectTasksResponse {
+  repeated TaskDetail tasks = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// AddProjectMemberRequest is the request for adding a member to a project.
+message AddProjectMemberRequest {
+  string project_id = 1;
+  string employee_id = 2;
+  ProjectMemberRole role = 3;
+}
+
+// AddProjectMemberResponse is the response after adding a project member.
+message AddProjectMemberResponse {
+  ProjectMemberDetail member = 1;
+}
+
+// ProjectService provides project management operations.
+service ProjectService {
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse);
+  rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse);
+  rpc GetProjectTasks(GetProjectTasksRequest) returns (GetProjectTasksResponse);
+  rpc AddProjectMember(AddProjectMemberRequest) returns (AddProjectMemberResponse);
+}

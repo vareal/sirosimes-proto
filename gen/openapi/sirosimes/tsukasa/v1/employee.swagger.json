@@ -1,0 +1,356 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tsukasa/v1/employee.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EmployeeService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ActorType"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "ActorRef is a lightweight reference to an Actor (for embedding in other messages).\nUse this instead of full Actor when only identity info is needed (e.g., in audit logs)."
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1DashboardSummaryResponse": {
+      "type": "object",
+      "properties": {
+        "totalEmployees": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "activeEmployees": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "humanEmployees": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "aiEmployees": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalDepartments": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "description": "DashboardSummaryResponse provides aggregate statistics for the dashboard."
+    },
+    "v1Department": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "parentDepartmentId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "description": "Department represents an organizational unit."
+    },
+    "v1Employee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "nameKana": {
+          "type": "string"
+        },
+        "employeeType": {
+          "$ref": "#/definitions/v1EmployeeType"
+        },
+        "status": {
+          "$ref": "#/definitions/v1EmployeeStatus"
+        },
+        "email": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "joinedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modelProvider": {
+          "type": "string"
+        },
+        "aiModelName": {
+          "type": "string"
+        },
+        "containerHost": {
+          "type": "string"
+        },
+        "containerName": {
+          "type": "string"
+        },
+        "mattermostUsername": {
+          "type": "string"
+        },
+        "lastHeartbeatAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Employee represents a human or AI employee in the organization."
+    },
+    "v1EmployeeDetail": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "$ref": "#/definitions/v1Employee"
+        },
+        "positions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Position"
+          }
+        },
+        "actorRef": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "EmployeeDetail bundles an employee with positions and actor reference."
+    },
+    "v1EmployeeStatus": {
+      "type": "string",
+      "enum": [
+        "EMPLOYEE_STATUS_UNSPECIFIED",
+        "EMPLOYEE_STATUS_ACTIVE",
+        "EMPLOYEE_STATUS_INACTIVE",
+        "EMPLOYEE_STATUS_ONBOARDING",
+        "EMPLOYEE_STATUS_SUSPENDED"
+      ],
+      "default": "EMPLOYEE_STATUS_UNSPECIFIED",
+      "description": "EmployeeStatus represents the lifecycle state of an employee."
+    },
+    "v1EmployeeType": {
+      "type": "string",
+      "enum": [
+        "EMPLOYEE_TYPE_UNSPECIFIED",
+        "EMPLOYEE_TYPE_HUMAN",
+        "EMPLOYEE_TYPE_AI_EMPLOYEE"
+      ],
+      "default": "EMPLOYEE_TYPE_UNSPECIFIED",
+      "description": "EmployeeType classifies an employee as human or AI."
+    },
+    "v1GetEmployeeResponse": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "$ref": "#/definitions/v1EmployeeDetail"
+        },
+        "departments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Department"
+          }
+        }
+      },
+      "description": "GetEmployeeResponse is the response containing a single employee."
+    },
+    "v1ListEmployeesResponse": {
+      "type": "object",
+      "properties": {
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListEmployeesResponse is the response for listing employees."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1Position": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "departmentId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "isPrimary": {
+          "type": "boolean"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Position represents a role assignment of an employee within a department."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    }
+  }
+}

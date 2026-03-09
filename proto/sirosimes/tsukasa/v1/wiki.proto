@@ -1,0 +1,220 @@
+syntax = "proto3";
+
+package sirosimes.tsukasa.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/actor.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// WikiShelf represents a top-level grouping of wiki books.
+message WikiShelf {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  int32 sort_order = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// WikiBook represents a collection of wiki documents within a shelf.
+message WikiBook {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string shelf_id = 5;
+  int32 sort_order = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// WikiDocument represents a single wiki page with markdown content.
+message WikiDocument {
+  string id = 1;
+  string title = 2;
+  string slug = 3;
+  string content = 4;
+  string book_id = 5;
+  string chapter_id = 6;
+  string created_by_id = 7;
+  string updated_by_id = 8;
+  int32 sort_order = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+// WikiDocumentDetail bundles a document with resolved actor references.
+message WikiDocumentDetail {
+  WikiDocument document = 1;
+  sirosimes.common.v1.ActorRef created_by = 2;
+  sirosimes.common.v1.ActorRef updated_by = 3;
+}
+
+// WikiRevision records a historical version of a wiki document.
+message WikiRevision {
+  string id = 1;
+  string document_id = 2;
+  string content = 3;
+  string changed_by_id = 4;
+  string summary = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+// WikiRevisionDetail bundles a revision with the author reference.
+message WikiRevisionDetail {
+  WikiRevision revision = 1;
+  sirosimes.common.v1.ActorRef changed_by = 2;
+}
+
+// WikiComment represents a comment on a wiki document.
+message WikiComment {
+  string id = 1;
+  string document_id = 2;
+  string author_id = 3;
+  string content = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+// WikiCommentDetail bundles a wiki comment with the author reference.
+message WikiCommentDetail {
+  WikiComment comment = 1;
+  sirosimes.common.v1.ActorRef author = 2;
+}
+
+// ListShelvesRequest is the request for listing wiki shelves.
+message ListShelvesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+}
+
+// ListShelvesResponse is the response for listing wiki shelves.
+message ListShelvesResponse {
+  repeated WikiShelf shelves = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// ListBooksRequest is the request for listing wiki books.
+message ListBooksRequest {
+  string shelf_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+// ListBooksResponse is the response for listing wiki books.
+message ListBooksResponse {
+  repeated WikiBook books = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetBookRequest is the request for retrieving a single wiki book.
+message GetBookRequest {
+  string id = 1;
+}
+
+// GetBookResponse is the response containing a single wiki book.
+message GetBookResponse {
+  WikiBook book = 1;
+}
+
+// ListDocumentsRequest is the request for listing wiki documents.
+message ListDocumentsRequest {
+  string book_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+  string search = 3;
+}
+
+// ListDocumentsResponse is the response for listing wiki documents.
+message ListDocumentsResponse {
+  repeated WikiDocumentDetail documents = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateDocumentRequest is the request for creating a new wiki document.
+message CreateDocumentRequest {
+  string title = 1;
+  string slug = 2;
+  string content = 3;
+  string book_id = 4;
+  string chapter_id = 5;
+  string created_by_id = 6;
+  int32 sort_order = 7;
+}
+
+// CreateDocumentResponse is the response after creating a wiki document.
+message CreateDocumentResponse {
+  WikiDocumentDetail document = 1;
+}
+
+// GetDocumentRequest is the request for retrieving a single wiki document.
+message GetDocumentRequest {
+  string id = 1;
+}
+
+// GetDocumentResponse is the response containing a single wiki document.
+message GetDocumentResponse {
+  WikiDocumentDetail document = 1;
+}
+
+// UpdateDocumentRequest is the request for updating an existing wiki document.
+message UpdateDocumentRequest {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+  string updated_by_id = 4;
+  string revision_summary = 5;
+}
+
+// UpdateDocumentResponse is the response after updating a wiki document.
+message UpdateDocumentResponse {
+  WikiDocumentDetail document = 1;
+}
+
+// ListRevisionsRequest is the request for listing revisions of a document.
+message ListRevisionsRequest {
+  string document_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+// ListRevisionsResponse is the response for listing document revisions.
+message ListRevisionsResponse {
+  repeated WikiRevisionDetail revisions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// ListWikiCommentsRequest is the request for listing wiki document comments.
+message ListWikiCommentsRequest {
+  string document_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+// ListWikiCommentsResponse is the response for listing wiki document comments.
+message ListWikiCommentsResponse {
+  repeated WikiCommentDetail comments = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateWikiCommentRequest is the request for creating a wiki document comment.
+message CreateWikiCommentRequest {
+  string document_id = 1;
+  string author_id = 2;
+  string content = 3;
+}
+
+// CreateWikiCommentResponse is the response after creating a wiki document comment.
+message CreateWikiCommentResponse {
+  WikiCommentDetail comment = 1;
+}
+
+// WikiService provides wiki management operations.
+service WikiService {
+  rpc ListShelves(ListShelvesRequest) returns (ListShelvesResponse);
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
+  rpc GetBook(GetBookRequest) returns (GetBookResponse);
+  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse);
+  rpc CreateDocument(CreateDocumentRequest) returns (CreateDocumentResponse);
+  rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse);
+  rpc UpdateDocument(UpdateDocumentRequest) returns (UpdateDocumentResponse);
+  rpc ListRevisions(ListRevisionsRequest) returns (ListRevisionsResponse);
+  rpc ListWikiComments(ListWikiCommentsRequest) returns (ListWikiCommentsResponse);
+  rpc CreateWikiComment(CreateWikiCommentRequest) returns (CreateWikiCommentResponse);
+}

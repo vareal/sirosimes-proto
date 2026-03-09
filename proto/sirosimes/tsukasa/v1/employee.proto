@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package sirosimes.tsukasa.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/actor.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// EmployeeType classifies an employee as human or AI.
+enum EmployeeType {
+  EMPLOYEE_TYPE_UNSPECIFIED = 0;
+  EMPLOYEE_TYPE_HUMAN = 1;
+  EMPLOYEE_TYPE_AI_EMPLOYEE = 2;
+}
+
+// EmployeeStatus represents the lifecycle state of an employee.
+enum EmployeeStatus {
+  EMPLOYEE_STATUS_UNSPECIFIED = 0;
+  EMPLOYEE_STATUS_ACTIVE = 1;
+  EMPLOYEE_STATUS_INACTIVE = 2;
+  EMPLOYEE_STATUS_ONBOARDING = 3;
+  EMPLOYEE_STATUS_SUSPENDED = 4;
+}
+
+// Employee represents a human or AI employee in the organization.
+message Employee {
+  string id = 1;
+  string display_name = 2;
+  string name_kana = 3;
+  EmployeeType employee_type = 4;
+  EmployeeStatus status = 5;
+  string email = 6;
+  string avatar_url = 7;
+  string bio = 8;
+  google.protobuf.Timestamp joined_at = 9;
+  string model_provider = 10;
+  string ai_model_name = 11;
+  string container_host = 12;
+  string container_name = 13;
+  string mattermost_username = 14;
+  google.protobuf.Timestamp last_heartbeat_at = 15;
+  google.protobuf.Timestamp created_at = 16;
+  google.protobuf.Timestamp updated_at = 17;
+}
+
+// Position represents a role assignment of an employee within a department.
+message Position {
+  string id = 1;
+  string employee_id = 2;
+  string department_id = 3;
+  string title = 4;
+  bool is_primary = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp ended_at = 7;
+}
+
+// Department represents an organizational unit.
+message Department {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string parent_department_id = 4;
+  string organization_id = 5;
+  string description = 6;
+  int32 sort_order = 7;
+}
+
+// EmployeeDetail bundles an employee with positions and actor reference.
+message EmployeeDetail {
+  Employee employee = 1;
+  repeated Position positions = 2;
+  sirosimes.common.v1.ActorRef actor_ref = 3;
+}
+
+// ListEmployeesRequest is the request for listing employees.
+message ListEmployeesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  EmployeeType employee_type = 2;
+  EmployeeStatus status = 3;
+  string department_id = 4;
+  string search = 5;
+}
+
+// ListEmployeesResponse is the response for listing employees.
+message ListEmployeesResponse {
+  repeated EmployeeDetail employees = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetEmployeeRequest is the request for retrieving a single employee.
+message GetEmployeeRequest {
+  string id = 1;
+}
+
+// GetEmployeeResponse is the response containing a single employee.
+message GetEmployeeResponse {
+  EmployeeDetail employee = 1;
+  repeated Department departments = 2;
+}
+
+// DashboardSummaryRequest is the request for the dashboard summary.
+message DashboardSummaryRequest {}
+
+// DashboardSummaryResponse provides aggregate statistics for the dashboard.
+message DashboardSummaryResponse {
+  int32 total_employees = 1;
+  int32 active_employees = 2;
+  int32 human_employees = 3;
+  int32 ai_employees = 4;
+  int32 total_departments = 5;
+}
+
+// EmployeeService provides employee management operations.
+service EmployeeService {
+  rpc ListEmployees(ListEmployeesRequest) returns (ListEmployeesResponse);
+  rpc GetEmployee(GetEmployeeRequest) returns (GetEmployeeResponse);
+  rpc DashboardSummary(DashboardSummaryRequest) returns (DashboardSummaryResponse);
+}

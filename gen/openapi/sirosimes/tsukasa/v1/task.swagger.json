@@ -1,0 +1,413 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tsukasa/v1/task.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "TaskService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ActorType"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "ActorRef is a lightweight reference to an Actor (for embedding in other messages).\nUse this instead of full Actor when only identity info is needed (e.g., in audit logs)."
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1ApprovalAction": {
+      "type": "string",
+      "enum": [
+        "APPROVAL_ACTION_UNSPECIFIED",
+        "APPROVAL_ACTION_APPROVED",
+        "APPROVAL_ACTION_REJECTED",
+        "APPROVAL_ACTION_REQUESTED_CHANGES"
+      ],
+      "default": "APPROVAL_ACTION_UNSPECIFIED",
+      "description": "ApprovalAction represents the outcome of a task review."
+    },
+    "v1ApproveTaskResponse": {
+      "type": "object",
+      "properties": {
+        "approval": {
+          "$ref": "#/definitions/v1TaskApproval"
+        }
+      },
+      "description": "ApproveTaskResponse is the response after approving a task."
+    },
+    "v1CreateCommentResponse": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "$ref": "#/definitions/v1TaskCommentDetail"
+        }
+      },
+      "description": "CreateCommentResponse is the response after creating a task comment."
+    },
+    "v1CreateTaskResponse": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1TaskDetail"
+        }
+      },
+      "description": "CreateTaskResponse is the response after creating a task."
+    },
+    "v1GetTaskResponse": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1TaskDetail"
+        },
+        "approvals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TaskApproval"
+          }
+        }
+      },
+      "description": "GetTaskResponse is the response containing a single task."
+    },
+    "v1ListCommentsResponse": {
+      "type": "object",
+      "properties": {
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TaskCommentDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListCommentsResponse is the response for listing task comments."
+    },
+    "v1ListTasksResponse": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TaskDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListTasksResponse is the response for listing tasks."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1RejectTaskResponse": {
+      "type": "object",
+      "properties": {
+        "approval": {
+          "$ref": "#/definitions/v1TaskApproval"
+        }
+      },
+      "description": "RejectTaskResponse is the response after rejecting a task."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1Task": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "taskType": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1TaskStatus"
+        },
+        "priority": {
+          "$ref": "#/definitions/v1TaskPriority"
+        },
+        "assigneeId": {
+          "type": "string"
+        },
+        "reporterId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "parentTaskId": {
+          "type": "string"
+        },
+        "sourceType": {
+          "type": "string"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "estimatedHours": {
+          "type": "number",
+          "format": "double"
+        },
+        "actualHours": {
+          "type": "number",
+          "format": "double"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Task represents a unit of work within a project."
+    },
+    "v1TaskApproval": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/definitions/v1ApprovalAction"
+        },
+        "actorId": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "TaskApproval records an approval decision on a task."
+    },
+    "v1TaskComment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "authorId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "TaskComment represents a comment on a task."
+    },
+    "v1TaskCommentDetail": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "$ref": "#/definitions/v1TaskComment"
+        },
+        "author": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "TaskCommentDetail bundles a comment with the author reference."
+    },
+    "v1TaskDetail": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1Task"
+        },
+        "assignee": {
+          "$ref": "#/definitions/v1ActorRef"
+        },
+        "reporter": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "TaskDetail bundles a task with resolved actor references."
+    },
+    "v1TaskPriority": {
+      "type": "string",
+      "enum": [
+        "TASK_PRIORITY_UNSPECIFIED",
+        "TASK_PRIORITY_LOW",
+        "TASK_PRIORITY_MEDIUM",
+        "TASK_PRIORITY_HIGH",
+        "TASK_PRIORITY_URGENT"
+      ],
+      "default": "TASK_PRIORITY_UNSPECIFIED",
+      "description": "TaskPriority indicates the urgency level of a task."
+    },
+    "v1TaskStatus": {
+      "type": "string",
+      "enum": [
+        "TASK_STATUS_UNSPECIFIED",
+        "TASK_STATUS_TODO",
+        "TASK_STATUS_IN_PROGRESS",
+        "TASK_STATUS_REVIEW",
+        "TASK_STATUS_DONE",
+        "TASK_STATUS_CANCELLED"
+      ],
+      "default": "TASK_STATUS_UNSPECIFIED",
+      "description": "TaskStatus represents the workflow state of a task."
+    },
+    "v1UpdateTaskResponse": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1TaskDetail"
+        }
+      },
+      "description": "UpdateTaskResponse is the response after updating a task."
+    }
+  }
+}

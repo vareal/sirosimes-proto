@@ -1,0 +1,478 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tsukasa/v1/project.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ProjectService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ActorType"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "ActorRef is a lightweight reference to an Actor (for embedding in other messages).\nUse this instead of full Actor when only identity info is needed (e.g., in audit logs)."
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1AddProjectMemberResponse": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/v1ProjectMemberDetail"
+        }
+      },
+      "description": "AddProjectMemberResponse is the response after adding a project member."
+    },
+    "v1CreateProjectResponse": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v1ProjectDetail"
+        }
+      },
+      "description": "CreateProjectResponse is the response after creating a project."
+    },
+    "v1GetProjectResponse": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v1ProjectDetail"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ProjectMemberDetail"
+          }
+        }
+      },
+      "description": "GetProjectResponse is the response containing a single project."
+    },
+    "v1GetProjectTasksResponse": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TaskDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "GetProjectTasksResponse is the response containing tasks in a project."
+    },
+    "v1ListProjectsResponse": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ProjectDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListProjectsResponse is the response for listing projects."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1Project": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ProjectStatus"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "leadId": {
+          "type": "string"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "gitRepoUrl": {
+          "type": "string"
+        },
+        "githubMirrorUrl": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/definitions/v1ProjectPriority"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Project represents a managed project with metadata and hierarchy."
+    },
+    "v1ProjectDetail": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v1Project"
+        },
+        "owner": {
+          "$ref": "#/definitions/v1ActorRef"
+        },
+        "lead": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "ProjectDetail bundles a project with resolved actor references."
+    },
+    "v1ProjectMember": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/definitions/v1ProjectMemberRole"
+        },
+        "joinedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "ProjectMember represents a member assigned to a project."
+    },
+    "v1ProjectMemberDetail": {
+      "type": "object",
+      "properties": {
+        "member": {
+          "$ref": "#/definitions/v1ProjectMember"
+        },
+        "employee": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "ProjectMemberDetail bundles a project member with the employee reference."
+    },
+    "v1ProjectMemberRole": {
+      "type": "string",
+      "enum": [
+        "PROJECT_MEMBER_ROLE_UNSPECIFIED",
+        "PROJECT_MEMBER_ROLE_OWNER",
+        "PROJECT_MEMBER_ROLE_LEAD",
+        "PROJECT_MEMBER_ROLE_MEMBER",
+        "PROJECT_MEMBER_ROLE_OBSERVER"
+      ],
+      "default": "PROJECT_MEMBER_ROLE_UNSPECIFIED",
+      "description": "ProjectMemberRole defines the role of a member within a project."
+    },
+    "v1ProjectPriority": {
+      "type": "string",
+      "enum": [
+        "PROJECT_PRIORITY_UNSPECIFIED",
+        "PROJECT_PRIORITY_LOW",
+        "PROJECT_PRIORITY_MEDIUM",
+        "PROJECT_PRIORITY_HIGH",
+        "PROJECT_PRIORITY_URGENT"
+      ],
+      "default": "PROJECT_PRIORITY_UNSPECIFIED",
+      "description": "ProjectPriority indicates the urgency level of a project."
+    },
+    "v1ProjectStatus": {
+      "type": "string",
+      "enum": [
+        "PROJECT_STATUS_UNSPECIFIED",
+        "PROJECT_STATUS_PLANNING",
+        "PROJECT_STATUS_ACTIVE",
+        "PROJECT_STATUS_PAUSED",
+        "PROJECT_STATUS_COMPLETED",
+        "PROJECT_STATUS_ARCHIVED"
+      ],
+      "default": "PROJECT_STATUS_UNSPECIFIED",
+      "description": "ProjectStatus represents the lifecycle state of a project."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1Task": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "taskType": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1TaskStatus"
+        },
+        "priority": {
+          "$ref": "#/definitions/v1TaskPriority"
+        },
+        "assigneeId": {
+          "type": "string"
+        },
+        "reporterId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "parentTaskId": {
+          "type": "string"
+        },
+        "sourceType": {
+          "type": "string"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "estimatedHours": {
+          "type": "number",
+          "format": "double"
+        },
+        "actualHours": {
+          "type": "number",
+          "format": "double"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Task represents a unit of work within a project."
+    },
+    "v1TaskDetail": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/v1Task"
+        },
+        "assignee": {
+          "$ref": "#/definitions/v1ActorRef"
+        },
+        "reporter": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "TaskDetail bundles a task with resolved actor references."
+    },
+    "v1TaskPriority": {
+      "type": "string",
+      "enum": [
+        "TASK_PRIORITY_UNSPECIFIED",
+        "TASK_PRIORITY_LOW",
+        "TASK_PRIORITY_MEDIUM",
+        "TASK_PRIORITY_HIGH",
+        "TASK_PRIORITY_URGENT"
+      ],
+      "default": "TASK_PRIORITY_UNSPECIFIED",
+      "description": "TaskPriority indicates the urgency level of a task."
+    },
+    "v1TaskStatus": {
+      "type": "string",
+      "enum": [
+        "TASK_STATUS_UNSPECIFIED",
+        "TASK_STATUS_TODO",
+        "TASK_STATUS_IN_PROGRESS",
+        "TASK_STATUS_REVIEW",
+        "TASK_STATUS_DONE",
+        "TASK_STATUS_CANCELLED"
+      ],
+      "default": "TASK_STATUS_UNSPECIFIED",
+      "description": "TaskStatus represents the workflow state of a task."
+    },
+    "v1UpdateProjectResponse": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v1ProjectDetail"
+        }
+      },
+      "description": "UpdateProjectResponse is the response after updating a project."
+    }
+  }
+}

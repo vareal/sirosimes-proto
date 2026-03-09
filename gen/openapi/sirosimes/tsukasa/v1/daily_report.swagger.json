@@ -1,0 +1,324 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tsukasa/v1/daily_report.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "DailyReportService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ActorType"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "ActorRef is a lightweight reference to an Actor (for embedding in other messages).\nUse this instead of full Actor when only identity info is needed (e.g., in audit logs)."
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1CreateReportResponse": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "$ref": "#/definitions/v1DailyReportDetail"
+        }
+      },
+      "description": "CreateReportResponse is the response after creating a daily report."
+    },
+    "v1CreateTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/v1DailyReportTemplate"
+        }
+      },
+      "description": "CreateTemplateResponse is the response after creating a report template."
+    },
+    "v1DailyReport": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "reportDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reportType": {
+          "$ref": "#/definitions/v1ReportType"
+        },
+        "content": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "nextPlan": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ReportStatus"
+        },
+        "reviewerId": {
+          "type": "string"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewComment": {
+          "type": "string"
+        },
+        "reflection": {
+          "type": "string"
+        },
+        "emotions": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "DailyReport represents a daily work report submitted by an employee."
+    },
+    "v1DailyReportDetail": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "$ref": "#/definitions/v1DailyReport"
+        },
+        "employee": {
+          "$ref": "#/definitions/v1ActorRef"
+        },
+        "reviewer": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "DailyReportDetail bundles a report with resolved actor references."
+    },
+    "v1DailyReportTemplate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "templateContent": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "DailyReportTemplate defines a reusable template for daily reports."
+    },
+    "v1GetActiveTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/v1DailyReportTemplate"
+        }
+      },
+      "description": "GetActiveTemplateResponse is the response containing the active template."
+    },
+    "v1ListReportsResponse": {
+      "type": "object",
+      "properties": {
+        "reports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DailyReportDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListReportsResponse is the response for listing daily reports."
+    },
+    "v1ListTemplatesResponse": {
+      "type": "object",
+      "properties": {
+        "templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DailyReportTemplate"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListTemplatesResponse is the response for listing report templates."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ReportStatus": {
+      "type": "string",
+      "enum": [
+        "REPORT_STATUS_UNSPECIFIED",
+        "REPORT_STATUS_DRAFT",
+        "REPORT_STATUS_SUBMITTED",
+        "REPORT_STATUS_REVIEWED"
+      ],
+      "default": "REPORT_STATUS_UNSPECIFIED",
+      "description": "ReportStatus represents the review lifecycle of a daily report."
+    },
+    "v1ReportType": {
+      "type": "string",
+      "enum": [
+        "REPORT_TYPE_UNSPECIFIED",
+        "REPORT_TYPE_AUTO",
+        "REPORT_TYPE_MANUAL"
+      ],
+      "default": "REPORT_TYPE_UNSPECIFIED",
+      "description": "ReportType classifies how a daily report was generated."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/v1DailyReportTemplate"
+        }
+      },
+      "description": "UpdateTemplateResponse is the response after updating a report template."
+    }
+  }
+}
