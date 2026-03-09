@@ -1,0 +1,20 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts (gen/ is tracked intentionally as SSoT output)
+# gen/ is NOT ignored — generated code is committed
+
+# Go
+*.exe
+*.test
+*.out
+
+# Node
+node_modules/

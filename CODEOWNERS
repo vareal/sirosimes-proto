@@ -1,0 +1,23 @@
+# Proto SSoT — コードオーナー定義
+# 全ての変更には以下のレビューが必要
+
+# セキュリティ関連
+proto/sirosimes/common/v1/permission.proto @katsuragi.makoto
+proto/sirosimes/common/v1/audit.proto @katsuragi.makoto
+SECURITY.md @katsuragi.makoto
+
+# External/Internal API分離
+proto/sirosimes/external/ @katsuragi.makoto
+proto/sirosimes/internal/ @katsuragi.makoto
+
+# 共通型定義
+proto/sirosimes/common/ @fujiwara.ai
+
+# CI/CD
+.github/ @fujiwara.ai
+Makefile @fujiwara.ai
+buf.yaml @fujiwara.ai
+buf.gen.yaml @fujiwara.ai
+
+# デフォルト（全ファイル）
+* @fujiwara.ai
