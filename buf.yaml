@@ -13,6 +13,9 @@ lint:
     - COMMENT_ONEOF
     - COMMENT_RPC
     - COMMENT_SERVICE
+    # External gateway services intentionally re-use Internal message types.
+    # This is by design: security boundary (separate service) not type boundary.
+    - RPC_REQUEST_RESPONSE_UNIQUE
 breaking:
   use:
     - FILE

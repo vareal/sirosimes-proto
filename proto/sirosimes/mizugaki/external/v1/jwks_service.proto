@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.external.v1;
+
+import "sirosimes/mizugaki/v1/token.proto";
+
+// jwks_service.proto — 瑞垣 External JWKS API。
+//
+// 公開鍵（JWKS）エンドポイントのみを定義。
+// 鍵ローテーション・トークン失効・イントロスペクションは Internal のみ。
+//
+// ⚠️ CISO指令: RotateKeys / RevokeToken / IntrospectToken は
+// sirosimes.mizugaki.v1.TokenService で INTERNAL のみ。
+
+// ExternalJwksService は公開鍵取得APIを提供する。
+service ExternalJwksService {
+  // JWKS公開鍵セット取得（/.well-known/jwks.json 相当）。
+  rpc GetJwks(sirosimes.mizugaki.v1.GetJwksRequest) returns (sirosimes.mizugaki.v1.GetJwksResponse);
+}

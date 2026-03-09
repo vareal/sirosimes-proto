@@ -470,7 +470,7 @@
         },
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata",
-          "description": "[Phase 2a] Standard resource metadata. Default security_level: INTERNAL."
+          "description": "[Phase 2a] Standard resource metadata. Default security_level: INTERNAL.\nPer-document override is supported: e.g., HR wikis → CONFIDENTIAL.\nImplementation MUST allow entity-level SecurityLevel override via this field."
         }
       },
       "description": "WikiDocument represents a single wiki page with markdown content."

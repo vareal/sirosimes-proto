@@ -1,0 +1,140 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mizugaki/external/v1/jwks_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ExternalJwksService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1GetJwksResponse": {
+      "type": "object",
+      "properties": {
+        "jwks": {
+          "$ref": "#/definitions/v1JsonWebKeySet",
+          "title": "公開鍵セット。"
+        }
+      },
+      "title": "GetJwksResponse は JWKS 取得レスポンスを表す。"
+    },
+    "v1JsonWebKey": {
+      "type": "object",
+      "properties": {
+        "kid": {
+          "type": "string",
+          "title": "鍵ID (kid)。"
+        },
+        "kty": {
+          "type": "string",
+          "title": "鍵タイプ (kty)。例: \"OKP\" (Ed25519), \"RSA\"。"
+        },
+        "algorithm": {
+          "$ref": "#/definitions/v1KeyAlgorithm",
+          "title": "署名アルゴリズム。"
+        },
+        "use": {
+          "type": "string",
+          "title": "用途 (use)。例: \"sig\"。"
+        },
+        "status": {
+          "$ref": "#/definitions/v1KeyStatus",
+          "title": "鍵の状態。"
+        },
+        "publicKey": {
+          "type": "string",
+          "title": "Base64url エンコードされた公開鍵パラメータ (Ed25519: x パラメータ)。"
+        },
+        "curve": {
+          "type": "string",
+          "title": "楕円曲線名 (Ed25519 の場合: \"Ed25519\")。"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "鍵の作成日時。"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "鍵の有効期限。"
+        }
+      },
+      "title": "JsonWebKey は JWKS エンドポイントで公開される個別の公開鍵を表す。"
+    },
+    "v1JsonWebKeySet": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1JsonWebKey"
+          },
+          "title": "公開鍵の一覧。"
+        }
+      },
+      "title": "JsonWebKeySet は JWKS 公開鍵セットを表す。"
+    },
+    "v1KeyAlgorithm": {
+      "type": "string",
+      "enum": [
+        "KEY_ALGORITHM_UNSPECIFIED",
+        "KEY_ALGORITHM_EDDSA",
+        "KEY_ALGORITHM_RS256"
+      ],
+      "default": "KEY_ALGORITHM_UNSPECIFIED",
+      "description": "- KEY_ALGORITHM_EDDSA: Ed25519 (EdDSA) — 瑞垣のデフォルト署名アルゴリズム。\n - KEY_ALGORITHM_RS256: RSA-256 — レガシー互換用。",
+      "title": "KeyAlgorithm は署名アルゴリズムを分類する。"
+    },
+    "v1KeyStatus": {
+      "type": "string",
+      "enum": [
+        "KEY_STATUS_UNSPECIFIED",
+        "KEY_STATUS_ACTIVE",
+        "KEY_STATUS_ROTATED",
+        "KEY_STATUS_REVOKED"
+      ],
+      "default": "KEY_STATUS_UNSPECIFIED",
+      "description": "- KEY_STATUS_ACTIVE: 鍵は有効でトークン署名に使用中。\n - KEY_STATUS_ROTATED: 鍵はローテーション中（検証のみ、新規署名には使用しない）。\n - KEY_STATUS_REVOKED: 鍵は失効済み。",
+      "title": "KeyStatus は署名鍵の状態を表す。"
+    }
+  }
+}

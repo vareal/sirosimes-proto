@@ -252,6 +252,8 @@ export declare class WikiDocument extends Message<WikiDocument> {
 
   /**
    * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   * Per-document override is supported: e.g., HR wikis → CONFIDENTIAL.
+   * Implementation MUST allow entity-level SecurityLevel override via this field.
    *
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 12;
    */

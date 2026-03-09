@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.external.v1;
+
+import "sirosimes/mizugaki/v1/oauth2.proto";
+
+// oauth2_service.proto — 瑞垣 External OAuth2/OIDC API。
+//
+// BFF/Gateway が外部クライアントに公開するOAuth2エンドポイントのみを定義。
+// クライアント管理（Register/Update/Delete/List/RotateSecret）は
+// sirosimes.mizugaki.v1.OAuth2Service を直接使用すること。
+//
+// ⚠️ CISO指令: TokenIntrospection は sirosimes.mizugaki.v1.TokenService で
+// INTERNAL のみ。外部に公開してはならない。
+
+// ExternalOAuth2Service は外部クライアント向けOAuth2/OIDC APIを提供する。
+service ExternalOAuth2Service {
+  // OAuth2 Authorization（PKCE必須）。
+  rpc Authorize(sirosimes.mizugaki.v1.AuthorizeRequest) returns (sirosimes.mizugaki.v1.AuthorizeResponse);
+  // OAuth2 Token Exchange。
+  rpc Token(sirosimes.mizugaki.v1.TokenRequest) returns (sirosimes.mizugaki.v1.TokenResponse);
+  // OIDC UserInfo。
+  rpc Userinfo(sirosimes.mizugaki.v1.UserinfoRequest) returns (sirosimes.mizugaki.v1.UserinfoResponse);
+}

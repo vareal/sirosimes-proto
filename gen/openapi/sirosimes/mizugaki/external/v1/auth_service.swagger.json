@@ -1,0 +1,196 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mizugaki/external/v1/auth_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ExternalAuthService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ActorType"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "ActorRef is a lightweight reference to an Actor (for embedding in other messages).\nUse this instead of full Actor when only identity info is needed (e.g., in audit logs)."
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1AuthMethod": {
+      "type": "string",
+      "enum": [
+        "AUTH_METHOD_UNSPECIFIED",
+        "AUTH_METHOD_PASSWORD",
+        "AUTH_METHOD_OAUTH2",
+        "AUTH_METHOD_API_KEY",
+        "AUTH_METHOD_SSO_COOKIE",
+        "AUTH_METHOD_REFRESH_TOKEN"
+      ],
+      "default": "AUTH_METHOD_UNSPECIFIED",
+      "title": "AuthMethod は認証に使用された方法を分類する。"
+    },
+    "v1AuthSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "actorRef": {
+          "$ref": "#/definitions/v1ActorRef"
+        },
+        "status": {
+          "$ref": "#/definitions/v1SessionStatus"
+        },
+        "authMethod": {
+          "$ref": "#/definitions/v1AuthMethod"
+        },
+        "accessToken": {
+          "type": "string",
+          "title": "アクセストークン（JWT）。SecurityLevel: RESTRICTED。\n⚠️ External APIではopaque session IDに変換して返却すること。\nJWT構造はInternal API間通信でのみ使用する。"
+        },
+        "refreshToken": {
+          "type": "string",
+          "title": "リフレッシュトークン。SecurityLevel: RESTRICTED。\n⚠️ 同上：外部にはopaque形式で返却。"
+        },
+        "accessTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ipAddress": {
+          "type": "string",
+          "title": "クライアントIPアドレス。SecurityLevel: CONFIDENTIAL — 監査用。"
+        },
+        "userAgent": {
+          "type": "string",
+          "title": "クライアントのユーザーエージェント。SecurityLevel: CONFIDENTIAL — 監査用。"
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "AuthSession はユーザーの認証セッションを表す。"
+    },
+    "v1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "$ref": "#/definitions/v1AuthSession"
+        }
+      },
+      "title": "LoginResponse はログインレスポンスを表す。"
+    },
+    "v1LogoutResponse": {
+      "type": "object",
+      "properties": {
+        "revokedCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "LogoutResponse はログアウトレスポンスを表す。"
+    },
+    "v1RefreshTokenResponse": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "$ref": "#/definitions/v1AuthSession"
+        }
+      },
+      "title": "RefreshTokenResponse はトークンリフレッシュレスポンスを表す。"
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SessionStatus": {
+      "type": "string",
+      "enum": [
+        "SESSION_STATUS_UNSPECIFIED",
+        "SESSION_STATUS_ACTIVE",
+        "SESSION_STATUS_EXPIRED",
+        "SESSION_STATUS_REVOKED"
+      ],
+      "default": "SESSION_STATUS_UNSPECIFIED",
+      "title": "SessionStatus はセッションの状態を表す。"
+    }
+  }
+}

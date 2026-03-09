@@ -1,0 +1,160 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mizugaki/external/v1/oauth2_service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ExternalOAuth2Service"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1AuthorizeResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "redirectUri": {
+          "type": "string"
+        }
+      },
+      "title": "AuthorizeResponse は OAuth2 認可レスポンスを表す。"
+    },
+    "v1GrantType": {
+      "type": "string",
+      "enum": [
+        "GRANT_TYPE_UNSPECIFIED",
+        "GRANT_TYPE_AUTHORIZATION_CODE",
+        "GRANT_TYPE_REFRESH_TOKEN",
+        "GRANT_TYPE_CLIENT_CREDENTIALS"
+      ],
+      "default": "GRANT_TYPE_UNSPECIFIED",
+      "description": "- GRANT_TYPE_AUTHORIZATION_CODE: Authorization Code Grant — ユーザー認証を伴うフロー。PKCE必須。\n - GRANT_TYPE_REFRESH_TOKEN: Refresh Token Grant — トークン更新。\n - GRANT_TYPE_CLIENT_CREDENTIALS: Client Credentials Grant — サービス間認証。\n\nImplicit Grant: 意図的に未定義（廃止済み、RFC 9207）。\n ROPC Grant: 意図的に未定義（非推奨、OAuth 2.1 draft）。",
+      "title": "GrantType は OAuth2 の認可タイプを分類する。"
+    },
+    "v1ResponseType": {
+      "type": "string",
+      "enum": [
+        "RESPONSE_TYPE_UNSPECIFIED",
+        "RESPONSE_TYPE_CODE"
+      ],
+      "default": "RESPONSE_TYPE_UNSPECIFIED",
+      "title": "ResponseType は OAuth2 の応答タイプを分類する。"
+    },
+    "v1TokenResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "tokenType": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "idToken": {
+          "type": "string"
+        }
+      },
+      "title": "TokenResponse は OAuth2 トークンレスポンスを表す。"
+    },
+    "v1UserinfoResponse": {
+      "type": "object",
+      "properties": {
+        "sub": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "emailVerified": {
+          "type": "boolean"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "trustLevel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "actorType": {
+          "$ref": "#/definitions/v1ActorType",
+          "title": "アクター種別（enum型で一貫性を保持）。"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "picture": {
+          "type": "string"
+        }
+      },
+      "title": "UserinfoResponse は OIDC UserInfo レスポンスを表す（OIDC Standard Claims準拠）。"
+    }
+  }
+}

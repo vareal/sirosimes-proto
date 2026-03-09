@@ -346,6 +346,8 @@ type WikiDocument struct {
 	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	// [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+	// Per-document override is supported: e.g., HR wikis → CONFIDENTIAL.
+	// Implementation MUST allow entity-level SecurityLevel override via this field.
 	Metadata *v1.ResourceMetadata `protobuf:"bytes,12,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 

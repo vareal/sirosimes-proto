@@ -88,3 +88,28 @@ All changes to this repository are tracked via Git history and the `AuditLog` pr
 The `AuditSeverity` enum classifies events for monitoring and alerting.
 `AuditLog.integrity_hash` provides tamper detection via HMAC-SHA256 chained hashes
 (each record includes the hash of the previous record).
+
+## External/Internal Service Separation (Phase 2b)
+
+Mizugaki proto definitions are split into:
+
+- **`mizugaki/v1/`** — Full service definitions (all RPCs). Used by internal microservices.
+- **`mizugaki/external/v1/`** — External-only service definitions. Used by BFF/Gateway.
+
+### Gateway Configuration Rule
+
+External-facing gRPC gateways and REST proxies MUST load ONLY the external service definitions:
+- `ExternalAuthService` (Login, Logout, RefreshToken)
+- `ExternalOAuth2Service` (Authorize, Token, Userinfo)
+- `ExternalJwksService` (GetJwks)
+
+Loading `mizugaki/v1/*.proto` services directly on external gateways is a **security violation**.
+
+### Internal-Only RPCs (MUST NOT be externally accessible)
+
+| Service | Internal-Only RPCs |
+|---------|-------------------|
+| AuthService | VerifyToken, ListSessions, RevokeSession, CreateApiKey, RevokeApiKey |
+| OAuth2Service | RegisterClient, GetClient, UpdateClient, DeleteClient, ListClients, RotateClientSecret |
+| TokenService | IntrospectToken, RotateKeys, RevokeToken |
+| IdentityService | All RPCs (CreateIdentity, GetIdentity, UpdateIdentity, DeleteIdentity, ListIdentities, ChangePassword) |

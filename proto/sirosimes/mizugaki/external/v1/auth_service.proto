@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.external.v1;
+
+import "sirosimes/mizugaki/v1/auth.proto";
+
+// auth_service.proto — 瑞垣 External Auth API。
+//
+// BFF/Gateway が外部クライアントに公開する認証エンドポイントのみを定義。
+// Internal RPCs（VerifyToken, ListSessions, RevokeSession, ApiKey管理）は
+// sirosimes.mizugaki.v1.AuthService を直接使用すること。
+//
+// ⚠️ CISO指令: このサービス定義のみを外部ゲートウェイにロードすること。
+// mizugaki/v1/auth.proto を外部に直接公開してはならない。
+//
+// トークン方針: レスポンスのaccess_token/refresh_tokenは
+// BFF/Gatewayがopaque session IDに変換して返却すること。
+
+// ExternalAuthService は外部クライアント向け認証APIを提供する。
+service ExternalAuthService {
+  // ログイン（メール/パスワード認証）。
+  rpc Login(sirosimes.mizugaki.v1.LoginRequest) returns (sirosimes.mizugaki.v1.LoginResponse);
+  // ログアウト（セッション無効化）。
+  rpc Logout(sirosimes.mizugaki.v1.LogoutRequest) returns (sirosimes.mizugaki.v1.LogoutResponse);
+  // トークンリフレッシュ（opaque形式で返却）。
+  rpc RefreshToken(sirosimes.mizugaki.v1.RefreshTokenRequest) returns (sirosimes.mizugaki.v1.RefreshTokenResponse);
+}
