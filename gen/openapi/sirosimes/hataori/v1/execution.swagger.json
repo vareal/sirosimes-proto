@@ -66,7 +66,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "[Phase 2c deprecated] Use metadata.id. Servers no longer populate this field."
         },
         "workflowId": {
           "type": "string"
@@ -99,11 +100,12 @@
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "[Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field."
         },
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata",
-          "description": "[Phase 2a] Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O)."
+          "description": "Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O)."
         }
       },
       "description": "Execution represents a single run of a workflow."

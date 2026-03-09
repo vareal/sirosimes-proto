@@ -65,7 +65,10 @@ export declare enum ReportStatus {
  */
 export declare class DailyReport extends Message<DailyReport> {
   /**
-   * @generated from field: string id = 1;
+   * [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+   *
+   * @generated from field: string id = 1 [deprecated = true];
+   * @deprecated
    */
   id: string;
 
@@ -130,17 +133,23 @@ export declare class DailyReport extends Message<DailyReport> {
   emotionTags: string[];
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 14;
+   * [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 14 [deprecated = true];
+   * @deprecated
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 15;
+   * [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp updated_at = 15 [deprecated = true];
+   * @deprecated
    */
   updatedAt?: Timestamp;
 
   /**
-   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   * Standard resource metadata. Default security_level: INTERNAL.
    *
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 16;
    */

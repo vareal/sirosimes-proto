@@ -1,0 +1,834 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kaji/v1/quality_gate.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "QualityGateService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/builds/{buildId}/test-results": {
+      "get": {
+        "operationId": "QualityGateService_ListTestResults",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTestResultsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "buildId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TEST_STATUS_UNSPECIFIED",
+              "TEST_STATUS_PASSED",
+              "TEST_STATUS_FAILED",
+              "TEST_STATUS_SKIPPED",
+              "TEST_STATUS_ERROR"
+            ],
+            "default": "TEST_STATUS_UNSPECIFIED"
+          },
+          {
+            "name": "suiteName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QualityGateService"
+        ]
+      }
+    },
+    "/v1/quality-gates": {
+      "get": {
+        "operationId": "QualityGateService_ListQualityGates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListQualityGatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "pipelineId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QualityGateService"
+        ]
+      },
+      "post": {
+        "operationId": "QualityGateService_CreateQualityGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateQualityGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateQualityGateRequest is the request for creating a quality gate.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateQualityGateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QualityGateService"
+        ]
+      }
+    },
+    "/v1/quality-gates/{id}": {
+      "get": {
+        "operationId": "QualityGateService_GetQualityGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetQualityGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QualityGateService"
+        ]
+      },
+      "delete": {
+        "operationId": "QualityGateService_DeleteQualityGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteQualityGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QualityGateService"
+        ]
+      },
+      "patch": {
+        "operationId": "QualityGateService_UpdateQualityGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateQualityGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/QualityGateServiceUpdateQualityGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "QualityGateService"
+        ]
+      }
+    },
+    "/v1/quality-gates/{qualityGateId}/evaluate": {
+      "post": {
+        "operationId": "QualityGateService_EvaluateQualityGate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1EvaluateQualityGateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "qualityGateId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/QualityGateServiceEvaluateQualityGateBody"
+            }
+          }
+        ],
+        "tags": [
+          "QualityGateService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "QualityGateServiceEvaluateQualityGateBody": {
+      "type": "object",
+      "properties": {
+        "buildId": {
+          "type": "string"
+        }
+      },
+      "description": "EvaluateQualityGateRequest is the request for evaluating a quality gate against a build."
+    },
+    "QualityGateServiceUpdateQualityGateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1QualityCondition"
+          }
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "description": "UpdateQualityGateRequest is the request for updating a quality gate."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ComparisonOperator": {
+      "type": "string",
+      "enum": [
+        "COMPARISON_OPERATOR_UNSPECIFIED",
+        "COMPARISON_OPERATOR_GREATER_THAN",
+        "COMPARISON_OPERATOR_LESS_THAN",
+        "COMPARISON_OPERATOR_GREATER_THAN_OR_EQUAL",
+        "COMPARISON_OPERATOR_LESS_THAN_OR_EQUAL",
+        "COMPARISON_OPERATOR_EQUAL"
+      ],
+      "default": "COMPARISON_OPERATOR_UNSPECIFIED",
+      "description": "ComparisonOperator defines how a metric is compared to a threshold."
+    },
+    "v1ConditionResult": {
+      "type": "object",
+      "properties": {
+        "metricName": {
+          "type": "string"
+        },
+        "actualValue": {
+          "type": "number",
+          "format": "double"
+        },
+        "threshold": {
+          "type": "number",
+          "format": "double"
+        },
+        "operator": {
+          "$ref": "#/definitions/v1ComparisonOperator"
+        },
+        "status": {
+          "$ref": "#/definitions/v1QualityGateStatus"
+        }
+      },
+      "description": "ConditionResult represents the result of a single condition check."
+    },
+    "v1CreateQualityGateRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1QualityCondition"
+          }
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "pipelineId": {
+          "type": "string"
+        }
+      },
+      "description": "CreateQualityGateRequest is the request for creating a quality gate."
+    },
+    "v1CreateQualityGateResponse": {
+      "type": "object",
+      "properties": {
+        "gate": {
+          "$ref": "#/definitions/v1QualityGate"
+        }
+      },
+      "description": "CreateQualityGateResponse is the response after creating a quality gate."
+    },
+    "v1DeleteQualityGateResponse": {
+      "type": "object",
+      "description": "DeleteQualityGateResponse is the response after deleting a quality gate."
+    },
+    "v1EvaluateQualityGateResponse": {
+      "type": "object",
+      "properties": {
+        "evaluation": {
+          "$ref": "#/definitions/v1QualityGateEvaluation"
+        }
+      },
+      "description": "EvaluateQualityGateResponse is the response containing the evaluation result."
+    },
+    "v1GetQualityGateResponse": {
+      "type": "object",
+      "properties": {
+        "gate": {
+          "$ref": "#/definitions/v1QualityGate"
+        }
+      },
+      "description": "GetQualityGateResponse is the response containing a single quality gate."
+    },
+    "v1ListQualityGatesResponse": {
+      "type": "object",
+      "properties": {
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1QualityGate"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListQualityGatesResponse is the response for listing quality gates."
+    },
+    "v1ListTestResultsResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TestResult"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        },
+        "summary": {
+          "$ref": "#/definitions/v1TestSummary"
+        }
+      },
+      "description": "ListTestResultsResponse is the response for listing test results."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1QualityCondition": {
+      "type": "object",
+      "properties": {
+        "metricName": {
+          "type": "string"
+        },
+        "operator": {
+          "$ref": "#/definitions/v1ComparisonOperator"
+        },
+        "threshold": {
+          "type": "number",
+          "format": "double"
+        },
+        "warningThreshold": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "description": "QualityCondition defines a single quality threshold check."
+    },
+    "v1QualityGate": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1QualityCondition"
+          }
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "pipelineId": {
+          "type": "string"
+        }
+      },
+      "description": "QualityGate represents a set of quality conditions for a pipeline."
+    },
+    "v1QualityGateEvaluation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "qualityGateId": {
+          "type": "string"
+        },
+        "buildId": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1QualityGateStatus"
+        },
+        "conditionResults": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ConditionResult"
+          }
+        },
+        "evaluatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "QualityGateEvaluation represents the result of evaluating a quality gate."
+    },
+    "v1QualityGateStatus": {
+      "type": "string",
+      "enum": [
+        "QUALITY_GATE_STATUS_UNSPECIFIED",
+        "QUALITY_GATE_STATUS_PASSED",
+        "QUALITY_GATE_STATUS_FAILED",
+        "QUALITY_GATE_STATUS_WARNING",
+        "QUALITY_GATE_STATUS_SKIPPED"
+      ],
+      "default": "QUALITY_GATE_STATUS_UNSPECIFIED",
+      "description": "QualityGateStatus represents the evaluation result of a quality gate."
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1TestResult": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "buildId": {
+          "type": "string"
+        },
+        "suiteName": {
+          "type": "string"
+        },
+        "testName": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1TestStatus"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "type": "string"
+        },
+        "executedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "TestResult represents a single test case result."
+    },
+    "v1TestStatus": {
+      "type": "string",
+      "enum": [
+        "TEST_STATUS_UNSPECIFIED",
+        "TEST_STATUS_PASSED",
+        "TEST_STATUS_FAILED",
+        "TEST_STATUS_SKIPPED",
+        "TEST_STATUS_ERROR"
+      ],
+      "default": "TEST_STATUS_UNSPECIFIED",
+      "description": "TestStatus represents the outcome of a single test case."
+    },
+    "v1TestSummary": {
+      "type": "object",
+      "properties": {
+        "buildId": {
+          "type": "string"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "errors": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "totalDuration": {
+          "type": "string"
+        }
+      },
+      "description": "TestSummary provides aggregated test statistics for a build."
+    },
+    "v1UpdateQualityGateResponse": {
+      "type": "object",
+      "properties": {
+        "gate": {
+          "$ref": "#/definitions/v1QualityGate"
+        }
+      },
+      "description": "UpdateQualityGateResponse is the response after updating a quality gate."
+    }
+  }
+}

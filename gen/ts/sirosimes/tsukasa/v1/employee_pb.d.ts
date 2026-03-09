@@ -70,10 +70,10 @@ export declare enum EmployeeStatus {
  */
 export declare class Employee extends Message<Employee> {
   /**
-   * [Phase 2a dual-write] Individual id — will be deprecated in Phase 2c.
-   * Prefer metadata.id for new code.
+   * [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
    *
-   * @generated from field: string id = 1;
+   * @generated from field: string id = 1 [deprecated = true];
+   * @deprecated
    */
   id: string;
 
@@ -140,20 +140,23 @@ export declare class Employee extends Message<Employee> {
   lastHeartbeatAt?: Timestamp;
 
   /**
-   * [Phase 2a dual-write] Individual timestamps — will be deprecated in Phase 2c.
-   * Prefer metadata.created_at / metadata.updated_at for new code.
+   * [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
    *
-   * @generated from field: google.protobuf.Timestamp created_at = 16;
+   * @generated from field: google.protobuf.Timestamp created_at = 16 [deprecated = true];
+   * @deprecated
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 17;
+   * [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp updated_at = 17 [deprecated = true];
+   * @deprecated
    */
   updatedAt?: Timestamp;
 
   /**
-   * [Phase 2a] Standard resource metadata (id, timestamps, version, security_level).
+   * Standard resource metadata (id, timestamps, version, security_level).
    * Default security_level: CONFIDENTIAL (contains PII: email, position).
    *
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 18;

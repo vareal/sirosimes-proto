@@ -1,0 +1,228 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// training.proto — 玉の舎（Tamanoya）トレーニングコンテンツ管理・進捗追跡。
+//
+// トレーニング教材のCRUD、学習進捗の管理を提供する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// ContentType classifies the type of training content.
+enum ContentType {
+  CONTENT_TYPE_UNSPECIFIED = 0;
+  CONTENT_TYPE_VIDEO = 1;
+  CONTENT_TYPE_ARTICLE = 2;
+  CONTENT_TYPE_EXERCISE = 3;
+  CONTENT_TYPE_INTERACTIVE = 4;
+  CONTENT_TYPE_SLIDE = 5;
+  CONTENT_TYPE_EXTERNAL_LINK = 6;
+}
+
+// TrainingStatus represents the lifecycle state of training content.
+enum TrainingStatus {
+  TRAINING_STATUS_UNSPECIFIED = 0;
+  TRAINING_STATUS_DRAFT = 1;
+  TRAINING_STATUS_PUBLISHED = 2;
+  TRAINING_STATUS_ARCHIVED = 3;
+}
+
+// ProgressStatus represents the learner's progress state.
+enum ProgressStatus {
+  PROGRESS_STATUS_UNSPECIFIED = 0;
+  PROGRESS_STATUS_NOT_STARTED = 1;
+  PROGRESS_STATUS_IN_PROGRESS = 2;
+  PROGRESS_STATUS_COMPLETED = 3;
+}
+
+// TrainingContent represents a single piece of training material.
+message TrainingContent {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string title = 2;
+  string description = 3;
+  ContentType type = 4;
+  TrainingStatus status = 5;
+  string skill_id = 6;
+  string content_url = 7;
+  string content_body = 8;
+  int32 duration_minutes = 9;
+  int32 sort_order = 10;
+  string created_by_id = 11;
+  repeated string tags = 12;
+  repeated string prerequisite_content_ids = 13;
+}
+
+// TrainingProgress represents a learner's progress on a training item.
+message TrainingProgress {
+  string id = 1;
+  string training_content_id = 2;
+  string learner_id = 3;
+  ProgressStatus status = 4;
+  int32 progress_percent = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp completed_at = 7;
+  google.protobuf.Timestamp last_accessed_at = 8;
+  int32 time_spent_minutes = 9;
+}
+
+// ListTrainingContentsRequest is the request for listing training contents.
+message ListTrainingContentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ContentType type = 2;
+  TrainingStatus status = 3;
+  string skill_id = 4;
+  string search = 5;
+}
+
+// ListTrainingContentsResponse is the response for listing training contents.
+message ListTrainingContentsResponse {
+  repeated TrainingContent contents = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetTrainingContentRequest is the request for retrieving a single training content.
+message GetTrainingContentRequest {
+  string id = 1;
+}
+
+// GetTrainingContentResponse is the response containing a single training content.
+message GetTrainingContentResponse {
+  TrainingContent content = 1;
+}
+
+// CreateTrainingContentRequest is the request for creating training content.
+message CreateTrainingContentRequest {
+  string title = 1;
+  string description = 2;
+  ContentType type = 3;
+  string skill_id = 4;
+  string content_url = 5;
+  string content_body = 6;
+  int32 duration_minutes = 7;
+  int32 sort_order = 8;
+  string created_by_id = 9;
+  repeated string tags = 10;
+  repeated string prerequisite_content_ids = 11;
+}
+
+// CreateTrainingContentResponse is the response after creating training content.
+message CreateTrainingContentResponse {
+  TrainingContent content = 1;
+}
+
+// UpdateTrainingContentRequest is the request for updating training content.
+message UpdateTrainingContentRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  TrainingStatus status = 4;
+  string content_url = 5;
+  string content_body = 6;
+  int32 duration_minutes = 7;
+  repeated string tags = 8;
+}
+
+// UpdateTrainingContentResponse is the response after updating training content.
+message UpdateTrainingContentResponse {
+  TrainingContent content = 1;
+}
+
+// DeleteTrainingContentRequest is the request for deleting training content.
+message DeleteTrainingContentRequest {
+  string id = 1;
+}
+
+// DeleteTrainingContentResponse is the response after deleting training content.
+message DeleteTrainingContentResponse {}
+
+// GetProgressRequest is the request for retrieving a learner's progress.
+message GetProgressRequest {
+  string training_content_id = 1;
+  string learner_id = 2;
+}
+
+// GetProgressResponse is the response containing learner progress.
+message GetProgressResponse {
+  TrainingProgress progress = 1;
+}
+
+// UpdateProgressRequest is the request for updating learner progress.
+message UpdateProgressRequest {
+  string training_content_id = 1;
+  string learner_id = 2;
+  ProgressStatus status = 3;
+  int32 progress_percent = 4;
+  int32 time_spent_minutes = 5;
+}
+
+// UpdateProgressResponse is the response after updating progress.
+message UpdateProgressResponse {
+  TrainingProgress progress = 1;
+}
+
+// ListLearnerProgressRequest is the request for listing all progress for a learner.
+message ListLearnerProgressRequest {
+  string learner_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+  ProgressStatus status = 3;
+  string skill_id = 4;
+}
+
+// ListLearnerProgressResponse is the response for listing learner progress.
+message ListLearnerProgressResponse {
+  repeated TrainingProgress progress = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// TrainingService manages training content and learner progress.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service TrainingService {
+  rpc ListTrainingContents(ListTrainingContentsRequest) returns (ListTrainingContentsResponse) {
+    option (google.api.http) = {
+      get: "/v1/training"
+    };
+  }
+  rpc GetTrainingContent(GetTrainingContentRequest) returns (GetTrainingContentResponse) {
+    option (google.api.http) = {
+      get: "/v1/training/{id}"
+    };
+  }
+  rpc CreateTrainingContent(CreateTrainingContentRequest) returns (CreateTrainingContentResponse) {
+    option (google.api.http) = {
+      post: "/v1/training"
+      body: "*"
+    };
+  }
+  rpc UpdateTrainingContent(UpdateTrainingContentRequest) returns (UpdateTrainingContentResponse) {
+    option (google.api.http) = {
+      patch: "/v1/training/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteTrainingContent(DeleteTrainingContentRequest) returns (DeleteTrainingContentResponse) {
+    option (google.api.http) = {
+      delete: "/v1/training/{id}"
+    };
+  }
+  rpc GetProgress(GetProgressRequest) returns (GetProgressResponse) {
+    option (google.api.http) = {
+      get: "/v1/training/{training_content_id}/progress/{learner_id}"
+    };
+  }
+  rpc UpdateProgress(UpdateProgressRequest) returns (UpdateProgressResponse) {
+    option (google.api.http) = {
+      put: "/v1/training/{training_content_id}/progress/{learner_id}"
+      body: "*"
+    };
+  }
+  rpc ListLearnerProgress(ListLearnerProgressRequest) returns (ListLearnerProgressResponse) {
+    option (google.api.http) = {
+      get: "/v1/learners/{learner_id}/progress"
+    };
+  }
+}

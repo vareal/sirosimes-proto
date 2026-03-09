@@ -1,0 +1,188 @@
+syntax = "proto3";
+
+package sirosimes.tamayura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/actor.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// message.proto — 玉響（Tamayura）メッセージ送受信・リアルタイム配信。
+//
+// チャンネル内のメッセージのCRUD、リアルタイムストリーミングを管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// MessageType classifies the type of message.
+enum MessageType {
+  MESSAGE_TYPE_UNSPECIFIED = 0;
+  MESSAGE_TYPE_TEXT = 1;
+  MESSAGE_TYPE_FILE = 2;
+  MESSAGE_TYPE_SYSTEM = 3;
+  MESSAGE_TYPE_REPLY = 4;
+  MESSAGE_TYPE_EDITED = 5;
+}
+
+// ChatMessage represents a single message in a channel.
+message ChatMessage {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string channel_id = 2;
+  string sender_id = 3;
+  MessageType type = 4;
+  string content = 5;
+  string reply_to_id = 6;
+  repeated string attachment_ids = 7;
+  repeated MessageReaction reactions = 8;
+  bool edited = 9;
+  google.protobuf.Timestamp edited_at = 10;
+  string thread_id = 11;
+}
+
+// MessageReaction represents an emoji reaction on a message.
+message MessageReaction {
+  string emoji = 1;
+  repeated string actor_ids = 2;
+  int32 count = 3;
+}
+
+// ChatMessageDetail bundles a message with resolved actor references.
+message ChatMessageDetail {
+  ChatMessage message = 1;
+  sirosimes.common.v1.ActorRef sender = 2;
+}
+
+// ListMessagesRequest is the request for listing messages in a channel.
+message ListMessagesRequest {
+  string channel_id = 1;
+  sirosimes.common.v1.PageToken page_token = 2;
+  google.protobuf.Timestamp before = 3;
+  google.protobuf.Timestamp after = 4;
+  string thread_id = 5;
+}
+
+// ListMessagesResponse is the response for listing messages.
+message ListMessagesResponse {
+  repeated ChatMessageDetail messages = 1;
+  sirosimes.common.v1.PageTokenResponse page_info = 2;
+}
+
+// GetMessageRequest is the request for retrieving a single message.
+message GetMessageRequest {
+  string id = 1;
+}
+
+// GetMessageResponse is the response containing a single message.
+message GetMessageResponse {
+  ChatMessageDetail message = 1;
+}
+
+// SendMessageRequest is the request for sending a new message.
+message SendMessageRequest {
+  string channel_id = 1;
+  string sender_id = 2;
+  MessageType type = 3;
+  string content = 4;
+  string reply_to_id = 5;
+  repeated string attachment_ids = 6;
+  string thread_id = 7;
+}
+
+// SendMessageResponse is the response after sending a message.
+message SendMessageResponse {
+  ChatMessageDetail message = 1;
+}
+
+// EditMessageRequest is the request for editing a message.
+message EditMessageRequest {
+  string id = 1;
+  string content = 2;
+}
+
+// EditMessageResponse is the response after editing a message.
+message EditMessageResponse {
+  ChatMessageDetail message = 1;
+}
+
+// DeleteMessageRequest is the request for deleting a message.
+message DeleteMessageRequest {
+  string id = 1;
+}
+
+// DeleteMessageResponse is the response after deleting a message.
+message DeleteMessageResponse {}
+
+// AddReactionRequest is the request for adding a reaction to a message.
+message AddReactionRequest {
+  string message_id = 1;
+  string actor_id = 2;
+  string emoji = 3;
+}
+
+// AddReactionResponse is the response after adding a reaction.
+message AddReactionResponse {}
+
+// RemoveReactionRequest is the request for removing a reaction from a message.
+message RemoveReactionRequest {
+  string message_id = 1;
+  string actor_id = 2;
+  string emoji = 3;
+}
+
+// RemoveReactionResponse is the response after removing a reaction.
+message RemoveReactionResponse {}
+
+// StreamMessagesRequest configures real-time message streaming.
+message StreamMessagesRequest {
+  string channel_id = 1;
+}
+
+// StreamMessagesResponse wraps a single streamed message event.
+message StreamMessagesResponse {
+  ChatMessageDetail message = 1;
+  string event_type = 2;
+}
+
+// MessageService manages messages within channels.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service MessageService {
+  rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse) {
+    option (google.api.http) = {
+      get: "/v1/channels/{channel_id}/messages"
+    };
+  }
+  rpc GetMessage(GetMessageRequest) returns (GetMessageResponse) {
+    option (google.api.http) = {
+      get: "/v1/messages/{id}"
+    };
+  }
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/channels/{channel_id}/messages"
+      body: "*"
+    };
+  }
+  rpc EditMessage(EditMessageRequest) returns (EditMessageResponse) {
+    option (google.api.http) = {
+      patch: "/v1/messages/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse) {
+    option (google.api.http) = {
+      delete: "/v1/messages/{id}"
+    };
+  }
+  rpc AddReaction(AddReactionRequest) returns (AddReactionResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages/{message_id}/reactions"
+      body: "*"
+    };
+  }
+  rpc RemoveReaction(RemoveReactionRequest) returns (RemoveReactionResponse) {
+    option (google.api.http) = {
+      delete: "/v1/messages/{message_id}/reactions/{emoji}"
+    };
+  }
+  rpc StreamMessages(StreamMessagesRequest) returns (stream StreamMessagesResponse);
+}

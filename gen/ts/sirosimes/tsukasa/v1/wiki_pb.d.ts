@@ -194,7 +194,10 @@ export declare class WikiChapter extends Message<WikiChapter> {
  */
 export declare class WikiDocument extends Message<WikiDocument> {
   /**
-   * @generated from field: string id = 1;
+   * [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+   *
+   * @generated from field: string id = 1 [deprecated = true];
+   * @deprecated
    */
   id: string;
 
@@ -241,17 +244,23 @@ export declare class WikiDocument extends Message<WikiDocument> {
   sortOrder: number;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 10;
+   * [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 10 [deprecated = true];
+   * @deprecated
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 11;
+   * [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp updated_at = 11 [deprecated = true];
+   * @deprecated
    */
   updatedAt?: Timestamp;
 
   /**
-   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   * Standard resource metadata. Default security_level: INTERNAL.
    * Per-document override is supported: e.g., HR wikis → CONFIDENTIAL.
    * Implementation MUST allow entity-level SecurityLevel override via this field.
    *

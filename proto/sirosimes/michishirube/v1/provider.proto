@@ -1,0 +1,200 @@
+syntax = "proto3";
+
+package sirosimes.michishirube.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// provider.proto — 道標（Michishirube）LLMプロバイダー管理。
+//
+// Anthropic/OpenAI/Google等のLLMプロバイダーの登録・ヘルスチェック・
+// APIキーローテーションを管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// ProviderType classifies the LLM provider.
+enum ProviderType {
+  PROVIDER_TYPE_UNSPECIFIED = 0;
+  PROVIDER_TYPE_ANTHROPIC = 1;
+  PROVIDER_TYPE_OPENAI = 2;
+  PROVIDER_TYPE_GOOGLE = 3;
+  PROVIDER_TYPE_LOCAL = 4;
+  PROVIDER_TYPE_AZURE_OPENAI = 5;
+  PROVIDER_TYPE_AWS_BEDROCK = 6;
+  PROVIDER_TYPE_CUSTOM = 7;
+}
+
+// ProviderStatus represents the operational state of a provider.
+enum ProviderStatus {
+  PROVIDER_STATUS_UNSPECIFIED = 0;
+  PROVIDER_STATUS_ACTIVE = 1;
+  PROVIDER_STATUS_DEGRADED = 2;
+  PROVIDER_STATUS_DOWN = 3;
+  PROVIDER_STATUS_MAINTENANCE = 4;
+  PROVIDER_STATUS_DISABLED = 5;
+}
+
+// Provider represents a registered LLM provider endpoint.
+message Provider {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  ProviderType type = 3;
+  string base_url = 4;
+  ProviderStatus status = 5;
+  int32 priority = 6;
+  int32 weight = 7;
+  ProviderRateLimits rate_limits = 8;
+  ProviderHealth health = 9;
+  repeated string supported_models = 10;
+  string region = 11;
+}
+
+// ProviderRateLimits defines rate limiting configuration.
+message ProviderRateLimits {
+  int32 requests_per_minute = 1;
+  int32 tokens_per_minute = 2;
+  int32 concurrent_requests = 3;
+}
+
+// ProviderHealth represents the latest health check result.
+message ProviderHealth {
+  bool healthy = 1;
+  float latency_ms = 2;
+  float error_rate = 3;
+  float uptime_percent = 4;
+  google.protobuf.Timestamp last_check_at = 5;
+  string last_error = 6;
+  int32 consecutive_failures = 7;
+}
+
+// ListProvidersRequest is the request for listing providers.
+message ListProvidersRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ProviderType type = 2;
+  ProviderStatus status = 3;
+}
+
+// ListProvidersResponse is the response for listing providers.
+message ListProvidersResponse {
+  repeated Provider providers = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetProviderRequest is the request for retrieving a single provider.
+message GetProviderRequest {
+  string id = 1;
+}
+
+// GetProviderResponse is the response containing a single provider.
+message GetProviderResponse {
+  Provider provider = 1;
+}
+
+// CreateProviderRequest is the request for registering a new provider.
+message CreateProviderRequest {
+  string name = 1;
+  ProviderType type = 2;
+  string base_url = 3;
+  int32 priority = 4;
+  int32 weight = 5;
+  ProviderRateLimits rate_limits = 6;
+  repeated string supported_models = 7;
+  string region = 8;
+  string api_key = 9;
+}
+
+// CreateProviderResponse is the response after registering a provider.
+message CreateProviderResponse {
+  Provider provider = 1;
+}
+
+// UpdateProviderRequest is the request for updating a provider.
+message UpdateProviderRequest {
+  string id = 1;
+  string name = 2;
+  string base_url = 3;
+  ProviderStatus status = 4;
+  int32 priority = 5;
+  int32 weight = 6;
+  ProviderRateLimits rate_limits = 7;
+  repeated string supported_models = 8;
+}
+
+// UpdateProviderResponse is the response after updating a provider.
+message UpdateProviderResponse {
+  Provider provider = 1;
+}
+
+// DeleteProviderRequest is the request for removing a provider.
+message DeleteProviderRequest {
+  string id = 1;
+}
+
+// DeleteProviderResponse is the response after removing a provider.
+message DeleteProviderResponse {}
+
+// HealthCheckRequest is the request for checking a provider's health.
+message HealthCheckRequest {
+  string id = 1;
+}
+
+// HealthCheckResponse is the response containing health check results.
+message HealthCheckResponse {
+  ProviderHealth health = 1;
+}
+
+// RotateKeyRequest is the request for rotating a provider's API key.
+message RotateKeyRequest {
+  string id = 1;
+  string new_api_key = 2;
+}
+
+// RotateKeyResponse is the response after rotating a provider's API key.
+message RotateKeyResponse {
+  google.protobuf.Timestamp rotated_at = 1;
+}
+
+// ProviderService manages LLM provider lifecycle and health.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service ProviderService {
+  rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {
+    option (google.api.http) = {
+      get: "/v1/providers"
+    };
+  }
+  rpc GetProvider(GetProviderRequest) returns (GetProviderResponse) {
+    option (google.api.http) = {
+      get: "/v1/providers/{id}"
+    };
+  }
+  rpc CreateProvider(CreateProviderRequest) returns (CreateProviderResponse) {
+    option (google.api.http) = {
+      post: "/v1/providers"
+      body: "*"
+    };
+  }
+  rpc UpdateProvider(UpdateProviderRequest) returns (UpdateProviderResponse) {
+    option (google.api.http) = {
+      patch: "/v1/providers/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
+    option (google.api.http) = {
+      delete: "/v1/providers/{id}"
+    };
+  }
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/v1/providers/{id}/health"
+    };
+  }
+  rpc RotateKey(RotateKeyRequest) returns (RotateKeyResponse) {
+    option (google.api.http) = {
+      post: "/v1/providers/{id}/rotate-key"
+      body: "*"
+    };
+  }
+}

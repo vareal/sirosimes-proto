@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package sirosimes.tamayura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/actor.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// participant.proto — 玉響（Tamayura）参加者管理・プレゼンス。
+//
+// チャンネル参加者のロール管理、オンラインステータス、プレゼンス追跡を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// ParticipantRole defines the role of a participant within a channel.
+enum ParticipantRole {
+  PARTICIPANT_ROLE_UNSPECIFIED = 0;
+  PARTICIPANT_ROLE_OWNER = 1;
+  PARTICIPANT_ROLE_ADMIN = 2;
+  PARTICIPANT_ROLE_MEMBER = 3;
+  PARTICIPANT_ROLE_GUEST = 4;
+}
+
+// PresenceStatus represents the online status of a participant.
+enum PresenceStatus {
+  PRESENCE_STATUS_UNSPECIFIED = 0;
+  PRESENCE_STATUS_ONLINE = 1;
+  PRESENCE_STATUS_OFFLINE = 2;
+  PRESENCE_STATUS_AWAY = 3;
+  PRESENCE_STATUS_DND = 4;
+  PRESENCE_STATUS_BUSY = 5;
+}
+
+// Participant represents a member of a channel.
+message Participant {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string channel_id = 2;
+  string actor_id = 3;
+  ParticipantRole role = 4;
+  PresenceStatus presence = 5;
+  string status_message = 6;
+  google.protobuf.Timestamp joined_at = 7;
+  google.protobuf.Timestamp last_read_at = 8;
+  int32 unread_count = 9;
+  bool muted = 10;
+}
+
+// ParticipantDetail bundles a participant with resolved actor reference.
+message ParticipantDetail {
+  Participant participant = 1;
+  sirosimes.common.v1.ActorRef actor = 2;
+}
+
+// ListParticipantsRequest is the request for listing channel participants.
+message ListParticipantsRequest {
+  string channel_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+  PresenceStatus presence = 3;
+  ParticipantRole role = 4;
+}
+
+// ListParticipantsResponse is the response for listing participants.
+message ListParticipantsResponse {
+  repeated ParticipantDetail participants = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetParticipantRequest is the request for retrieving a single participant.
+message GetParticipantRequest {
+  string channel_id = 1;
+  string actor_id = 2;
+}
+
+// GetParticipantResponse is the response containing a single participant.
+message GetParticipantResponse {
+  ParticipantDetail participant = 1;
+}
+
+// UpdateParticipantRequest is the request for updating a participant's role.
+message UpdateParticipantRequest {
+  string channel_id = 1;
+  string actor_id = 2;
+  ParticipantRole role = 3;
+  bool muted = 4;
+}
+
+// UpdateParticipantResponse is the response after updating a participant.
+message UpdateParticipantResponse {
+  ParticipantDetail participant = 1;
+}
+
+// UpdatePresenceRequest is the request for updating a participant's presence.
+message UpdatePresenceRequest {
+  string actor_id = 1;
+  PresenceStatus presence = 2;
+  string status_message = 3;
+}
+
+// UpdatePresenceResponse is the response after updating presence.
+message UpdatePresenceResponse {}
+
+// MarkReadRequest is the request for marking messages as read.
+message MarkReadRequest {
+  string channel_id = 1;
+  string actor_id = 2;
+  string last_read_message_id = 3;
+}
+
+// MarkReadResponse is the response after marking messages as read.
+message MarkReadResponse {
+  int32 unread_count = 1;
+}
+
+// KickParticipantRequest is the request for removing a participant from a channel.
+message KickParticipantRequest {
+  string channel_id = 1;
+  string actor_id = 2;
+  string reason = 3;
+}
+
+// KickParticipantResponse is the response after kicking a participant.
+message KickParticipantResponse {}
+
+// StreamPresenceRequest configures real-time presence streaming.
+message StreamPresenceRequest {
+  repeated string channel_ids = 1;
+}
+
+// StreamPresenceResponse wraps a single presence change event.
+message StreamPresenceResponse {
+  string actor_id = 1;
+  PresenceStatus presence = 2;
+  string status_message = 3;
+}
+
+// ParticipantService manages channel participants and presence.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service ParticipantService {
+  rpc ListParticipants(ListParticipantsRequest) returns (ListParticipantsResponse) {
+    option (google.api.http) = {
+      get: "/v1/channels/{channel_id}/participants"
+    };
+  }
+  rpc GetParticipant(GetParticipantRequest) returns (GetParticipantResponse) {
+    option (google.api.http) = {
+      get: "/v1/channels/{channel_id}/participants/{actor_id}"
+    };
+  }
+  rpc UpdateParticipant(UpdateParticipantRequest) returns (UpdateParticipantResponse) {
+    option (google.api.http) = {
+      patch: "/v1/channels/{channel_id}/participants/{actor_id}"
+      body: "*"
+    };
+  }
+  rpc UpdatePresence(UpdatePresenceRequest) returns (UpdatePresenceResponse) {
+    option (google.api.http) = {
+      put: "/v1/presence/{actor_id}"
+      body: "*"
+    };
+  }
+  rpc MarkRead(MarkReadRequest) returns (MarkReadResponse) {
+    option (google.api.http) = {
+      post: "/v1/channels/{channel_id}/read"
+      body: "*"
+    };
+  }
+  rpc KickParticipant(KickParticipantRequest) returns (KickParticipantResponse) {
+    option (google.api.http) = {
+      post: "/v1/channels/{channel_id}/participants/{actor_id}/kick"
+      body: "*"
+    };
+  }
+  rpc StreamPresence(StreamPresenceRequest) returns (stream StreamPresenceResponse);
+}

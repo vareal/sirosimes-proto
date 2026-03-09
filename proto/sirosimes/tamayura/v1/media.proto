@@ -1,0 +1,206 @@
+syntax = "proto3";
+
+package sirosimes.tamayura.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// media.proto — 玉響（Tamayura）メディア処理。
+//
+// 音声・ビデオストリーム管理、ファイル共有・アップロードを管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// MediaType classifies the type of media.
+enum MediaType {
+  MEDIA_TYPE_UNSPECIFIED = 0;
+  MEDIA_TYPE_IMAGE = 1;
+  MEDIA_TYPE_VIDEO = 2;
+  MEDIA_TYPE_AUDIO = 3;
+  MEDIA_TYPE_DOCUMENT = 4;
+  MEDIA_TYPE_ARCHIVE = 5;
+}
+
+// MediaStreamStatus represents the state of a live media stream.
+enum MediaStreamStatus {
+  MEDIA_STREAM_STATUS_UNSPECIFIED = 0;
+  MEDIA_STREAM_STATUS_CONNECTING = 1;
+  MEDIA_STREAM_STATUS_ACTIVE = 2;
+  MEDIA_STREAM_STATUS_PAUSED = 3;
+  MEDIA_STREAM_STATUS_ENDED = 4;
+  MEDIA_STREAM_STATUS_ERROR = 5;
+}
+
+// MediaStreamType classifies the type of media stream.
+enum MediaStreamType {
+  MEDIA_STREAM_TYPE_UNSPECIFIED = 0;
+  MEDIA_STREAM_TYPE_AUDIO = 1;
+  MEDIA_STREAM_TYPE_VIDEO = 2;
+  MEDIA_STREAM_TYPE_SCREEN_SHARE = 3;
+}
+
+// MediaFile represents an uploaded file attachment.
+message MediaFile {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string filename = 2;
+  string mime_type = 3;
+  int64 size_bytes = 4;
+  string storage_url = 5;
+  string thumbnail_url = 6;
+  MediaType type = 7;
+  string channel_id = 8;
+  string uploaded_by_id = 9;
+  string checksum_sha256 = 10;
+}
+
+// MediaStream represents a live audio or video stream.
+message MediaStream {
+  string id = 1;
+  string channel_id = 2;
+  string participant_id = 3;
+  MediaStreamType type = 4;
+  MediaStreamStatus status = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp ended_at = 7;
+}
+
+// UploadMediaRequest is the request for uploading a file.
+message UploadMediaRequest {
+  string filename = 1;
+  string mime_type = 2;
+  int64 size_bytes = 3;
+  string channel_id = 4;
+  string uploaded_by_id = 5;
+  bytes content = 6;
+}
+
+// UploadMediaResponse is the response after uploading a file.
+message UploadMediaResponse {
+  MediaFile file = 1;
+}
+
+// GetMediaRequest is the request for retrieving a media file.
+message GetMediaRequest {
+  string id = 1;
+}
+
+// GetMediaResponse is the response containing a media file.
+message GetMediaResponse {
+  MediaFile file = 1;
+}
+
+// ListMediaRequest is the request for listing media files in a channel.
+message ListMediaRequest {
+  string channel_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+  MediaType type = 3;
+}
+
+// ListMediaResponse is the response for listing media files.
+message ListMediaResponse {
+  repeated MediaFile files = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// DeleteMediaRequest is the request for deleting a media file.
+message DeleteMediaRequest {
+  string id = 1;
+}
+
+// DeleteMediaResponse is the response after deleting a media file.
+message DeleteMediaResponse {}
+
+// GetDownloadUrlRequest is the request for generating a download URL.
+message GetDownloadUrlRequest {
+  string id = 1;
+  int32 expires_in_seconds = 2;
+}
+
+// GetDownloadUrlResponse is the response containing a signed download URL.
+message GetDownloadUrlResponse {
+  string url = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}
+
+// StartStreamRequest is the request for starting a media stream.
+message StartStreamRequest {
+  string channel_id = 1;
+  string participant_id = 2;
+  MediaStreamType type = 3;
+}
+
+// StartStreamResponse is the response after starting a stream.
+message StartStreamResponse {
+  MediaStream stream = 1;
+  string signaling_url = 2;
+}
+
+// StopStreamRequest is the request for stopping a media stream.
+message StopStreamRequest {
+  string stream_id = 1;
+}
+
+// StopStreamResponse is the response after stopping a stream.
+message StopStreamResponse {
+  MediaStream stream = 1;
+}
+
+// ListStreamsRequest is the request for listing active streams in a channel.
+message ListStreamsRequest {
+  string channel_id = 1;
+}
+
+// ListStreamsResponse is the response for listing active streams.
+message ListStreamsResponse {
+  repeated MediaStream streams = 1;
+}
+
+// MediaService manages file uploads and media streams.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service MediaService {
+  rpc UploadMedia(UploadMediaRequest) returns (UploadMediaResponse) {
+    option (google.api.http) = {
+      post: "/v1/media"
+      body: "*"
+    };
+  }
+  rpc GetMedia(GetMediaRequest) returns (GetMediaResponse) {
+    option (google.api.http) = {
+      get: "/v1/media/{id}"
+    };
+  }
+  rpc ListMedia(ListMediaRequest) returns (ListMediaResponse) {
+    option (google.api.http) = {
+      get: "/v1/channels/{channel_id}/media"
+    };
+  }
+  rpc DeleteMedia(DeleteMediaRequest) returns (DeleteMediaResponse) {
+    option (google.api.http) = {
+      delete: "/v1/media/{id}"
+    };
+  }
+  rpc GetDownloadUrl(GetDownloadUrlRequest) returns (GetDownloadUrlResponse) {
+    option (google.api.http) = {
+      get: "/v1/media/{id}/download"
+    };
+  }
+  rpc StartStream(StartStreamRequest) returns (StartStreamResponse) {
+    option (google.api.http) = {
+      post: "/v1/channels/{channel_id}/streams"
+      body: "*"
+    };
+  }
+  rpc StopStream(StopStreamRequest) returns (StopStreamResponse) {
+    option (google.api.http) = {
+      post: "/v1/streams/{stream_id}/stop"
+      body: "*"
+    };
+  }
+  rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse) {
+    option (google.api.http) = {
+      get: "/v1/channels/{channel_id}/streams"
+    };
+  }
+}

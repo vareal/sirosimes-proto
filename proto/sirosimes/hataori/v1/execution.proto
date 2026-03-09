@@ -37,7 +37,8 @@ enum ExecutionStepStatus {
 
 // Execution represents a single run of a workflow.
 message Execution {
-  string id = 1;
+  // [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string workflow_id = 2;
   string version_id = 3;
   ExecutionStatus status = 4;
@@ -47,8 +48,9 @@ message Execution {
   string triggered_by = 8;
   google.protobuf.Timestamp started_at = 9;
   google.protobuf.Timestamp finished_at = 10;
-  google.protobuf.Timestamp created_at = 11;
-  // [Phase 2a] Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O).
+  // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 11 [deprecated = true];
+  // Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O).
   sirosimes.common.v1.ResourceMetadata metadata = 12;
 }
 

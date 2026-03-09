@@ -118,7 +118,10 @@ export declare enum ProjectMemberRole {
  */
 export declare class Project extends Message<Project> {
   /**
-   * @generated from field: string id = 1;
+   * [Phase 2c deprecated] Use resource_metadata.id. Servers no longer populate this field.
+   *
+   * @generated from field: string id = 1 [deprecated = true];
+   * @deprecated
    */
   id: string;
 
@@ -193,22 +196,33 @@ export declare class Project extends Message<Project> {
   tags: string[];
 
   /**
-   * @generated from field: map<string, string> metadata = 16;
+   * [Phase 2c deprecated] Use resource_metadata.labels instead.
+   *
+   * @generated from field: map<string, string> metadata = 16 [deprecated = true];
+   * @deprecated
    */
   metadata: { [key: string]: string };
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 17;
+   * [Phase 2c deprecated] Use resource_metadata.created_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 17 [deprecated = true];
+   * @deprecated
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 18;
+   * [Phase 2c deprecated] Use resource_metadata.updated_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp updated_at = 18 [deprecated = true];
+   * @deprecated
    */
   updatedAt?: Timestamp;
 
   /**
-   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   * Standard resource metadata. Default security_level: INTERNAL.
+   * Note: Named resource_metadata (not metadata) because field 16 uses 'metadata' name.
+   * Will be renamed to 'metadata' in Phase 2d after field 16 is reserved.
    *
    * @generated from field: sirosimes.common.v1.ResourceMetadata resource_metadata = 19;
    */

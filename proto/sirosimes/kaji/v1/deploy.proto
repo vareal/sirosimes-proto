@@ -1,0 +1,187 @@
+syntax = "proto3";
+
+package sirosimes.kaji.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// deploy.proto — 鍛冶（Kaji）デプロイメント管理。
+//
+// Blue-Green、カナリア、ローリング等のデプロイ戦略管理、
+// ロールバック、プロモーション操作を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// DeployStrategy classifies the deployment strategy.
+enum DeployStrategy {
+  DEPLOY_STRATEGY_UNSPECIFIED = 0;
+  DEPLOY_STRATEGY_ROLLING = 1;
+  DEPLOY_STRATEGY_BLUE_GREEN = 2;
+  DEPLOY_STRATEGY_CANARY = 3;
+  DEPLOY_STRATEGY_RECREATE = 4;
+}
+
+// DeploymentStatus represents the lifecycle state of a deployment.
+enum DeploymentStatus {
+  DEPLOYMENT_STATUS_UNSPECIFIED = 0;
+  DEPLOYMENT_STATUS_PENDING = 1;
+  DEPLOYMENT_STATUS_IN_PROGRESS = 2;
+  DEPLOYMENT_STATUS_SUCCESS = 3;
+  DEPLOYMENT_STATUS_FAILURE = 4;
+  DEPLOYMENT_STATUS_ROLLED_BACK = 5;
+  DEPLOYMENT_STATUS_CANCELLED = 6;
+}
+
+// CanaryConfig defines canary deployment parameters.
+message CanaryConfig {
+  int32 initial_weight_percent = 1;
+  int32 step_weight_percent = 2;
+  int32 step_interval_seconds = 3;
+  double max_error_rate = 4;
+  double max_latency_ms = 5;
+}
+
+// HealthCheck defines deployment health check configuration.
+message HealthCheck {
+  string path = 1;
+  int32 port = 2;
+  int32 interval_seconds = 3;
+  int32 timeout_seconds = 4;
+  int32 healthy_threshold = 5;
+  int32 unhealthy_threshold = 6;
+}
+
+// Deployment represents a single deployment operation.
+message Deployment {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string pipeline_id = 2;
+  string build_id = 3;
+  string environment = 4;
+  DeployStrategy strategy = 5;
+  DeploymentStatus status = 6;
+  string version = 7;
+  string previous_version = 8;
+  CanaryConfig canary_config = 9;
+  HealthCheck health_check = 10;
+  string deployed_by_id = 11;
+  google.protobuf.Timestamp started_at = 12;
+  google.protobuf.Timestamp finished_at = 13;
+  string rollback_to_id = 14;
+  string error = 15;
+  int32 replica_count = 16;
+}
+
+// ListDeploymentsRequest is the request for listing deployments.
+message ListDeploymentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string pipeline_id = 2;
+  string environment = 3;
+  DeploymentStatus status = 4;
+}
+
+// ListDeploymentsResponse is the response for listing deployments.
+message ListDeploymentsResponse {
+  repeated Deployment deployments = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetDeploymentRequest is the request for retrieving a single deployment.
+message GetDeploymentRequest {
+  string id = 1;
+}
+
+// GetDeploymentResponse is the response containing a single deployment.
+message GetDeploymentResponse {
+  Deployment deployment = 1;
+}
+
+// CreateDeploymentRequest is the request for creating a deployment.
+message CreateDeploymentRequest {
+  string pipeline_id = 1;
+  string build_id = 2;
+  string environment = 3;
+  DeployStrategy strategy = 4;
+  CanaryConfig canary_config = 5;
+  HealthCheck health_check = 6;
+  string deployed_by_id = 7;
+  int32 replica_count = 8;
+}
+
+// CreateDeploymentResponse is the response after creating a deployment.
+message CreateDeploymentResponse {
+  Deployment deployment = 1;
+}
+
+// RollbackDeploymentRequest is the request for rolling back a deployment.
+message RollbackDeploymentRequest {
+  string id = 1;
+  string rollback_to_id = 2;
+  string reason = 3;
+}
+
+// RollbackDeploymentResponse is the response after rolling back.
+message RollbackDeploymentResponse {
+  Deployment deployment = 1;
+}
+
+// PromoteDeploymentRequest is the request for promoting a canary deployment.
+message PromoteDeploymentRequest {
+  string id = 1;
+}
+
+// PromoteDeploymentResponse is the response after promotion.
+message PromoteDeploymentResponse {
+  Deployment deployment = 1;
+}
+
+// CancelDeploymentRequest is the request for cancelling a deployment.
+message CancelDeploymentRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+// CancelDeploymentResponse is the response after cancelling a deployment.
+message CancelDeploymentResponse {
+  Deployment deployment = 1;
+}
+
+// DeploymentService manages deployments.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service DeploymentService {
+  rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse) {
+    option (google.api.http) = {
+      get: "/v1/deployments"
+    };
+  }
+  rpc GetDeployment(GetDeploymentRequest) returns (GetDeploymentResponse) {
+    option (google.api.http) = {
+      get: "/v1/deployments/{id}"
+    };
+  }
+  rpc CreateDeployment(CreateDeploymentRequest) returns (CreateDeploymentResponse) {
+    option (google.api.http) = {
+      post: "/v1/deployments"
+      body: "*"
+    };
+  }
+  rpc RollbackDeployment(RollbackDeploymentRequest) returns (RollbackDeploymentResponse) {
+    option (google.api.http) = {
+      post: "/v1/deployments/{id}/rollback"
+      body: "*"
+    };
+  }
+  rpc PromoteDeployment(PromoteDeploymentRequest) returns (PromoteDeploymentResponse) {
+    option (google.api.http) = {
+      post: "/v1/deployments/{id}/promote"
+      body: "*"
+    };
+  }
+  rpc CancelDeployment(CancelDeploymentRequest) returns (CancelDeploymentResponse) {
+    option (google.api.http) = {
+      post: "/v1/deployments/{id}/cancel"
+      body: "*"
+    };
+  }
+}

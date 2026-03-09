@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package sirosimes.kaji.v1;
+
+import "google/api/annotations.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// pipeline.proto — 鍛冶（Kaji）CI/CDパイプライン定義・ステージ管理。
+//
+// CI/CDパイプラインのCRUD、ステージ定義、トリガー操作を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// PipelineStatus represents the lifecycle state of a pipeline.
+enum PipelineStatus {
+  PIPELINE_STATUS_UNSPECIFIED = 0;
+  PIPELINE_STATUS_ACTIVE = 1;
+  PIPELINE_STATUS_INACTIVE = 2;
+  PIPELINE_STATUS_ARCHIVED = 3;
+}
+
+// StageType classifies the type of a pipeline stage.
+enum StageType {
+  STAGE_TYPE_UNSPECIFIED = 0;
+  STAGE_TYPE_BUILD = 1;
+  STAGE_TYPE_TEST = 2;
+  STAGE_TYPE_LINT = 3;
+  STAGE_TYPE_SECURITY_SCAN = 4;
+  STAGE_TYPE_QUALITY_GATE = 5;
+  STAGE_TYPE_DEPLOY = 6;
+  STAGE_TYPE_APPROVAL = 7;
+  STAGE_TYPE_CUSTOM = 8;
+}
+
+// Stage represents a single step in a pipeline.
+message Stage {
+  string name = 1;
+  StageType type = 2;
+  int32 order = 3;
+  string image = 4;
+  repeated string commands = 5;
+  map<string, string> environment = 6;
+  int32 timeout_seconds = 7;
+  int32 retry_count = 8;
+  repeated string depends_on = 9;
+  bool allow_failure = 10;
+}
+
+// Pipeline represents a CI/CD pipeline definition.
+message Pipeline {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  string repo_url = 4;
+  string branch = 5;
+  string config_path = 6;
+  PipelineStatus status = 7;
+  repeated Stage stages = 8;
+  map<string, string> default_environment = 9;
+  string project_id = 10;
+  string created_by_id = 11;
+}
+
+// ListPipelinesRequest is the request for listing pipelines.
+message ListPipelinesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  PipelineStatus status = 2;
+  string project_id = 3;
+  string search = 4;
+}
+
+// ListPipelinesResponse is the response for listing pipelines.
+message ListPipelinesResponse {
+  repeated Pipeline pipelines = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetPipelineRequest is the request for retrieving a single pipeline.
+message GetPipelineRequest {
+  string id = 1;
+}
+
+// GetPipelineResponse is the response containing a single pipeline.
+message GetPipelineResponse {
+  Pipeline pipeline = 1;
+}
+
+// CreatePipelineRequest is the request for creating a pipeline.
+message CreatePipelineRequest {
+  string name = 1;
+  string description = 2;
+  string repo_url = 3;
+  string branch = 4;
+  string config_path = 5;
+  repeated Stage stages = 6;
+  map<string, string> default_environment = 7;
+  string project_id = 8;
+  string created_by_id = 9;
+}
+
+// CreatePipelineResponse is the response after creating a pipeline.
+message CreatePipelineResponse {
+  Pipeline pipeline = 1;
+}
+
+// UpdatePipelineRequest is the request for updating a pipeline.
+message UpdatePipelineRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string branch = 4;
+  string config_path = 5;
+  PipelineStatus status = 6;
+  repeated Stage stages = 7;
+  map<string, string> default_environment = 8;
+}
+
+// UpdatePipelineResponse is the response after updating a pipeline.
+message UpdatePipelineResponse {
+  Pipeline pipeline = 1;
+}
+
+// DeletePipelineRequest is the request for deleting a pipeline.
+message DeletePipelineRequest {
+  string id = 1;
+}
+
+// DeletePipelineResponse is the response after deleting a pipeline.
+message DeletePipelineResponse {}
+
+// TriggerPipelineRequest is the request for manually triggering a pipeline run.
+message TriggerPipelineRequest {
+  string id = 1;
+  string branch = 2;
+  string commit_sha = 3;
+  map<string, string> variables = 4;
+  string triggered_by_id = 5;
+}
+
+// TriggerPipelineResponse is the response after triggering a pipeline.
+message TriggerPipelineResponse {
+  string build_id = 1;
+}
+
+// PipelineService manages CI/CD pipeline definitions.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service PipelineService {
+  rpc ListPipelines(ListPipelinesRequest) returns (ListPipelinesResponse) {
+    option (google.api.http) = {
+      get: "/v1/pipelines"
+    };
+  }
+  rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse) {
+    option (google.api.http) = {
+      get: "/v1/pipelines/{id}"
+    };
+  }
+  rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse) {
+    option (google.api.http) = {
+      post: "/v1/pipelines"
+      body: "*"
+    };
+  }
+  rpc UpdatePipeline(UpdatePipelineRequest) returns (UpdatePipelineResponse) {
+    option (google.api.http) = {
+      patch: "/v1/pipelines/{id}"
+      body: "*"
+    };
+  }
+  rpc DeletePipeline(DeletePipelineRequest) returns (DeletePipelineResponse) {
+    option (google.api.http) = {
+      delete: "/v1/pipelines/{id}"
+    };
+  }
+  rpc TriggerPipeline(TriggerPipelineRequest) returns (TriggerPipelineResponse) {
+    option (google.api.http) = {
+      post: "/v1/pipelines/{id}/trigger"
+      body: "*"
+    };
+  }
+}

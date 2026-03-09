@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/actor.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// assessment.proto — 玉の舎（Tamanoya）アセスメント作成・実施・採点。
+//
+// スキルアセスメントの作成、出題、提出、採点を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// AssessmentType classifies the type of assessment.
+enum AssessmentType {
+  ASSESSMENT_TYPE_UNSPECIFIED = 0;
+  ASSESSMENT_TYPE_QUIZ = 1;
+  ASSESSMENT_TYPE_PRACTICAL = 2;
+  ASSESSMENT_TYPE_PEER_REVIEW = 3;
+  ASSESSMENT_TYPE_SELF_ASSESSMENT = 4;
+  ASSESSMENT_TYPE_CERTIFICATION = 5;
+}
+
+// AssessmentStatus represents the lifecycle state of an assessment.
+enum AssessmentStatus {
+  ASSESSMENT_STATUS_UNSPECIFIED = 0;
+  ASSESSMENT_STATUS_DRAFT = 1;
+  ASSESSMENT_STATUS_PUBLISHED = 2;
+  ASSESSMENT_STATUS_ARCHIVED = 3;
+}
+
+// SubmissionStatus represents the state of a submission.
+enum SubmissionStatus {
+  SUBMISSION_STATUS_UNSPECIFIED = 0;
+  SUBMISSION_STATUS_NOT_STARTED = 1;
+  SUBMISSION_STATUS_IN_PROGRESS = 2;
+  SUBMISSION_STATUS_SUBMITTED = 3;
+  SUBMISSION_STATUS_GRADED = 4;
+}
+
+// QuestionType classifies the type of question.
+enum QuestionType {
+  QUESTION_TYPE_UNSPECIFIED = 0;
+  QUESTION_TYPE_MULTIPLE_CHOICE = 1;
+  QUESTION_TYPE_FREE_TEXT = 2;
+  QUESTION_TYPE_CODE = 3;
+  QUESTION_TYPE_TRUE_FALSE = 4;
+  QUESTION_TYPE_RATING = 5;
+}
+
+// Question represents a single question in an assessment.
+message Question {
+  string id = 1;
+  QuestionType type = 2;
+  string content = 3;
+  repeated string options = 4;
+  string correct_answer = 5;
+  int32 points = 6;
+  int32 order = 7;
+  string explanation = 8;
+}
+
+// Assessment represents a skill evaluation.
+message Assessment {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string title = 2;
+  string description = 3;
+  AssessmentType type = 4;
+  AssessmentStatus status = 5;
+  string skill_id = 6;
+  repeated Question questions = 7;
+  int32 passing_score = 8;
+  int32 time_limit_minutes = 9;
+  int32 max_attempts = 10;
+  string created_by_id = 11;
+}
+
+// Answer represents a learner's answer to a question.
+message Answer {
+  string question_id = 1;
+  string answer = 2;
+  int32 score = 3;
+  string feedback = 4;
+}
+
+// Submission represents a learner's assessment attempt.
+message Submission {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string assessment_id = 2;
+  string learner_id = 3;
+  SubmissionStatus status = 4;
+  repeated Answer answers = 5;
+  int32 total_score = 6;
+  int32 max_score = 7;
+  bool passed = 8;
+  int32 attempt_number = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp submitted_at = 11;
+  google.protobuf.Timestamp graded_at = 12;
+  string graded_by_id = 13;
+}
+
+// SubmissionDetail bundles a submission with resolved actor references.
+message SubmissionDetail {
+  Submission submission = 1;
+  sirosimes.common.v1.ActorRef learner = 2;
+  sirosimes.common.v1.ActorRef graded_by = 3;
+}
+
+// ListAssessmentsRequest is the request for listing assessments.
+message ListAssessmentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  AssessmentType type = 2;
+  AssessmentStatus status = 3;
+  string skill_id = 4;
+  string search = 5;
+}
+
+// ListAssessmentsResponse is the response for listing assessments.
+message ListAssessmentsResponse {
+  repeated Assessment assessments = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetAssessmentRequest is the request for retrieving a single assessment.
+message GetAssessmentRequest {
+  string id = 1;
+}
+
+// GetAssessmentResponse is the response containing a single assessment.
+message GetAssessmentResponse {
+  Assessment assessment = 1;
+}
+
+// CreateAssessmentRequest is the request for creating an assessment.
+message CreateAssessmentRequest {
+  string title = 1;
+  string description = 2;
+  AssessmentType type = 3;
+  string skill_id = 4;
+  repeated Question questions = 5;
+  int32 passing_score = 6;
+  int32 time_limit_minutes = 7;
+  int32 max_attempts = 8;
+  string created_by_id = 9;
+}
+
+// CreateAssessmentResponse is the response after creating an assessment.
+message CreateAssessmentResponse {
+  Assessment assessment = 1;
+}
+
+// UpdateAssessmentRequest is the request for updating an assessment.
+message UpdateAssessmentRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  AssessmentStatus status = 4;
+  repeated Question questions = 5;
+  int32 passing_score = 6;
+  int32 time_limit_minutes = 7;
+}
+
+// UpdateAssessmentResponse is the response after updating an assessment.
+message UpdateAssessmentResponse {
+  Assessment assessment = 1;
+}
+
+// DeleteAssessmentRequest is the request for deleting an assessment.
+message DeleteAssessmentRequest {
+  string id = 1;
+}
+
+// DeleteAssessmentResponse is the response after deleting an assessment.
+message DeleteAssessmentResponse {}
+
+// SubmitAssessmentRequest is the request for submitting answers.
+message SubmitAssessmentRequest {
+  string assessment_id = 1;
+  string learner_id = 2;
+  repeated Answer answers = 3;
+}
+
+// SubmitAssessmentResponse is the response after submitting answers.
+message SubmitAssessmentResponse {
+  SubmissionDetail submission = 1;
+}
+
+// GradeSubmissionRequest is the request for grading a submission.
+message GradeSubmissionRequest {
+  string submission_id = 1;
+  string graded_by_id = 2;
+  repeated Answer graded_answers = 3;
+}
+
+// GradeSubmissionResponse is the response after grading a submission.
+message GradeSubmissionResponse {
+  SubmissionDetail submission = 1;
+}
+
+// ListSubmissionsRequest is the request for listing submissions.
+message ListSubmissionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string assessment_id = 2;
+  string learner_id = 3;
+  SubmissionStatus status = 4;
+}
+
+// ListSubmissionsResponse is the response for listing submissions.
+message ListSubmissionsResponse {
+  repeated SubmissionDetail submissions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// AssessmentService manages assessments and submissions.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service AssessmentService {
+  rpc ListAssessments(ListAssessmentsRequest) returns (ListAssessmentsResponse) {
+    option (google.api.http) = {
+      get: "/v1/assessments"
+    };
+  }
+  rpc GetAssessment(GetAssessmentRequest) returns (GetAssessmentResponse) {
+    option (google.api.http) = {
+      get: "/v1/assessments/{id}"
+    };
+  }
+  rpc CreateAssessment(CreateAssessmentRequest) returns (CreateAssessmentResponse) {
+    option (google.api.http) = {
+      post: "/v1/assessments"
+      body: "*"
+    };
+  }
+  rpc UpdateAssessment(UpdateAssessmentRequest) returns (UpdateAssessmentResponse) {
+    option (google.api.http) = {
+      patch: "/v1/assessments/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteAssessment(DeleteAssessmentRequest) returns (DeleteAssessmentResponse) {
+    option (google.api.http) = {
+      delete: "/v1/assessments/{id}"
+    };
+  }
+  rpc SubmitAssessment(SubmitAssessmentRequest) returns (SubmitAssessmentResponse) {
+    option (google.api.http) = {
+      post: "/v1/assessments/{assessment_id}/submit"
+      body: "*"
+    };
+  }
+  rpc GradeSubmission(GradeSubmissionRequest) returns (GradeSubmissionResponse) {
+    option (google.api.http) = {
+      post: "/v1/submissions/{submission_id}/grade"
+      body: "*"
+    };
+  }
+  rpc ListSubmissions(ListSubmissionsRequest) returns (ListSubmissionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/submissions"
+    };
+  }
+}

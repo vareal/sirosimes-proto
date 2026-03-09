@@ -1,0 +1,944 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tamanoya/v1/learner.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "LearnerService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/learners": {
+      "get": {
+        "operationId": "LearnerService_ListLearnerProfiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLearnerProfilesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "skillId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "minLevel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SKILL_LEVEL_UNSPECIFIED",
+              "SKILL_LEVEL_BEGINNER",
+              "SKILL_LEVEL_INTERMEDIATE",
+              "SKILL_LEVEL_ADVANCED",
+              "SKILL_LEVEL_EXPERT"
+            ],
+            "default": "SKILL_LEVEL_UNSPECIFIED"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      }
+    },
+    "/v1/learners/{actorId}": {
+      "get": {
+        "operationId": "LearnerService_GetLearnerProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetLearnerProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "actorId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      },
+      "patch": {
+        "operationId": "LearnerService_UpdateLearnerProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateLearnerProfileResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "actorId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LearnerServiceUpdateLearnerProfileBody"
+            }
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      }
+    },
+    "/v1/learners/{actorId}/recommendations": {
+      "get": {
+        "operationId": "LearnerService_GetRecommendations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetRecommendationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "actorId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      }
+    },
+    "/v1/roadmaps": {
+      "get": {
+        "operationId": "LearnerService_ListRoadmaps",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListRoadmapsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "learnerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      },
+      "post": {
+        "operationId": "LearnerService_CreateRoadmap",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateRoadmapResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateRoadmapRequest is the request for creating a roadmap.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateRoadmapRequest"
+            }
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      }
+    },
+    "/v1/roadmaps/{id}": {
+      "get": {
+        "operationId": "LearnerService_GetRoadmap",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetRoadmapResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      },
+      "delete": {
+        "operationId": "LearnerService_DeleteRoadmap",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteRoadmapResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      },
+      "patch": {
+        "operationId": "LearnerService_UpdateRoadmap",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateRoadmapResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LearnerServiceUpdateRoadmapBody"
+            }
+          }
+        ],
+        "tags": [
+          "LearnerService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "LearnerServiceUpdateLearnerProfileBody": {
+      "type": "object",
+      "properties": {
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LearnerSkill"
+          }
+        }
+      },
+      "description": "UpdateLearnerProfileRequest is the request for updating a learner profile."
+    },
+    "LearnerServiceUpdateRoadmapBody": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Milestone"
+          }
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "UpdateRoadmapRequest is the request for updating a roadmap."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ActorRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ActorType"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "ActorRef is a lightweight reference to an Actor (for embedding in other messages).\nUse this instead of full Actor when only identity info is needed (e.g., in audit logs)."
+    },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
+    "v1CreateRoadmapRequest": {
+      "type": "object",
+      "properties": {
+        "learnerId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Milestone"
+          }
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdById": {
+          "type": "string"
+        }
+      },
+      "description": "CreateRoadmapRequest is the request for creating a roadmap."
+    },
+    "v1CreateRoadmapResponse": {
+      "type": "object",
+      "properties": {
+        "roadmap": {
+          "$ref": "#/definitions/v1RoadmapDetail"
+        }
+      },
+      "description": "CreateRoadmapResponse is the response after creating a roadmap."
+    },
+    "v1DeleteRoadmapResponse": {
+      "type": "object",
+      "description": "DeleteRoadmapResponse is the response after deleting a roadmap."
+    },
+    "v1GetLearnerProfileResponse": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/definitions/v1LearnerProfileDetail"
+        }
+      },
+      "description": "GetLearnerProfileResponse is the response containing a learner profile."
+    },
+    "v1GetRecommendationsResponse": {
+      "type": "object",
+      "properties": {
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SkillRecommendation"
+          }
+        }
+      },
+      "description": "GetRecommendationsResponse is the response containing skill recommendations."
+    },
+    "v1GetRoadmapResponse": {
+      "type": "object",
+      "properties": {
+        "roadmap": {
+          "$ref": "#/definitions/v1RoadmapDetail"
+        }
+      },
+      "description": "GetRoadmapResponse is the response containing a single roadmap."
+    },
+    "v1LearnerProfile": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "actorId": {
+          "type": "string"
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LearnerSkill"
+          }
+        },
+        "totalTrainingHours": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "assessmentsCompleted": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "assessmentsPassed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "lastActivityAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "LearnerProfile represents a learner's skill profile."
+    },
+    "v1LearnerProfileDetail": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/definitions/v1LearnerProfile"
+        },
+        "actor": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "LearnerProfileDetail bundles a profile with the actor reference."
+    },
+    "v1LearnerSkill": {
+      "type": "object",
+      "properties": {
+        "skillId": {
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/definitions/v1SkillLevel"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "earnedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verifiedById": {
+          "type": "string"
+        }
+      },
+      "description": "LearnerSkill represents a skill held by a learner."
+    },
+    "v1ListLearnerProfilesResponse": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LearnerProfileDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListLearnerProfilesResponse is the response for listing learner profiles."
+    },
+    "v1ListRoadmapsResponse": {
+      "type": "object",
+      "properties": {
+        "roadmaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RoadmapDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListRoadmapsResponse is the response for listing roadmaps."
+    },
+    "v1Milestone": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "skillId": {
+          "type": "string"
+        },
+        "targetLevel": {
+          "$ref": "#/definitions/v1SkillLevel"
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "trainingContentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assessmentId": {
+          "type": "string"
+        }
+      },
+      "description": "Milestone represents a target in a learning roadmap."
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1Roadmap": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "learnerId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Milestone"
+          }
+        },
+        "completionPercent": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdById": {
+          "type": "string"
+        }
+      },
+      "description": "Roadmap represents a personalized learning plan."
+    },
+    "v1RoadmapDetail": {
+      "type": "object",
+      "properties": {
+        "roadmap": {
+          "$ref": "#/definitions/v1Roadmap"
+        },
+        "learner": {
+          "$ref": "#/definitions/v1ActorRef"
+        },
+        "createdBy": {
+          "$ref": "#/definitions/v1ActorRef"
+        }
+      },
+      "description": "RoadmapDetail bundles a roadmap with the learner reference."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SkillLevel": {
+      "type": "string",
+      "enum": [
+        "SKILL_LEVEL_UNSPECIFIED",
+        "SKILL_LEVEL_BEGINNER",
+        "SKILL_LEVEL_INTERMEDIATE",
+        "SKILL_LEVEL_ADVANCED",
+        "SKILL_LEVEL_EXPERT"
+      ],
+      "default": "SKILL_LEVEL_UNSPECIFIED",
+      "description": "SkillLevel classifies the proficiency level of a skill."
+    },
+    "v1SkillRecommendation": {
+      "type": "object",
+      "properties": {
+        "skillId": {
+          "type": "string"
+        },
+        "skillName": {
+          "type": "string"
+        },
+        "recommendedLevel": {
+          "$ref": "#/definitions/v1SkillLevel"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "relevanceScore": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "description": "SkillRecommendation represents a suggested next skill to learn."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateLearnerProfileResponse": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/definitions/v1LearnerProfileDetail"
+        }
+      },
+      "description": "UpdateLearnerProfileResponse is the response after updating a learner profile."
+    },
+    "v1UpdateRoadmapResponse": {
+      "type": "object",
+      "properties": {
+        "roadmap": {
+          "$ref": "#/definitions/v1RoadmapDetail"
+        }
+      },
+      "description": "UpdateRoadmapResponse is the response after updating a roadmap."
+    }
+  }
+}

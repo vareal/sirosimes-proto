@@ -45,6 +45,28 @@
         }
       }
     },
+    "sirosimeskotodamav1ChatMessage": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v1MessageRole"
+        },
+        "content": {
+          "type": "string"
+        },
+        "contentParts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ContentPart"
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "description": "ChatMessage represents a single message in a conversation."
+    },
     "v1ChatChoice": {
       "type": "object",
       "properties": {
@@ -53,7 +75,7 @@
           "format": "int32"
         },
         "message": {
-          "$ref": "#/definitions/v1ChatMessage"
+          "$ref": "#/definitions/sirosimeskotodamav1ChatMessage"
         },
         "finishReason": {
           "$ref": "#/definitions/v1FinishReason"
@@ -137,28 +159,6 @@
         }
       },
       "description": "ChatCompletionStreamResponse wraps a single streaming chunk."
-    },
-    "v1ChatMessage": {
-      "type": "object",
-      "properties": {
-        "role": {
-          "$ref": "#/definitions/v1MessageRole"
-        },
-        "content": {
-          "type": "string"
-        },
-        "contentParts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1ContentPart"
-          }
-        },
-        "name": {
-          "type": "string"
-        }
-      },
-      "description": "ChatMessage represents a single message in a conversation."
     },
     "v1ChatMessageDelta": {
       "type": "object",

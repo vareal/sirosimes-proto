@@ -58,7 +58,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier (UUID format)."
+          "description": "[Phase 2c deprecated] Use metadata.id. Servers no longer populate this field."
         },
         "executionId": {
           "type": "string",
@@ -100,11 +100,12 @@
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "[Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field."
         },
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata",
-          "description": "[Phase 2a] Standard resource metadata. Default security_level: CONFIDENTIAL (approval audit trail)."
+          "description": "Standard resource metadata. Default security_level: CONFIDENTIAL (approval audit trail)."
         }
       },
       "description": "ApprovalRequest represents a pending human decision within a workflow execution."

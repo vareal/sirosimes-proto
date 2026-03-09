@@ -131,7 +131,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "[Phase 2a dual-write] Individual id — will be deprecated in Phase 2c.\nPrefer metadata.id for new code."
+          "description": "[Phase 2c deprecated] Use metadata.id. Servers no longer populate this field."
         },
         "displayName": {
           "type": "string"
@@ -175,15 +175,16 @@
         "createdAt": {
           "type": "string",
           "format": "date-time",
-          "description": "[Phase 2a dual-write] Individual timestamps — will be deprecated in Phase 2c.\nPrefer metadata.created_at / metadata.updated_at for new code."
+          "description": "[Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field."
         },
         "updatedAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "[Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field."
         },
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata",
-          "description": "[Phase 2a] Standard resource metadata (id, timestamps, version, security_level).\nDefault security_level: CONFIDENTIAL (contains PII: email, position)."
+          "description": "Standard resource metadata (id, timestamps, version, security_level).\nDefault security_level: CONFIDENTIAL (contains PII: email, position)."
         }
       },
       "description": "Employee represents a human or AI employee in the organization."

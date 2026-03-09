@@ -30,7 +30,8 @@ enum ReportStatus {
 
 // DailyReport represents a daily work report submitted by an employee.
 message DailyReport {
-  string id = 1;
+  // [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string employee_id = 2;
   google.protobuf.Timestamp report_date = 3;
   ReportType report_type = 4;
@@ -48,9 +49,11 @@ message DailyReport {
   reserved 13;
   reserved "emotions";
   repeated string emotion_tags = 19;
-  google.protobuf.Timestamp created_at = 14;
-  google.protobuf.Timestamp updated_at = 15;
-  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 14 [deprecated = true];
+  // [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+  google.protobuf.Timestamp updated_at = 15 [deprecated = true];
+  // Standard resource metadata. Default security_level: INTERNAL.
   sirosimes.common.v1.ResourceMetadata metadata = 16;
 }
 

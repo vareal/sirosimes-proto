@@ -43,8 +43,8 @@ enum ApprovalAction {
 
 // Task represents a unit of work within a project.
 message Task {
-  // [Phase 2a dual-write] Prefer metadata.id for new code.
-  string id = 1;
+  // [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string title = 2;
   string description = 3;
   string task_type = 4;
@@ -60,9 +60,11 @@ message Task {
   google.protobuf.Timestamp completed_at = 14;
   double estimated_hours = 15;
   double actual_hours = 16;
-  google.protobuf.Timestamp created_at = 17;
-  google.protobuf.Timestamp updated_at = 18;
-  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 17 [deprecated = true];
+  // [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+  google.protobuf.Timestamp updated_at = 18 [deprecated = true];
+  // Standard resource metadata. Default security_level: INTERNAL.
   sirosimes.common.v1.ResourceMetadata metadata = 19;
 }
 
@@ -75,7 +77,7 @@ message TaskDetail {
 
 // TaskComment represents a comment on a task.
 message TaskComment {
-  // [Phase 2a dual-write] Prefer metadata.id for new code.
+  // Sub-entity: no ResourceMetadata (tracked via parent Task).
   string id = 1;
   string task_id = 2;
   string author_id = 3;
@@ -92,7 +94,7 @@ message TaskCommentDetail {
 
 // TaskApproval records an approval decision on a task.
 message TaskApproval {
-  // [Phase 2a dual-write] Prefer metadata.id for new code.
+  // Sub-entity: no ResourceMetadata (tracked via parent Task).
   string id = 1;
   string task_id = 2;
   ApprovalAction action = 3;
@@ -141,7 +143,6 @@ message ListTasksResponse {
 
 // GetTaskRequest is the request for retrieving a single task.
 message GetTaskRequest {
-  // [Phase 2a dual-write] Prefer metadata.id for new code.
   string id = 1;
 }
 
@@ -153,7 +154,6 @@ message GetTaskResponse {
 
 // UpdateTaskRequest is the request for updating an existing task.
 message UpdateTaskRequest {
-  // [Phase 2a dual-write] Prefer metadata.id for new code.
   string id = 1;
   string title = 2;
   string description = 3;

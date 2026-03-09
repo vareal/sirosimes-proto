@@ -13,9 +13,8 @@ import "sirosimes/common/v1/pagination.proto";
 // インフラ情報（コンテナ等）は EmployeeInfraConfig に分離し、
 // 管理者向けGetEmployeeでのみ返却する。
 //
-// Phase 2a: ResourceMetadata dual-write開始。metadata フィールドと
-// 個別フィールド（id, created_at, updated_at）を両方保持。
-// クライアントはmetadataフィールドへの移行を推奨。
+// Phase 2c: 旧個別フィールド（id, created_at, updated_at）は deprecated 化完了。
+// metadata フィールドを唯一の情報源として使用すること。
 //
 // Exposure: INTERNAL（全RPC）
 
@@ -37,9 +36,8 @@ enum EmployeeStatus {
 
 // Employee represents a human or AI employee in the organization.
 message Employee {
-  // [Phase 2a dual-write] Individual id — will be deprecated in Phase 2c.
-  // Prefer metadata.id for new code.
-  string id = 1;
+  // [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string display_name = 2;
   string name_kana = 3;
   EmployeeType employee_type = 4;
@@ -55,11 +53,11 @@ message Employee {
   reserved "container_host", "container_name";
   string mattermost_username = 14;
   google.protobuf.Timestamp last_heartbeat_at = 15;
-  // [Phase 2a dual-write] Individual timestamps — will be deprecated in Phase 2c.
-  // Prefer metadata.created_at / metadata.updated_at for new code.
-  google.protobuf.Timestamp created_at = 16;
-  google.protobuf.Timestamp updated_at = 17;
-  // [Phase 2a] Standard resource metadata (id, timestamps, version, security_level).
+  // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 16 [deprecated = true];
+  // [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+  google.protobuf.Timestamp updated_at = 17 [deprecated = true];
+  // Standard resource metadata (id, timestamps, version, security_level).
   // Default security_level: CONFIDENTIAL (contains PII: email, position).
   sirosimes.common.v1.ResourceMetadata metadata = 18;
 }

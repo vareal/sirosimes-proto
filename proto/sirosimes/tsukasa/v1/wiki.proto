@@ -52,7 +52,8 @@ message WikiChapter {
 
 // WikiDocument represents a single wiki page with markdown content.
 message WikiDocument {
-  string id = 1;
+  // [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string title = 2;
   string slug = 3;
   string content = 4;
@@ -62,9 +63,11 @@ message WikiDocument {
   string created_by_id = 7;
   string updated_by_id = 8;
   int32 sort_order = 9;
-  google.protobuf.Timestamp created_at = 10;
-  google.protobuf.Timestamp updated_at = 11;
-  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 10 [deprecated = true];
+  // [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+  google.protobuf.Timestamp updated_at = 11 [deprecated = true];
+  // Standard resource metadata. Default security_level: INTERNAL.
   // Per-document override is supported: e.g., HR wikis → CONFIDENTIAL.
   // Implementation MUST allow entity-level SecurityLevel override via this field.
   sirosimes.common.v1.ResourceMetadata metadata = 12;

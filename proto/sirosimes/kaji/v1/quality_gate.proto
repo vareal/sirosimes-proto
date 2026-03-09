@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+package sirosimes.kaji.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// quality_gate.proto — 鍛冶（Kaji）品質ゲート定義・テスト結果・合否判定。
+//
+// ビルドの品質基準を定義し、テスト結果の収集と合否判定を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// QualityGateStatus represents the evaluation result of a quality gate.
+enum QualityGateStatus {
+  QUALITY_GATE_STATUS_UNSPECIFIED = 0;
+  QUALITY_GATE_STATUS_PASSED = 1;
+  QUALITY_GATE_STATUS_FAILED = 2;
+  QUALITY_GATE_STATUS_WARNING = 3;
+  QUALITY_GATE_STATUS_SKIPPED = 4;
+}
+
+// ComparisonOperator defines how a metric is compared to a threshold.
+enum ComparisonOperator {
+  COMPARISON_OPERATOR_UNSPECIFIED = 0;
+  COMPARISON_OPERATOR_GREATER_THAN = 1;
+  COMPARISON_OPERATOR_LESS_THAN = 2;
+  COMPARISON_OPERATOR_GREATER_THAN_OR_EQUAL = 3;
+  COMPARISON_OPERATOR_LESS_THAN_OR_EQUAL = 4;
+  COMPARISON_OPERATOR_EQUAL = 5;
+}
+
+// TestStatus represents the outcome of a single test case.
+enum TestStatus {
+  TEST_STATUS_UNSPECIFIED = 0;
+  TEST_STATUS_PASSED = 1;
+  TEST_STATUS_FAILED = 2;
+  TEST_STATUS_SKIPPED = 3;
+  TEST_STATUS_ERROR = 4;
+}
+
+// QualityCondition defines a single quality threshold check.
+message QualityCondition {
+  string metric_name = 1;
+  ComparisonOperator operator = 2;
+  double threshold = 3;
+  double warning_threshold = 4;
+}
+
+// QualityGate represents a set of quality conditions for a pipeline.
+message QualityGate {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  repeated QualityCondition conditions = 4;
+  bool required = 5;
+  string pipeline_id = 6;
+}
+
+// QualityGateEvaluation represents the result of evaluating a quality gate.
+message QualityGateEvaluation {
+  string id = 1;
+  string quality_gate_id = 2;
+  string build_id = 3;
+  QualityGateStatus status = 4;
+  repeated ConditionResult condition_results = 5;
+  google.protobuf.Timestamp evaluated_at = 6;
+}
+
+// ConditionResult represents the result of a single condition check.
+message ConditionResult {
+  string metric_name = 1;
+  double actual_value = 2;
+  double threshold = 3;
+  ComparisonOperator operator = 4;
+  QualityGateStatus status = 5;
+}
+
+// TestResult represents a single test case result.
+message TestResult {
+  string id = 1;
+  string build_id = 2;
+  string suite_name = 3;
+  string test_name = 4;
+  TestStatus status = 5;
+  google.protobuf.Duration duration = 6;
+  string error_message = 7;
+  string stack_trace = 8;
+  google.protobuf.Timestamp executed_at = 9;
+}
+
+// TestSummary provides aggregated test statistics for a build.
+message TestSummary {
+  string build_id = 1;
+  int32 total = 2;
+  int32 passed = 3;
+  int32 failed = 4;
+  int32 skipped = 5;
+  int32 errors = 6;
+  double pass_rate = 7;
+  google.protobuf.Duration total_duration = 8;
+}
+
+// ListQualityGatesRequest is the request for listing quality gates.
+message ListQualityGatesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string pipeline_id = 2;
+}
+
+// ListQualityGatesResponse is the response for listing quality gates.
+message ListQualityGatesResponse {
+  repeated QualityGate gates = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetQualityGateRequest is the request for retrieving a single quality gate.
+message GetQualityGateRequest {
+  string id = 1;
+}
+
+// GetQualityGateResponse is the response containing a single quality gate.
+message GetQualityGateResponse {
+  QualityGate gate = 1;
+}
+
+// CreateQualityGateRequest is the request for creating a quality gate.
+message CreateQualityGateRequest {
+  string name = 1;
+  string description = 2;
+  repeated QualityCondition conditions = 3;
+  bool required = 4;
+  string pipeline_id = 5;
+}
+
+// CreateQualityGateResponse is the response after creating a quality gate.
+message CreateQualityGateResponse {
+  QualityGate gate = 1;
+}
+
+// UpdateQualityGateRequest is the request for updating a quality gate.
+message UpdateQualityGateRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated QualityCondition conditions = 4;
+  bool required = 5;
+}
+
+// UpdateQualityGateResponse is the response after updating a quality gate.
+message UpdateQualityGateResponse {
+  QualityGate gate = 1;
+}
+
+// DeleteQualityGateRequest is the request for deleting a quality gate.
+message DeleteQualityGateRequest {
+  string id = 1;
+}
+
+// DeleteQualityGateResponse is the response after deleting a quality gate.
+message DeleteQualityGateResponse {}
+
+// EvaluateQualityGateRequest is the request for evaluating a quality gate against a build.
+message EvaluateQualityGateRequest {
+  string quality_gate_id = 1;
+  string build_id = 2;
+}
+
+// EvaluateQualityGateResponse is the response containing the evaluation result.
+message EvaluateQualityGateResponse {
+  QualityGateEvaluation evaluation = 1;
+}
+
+// ListTestResultsRequest is the request for listing test results for a build.
+message ListTestResultsRequest {
+  string build_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+  TestStatus status = 3;
+  string suite_name = 4;
+}
+
+// ListTestResultsResponse is the response for listing test results.
+message ListTestResultsResponse {
+  repeated TestResult results = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+  TestSummary summary = 3;
+}
+
+// QualityGateService manages quality gates and test results.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service QualityGateService {
+  rpc ListQualityGates(ListQualityGatesRequest) returns (ListQualityGatesResponse) {
+    option (google.api.http) = {
+      get: "/v1/quality-gates"
+    };
+  }
+  rpc GetQualityGate(GetQualityGateRequest) returns (GetQualityGateResponse) {
+    option (google.api.http) = {
+      get: "/v1/quality-gates/{id}"
+    };
+  }
+  rpc CreateQualityGate(CreateQualityGateRequest) returns (CreateQualityGateResponse) {
+    option (google.api.http) = {
+      post: "/v1/quality-gates"
+      body: "*"
+    };
+  }
+  rpc UpdateQualityGate(UpdateQualityGateRequest) returns (UpdateQualityGateResponse) {
+    option (google.api.http) = {
+      patch: "/v1/quality-gates/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteQualityGate(DeleteQualityGateRequest) returns (DeleteQualityGateResponse) {
+    option (google.api.http) = {
+      delete: "/v1/quality-gates/{id}"
+    };
+  }
+  rpc EvaluateQualityGate(EvaluateQualityGateRequest) returns (EvaluateQualityGateResponse) {
+    option (google.api.http) = {
+      post: "/v1/quality-gates/{quality_gate_id}/evaluate"
+      body: "*"
+    };
+  }
+  rpc ListTestResults(ListTestResultsRequest) returns (ListTestResultsResponse) {
+    option (google.api.http) = {
+      get: "/v1/builds/{build_id}/test-results"
+    };
+  }
+}

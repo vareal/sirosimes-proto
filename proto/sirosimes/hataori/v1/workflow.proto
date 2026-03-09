@@ -26,16 +26,19 @@ enum WorkflowStatus {
 
 // Workflow represents a reusable automation definition.
 message Workflow {
-  string id = 1;
+  // [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string name = 2;
   string description = 3;
   WorkflowStatus status = 4;
   repeated string tags = 5;
   google.protobuf.Struct llm_config = 6;
   string created_by = 7;
-  google.protobuf.Timestamp created_at = 8;
-  google.protobuf.Timestamp updated_at = 9;
-  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 8 [deprecated = true];
+  // [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+  google.protobuf.Timestamp updated_at = 9 [deprecated = true];
+  // Standard resource metadata. Default security_level: INTERNAL.
   sirosimes.common.v1.ResourceMetadata metadata = 10;
 }
 

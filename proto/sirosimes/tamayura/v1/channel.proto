@@ -1,0 +1,188 @@
+syntax = "proto3";
+
+package sirosimes.tamayura.v1;
+
+import "google/api/annotations.proto";
+import "sirosimes/common/v1/actor.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// channel.proto — 玉響（Tamayura）チャンネル管理。
+//
+// テキスト・音声・ビデオチャンネルのCRUD、参加・退出操作を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// ChannelType classifies the communication channel type.
+enum ChannelType {
+  CHANNEL_TYPE_UNSPECIFIED = 0;
+  CHANNEL_TYPE_TEXT = 1;
+  CHANNEL_TYPE_VOICE = 2;
+  CHANNEL_TYPE_VIDEO = 3;
+  CHANNEL_TYPE_THREAD = 4;
+}
+
+// ChannelStatus represents the operational state of a channel.
+enum ChannelStatus {
+  CHANNEL_STATUS_UNSPECIFIED = 0;
+  CHANNEL_STATUS_ACTIVE = 1;
+  CHANNEL_STATUS_ARCHIVED = 2;
+  CHANNEL_STATUS_DELETED = 3;
+}
+
+// ChannelVisibility controls who can see and join a channel.
+enum ChannelVisibility {
+  CHANNEL_VISIBILITY_UNSPECIFIED = 0;
+  CHANNEL_VISIBILITY_PUBLIC = 1;
+  CHANNEL_VISIBILITY_PRIVATE = 2;
+}
+
+// Channel represents a communication channel.
+message Channel {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  ChannelType type = 5;
+  ChannelStatus status = 6;
+  ChannelVisibility visibility = 7;
+  string organization_id = 8;
+  string created_by_id = 9;
+  string parent_channel_id = 10;
+  int32 member_count = 11;
+  string topic = 12;
+}
+
+// ChannelDetail bundles a channel with the creator reference.
+message ChannelDetail {
+  Channel channel = 1;
+  sirosimes.common.v1.ActorRef created_by = 2;
+}
+
+// ListChannelsRequest is the request for listing channels.
+message ListChannelsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ChannelType type = 2;
+  ChannelStatus status = 3;
+  string organization_id = 4;
+  string search = 5;
+}
+
+// ListChannelsResponse is the response for listing channels.
+message ListChannelsResponse {
+  repeated ChannelDetail channels = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetChannelRequest is the request for retrieving a single channel.
+message GetChannelRequest {
+  string id = 1;
+}
+
+// GetChannelResponse is the response containing a single channel.
+message GetChannelResponse {
+  ChannelDetail channel = 1;
+}
+
+// CreateChannelRequest is the request for creating a channel.
+message CreateChannelRequest {
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  ChannelType type = 4;
+  ChannelVisibility visibility = 5;
+  string organization_id = 6;
+  string created_by_id = 7;
+  string parent_channel_id = 8;
+  string topic = 9;
+}
+
+// CreateChannelResponse is the response after creating a channel.
+message CreateChannelResponse {
+  ChannelDetail channel = 1;
+}
+
+// UpdateChannelRequest is the request for updating a channel.
+message UpdateChannelRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  ChannelStatus status = 4;
+  ChannelVisibility visibility = 5;
+  string topic = 6;
+}
+
+// UpdateChannelResponse is the response after updating a channel.
+message UpdateChannelResponse {
+  ChannelDetail channel = 1;
+}
+
+// DeleteChannelRequest is the request for deleting a channel.
+message DeleteChannelRequest {
+  string id = 1;
+}
+
+// DeleteChannelResponse is the response after deleting a channel.
+message DeleteChannelResponse {}
+
+// JoinChannelRequest is the request for joining a channel.
+message JoinChannelRequest {
+  string channel_id = 1;
+  string actor_id = 2;
+}
+
+// JoinChannelResponse is the response after joining a channel.
+message JoinChannelResponse {}
+
+// LeaveChannelRequest is the request for leaving a channel.
+message LeaveChannelRequest {
+  string channel_id = 1;
+  string actor_id = 2;
+}
+
+// LeaveChannelResponse is the response after leaving a channel.
+message LeaveChannelResponse {}
+
+// ChannelService manages communication channels.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service ChannelService {
+  rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse) {
+    option (google.api.http) = {
+      get: "/v1/channels"
+    };
+  }
+  rpc GetChannel(GetChannelRequest) returns (GetChannelResponse) {
+    option (google.api.http) = {
+      get: "/v1/channels/{id}"
+    };
+  }
+  rpc CreateChannel(CreateChannelRequest) returns (CreateChannelResponse) {
+    option (google.api.http) = {
+      post: "/v1/channels"
+      body: "*"
+    };
+  }
+  rpc UpdateChannel(UpdateChannelRequest) returns (UpdateChannelResponse) {
+    option (google.api.http) = {
+      patch: "/v1/channels/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteChannel(DeleteChannelRequest) returns (DeleteChannelResponse) {
+    option (google.api.http) = {
+      delete: "/v1/channels/{id}"
+    };
+  }
+  rpc JoinChannel(JoinChannelRequest) returns (JoinChannelResponse) {
+    option (google.api.http) = {
+      post: "/v1/channels/{channel_id}/join"
+      body: "*"
+    };
+  }
+  rpc LeaveChannel(LeaveChannelRequest) returns (LeaveChannelResponse) {
+    option (google.api.http) = {
+      post: "/v1/channels/{channel_id}/leave"
+      body: "*"
+    };
+  }
+}

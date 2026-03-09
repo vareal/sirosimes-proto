@@ -50,7 +50,8 @@ message WebhookConfig {
 
 // Trigger defines a condition that automatically starts a workflow.
 message Trigger {
-  string id = 1;
+  // [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string workflow_id = 2;
   TriggerType type = 3;
   string name = 4;
@@ -61,9 +62,11 @@ message Trigger {
   // Webhook-specific security configuration.
   // Only populated when type is TRIGGER_TYPE_WEBHOOK.
   WebhookConfig webhook_config = 9;
-  google.protobuf.Timestamp created_at = 7;
-  google.protobuf.Timestamp updated_at = 8;
-  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 7 [deprecated = true];
+  // [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+  google.protobuf.Timestamp updated_at = 8 [deprecated = true];
+  // Standard resource metadata. Default security_level: INTERNAL.
   sirosimes.common.v1.ResourceMetadata metadata = 10;
 }
 

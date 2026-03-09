@@ -99,7 +99,10 @@ export declare enum ExecutionStepStatus {
  */
 export declare class Execution extends Message<Execution> {
   /**
-   * @generated from field: string id = 1;
+   * [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+   *
+   * @generated from field: string id = 1 [deprecated = true];
+   * @deprecated
    */
   id: string;
 
@@ -149,12 +152,15 @@ export declare class Execution extends Message<Execution> {
   finishedAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 11;
+   * [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 11 [deprecated = true];
+   * @deprecated
    */
   createdAt?: Timestamp;
 
   /**
-   * [Phase 2a] Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O).
+   * Standard resource metadata. Default security_level: CONFIDENTIAL (may contain sensitive I/O).
    *
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 12;
    */

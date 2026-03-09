@@ -47,7 +47,10 @@ export declare enum WorkflowStatus {
  */
 export declare class Workflow extends Message<Workflow> {
   /**
-   * @generated from field: string id = 1;
+   * [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
+   *
+   * @generated from field: string id = 1 [deprecated = true];
+   * @deprecated
    */
   id: string;
 
@@ -82,17 +85,23 @@ export declare class Workflow extends Message<Workflow> {
   createdBy: string;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 8;
+   * [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 8 [deprecated = true];
+   * @deprecated
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 9;
+   * [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp updated_at = 9 [deprecated = true];
+   * @deprecated
    */
   updatedAt?: Timestamp;
 
   /**
-   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   * Standard resource metadata. Default security_level: INTERNAL.
    *
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 10;
    */

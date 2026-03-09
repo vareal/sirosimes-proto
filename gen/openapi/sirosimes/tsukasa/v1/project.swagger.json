@@ -195,7 +195,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "[Phase 2c deprecated] Use resource_metadata.id. Servers no longer populate this field."
         },
         "name": {
           "type": "string"
@@ -249,19 +250,22 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "[Phase 2c deprecated] Use resource_metadata.labels instead."
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "[Phase 2c deprecated] Use resource_metadata.created_at. Servers no longer populate this field."
         },
         "updatedAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "[Phase 2c deprecated] Use resource_metadata.updated_at. Servers no longer populate this field."
         },
         "resourceMetadata": {
           "$ref": "#/definitions/v1ResourceMetadata",
-          "description": "[Phase 2a] Standard resource metadata. Default security_level: INTERNAL."
+          "description": "Standard resource metadata. Default security_level: INTERNAL.\nNote: Named resource_metadata (not metadata) because field 16 uses 'metadata' name.\nWill be renamed to 'metadata' in Phase 2d after field 16 is reserved."
         }
       },
       "description": "Project represents a managed project with metadata and hierarchy."
@@ -435,7 +439,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "[Phase 2a dual-write] Prefer metadata.id for new code."
+          "description": "[Phase 2c deprecated] Use metadata.id. Servers no longer populate this field."
         },
         "title": {
           "type": "string"
@@ -489,15 +493,17 @@
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "[Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field."
         },
         "updatedAt": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "[Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field."
         },
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata",
-          "description": "[Phase 2a] Standard resource metadata. Default security_level: INTERNAL."
+          "description": "Standard resource metadata. Default security_level: INTERNAL."
         }
       },
       "description": "Task represents a unit of work within a project."

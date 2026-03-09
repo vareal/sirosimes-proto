@@ -112,9 +112,10 @@ export declare enum ApprovalAction {
  */
 export declare class Task extends Message<Task> {
   /**
-   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   * [Phase 2c deprecated] Use metadata.id. Servers no longer populate this field.
    *
-   * @generated from field: string id = 1;
+   * @generated from field: string id = 1 [deprecated = true];
+   * @deprecated
    */
   id: string;
 
@@ -194,17 +195,23 @@ export declare class Task extends Message<Task> {
   actualHours: number;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 17;
+   * [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp created_at = 17 [deprecated = true];
+   * @deprecated
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 18;
+   * [Phase 2c deprecated] Use metadata.updated_at. Servers no longer populate this field.
+   *
+   * @generated from field: google.protobuf.Timestamp updated_at = 18 [deprecated = true];
+   * @deprecated
    */
   updatedAt?: Timestamp;
 
   /**
-   * [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+   * Standard resource metadata. Default security_level: INTERNAL.
    *
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 19;
    */
@@ -268,7 +275,7 @@ export declare class TaskDetail extends Message<TaskDetail> {
  */
 export declare class TaskComment extends Message<TaskComment> {
   /**
-   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   * Sub-entity: no ResourceMetadata (tracked via parent Task).
    *
    * @generated from field: string id = 1;
    */
@@ -352,7 +359,7 @@ export declare class TaskCommentDetail extends Message<TaskCommentDetail> {
  */
 export declare class TaskApproval extends Message<TaskApproval> {
   /**
-   * [Phase 2a dual-write] Prefer metadata.id for new code.
+   * Sub-entity: no ResourceMetadata (tracked via parent Task).
    *
    * @generated from field: string id = 1;
    */
@@ -595,8 +602,6 @@ export declare class ListTasksResponse extends Message<ListTasksResponse> {
  */
 export declare class GetTaskRequest extends Message<GetTaskRequest> {
   /**
-   * [Phase 2a dual-write] Prefer metadata.id for new code.
-   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -654,8 +659,6 @@ export declare class GetTaskResponse extends Message<GetTaskResponse> {
  */
 export declare class UpdateTaskRequest extends Message<UpdateTaskRequest> {
   /**
-   * [Phase 2a dual-write] Prefer metadata.id for new code.
-   *
    * @generated from field: string id = 1;
    */
   id: string;

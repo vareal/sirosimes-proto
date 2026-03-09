@@ -1,0 +1,246 @@
+syntax = "proto3";
+
+package sirosimes.michishirube.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// cost.proto — 道標（Michishirube）コスト追跡・予算管理。
+//
+// LLMプロバイダーの使用量メトリクス、コスト記録、予算制御を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// BudgetPeriod classifies the time period for a budget.
+enum BudgetPeriod {
+  BUDGET_PERIOD_UNSPECIFIED = 0;
+  BUDGET_PERIOD_DAILY = 1;
+  BUDGET_PERIOD_WEEKLY = 2;
+  BUDGET_PERIOD_MONTHLY = 3;
+  BUDGET_PERIOD_QUARTERLY = 4;
+}
+
+// BudgetStatus represents the state of a budget.
+enum BudgetStatus {
+  BUDGET_STATUS_UNSPECIFIED = 0;
+  BUDGET_STATUS_NORMAL = 1;
+  BUDGET_STATUS_WARNING = 2;
+  BUDGET_STATUS_EXCEEDED = 3;
+  BUDGET_STATUS_SUSPENDED = 4;
+}
+
+// CostRecord represents a single cost entry for an LLM API call.
+message CostRecord {
+  string id = 1;
+  string provider_id = 2;
+  string model = 3;
+  string agent_id = 4;
+  int64 prompt_tokens = 5;
+  int64 completion_tokens = 6;
+  int64 total_tokens = 7;
+  double cost_jpy = 8;
+  double cost_usd = 9;
+  google.protobuf.Timestamp recorded_at = 10;
+  string request_id = 11;
+}
+
+// UsageMetrics provides aggregated usage metrics.
+message UsageMetrics {
+  string provider_id = 1;
+  string model = 2;
+  int64 total_requests = 3;
+  int64 total_tokens = 4;
+  double total_cost_jpy = 5;
+  double total_cost_usd = 6;
+  double avg_latency_ms = 7;
+  double error_rate = 8;
+  google.protobuf.Timestamp period_start = 9;
+  google.protobuf.Timestamp period_end = 10;
+}
+
+// Budget represents a spending limit for a period.
+message Budget {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  BudgetPeriod period = 4;
+  double limit_jpy = 5;
+  double current_spend_jpy = 6;
+  BudgetStatus status = 7;
+  double warning_threshold_percent = 8;
+  string owner_id = 9;
+  repeated string scope_agent_ids = 10;
+  repeated string scope_provider_ids = 11;
+}
+
+// BudgetAlert represents a budget threshold notification.
+message BudgetAlert {
+  string id = 1;
+  string budget_id = 2;
+  BudgetStatus triggered_status = 3;
+  double spend_at_trigger_jpy = 4;
+  double limit_jpy = 5;
+  double usage_percent = 6;
+  google.protobuf.Timestamp triggered_at = 7;
+  bool acknowledged = 8;
+}
+
+// ListCostRecordsRequest is the request for listing cost records.
+message ListCostRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string provider_id = 2;
+  string model = 3;
+  string agent_id = 4;
+  google.protobuf.Timestamp from = 5;
+  google.protobuf.Timestamp to = 6;
+}
+
+// ListCostRecordsResponse is the response for listing cost records.
+message ListCostRecordsResponse {
+  repeated CostRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetUsageMetricsRequest is the request for retrieving usage metrics.
+message GetUsageMetricsRequest {
+  string provider_id = 1;
+  string model = 2;
+  string agent_id = 3;
+  google.protobuf.Timestamp from = 4;
+  google.protobuf.Timestamp to = 5;
+}
+
+// GetUsageMetricsResponse is the response containing usage metrics.
+message GetUsageMetricsResponse {
+  repeated UsageMetrics metrics = 1;
+}
+
+// ListBudgetsRequest is the request for listing budgets.
+message ListBudgetsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  BudgetStatus status = 2;
+  string owner_id = 3;
+}
+
+// ListBudgetsResponse is the response for listing budgets.
+message ListBudgetsResponse {
+  repeated Budget budgets = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetBudgetRequest is the request for retrieving a single budget.
+message GetBudgetRequest {
+  string id = 1;
+}
+
+// GetBudgetResponse is the response containing a single budget.
+message GetBudgetResponse {
+  Budget budget = 1;
+  repeated BudgetAlert recent_alerts = 2;
+}
+
+// CreateBudgetRequest is the request for creating a budget.
+message CreateBudgetRequest {
+  string name = 1;
+  string description = 2;
+  BudgetPeriod period = 3;
+  double limit_jpy = 4;
+  double warning_threshold_percent = 5;
+  string owner_id = 6;
+  repeated string scope_agent_ids = 7;
+  repeated string scope_provider_ids = 8;
+}
+
+// CreateBudgetResponse is the response after creating a budget.
+message CreateBudgetResponse {
+  Budget budget = 1;
+}
+
+// UpdateBudgetRequest is the request for updating a budget.
+message UpdateBudgetRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  double limit_jpy = 4;
+  double warning_threshold_percent = 5;
+  BudgetStatus status = 6;
+}
+
+// UpdateBudgetResponse is the response after updating a budget.
+message UpdateBudgetResponse {
+  Budget budget = 1;
+}
+
+// DeleteBudgetRequest is the request for deleting a budget.
+message DeleteBudgetRequest {
+  string id = 1;
+}
+
+// DeleteBudgetResponse is the response after deleting a budget.
+message DeleteBudgetResponse {}
+
+// CheckBudgetRequest is the request for checking if a request is within budget.
+message CheckBudgetRequest {
+  string agent_id = 1;
+  string provider_id = 2;
+  int64 estimated_tokens = 3;
+}
+
+// CheckBudgetResponse is the response containing budget check result.
+message CheckBudgetResponse {
+  bool allowed = 1;
+  string budget_id = 2;
+  double remaining_jpy = 3;
+  BudgetStatus current_status = 4;
+  string denial_reason = 5;
+}
+
+// CostService manages cost tracking, usage metrics, and budget control.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service CostService {
+  rpc ListCostRecords(ListCostRecordsRequest) returns (ListCostRecordsResponse) {
+    option (google.api.http) = {
+      get: "/v1/costs"
+    };
+  }
+  rpc GetUsageMetrics(GetUsageMetricsRequest) returns (GetUsageMetricsResponse) {
+    option (google.api.http) = {
+      get: "/v1/costs/usage"
+    };
+  }
+  rpc ListBudgets(ListBudgetsRequest) returns (ListBudgetsResponse) {
+    option (google.api.http) = {
+      get: "/v1/budgets"
+    };
+  }
+  rpc GetBudget(GetBudgetRequest) returns (GetBudgetResponse) {
+    option (google.api.http) = {
+      get: "/v1/budgets/{id}"
+    };
+  }
+  rpc CreateBudget(CreateBudgetRequest) returns (CreateBudgetResponse) {
+    option (google.api.http) = {
+      post: "/v1/budgets"
+      body: "*"
+    };
+  }
+  rpc UpdateBudget(UpdateBudgetRequest) returns (UpdateBudgetResponse) {
+    option (google.api.http) = {
+      patch: "/v1/budgets/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteBudget(DeleteBudgetRequest) returns (DeleteBudgetResponse) {
+    option (google.api.http) = {
+      delete: "/v1/budgets/{id}"
+    };
+  }
+  rpc CheckBudget(CheckBudgetRequest) returns (CheckBudgetResponse) {
+    option (google.api.http) = {
+      post: "/v1/budgets:check"
+      body: "*"
+    };
+  }
+}

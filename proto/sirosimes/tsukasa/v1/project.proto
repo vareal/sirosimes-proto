@@ -43,7 +43,8 @@ enum ProjectMemberRole {
 
 // Project represents a managed project with metadata and hierarchy.
 message Project {
-  string id = 1;
+  // [Phase 2c deprecated] Use resource_metadata.id. Servers no longer populate this field.
+  string id = 1 [deprecated = true];
   string name = 2;
   string slug = 3;
   string description = 4;
@@ -58,10 +59,15 @@ message Project {
   string parent_id = 13;
   ProjectPriority priority = 14;
   repeated string tags = 15;
-  map<string, string> metadata = 16;
-  google.protobuf.Timestamp created_at = 17;
-  google.protobuf.Timestamp updated_at = 18;
-  // [Phase 2a] Standard resource metadata. Default security_level: INTERNAL.
+  // [Phase 2c deprecated] Use resource_metadata.labels instead.
+  map<string, string> metadata = 16 [deprecated = true];
+  // [Phase 2c deprecated] Use resource_metadata.created_at. Servers no longer populate this field.
+  google.protobuf.Timestamp created_at = 17 [deprecated = true];
+  // [Phase 2c deprecated] Use resource_metadata.updated_at. Servers no longer populate this field.
+  google.protobuf.Timestamp updated_at = 18 [deprecated = true];
+  // Standard resource metadata. Default security_level: INTERNAL.
+  // Note: Named resource_metadata (not metadata) because field 16 uses 'metadata' name.
+  // Will be renamed to 'metadata' in Phase 2d after field 16 is reserved.
   sirosimes.common.v1.ResourceMetadata resource_metadata = 19;
 }
 

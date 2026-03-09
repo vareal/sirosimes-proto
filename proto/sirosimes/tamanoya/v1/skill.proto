@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+package sirosimes.tamanoya.v1;
+
+import "google/api/annotations.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// skill.proto — 玉の舎（Tamanoya）スキル定義・カテゴリ管理。
+//
+// スキルとカテゴリのCRUD、階層構造の管理を提供する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// SkillLevel classifies the proficiency level of a skill.
+enum SkillLevel {
+  SKILL_LEVEL_UNSPECIFIED = 0;
+  SKILL_LEVEL_BEGINNER = 1;
+  SKILL_LEVEL_INTERMEDIATE = 2;
+  SKILL_LEVEL_ADVANCED = 3;
+  SKILL_LEVEL_EXPERT = 4;
+}
+
+// SkillStatus represents the lifecycle state of a skill.
+enum SkillStatus {
+  SKILL_STATUS_UNSPECIFIED = 0;
+  SKILL_STATUS_ACTIVE = 1;
+  SKILL_STATUS_DRAFT = 2;
+  SKILL_STATUS_ARCHIVED = 3;
+}
+
+// SkillCategory represents a grouping of related skills.
+message SkillCategory {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string parent_category_id = 5;
+  int32 sort_order = 6;
+}
+
+// Skill represents a defined competency or capability.
+message Skill {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string category_id = 5;
+  SkillLevel default_level = 6;
+  SkillStatus status = 7;
+  repeated string prerequisite_skill_ids = 8;
+  repeated string tags = 9;
+}
+
+// ListSkillCategoriesRequest is the request for listing skill categories.
+message ListSkillCategoriesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string parent_category_id = 2;
+}
+
+// ListSkillCategoriesResponse is the response for listing skill categories.
+message ListSkillCategoriesResponse {
+  repeated SkillCategory categories = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetSkillCategoryRequest is the request for retrieving a single skill category.
+message GetSkillCategoryRequest {
+  string id = 1;
+}
+
+// GetSkillCategoryResponse is the response containing a single skill category.
+message GetSkillCategoryResponse {
+  SkillCategory category = 1;
+}
+
+// CreateSkillCategoryRequest is the request for creating a skill category.
+message CreateSkillCategoryRequest {
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  string parent_category_id = 4;
+  int32 sort_order = 5;
+}
+
+// CreateSkillCategoryResponse is the response after creating a skill category.
+message CreateSkillCategoryResponse {
+  SkillCategory category = 1;
+}
+
+// UpdateSkillCategoryRequest is the request for updating a skill category.
+message UpdateSkillCategoryRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 sort_order = 4;
+}
+
+// UpdateSkillCategoryResponse is the response after updating a skill category.
+message UpdateSkillCategoryResponse {
+  SkillCategory category = 1;
+}
+
+// DeleteSkillCategoryRequest is the request for deleting a skill category.
+message DeleteSkillCategoryRequest {
+  string id = 1;
+}
+
+// DeleteSkillCategoryResponse is the response after deleting a skill category.
+message DeleteSkillCategoryResponse {}
+
+// ListSkillsRequest is the request for listing skills.
+message ListSkillsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string category_id = 2;
+  SkillStatus status = 3;
+  SkillLevel level = 4;
+  string search = 5;
+}
+
+// ListSkillsResponse is the response for listing skills.
+message ListSkillsResponse {
+  repeated Skill skills = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// GetSkillRequest is the request for retrieving a single skill.
+message GetSkillRequest {
+  string id = 1;
+}
+
+// GetSkillResponse is the response containing a single skill.
+message GetSkillResponse {
+  Skill skill = 1;
+}
+
+// CreateSkillRequest is the request for creating a skill.
+message CreateSkillRequest {
+  string name = 1;
+  string slug = 2;
+  string description = 3;
+  string category_id = 4;
+  SkillLevel default_level = 5;
+  repeated string prerequisite_skill_ids = 6;
+  repeated string tags = 7;
+}
+
+// CreateSkillResponse is the response after creating a skill.
+message CreateSkillResponse {
+  Skill skill = 1;
+}
+
+// UpdateSkillRequest is the request for updating a skill.
+message UpdateSkillRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string category_id = 4;
+  SkillLevel default_level = 5;
+  SkillStatus status = 6;
+  repeated string prerequisite_skill_ids = 7;
+  repeated string tags = 8;
+}
+
+// UpdateSkillResponse is the response after updating a skill.
+message UpdateSkillResponse {
+  Skill skill = 1;
+}
+
+// DeleteSkillRequest is the request for deleting a skill.
+message DeleteSkillRequest {
+  string id = 1;
+}
+
+// DeleteSkillResponse is the response after deleting a skill.
+message DeleteSkillResponse {}
+
+// SkillService manages skills and skill categories.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+service SkillService {
+  rpc ListSkillCategories(ListSkillCategoriesRequest) returns (ListSkillCategoriesResponse) {
+    option (google.api.http) = {
+      get: "/v1/skill-categories"
+    };
+  }
+  rpc GetSkillCategory(GetSkillCategoryRequest) returns (GetSkillCategoryResponse) {
+    option (google.api.http) = {
+      get: "/v1/skill-categories/{id}"
+    };
+  }
+  rpc CreateSkillCategory(CreateSkillCategoryRequest) returns (CreateSkillCategoryResponse) {
+    option (google.api.http) = {
+      post: "/v1/skill-categories"
+      body: "*"
+    };
+  }
+  rpc UpdateSkillCategory(UpdateSkillCategoryRequest) returns (UpdateSkillCategoryResponse) {
+    option (google.api.http) = {
+      patch: "/v1/skill-categories/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteSkillCategory(DeleteSkillCategoryRequest) returns (DeleteSkillCategoryResponse) {
+    option (google.api.http) = {
+      delete: "/v1/skill-categories/{id}"
+    };
+  }
+  rpc ListSkills(ListSkillsRequest) returns (ListSkillsResponse) {
+    option (google.api.http) = {
+      get: "/v1/skills"
+    };
+  }
+  rpc GetSkill(GetSkillRequest) returns (GetSkillResponse) {
+    option (google.api.http) = {
+      get: "/v1/skills/{id}"
+    };
+  }
+  rpc CreateSkill(CreateSkillRequest) returns (CreateSkillResponse) {
+    option (google.api.http) = {
+      post: "/v1/skills"
+      body: "*"
+    };
+  }
+  rpc UpdateSkill(UpdateSkillRequest) returns (UpdateSkillResponse) {
+    option (google.api.http) = {
+      patch: "/v1/skills/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteSkill(DeleteSkillRequest) returns (DeleteSkillResponse) {
+    option (google.api.http) = {
+      delete: "/v1/skills/{id}"
+    };
+  }
+}
