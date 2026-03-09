@@ -1,0 +1,225 @@
+syntax = "proto3";
+
+package sirosimes.michishirube.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// dns.proto — 道標（Michishirube）DNS・証明書管理。
+//
+// 内部DNS レコード管理、TLS証明書の発行・失効、
+// 内部CA（認証局）設定を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// DNSRecordType classifies the type of DNS record.
+enum DNSRecordType {
+  DNS_RECORD_TYPE_UNSPECIFIED = 0;
+  DNS_RECORD_TYPE_A = 1;
+  DNS_RECORD_TYPE_AAAA = 2;
+  DNS_RECORD_TYPE_CNAME = 3;
+  DNS_RECORD_TYPE_TXT = 4;
+  DNS_RECORD_TYPE_MX = 5;
+  DNS_RECORD_TYPE_SRV = 6;
+}
+
+// CertificateIssuer classifies the certificate issuing authority.
+enum CertificateIssuer {
+  CERTIFICATE_ISSUER_UNSPECIFIED = 0;
+  CERTIFICATE_ISSUER_INTERNAL_CA = 1;
+  CERTIFICATE_ISSUER_LETS_ENCRYPT = 2;
+  CERTIFICATE_ISSUER_CLOUDFLARE = 3;
+}
+
+// DNSRecord represents a DNS record entry.
+message DNSRecord {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  DNSRecordType record_type = 3;
+  string value = 4;
+  int32 ttl = 5;
+  bool is_internal = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// Certificate represents a TLS certificate.
+message Certificate {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string domain = 2;
+  CertificateIssuer issuer = 3;
+  google.protobuf.Timestamp not_before = 4;
+  google.protobuf.Timestamp not_after = 5;
+  string fingerprint = 6;
+  bool is_active = 7;
+}
+
+// CAConfig represents the internal Certificate Authority configuration.
+message CAConfig {
+  string root_ca_cert = 1;
+  repeated string intermediate_certs = 2;
+  int32 auto_renew_days = 3;
+}
+
+// ListDNSRecordsRequest is the request for listing DNS records.
+message ListDNSRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  DNSRecordType record_type = 2;
+  bool is_internal = 3;
+  string name_filter = 4;
+}
+
+// ListDNSRecordsResponse is the response for listing DNS records.
+message ListDNSRecordsResponse {
+  repeated DNSRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateDNSRecordRequest is the request for creating a DNS record.
+message CreateDNSRecordRequest {
+  string name = 1;
+  DNSRecordType record_type = 2;
+  string value = 3;
+  int32 ttl = 4;
+  bool is_internal = 5;
+}
+
+// CreateDNSRecordResponse is the response after creating a DNS record.
+message CreateDNSRecordResponse {
+  DNSRecord record = 1;
+}
+
+// UpdateDNSRecordRequest is the request for updating a DNS record.
+message UpdateDNSRecordRequest {
+  string id = 1;
+  string name = 2;
+  DNSRecordType record_type = 3;
+  string value = 4;
+  int32 ttl = 5;
+  bool is_internal = 6;
+}
+
+// UpdateDNSRecordResponse is the response after updating a DNS record.
+message UpdateDNSRecordResponse {
+  DNSRecord record = 1;
+}
+
+// DeleteDNSRecordRequest is the request for deleting a DNS record.
+message DeleteDNSRecordRequest {
+  string id = 1;
+}
+
+// DeleteDNSRecordResponse is the response after deleting a DNS record.
+message DeleteDNSRecordResponse {}
+
+// ListCertificatesRequest is the request for listing certificates.
+message ListCertificatesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  CertificateIssuer issuer = 2;
+  bool is_active = 3;
+  string domain_filter = 4;
+}
+
+// ListCertificatesResponse is the response for listing certificates.
+message ListCertificatesResponse {
+  repeated Certificate certificates = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// IssueCertificateRequest is the request for issuing a new certificate.
+message IssueCertificateRequest {
+  string domain = 1;
+  CertificateIssuer issuer = 2;
+  repeated string subject_alt_names = 3;
+}
+
+// IssueCertificateResponse is the response after issuing a certificate.
+message IssueCertificateResponse {
+  Certificate certificate = 1;
+}
+
+// RevokeCertificateRequest is the request for revoking a certificate.
+message RevokeCertificateRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+// RevokeCertificateResponse is the response after revoking a certificate.
+message RevokeCertificateResponse {
+  Certificate certificate = 1;
+}
+
+// GetCAConfigRequest is the request for retrieving CA configuration.
+message GetCAConfigRequest {}
+
+// GetCAConfigResponse is the response containing CA configuration.
+message GetCAConfigResponse {
+  CAConfig config = 1;
+}
+
+// UpdateCAConfigRequest is the request for updating CA configuration.
+message UpdateCAConfigRequest {
+  string root_ca_cert = 1;
+  repeated string intermediate_certs = 2;
+  int32 auto_renew_days = 3;
+}
+
+// UpdateCAConfigResponse is the response after updating CA configuration.
+message UpdateCAConfigResponse {
+  CAConfig config = 1;
+}
+
+// DNSService manages DNS records, TLS certificates, and internal CA configuration.
+service DNSService {
+  rpc ListDNSRecords(ListDNSRecordsRequest) returns (ListDNSRecordsResponse) {
+    option (google.api.http) = {
+      get: "/v1/dns/records"
+    };
+  }
+  rpc CreateDNSRecord(CreateDNSRecordRequest) returns (CreateDNSRecordResponse) {
+    option (google.api.http) = {
+      post: "/v1/dns/records"
+      body: "*"
+    };
+  }
+  rpc UpdateDNSRecord(UpdateDNSRecordRequest) returns (UpdateDNSRecordResponse) {
+    option (google.api.http) = {
+      patch: "/v1/dns/records/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteDNSRecord(DeleteDNSRecordRequest) returns (DeleteDNSRecordResponse) {
+    option (google.api.http) = {
+      delete: "/v1/dns/records/{id}"
+    };
+  }
+  rpc ListCertificates(ListCertificatesRequest) returns (ListCertificatesResponse) {
+    option (google.api.http) = {
+      get: "/v1/dns/certificates"
+    };
+  }
+  rpc IssueCertificate(IssueCertificateRequest) returns (IssueCertificateResponse) {
+    option (google.api.http) = {
+      post: "/v1/dns/certificates"
+      body: "*"
+    };
+  }
+  rpc RevokeCertificate(RevokeCertificateRequest) returns (RevokeCertificateResponse) {
+    option (google.api.http) = {
+      post: "/v1/dns/certificates/{id}/revoke"
+      body: "*"
+    };
+  }
+  rpc GetCAConfig(GetCAConfigRequest) returns (GetCAConfigResponse) {
+    option (google.api.http) = {
+      get: "/v1/dns/ca-config"
+    };
+  }
+  rpc UpdateCAConfig(UpdateCAConfigRequest) returns (UpdateCAConfigResponse) {
+    option (google.api.http) = {
+      put: "/v1/dns/ca-config"
+      body: "*"
+    };
+  }
+}

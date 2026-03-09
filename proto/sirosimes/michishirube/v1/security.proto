@@ -1,0 +1,213 @@
+syntax = "proto3";
+
+package sirosimes.michishirube.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// security.proto — 道標（Michishirube）WAF/IDS/IPS・インジェクション検査。
+//
+// メッセージのセキュリティスキャン（プロンプトインジェクション、コマンドインジェクション等）、
+// WAFルール管理、セキュリティアラートの発行・解決を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// ScanSeverity classifies the severity level of a security scan finding.
+enum ScanSeverity {
+  SCAN_SEVERITY_UNSPECIFIED = 0;
+  SCAN_SEVERITY_CRITICAL = 1;
+  SCAN_SEVERITY_WARNING = 2;
+  SCAN_SEVERITY_INFO = 3;
+}
+
+// DetectionType classifies the type of security threat detected.
+enum DetectionType {
+  DETECTION_TYPE_UNSPECIFIED = 0;
+  DETECTION_TYPE_PROMPT_INJECTION = 1;
+  DETECTION_TYPE_COMMAND_INJECTION = 2;
+  DETECTION_TYPE_INFO_EXTRACTION = 3;
+  DETECTION_TYPE_DATA_EXFILTRATION = 4;
+  DETECTION_TYPE_PRIVILEGE_ESCALATION = 5;
+}
+
+// ScanAction classifies the action taken on a scanned message.
+enum ScanAction {
+  SCAN_ACTION_UNSPECIFIED = 0;
+  SCAN_ACTION_BLOCKED = 1;
+  SCAN_ACTION_LOGGED = 2;
+  SCAN_ACTION_PASSED = 3;
+}
+
+// WAFRuleAction classifies the action a WAF rule performs.
+enum WAFRuleAction {
+  WAF_RULE_ACTION_UNSPECIFIED = 0;
+  WAF_RULE_ACTION_BLOCK = 1;
+  WAF_RULE_ACTION_LOG = 2;
+  WAF_RULE_ACTION_ALERT = 3;
+}
+
+// InjectionScanResult represents the result of scanning a message for injections.
+message InjectionScanResult {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string message_id = 2;
+  ScanSeverity severity = 3;
+  DetectionType detection_type = 4;
+  string pattern_matched = 5;
+  ScanAction action_taken = 6;
+  google.protobuf.Timestamp scanned_at = 7;
+}
+
+// WAFRule represents a Web Application Firewall rule.
+message WAFRule {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string pattern = 3;
+  ScanSeverity severity = 4;
+  WAFRuleAction action = 5;
+  bool is_active = 6;
+}
+
+// SecurityAlert represents a security alert raised by the system.
+message SecurityAlert {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string source = 2;
+  ScanSeverity severity = 3;
+  string description = 4;
+  string target_agent = 5;
+  string message_preview = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp resolved_at = 8;
+}
+
+// ScanMessageRequest is the request for scanning a message.
+message ScanMessageRequest {
+  string message_id = 1;
+  string content = 2;
+  string sender_id = 3;
+  string target_agent = 4;
+}
+
+// ScanMessageResponse is the response after scanning a message.
+message ScanMessageResponse {
+  InjectionScanResult result = 1;
+}
+
+// ListWAFRulesRequest is the request for listing WAF rules.
+message ListWAFRulesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  bool is_active = 2;
+  ScanSeverity severity = 3;
+}
+
+// ListWAFRulesResponse is the response for listing WAF rules.
+message ListWAFRulesResponse {
+  repeated WAFRule rules = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateWAFRuleRequest is the request for creating a WAF rule.
+message CreateWAFRuleRequest {
+  string name = 1;
+  string pattern = 2;
+  ScanSeverity severity = 3;
+  WAFRuleAction action = 4;
+  bool is_active = 5;
+}
+
+// CreateWAFRuleResponse is the response after creating a WAF rule.
+message CreateWAFRuleResponse {
+  WAFRule rule = 1;
+}
+
+// UpdateWAFRuleRequest is the request for updating a WAF rule.
+message UpdateWAFRuleRequest {
+  string id = 1;
+  string name = 2;
+  string pattern = 3;
+  ScanSeverity severity = 4;
+  WAFRuleAction action = 5;
+  bool is_active = 6;
+}
+
+// UpdateWAFRuleResponse is the response after updating a WAF rule.
+message UpdateWAFRuleResponse {
+  WAFRule rule = 1;
+}
+
+// DeleteWAFRuleRequest is the request for deleting a WAF rule.
+message DeleteWAFRuleRequest {
+  string id = 1;
+}
+
+// DeleteWAFRuleResponse is the response after deleting a WAF rule.
+message DeleteWAFRuleResponse {}
+
+// ListAlertsRequest is the request for listing security alerts.
+message ListAlertsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ScanSeverity severity = 2;
+  string target_agent = 3;
+  bool include_resolved = 4;
+}
+
+// ListAlertsResponse is the response for listing security alerts.
+message ListAlertsResponse {
+  repeated SecurityAlert alerts = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// ResolveAlertRequest is the request for resolving a security alert.
+message ResolveAlertRequest {
+  string id = 1;
+  string resolution_note = 2;
+}
+
+// ResolveAlertResponse is the response after resolving a security alert.
+message ResolveAlertResponse {
+  SecurityAlert alert = 1;
+}
+
+// SecurityService manages security scanning, WAF rules, and security alerts.
+service SecurityService {
+  rpc ScanMessage(ScanMessageRequest) returns (ScanMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/security/scan"
+      body: "*"
+    };
+  }
+  rpc ListWAFRules(ListWAFRulesRequest) returns (ListWAFRulesResponse) {
+    option (google.api.http) = {
+      get: "/v1/security/waf-rules"
+    };
+  }
+  rpc CreateWAFRule(CreateWAFRuleRequest) returns (CreateWAFRuleResponse) {
+    option (google.api.http) = {
+      post: "/v1/security/waf-rules"
+      body: "*"
+    };
+  }
+  rpc UpdateWAFRule(UpdateWAFRuleRequest) returns (UpdateWAFRuleResponse) {
+    option (google.api.http) = {
+      patch: "/v1/security/waf-rules/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteWAFRule(DeleteWAFRuleRequest) returns (DeleteWAFRuleResponse) {
+    option (google.api.http) = {
+      delete: "/v1/security/waf-rules/{id}"
+    };
+  }
+  rpc ListAlerts(ListAlertsRequest) returns (ListAlertsResponse) {
+    option (google.api.http) = {
+      get: "/v1/security/alerts"
+    };
+  }
+  rpc ResolveAlert(ResolveAlertRequest) returns (ResolveAlertResponse) {
+    option (google.api.http) = {
+      post: "/v1/security/alerts/{id}/resolve"
+      body: "*"
+    };
+  }
+}

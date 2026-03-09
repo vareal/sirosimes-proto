@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package sirosimes.michishirube.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+
+// proxy.proto — 道標（Michishirube）メッセージプロキシ。
+//
+// 各種メッセージングプラットフォーム（Mattermost, Telegram, Signal等）からの
+// インバウンドメッセージを受信し、適切なエージェントへディスパッチする。
+//
+// Exposure: INTERNAL（全RPC）
+
+// MessageSource classifies the origin platform of a message.
+enum MessageSource {
+  MESSAGE_SOURCE_UNSPECIFIED = 0;
+  MESSAGE_SOURCE_MATTERMOST = 1;
+  MESSAGE_SOURCE_TELEGRAM = 2;
+  MESSAGE_SOURCE_SIGNAL = 3;
+  MESSAGE_SOURCE_DISCORD = 4;
+  MESSAGE_SOURCE_WHATSAPP = 5;
+  MESSAGE_SOURCE_SLACK = 6;
+  MESSAGE_SOURCE_EMAIL = 7;
+  MESSAGE_SOURCE_API = 8;
+}
+
+// DispatchAction classifies the action taken on a proxied message.
+enum DispatchAction {
+  DISPATCH_ACTION_UNSPECIFIED = 0;
+  DISPATCH_ACTION_DISPATCHED = 1;
+  DISPATCH_ACTION_BLOCKED = 2;
+  DISPATCH_ACTION_WF_MATCHED = 3;
+}
+
+// DispatchStatus classifies the result status of a dispatch operation.
+enum DispatchStatus {
+  DISPATCH_STATUS_UNSPECIFIED = 0;
+  DISPATCH_STATUS_DISPATCHED = 1;
+  DISPATCH_STATUS_BLOCKED = 2;
+  DISPATCH_STATUS_WF_MATCHED = 3;
+  DISPATCH_STATUS_ERROR = 4;
+}
+
+// ProxyMessage represents a message received and tracked by the proxy.
+message ProxyMessage {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  MessageSource source = 2;
+  string channel_id = 3;
+  string sender_id = 4;
+  string sender_username = 5;
+  string message = 6;
+  string target_agent = 7;
+  google.protobuf.Timestamp timestamp = 8;
+  map<string, string> extra_metadata = 9;
+}
+
+// ProxyResponse represents the response after processing a proxied message.
+message ProxyResponse {
+  string id = 1;
+  string response_message = 2;
+  DispatchAction action_taken = 3;
+}
+
+// InboundMessage represents an incoming message from an external platform.
+message InboundMessage {
+  MessageSource source = 1;
+  string channel_id = 2;
+  string sender_id = 3;
+  string sender_username = 4;
+  string message_content = 5;
+  google.protobuf.Timestamp timestamp = 6;
+  map<string, string> metadata = 7;
+}
+
+// DispatchResult represents the result of dispatching a message to an agent.
+message DispatchResult {
+  string target = 1;
+  DispatchStatus status = 2;
+  string response = 3;
+  float latency_ms = 4;
+}
+
+// ProxyInboundRequest is the request for processing an inbound message.
+message ProxyInboundRequest {
+  InboundMessage inbound_message = 1;
+}
+
+// ProxyInboundResponse is the response after processing an inbound message.
+message ProxyInboundResponse {
+  ProxyResponse proxy_response = 1;
+  DispatchResult dispatch_result = 2;
+}
+
+// GetDispatchStatusRequest is the request for retrieving dispatch status.
+message GetDispatchStatusRequest {
+  string message_id = 1;
+}
+
+// GetDispatchStatusResponse is the response containing dispatch status.
+message GetDispatchStatusResponse {
+  DispatchResult result = 1;
+}
+
+// ProxyService handles message proxy inbound and dispatch operations.
+service ProxyService {
+  rpc ProxyInbound(ProxyInboundRequest) returns (ProxyInboundResponse) {
+    option (google.api.http) = {
+      post: "/v1/proxy/inbound"
+      body: "*"
+    };
+  }
+  rpc GetDispatchStatus(GetDispatchStatusRequest) returns (GetDispatchStatusResponse) {
+    option (google.api.http) = {
+      get: "/v1/proxy/dispatch/{message_id}"
+    };
+  }
+}

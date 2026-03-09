@@ -3,146 +3,103 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
- * RoutingStrategy classifies the load balancing strategy.
+ * TlsMode classifies the TLS termination mode for a route.
  *
- * @generated from enum sirosimes.michishirube.v1.RoutingStrategy
+ * @generated from enum sirosimes.michishirube.v1.TlsMode
  */
-export declare enum RoutingStrategy {
+export declare enum TlsMode {
   /**
-   * @generated from enum value: ROUTING_STRATEGY_UNSPECIFIED = 0;
+   * @generated from enum value: TLS_MODE_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: ROUTING_STRATEGY_PRIORITY = 1;
+   * @generated from enum value: TLS_MODE_NONE = 1;
    */
-  PRIORITY = 1,
+  NONE = 1,
 
   /**
-   * @generated from enum value: ROUTING_STRATEGY_ROUND_ROBIN = 2;
+   * @generated from enum value: TLS_MODE_INTERNAL_CA = 2;
    */
-  ROUND_ROBIN = 2,
+  INTERNAL_CA = 2,
 
   /**
-   * @generated from enum value: ROUTING_STRATEGY_WEIGHTED = 3;
+   * @generated from enum value: TLS_MODE_LETS_ENCRYPT = 3;
    */
-  WEIGHTED = 3,
-
-  /**
-   * @generated from enum value: ROUTING_STRATEGY_COST_OPTIMIZED = 4;
-   */
-  COST_OPTIMIZED = 4,
-
-  /**
-   * @generated from enum value: ROUTING_STRATEGY_LATENCY_OPTIMIZED = 5;
-   */
-  LATENCY_OPTIMIZED = 5,
+  LETS_ENCRYPT = 3,
 }
 
 /**
- * ModelMapping maps a model alias to a provider and its provider-specific model name.
+ * UpstreamHealthStatus classifies the health state of an upstream target.
  *
- * @generated from message sirosimes.michishirube.v1.ModelMapping
+ * @generated from enum sirosimes.michishirube.v1.UpstreamHealthStatus
  */
-export declare class ModelMapping extends Message<ModelMapping> {
+export declare enum UpstreamHealthStatus {
   /**
-   * @generated from field: string model_alias = 1;
+   * @generated from enum value: UPSTREAM_HEALTH_STATUS_UNSPECIFIED = 0;
    */
-  modelAlias: string;
-
-  /**
-   * @generated from field: string provider_id = 2;
-   */
-  providerId: string;
+  UNSPECIFIED = 0,
 
   /**
-   * @generated from field: string provider_model = 3;
+   * @generated from enum value: UPSTREAM_HEALTH_STATUS_HEALTHY = 1;
    */
-  providerModel: string;
+  HEALTHY = 1,
 
   /**
-   * @generated from field: int32 priority = 4;
+   * @generated from enum value: UPSTREAM_HEALTH_STATUS_UNHEALTHY = 2;
    */
-  priority: number;
+  UNHEALTHY = 2,
 
   /**
-   * @generated from field: int32 weight = 5;
+   * @generated from enum value: UPSTREAM_HEALTH_STATUS_UNKNOWN = 3;
    */
-  weight: number;
-
-  /**
-   * @generated from field: bool enabled = 6;
-   */
-  enabled: boolean;
-
-  constructor(data?: PartialMessage<ModelMapping>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.ModelMapping";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ModelMapping;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ModelMapping;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ModelMapping;
-
-  static equals(a: ModelMapping | PlainMessage<ModelMapping> | undefined, b: ModelMapping | PlainMessage<ModelMapping> | undefined): boolean;
+  UNKNOWN = 3,
 }
 
 /**
- * FallbackRule defines a fallback provider chain for a model alias.
+ * RoutingRuleAction classifies the action for a routing rule.
  *
- * @generated from message sirosimes.michishirube.v1.FallbackRule
+ * @generated from enum sirosimes.michishirube.v1.RoutingRuleAction
  */
-export declare class FallbackRule extends Message<FallbackRule> {
+export declare enum RoutingRuleAction {
   /**
-   * @generated from field: string model_alias = 1;
+   * @generated from enum value: ROUTING_RULE_ACTION_UNSPECIFIED = 0;
    */
-  modelAlias: string;
-
-  /**
-   * @generated from field: repeated string fallback_provider_ids = 2;
-   */
-  fallbackProviderIds: string[];
+  UNSPECIFIED = 0,
 
   /**
-   * @generated from field: int32 max_retries = 3;
+   * @generated from enum value: ROUTING_RULE_ACTION_ALLOW = 1;
    */
-  maxRetries: number;
+  ALLOW = 1,
 
   /**
-   * @generated from field: int32 retry_delay_ms = 4;
+   * @generated from enum value: ROUTING_RULE_ACTION_DENY = 2;
    */
-  retryDelayMs: number;
+  DENY = 2,
 
-  constructor(data?: PartialMessage<FallbackRule>);
+  /**
+   * @generated from enum value: ROUTING_RULE_ACTION_REDIRECT = 3;
+   */
+  REDIRECT = 3,
 
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.FallbackRule";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FallbackRule;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FallbackRule;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FallbackRule;
-
-  static equals(a: FallbackRule | PlainMessage<FallbackRule> | undefined, b: FallbackRule | PlainMessage<FallbackRule> | undefined): boolean;
+  /**
+   * @generated from enum value: ROUTING_RULE_ACTION_RATE_LIMIT = 4;
+   */
+  RATE_LIMIT = 4,
 }
 
 /**
- * RoutingRule represents a named routing configuration.
+ * Route represents a reverse proxy route configuration.
  *
- * @generated from message sirosimes.michishirube.v1.RoutingRule
+ * @generated from message sirosimes.michishirube.v1.Route
  */
-export declare class RoutingRule extends Message<RoutingRule> {
+export declare class Route extends Message<Route> {
   /**
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
    */
@@ -154,29 +111,131 @@ export declare class RoutingRule extends Message<RoutingRule> {
   name: string;
 
   /**
-   * @generated from field: string description = 3;
+   * @generated from field: string domain = 3;
    */
-  description: string;
+  domain: string;
 
   /**
-   * @generated from field: sirosimes.michishirube.v1.RoutingStrategy strategy = 4;
+   * @generated from field: string path_prefix = 4;
    */
-  strategy: RoutingStrategy;
+  pathPrefix: string;
 
   /**
-   * @generated from field: repeated sirosimes.michishirube.v1.ModelMapping mappings = 5;
+   * @generated from field: string upstream_url = 5;
    */
-  mappings: ModelMapping[];
+  upstreamUrl: string;
 
   /**
-   * @generated from field: repeated sirosimes.michishirube.v1.FallbackRule fallbacks = 6;
+   * @generated from field: bool is_active = 6;
    */
-  fallbacks: FallbackRule[];
+  isActive: boolean;
 
   /**
-   * @generated from field: bool enabled = 7;
+   * @generated from field: sirosimes.michishirube.v1.TlsMode tls_mode = 7;
    */
-  enabled: boolean;
+  tlsMode: TlsMode;
+
+  /**
+   * @generated from field: string health_check_path = 8;
+   */
+  healthCheckPath: string;
+
+  /**
+   * @generated from field: int32 timeout_ms = 9;
+   */
+  timeoutMs: number;
+
+  /**
+   * @generated from field: map<string, string> route_metadata = 10;
+   */
+  routeMetadata: { [key: string]: string };
+
+  constructor(data?: PartialMessage<Route>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.Route";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Route;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Route;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Route;
+
+  static equals(a: Route | PlainMessage<Route> | undefined, b: Route | PlainMessage<Route> | undefined): boolean;
+}
+
+/**
+ * UpstreamHealth represents the health status of a route upstream.
+ *
+ * @generated from message sirosimes.michishirube.v1.UpstreamHealth
+ */
+export declare class UpstreamHealth extends Message<UpstreamHealth> {
+  /**
+   * @generated from field: string route_id = 1;
+   */
+  routeId: string;
+
+  /**
+   * @generated from field: sirosimes.michishirube.v1.UpstreamHealthStatus status = 2;
+   */
+  status: UpstreamHealthStatus;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp last_check_at = 3;
+   */
+  lastCheckAt?: Timestamp;
+
+  /**
+   * @generated from field: float response_time_ms = 4;
+   */
+  responseTimeMs: number;
+
+  constructor(data?: PartialMessage<UpstreamHealth>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.UpstreamHealth";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpstreamHealth;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpstreamHealth;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpstreamHealth;
+
+  static equals(a: UpstreamHealth | PlainMessage<UpstreamHealth> | undefined, b: UpstreamHealth | PlainMessage<UpstreamHealth> | undefined): boolean;
+}
+
+/**
+ * RoutingRule represents a conditional routing rule applied to a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.RoutingRule
+ */
+export declare class RoutingRule extends Message<RoutingRule> {
+  /**
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   */
+  metadata?: ResourceMetadata;
+
+  /**
+   * @generated from field: string route_id = 2;
+   */
+  routeId: string;
+
+  /**
+   * @generated from field: google.protobuf.Struct condition = 3;
+   */
+  condition?: Struct;
+
+  /**
+   * @generated from field: sirosimes.michishirube.v1.RoutingRuleAction action = 4;
+   */
+  action: RoutingRuleAction;
+
+  /**
+   * @generated from field: int32 priority = 5;
+   */
+  priority: number;
 
   constructor(data?: PartialMessage<RoutingRule>);
 
@@ -194,59 +253,415 @@ export declare class RoutingRule extends Message<RoutingRule> {
 }
 
 /**
- * RouteResolution represents the resolved provider for a request.
+ * ListRoutesRequest is the request for listing routes.
  *
- * @generated from message sirosimes.michishirube.v1.RouteResolution
+ * @generated from message sirosimes.michishirube.v1.ListRoutesRequest
  */
-export declare class RouteResolution extends Message<RouteResolution> {
+export declare class ListRoutesRequest extends Message<ListRoutesRequest> {
   /**
-   * @generated from field: string provider_id = 1;
+   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
    */
-  providerId: string;
+  pagination?: PaginationRequest;
 
   /**
-   * @generated from field: string provider_model = 2;
+   * @generated from field: string domain = 2;
    */
-  providerModel: string;
+  domain: string;
 
   /**
-   * @generated from field: string model_alias = 3;
+   * @generated from field: bool is_active = 3;
    */
-  modelAlias: string;
+  isActive: boolean;
 
   /**
-   * @generated from field: sirosimes.michishirube.v1.RoutingStrategy strategy_used = 4;
+   * @generated from field: sirosimes.michishirube.v1.TlsMode tls_mode = 4;
    */
-  strategyUsed: RoutingStrategy;
+  tlsMode: TlsMode;
 
-  /**
-   * @generated from field: bool fallback_used = 5;
-   */
-  fallbackUsed: boolean;
-
-  /**
-   * @generated from field: int32 attempt_number = 6;
-   */
-  attemptNumber: number;
-
-  /**
-   * @generated from field: float estimated_latency_ms = 7;
-   */
-  estimatedLatencyMs: number;
-
-  constructor(data?: PartialMessage<RouteResolution>);
+  constructor(data?: PartialMessage<ListRoutesRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.RouteResolution";
+  static readonly typeName = "sirosimes.michishirube.v1.ListRoutesRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RouteResolution;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListRoutesRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RouteResolution;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListRoutesRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RouteResolution;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListRoutesRequest;
 
-  static equals(a: RouteResolution | PlainMessage<RouteResolution> | undefined, b: RouteResolution | PlainMessage<RouteResolution> | undefined): boolean;
+  static equals(a: ListRoutesRequest | PlainMessage<ListRoutesRequest> | undefined, b: ListRoutesRequest | PlainMessage<ListRoutesRequest> | undefined): boolean;
+}
+
+/**
+ * ListRoutesResponse is the response for listing routes.
+ *
+ * @generated from message sirosimes.michishirube.v1.ListRoutesResponse
+ */
+export declare class ListRoutesResponse extends Message<ListRoutesResponse> {
+  /**
+   * @generated from field: repeated sirosimes.michishirube.v1.Route routes = 1;
+   */
+  routes: Route[];
+
+  /**
+   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   */
+  pagination?: PaginationResponse;
+
+  constructor(data?: PartialMessage<ListRoutesResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.ListRoutesResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListRoutesResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListRoutesResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListRoutesResponse;
+
+  static equals(a: ListRoutesResponse | PlainMessage<ListRoutesResponse> | undefined, b: ListRoutesResponse | PlainMessage<ListRoutesResponse> | undefined): boolean;
+}
+
+/**
+ * CreateRouteRequest is the request for creating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.CreateRouteRequest
+ */
+export declare class CreateRouteRequest extends Message<CreateRouteRequest> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string domain = 2;
+   */
+  domain: string;
+
+  /**
+   * @generated from field: string path_prefix = 3;
+   */
+  pathPrefix: string;
+
+  /**
+   * @generated from field: string upstream_url = 4;
+   */
+  upstreamUrl: string;
+
+  /**
+   * @generated from field: bool is_active = 5;
+   */
+  isActive: boolean;
+
+  /**
+   * @generated from field: sirosimes.michishirube.v1.TlsMode tls_mode = 6;
+   */
+  tlsMode: TlsMode;
+
+  /**
+   * @generated from field: string health_check_path = 7;
+   */
+  healthCheckPath: string;
+
+  /**
+   * @generated from field: int32 timeout_ms = 8;
+   */
+  timeoutMs: number;
+
+  /**
+   * @generated from field: map<string, string> route_metadata = 9;
+   */
+  routeMetadata: { [key: string]: string };
+
+  constructor(data?: PartialMessage<CreateRouteRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.CreateRouteRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateRouteRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateRouteRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateRouteRequest;
+
+  static equals(a: CreateRouteRequest | PlainMessage<CreateRouteRequest> | undefined, b: CreateRouteRequest | PlainMessage<CreateRouteRequest> | undefined): boolean;
+}
+
+/**
+ * CreateRouteResponse is the response after creating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.CreateRouteResponse
+ */
+export declare class CreateRouteResponse extends Message<CreateRouteResponse> {
+  /**
+   * @generated from field: sirosimes.michishirube.v1.Route route = 1;
+   */
+  route?: Route;
+
+  constructor(data?: PartialMessage<CreateRouteResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.CreateRouteResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateRouteResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateRouteResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateRouteResponse;
+
+  static equals(a: CreateRouteResponse | PlainMessage<CreateRouteResponse> | undefined, b: CreateRouteResponse | PlainMessage<CreateRouteResponse> | undefined): boolean;
+}
+
+/**
+ * GetRouteRequest is the request for retrieving a single route.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetRouteRequest
+ */
+export declare class GetRouteRequest extends Message<GetRouteRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  constructor(data?: PartialMessage<GetRouteRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.GetRouteRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetRouteRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetRouteRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetRouteRequest;
+
+  static equals(a: GetRouteRequest | PlainMessage<GetRouteRequest> | undefined, b: GetRouteRequest | PlainMessage<GetRouteRequest> | undefined): boolean;
+}
+
+/**
+ * GetRouteResponse is the response containing a single route.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetRouteResponse
+ */
+export declare class GetRouteResponse extends Message<GetRouteResponse> {
+  /**
+   * @generated from field: sirosimes.michishirube.v1.Route route = 1;
+   */
+  route?: Route;
+
+  constructor(data?: PartialMessage<GetRouteResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.GetRouteResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetRouteResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetRouteResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetRouteResponse;
+
+  static equals(a: GetRouteResponse | PlainMessage<GetRouteResponse> | undefined, b: GetRouteResponse | PlainMessage<GetRouteResponse> | undefined): boolean;
+}
+
+/**
+ * UpdateRouteRequest is the request for updating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.UpdateRouteRequest
+ */
+export declare class UpdateRouteRequest extends Message<UpdateRouteRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string domain = 3;
+   */
+  domain: string;
+
+  /**
+   * @generated from field: string path_prefix = 4;
+   */
+  pathPrefix: string;
+
+  /**
+   * @generated from field: string upstream_url = 5;
+   */
+  upstreamUrl: string;
+
+  /**
+   * @generated from field: bool is_active = 6;
+   */
+  isActive: boolean;
+
+  /**
+   * @generated from field: sirosimes.michishirube.v1.TlsMode tls_mode = 7;
+   */
+  tlsMode: TlsMode;
+
+  /**
+   * @generated from field: string health_check_path = 8;
+   */
+  healthCheckPath: string;
+
+  /**
+   * @generated from field: int32 timeout_ms = 9;
+   */
+  timeoutMs: number;
+
+  /**
+   * @generated from field: map<string, string> route_metadata = 10;
+   */
+  routeMetadata: { [key: string]: string };
+
+  constructor(data?: PartialMessage<UpdateRouteRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.UpdateRouteRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateRouteRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateRouteRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateRouteRequest;
+
+  static equals(a: UpdateRouteRequest | PlainMessage<UpdateRouteRequest> | undefined, b: UpdateRouteRequest | PlainMessage<UpdateRouteRequest> | undefined): boolean;
+}
+
+/**
+ * UpdateRouteResponse is the response after updating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.UpdateRouteResponse
+ */
+export declare class UpdateRouteResponse extends Message<UpdateRouteResponse> {
+  /**
+   * @generated from field: sirosimes.michishirube.v1.Route route = 1;
+   */
+  route?: Route;
+
+  constructor(data?: PartialMessage<UpdateRouteResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.UpdateRouteResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateRouteResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateRouteResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateRouteResponse;
+
+  static equals(a: UpdateRouteResponse | PlainMessage<UpdateRouteResponse> | undefined, b: UpdateRouteResponse | PlainMessage<UpdateRouteResponse> | undefined): boolean;
+}
+
+/**
+ * DeleteRouteRequest is the request for deleting a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.DeleteRouteRequest
+ */
+export declare class DeleteRouteRequest extends Message<DeleteRouteRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  constructor(data?: PartialMessage<DeleteRouteRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.DeleteRouteRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteRouteRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteRouteRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteRouteRequest;
+
+  static equals(a: DeleteRouteRequest | PlainMessage<DeleteRouteRequest> | undefined, b: DeleteRouteRequest | PlainMessage<DeleteRouteRequest> | undefined): boolean;
+}
+
+/**
+ * DeleteRouteResponse is the response after deleting a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.DeleteRouteResponse
+ */
+export declare class DeleteRouteResponse extends Message<DeleteRouteResponse> {
+  constructor(data?: PartialMessage<DeleteRouteResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.DeleteRouteResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteRouteResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteRouteResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteRouteResponse;
+
+  static equals(a: DeleteRouteResponse | PlainMessage<DeleteRouteResponse> | undefined, b: DeleteRouteResponse | PlainMessage<DeleteRouteResponse> | undefined): boolean;
+}
+
+/**
+ * GetUpstreamHealthRequest is the request for checking upstream health.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetUpstreamHealthRequest
+ */
+export declare class GetUpstreamHealthRequest extends Message<GetUpstreamHealthRequest> {
+  /**
+   * @generated from field: string route_id = 1;
+   */
+  routeId: string;
+
+  constructor(data?: PartialMessage<GetUpstreamHealthRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.GetUpstreamHealthRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetUpstreamHealthRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetUpstreamHealthRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetUpstreamHealthRequest;
+
+  static equals(a: GetUpstreamHealthRequest | PlainMessage<GetUpstreamHealthRequest> | undefined, b: GetUpstreamHealthRequest | PlainMessage<GetUpstreamHealthRequest> | undefined): boolean;
+}
+
+/**
+ * GetUpstreamHealthResponse is the response containing upstream health.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetUpstreamHealthResponse
+ */
+export declare class GetUpstreamHealthResponse extends Message<GetUpstreamHealthResponse> {
+  /**
+   * @generated from field: sirosimes.michishirube.v1.UpstreamHealth health = 1;
+   */
+  health?: UpstreamHealth;
+
+  constructor(data?: PartialMessage<GetUpstreamHealthResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.michishirube.v1.GetUpstreamHealthResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetUpstreamHealthResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetUpstreamHealthResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetUpstreamHealthResponse;
+
+  static equals(a: GetUpstreamHealthResponse | PlainMessage<GetUpstreamHealthResponse> | undefined, b: GetUpstreamHealthResponse | PlainMessage<GetUpstreamHealthResponse> | undefined): boolean;
 }
 
 /**
@@ -261,9 +676,14 @@ export declare class ListRoutingRulesRequest extends Message<ListRoutingRulesReq
   pagination?: PaginationRequest;
 
   /**
-   * @generated from field: sirosimes.michishirube.v1.RoutingStrategy strategy = 2;
+   * @generated from field: string route_id = 2;
    */
-  strategy: RoutingStrategy;
+  routeId: string;
+
+  /**
+   * @generated from field: sirosimes.michishirube.v1.RoutingRuleAction action = 3;
+   */
+  action: RoutingRuleAction;
 
   constructor(data?: PartialMessage<ListRoutingRulesRequest>);
 
@@ -312,92 +732,30 @@ export declare class ListRoutingRulesResponse extends Message<ListRoutingRulesRe
 }
 
 /**
- * GetRoutingRuleRequest is the request for retrieving a single routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.GetRoutingRuleRequest
- */
-export declare class GetRoutingRuleRequest extends Message<GetRoutingRuleRequest> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  constructor(data?: PartialMessage<GetRoutingRuleRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.GetRoutingRuleRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetRoutingRuleRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetRoutingRuleRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetRoutingRuleRequest;
-
-  static equals(a: GetRoutingRuleRequest | PlainMessage<GetRoutingRuleRequest> | undefined, b: GetRoutingRuleRequest | PlainMessage<GetRoutingRuleRequest> | undefined): boolean;
-}
-
-/**
- * GetRoutingRuleResponse is the response containing a single routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.GetRoutingRuleResponse
- */
-export declare class GetRoutingRuleResponse extends Message<GetRoutingRuleResponse> {
-  /**
-   * @generated from field: sirosimes.michishirube.v1.RoutingRule rule = 1;
-   */
-  rule?: RoutingRule;
-
-  constructor(data?: PartialMessage<GetRoutingRuleResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.GetRoutingRuleResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetRoutingRuleResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetRoutingRuleResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetRoutingRuleResponse;
-
-  static equals(a: GetRoutingRuleResponse | PlainMessage<GetRoutingRuleResponse> | undefined, b: GetRoutingRuleResponse | PlainMessage<GetRoutingRuleResponse> | undefined): boolean;
-}
-
-/**
  * CreateRoutingRuleRequest is the request for creating a routing rule.
  *
  * @generated from message sirosimes.michishirube.v1.CreateRoutingRuleRequest
  */
 export declare class CreateRoutingRuleRequest extends Message<CreateRoutingRuleRequest> {
   /**
-   * @generated from field: string name = 1;
+   * @generated from field: string route_id = 1;
    */
-  name: string;
+  routeId: string;
 
   /**
-   * @generated from field: string description = 2;
+   * @generated from field: google.protobuf.Struct condition = 2;
    */
-  description: string;
+  condition?: Struct;
 
   /**
-   * @generated from field: sirosimes.michishirube.v1.RoutingStrategy strategy = 3;
+   * @generated from field: sirosimes.michishirube.v1.RoutingRuleAction action = 3;
    */
-  strategy: RoutingStrategy;
+  action: RoutingRuleAction;
 
   /**
-   * @generated from field: repeated sirosimes.michishirube.v1.ModelMapping mappings = 4;
+   * @generated from field: int32 priority = 4;
    */
-  mappings: ModelMapping[];
-
-  /**
-   * @generated from field: repeated sirosimes.michishirube.v1.FallbackRule fallbacks = 5;
-   */
-  fallbacks: FallbackRule[];
-
-  /**
-   * @generated from field: bool enabled = 6;
-   */
-  enabled: boolean;
+  priority: number;
 
   constructor(data?: PartialMessage<CreateRoutingRuleRequest>);
 
@@ -438,196 +796,5 @@ export declare class CreateRoutingRuleResponse extends Message<CreateRoutingRule
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateRoutingRuleResponse;
 
   static equals(a: CreateRoutingRuleResponse | PlainMessage<CreateRoutingRuleResponse> | undefined, b: CreateRoutingRuleResponse | PlainMessage<CreateRoutingRuleResponse> | undefined): boolean;
-}
-
-/**
- * UpdateRoutingRuleRequest is the request for updating a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.UpdateRoutingRuleRequest
- */
-export declare class UpdateRoutingRuleRequest extends Message<UpdateRoutingRuleRequest> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
-
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
-
-  /**
-   * @generated from field: sirosimes.michishirube.v1.RoutingStrategy strategy = 4;
-   */
-  strategy: RoutingStrategy;
-
-  /**
-   * @generated from field: repeated sirosimes.michishirube.v1.ModelMapping mappings = 5;
-   */
-  mappings: ModelMapping[];
-
-  /**
-   * @generated from field: repeated sirosimes.michishirube.v1.FallbackRule fallbacks = 6;
-   */
-  fallbacks: FallbackRule[];
-
-  /**
-   * @generated from field: bool enabled = 7;
-   */
-  enabled: boolean;
-
-  constructor(data?: PartialMessage<UpdateRoutingRuleRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.UpdateRoutingRuleRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateRoutingRuleRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateRoutingRuleRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateRoutingRuleRequest;
-
-  static equals(a: UpdateRoutingRuleRequest | PlainMessage<UpdateRoutingRuleRequest> | undefined, b: UpdateRoutingRuleRequest | PlainMessage<UpdateRoutingRuleRequest> | undefined): boolean;
-}
-
-/**
- * UpdateRoutingRuleResponse is the response after updating a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.UpdateRoutingRuleResponse
- */
-export declare class UpdateRoutingRuleResponse extends Message<UpdateRoutingRuleResponse> {
-  /**
-   * @generated from field: sirosimes.michishirube.v1.RoutingRule rule = 1;
-   */
-  rule?: RoutingRule;
-
-  constructor(data?: PartialMessage<UpdateRoutingRuleResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.UpdateRoutingRuleResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateRoutingRuleResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateRoutingRuleResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateRoutingRuleResponse;
-
-  static equals(a: UpdateRoutingRuleResponse | PlainMessage<UpdateRoutingRuleResponse> | undefined, b: UpdateRoutingRuleResponse | PlainMessage<UpdateRoutingRuleResponse> | undefined): boolean;
-}
-
-/**
- * DeleteRoutingRuleRequest is the request for deleting a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.DeleteRoutingRuleRequest
- */
-export declare class DeleteRoutingRuleRequest extends Message<DeleteRoutingRuleRequest> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  constructor(data?: PartialMessage<DeleteRoutingRuleRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.DeleteRoutingRuleRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteRoutingRuleRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteRoutingRuleRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteRoutingRuleRequest;
-
-  static equals(a: DeleteRoutingRuleRequest | PlainMessage<DeleteRoutingRuleRequest> | undefined, b: DeleteRoutingRuleRequest | PlainMessage<DeleteRoutingRuleRequest> | undefined): boolean;
-}
-
-/**
- * DeleteRoutingRuleResponse is the response after deleting a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.DeleteRoutingRuleResponse
- */
-export declare class DeleteRoutingRuleResponse extends Message<DeleteRoutingRuleResponse> {
-  constructor(data?: PartialMessage<DeleteRoutingRuleResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.DeleteRoutingRuleResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteRoutingRuleResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteRoutingRuleResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteRoutingRuleResponse;
-
-  static equals(a: DeleteRoutingRuleResponse | PlainMessage<DeleteRoutingRuleResponse> | undefined, b: DeleteRoutingRuleResponse | PlainMessage<DeleteRoutingRuleResponse> | undefined): boolean;
-}
-
-/**
- * ResolveRouteRequest is the request for resolving the best provider for a model.
- *
- * @generated from message sirosimes.michishirube.v1.ResolveRouteRequest
- */
-export declare class ResolveRouteRequest extends Message<ResolveRouteRequest> {
-  /**
-   * @generated from field: string model_alias = 1;
-   */
-  modelAlias: string;
-
-  /**
-   * @generated from field: string agent_id = 2;
-   */
-  agentId: string;
-
-  /**
-   * @generated from field: string priority = 3;
-   */
-  priority: string;
-
-  constructor(data?: PartialMessage<ResolveRouteRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.ResolveRouteRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ResolveRouteRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ResolveRouteRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ResolveRouteRequest;
-
-  static equals(a: ResolveRouteRequest | PlainMessage<ResolveRouteRequest> | undefined, b: ResolveRouteRequest | PlainMessage<ResolveRouteRequest> | undefined): boolean;
-}
-
-/**
- * ResolveRouteResponse is the response containing the resolved route.
- *
- * @generated from message sirosimes.michishirube.v1.ResolveRouteResponse
- */
-export declare class ResolveRouteResponse extends Message<ResolveRouteResponse> {
-  /**
-   * @generated from field: sirosimes.michishirube.v1.RouteResolution resolution = 1;
-   */
-  resolution?: RouteResolution;
-
-  constructor(data?: PartialMessage<ResolveRouteResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.michishirube.v1.ResolveRouteResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ResolveRouteResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ResolveRouteResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ResolveRouteResponse;
-
-  static equals(a: ResolveRouteResponse | PlainMessage<ResolveRouteResponse> | undefined, b: ResolveRouteResponse | PlainMessage<ResolveRouteResponse> | undefined): boolean;
 }
 

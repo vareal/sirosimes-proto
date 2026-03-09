@@ -3,69 +3,158 @@ syntax = "proto3";
 package sirosimes.michishirube.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
 
-// routing.proto — 道標（Michishirube）リクエストルーティング。
+// routing.proto — 道標（Michishirube）リバースプロキシルーティング。
 //
-// モデルマッピング、フォールバックルール、負荷分散戦略によるリクエストルーティングを管理する。
+// ドメインベースのルート管理、TLS設定、アップストリームヘルスチェック、
+// および条件付きルーティングルールを管理する。
 //
 // Exposure: INTERNAL（全RPC）
 
-// RoutingStrategy classifies the load balancing strategy.
-enum RoutingStrategy {
-  ROUTING_STRATEGY_UNSPECIFIED = 0;
-  ROUTING_STRATEGY_PRIORITY = 1;
-  ROUTING_STRATEGY_ROUND_ROBIN = 2;
-  ROUTING_STRATEGY_WEIGHTED = 3;
-  ROUTING_STRATEGY_COST_OPTIMIZED = 4;
-  ROUTING_STRATEGY_LATENCY_OPTIMIZED = 5;
+// TlsMode classifies the TLS termination mode for a route.
+enum TlsMode {
+  TLS_MODE_UNSPECIFIED = 0;
+  TLS_MODE_NONE = 1;
+  TLS_MODE_INTERNAL_CA = 2;
+  TLS_MODE_LETS_ENCRYPT = 3;
 }
 
-// ModelMapping maps a model alias to a provider and its provider-specific model name.
-message ModelMapping {
-  string model_alias = 1;
-  string provider_id = 2;
-  string provider_model = 3;
-  int32 priority = 4;
-  int32 weight = 5;
-  bool enabled = 6;
+// UpstreamHealthStatus classifies the health state of an upstream target.
+enum UpstreamHealthStatus {
+  UPSTREAM_HEALTH_STATUS_UNSPECIFIED = 0;
+  UPSTREAM_HEALTH_STATUS_HEALTHY = 1;
+  UPSTREAM_HEALTH_STATUS_UNHEALTHY = 2;
+  UPSTREAM_HEALTH_STATUS_UNKNOWN = 3;
 }
 
-// FallbackRule defines a fallback provider chain for a model alias.
-message FallbackRule {
-  string model_alias = 1;
-  repeated string fallback_provider_ids = 2;
-  int32 max_retries = 3;
-  int32 retry_delay_ms = 4;
+// RoutingRuleAction classifies the action for a routing rule.
+enum RoutingRuleAction {
+  ROUTING_RULE_ACTION_UNSPECIFIED = 0;
+  ROUTING_RULE_ACTION_ALLOW = 1;
+  ROUTING_RULE_ACTION_DENY = 2;
+  ROUTING_RULE_ACTION_REDIRECT = 3;
+  ROUTING_RULE_ACTION_RATE_LIMIT = 4;
 }
 
-// RoutingRule represents a named routing configuration.
-message RoutingRule {
+// Route represents a reverse proxy route configuration.
+message Route {
   sirosimes.common.v1.ResourceMetadata metadata = 1;
   string name = 2;
-  string description = 3;
-  RoutingStrategy strategy = 4;
-  repeated ModelMapping mappings = 5;
-  repeated FallbackRule fallbacks = 6;
-  bool enabled = 7;
+  string domain = 3;
+  string path_prefix = 4;
+  string upstream_url = 5;
+  bool is_active = 6;
+  TlsMode tls_mode = 7;
+  string health_check_path = 8;
+  int32 timeout_ms = 9;
+  map<string, string> route_metadata = 10;
 }
 
-// RouteResolution represents the resolved provider for a request.
-message RouteResolution {
-  string provider_id = 1;
-  string provider_model = 2;
-  string model_alias = 3;
-  RoutingStrategy strategy_used = 4;
-  bool fallback_used = 5;
-  int32 attempt_number = 6;
-  float estimated_latency_ms = 7;
+// UpstreamHealth represents the health status of a route upstream.
+message UpstreamHealth {
+  string route_id = 1;
+  UpstreamHealthStatus status = 2;
+  google.protobuf.Timestamp last_check_at = 3;
+  float response_time_ms = 4;
+}
+
+// RoutingRule represents a conditional routing rule applied to a route.
+message RoutingRule {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string route_id = 2;
+  google.protobuf.Struct condition = 3;
+  RoutingRuleAction action = 4;
+  int32 priority = 5;
+}
+
+// ListRoutesRequest is the request for listing routes.
+message ListRoutesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string domain = 2;
+  bool is_active = 3;
+  TlsMode tls_mode = 4;
+}
+
+// ListRoutesResponse is the response for listing routes.
+message ListRoutesResponse {
+  repeated Route routes = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateRouteRequest is the request for creating a route.
+message CreateRouteRequest {
+  string name = 1;
+  string domain = 2;
+  string path_prefix = 3;
+  string upstream_url = 4;
+  bool is_active = 5;
+  TlsMode tls_mode = 6;
+  string health_check_path = 7;
+  int32 timeout_ms = 8;
+  map<string, string> route_metadata = 9;
+}
+
+// CreateRouteResponse is the response after creating a route.
+message CreateRouteResponse {
+  Route route = 1;
+}
+
+// GetRouteRequest is the request for retrieving a single route.
+message GetRouteRequest {
+  string id = 1;
+}
+
+// GetRouteResponse is the response containing a single route.
+message GetRouteResponse {
+  Route route = 1;
+}
+
+// UpdateRouteRequest is the request for updating a route.
+message UpdateRouteRequest {
+  string id = 1;
+  string name = 2;
+  string domain = 3;
+  string path_prefix = 4;
+  string upstream_url = 5;
+  bool is_active = 6;
+  TlsMode tls_mode = 7;
+  string health_check_path = 8;
+  int32 timeout_ms = 9;
+  map<string, string> route_metadata = 10;
+}
+
+// UpdateRouteResponse is the response after updating a route.
+message UpdateRouteResponse {
+  Route route = 1;
+}
+
+// DeleteRouteRequest is the request for deleting a route.
+message DeleteRouteRequest {
+  string id = 1;
+}
+
+// DeleteRouteResponse is the response after deleting a route.
+message DeleteRouteResponse {}
+
+// GetUpstreamHealthRequest is the request for checking upstream health.
+message GetUpstreamHealthRequest {
+  string route_id = 1;
+}
+
+// GetUpstreamHealthResponse is the response containing upstream health.
+message GetUpstreamHealthResponse {
+  UpstreamHealth health = 1;
 }
 
 // ListRoutingRulesRequest is the request for listing routing rules.
 message ListRoutingRulesRequest {
   sirosimes.common.v1.PaginationRequest pagination = 1;
-  RoutingStrategy strategy = 2;
+  string route_id = 2;
+  RoutingRuleAction action = 3;
 }
 
 // ListRoutingRulesResponse is the response for listing routing rules.
@@ -74,24 +163,12 @@ message ListRoutingRulesResponse {
   sirosimes.common.v1.PaginationResponse pagination = 2;
 }
 
-// GetRoutingRuleRequest is the request for retrieving a single routing rule.
-message GetRoutingRuleRequest {
-  string id = 1;
-}
-
-// GetRoutingRuleResponse is the response containing a single routing rule.
-message GetRoutingRuleResponse {
-  RoutingRule rule = 1;
-}
-
 // CreateRoutingRuleRequest is the request for creating a routing rule.
 message CreateRoutingRuleRequest {
-  string name = 1;
-  string description = 2;
-  RoutingStrategy strategy = 3;
-  repeated ModelMapping mappings = 4;
-  repeated FallbackRule fallbacks = 5;
-  bool enabled = 6;
+  string route_id = 1;
+  google.protobuf.Struct condition = 2;
+  RoutingRuleAction action = 3;
+  int32 priority = 4;
 }
 
 // CreateRoutingRuleResponse is the response after creating a routing rule.
@@ -99,75 +176,48 @@ message CreateRoutingRuleResponse {
   RoutingRule rule = 1;
 }
 
-// UpdateRoutingRuleRequest is the request for updating a routing rule.
-message UpdateRoutingRuleRequest {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  RoutingStrategy strategy = 4;
-  repeated ModelMapping mappings = 5;
-  repeated FallbackRule fallbacks = 6;
-  bool enabled = 7;
-}
-
-// UpdateRoutingRuleResponse is the response after updating a routing rule.
-message UpdateRoutingRuleResponse {
-  RoutingRule rule = 1;
-}
-
-// DeleteRoutingRuleRequest is the request for deleting a routing rule.
-message DeleteRoutingRuleRequest {
-  string id = 1;
-}
-
-// DeleteRoutingRuleResponse is the response after deleting a routing rule.
-message DeleteRoutingRuleResponse {}
-
-// ResolveRouteRequest is the request for resolving the best provider for a model.
-message ResolveRouteRequest {
-  string model_alias = 1;
-  string agent_id = 2;
-  string priority = 3;
-}
-
-// ResolveRouteResponse is the response containing the resolved route.
-message ResolveRouteResponse {
-  RouteResolution resolution = 1;
-}
-
-// RoutingService manages request routing rules and route resolution.
-// Exposure: INTERNAL — all RPCs are for internal use only.
-service RoutingService {
+// RouteService manages reverse proxy routes, upstream health, and routing rules.
+service RouteService {
+  rpc ListRoutes(ListRoutesRequest) returns (ListRoutesResponse) {
+    option (google.api.http) = {
+      get: "/v1/routes"
+    };
+  }
+  rpc CreateRoute(CreateRouteRequest) returns (CreateRouteResponse) {
+    option (google.api.http) = {
+      post: "/v1/routes"
+      body: "*"
+    };
+  }
+  rpc GetRoute(GetRouteRequest) returns (GetRouteResponse) {
+    option (google.api.http) = {
+      get: "/v1/routes/{id}"
+    };
+  }
+  rpc UpdateRoute(UpdateRouteRequest) returns (UpdateRouteResponse) {
+    option (google.api.http) = {
+      patch: "/v1/routes/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteRoute(DeleteRouteRequest) returns (DeleteRouteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/routes/{id}"
+    };
+  }
+  rpc GetUpstreamHealth(GetUpstreamHealthRequest) returns (GetUpstreamHealthResponse) {
+    option (google.api.http) = {
+      get: "/v1/routes/{route_id}/health"
+    };
+  }
   rpc ListRoutingRules(ListRoutingRulesRequest) returns (ListRoutingRulesResponse) {
     option (google.api.http) = {
       get: "/v1/routing-rules"
     };
   }
-  rpc GetRoutingRule(GetRoutingRuleRequest) returns (GetRoutingRuleResponse) {
-    option (google.api.http) = {
-      get: "/v1/routing-rules/{id}"
-    };
-  }
   rpc CreateRoutingRule(CreateRoutingRuleRequest) returns (CreateRoutingRuleResponse) {
     option (google.api.http) = {
       post: "/v1/routing-rules"
-      body: "*"
-    };
-  }
-  rpc UpdateRoutingRule(UpdateRoutingRuleRequest) returns (UpdateRoutingRuleResponse) {
-    option (google.api.http) = {
-      patch: "/v1/routing-rules/{id}"
-      body: "*"
-    };
-  }
-  rpc DeleteRoutingRule(DeleteRoutingRuleRequest) returns (DeleteRoutingRuleResponse) {
-    option (google.api.http) = {
-      delete: "/v1/routing-rules/{id}"
-    };
-  }
-  rpc ResolveRoute(ResolveRouteRequest) returns (ResolveRouteResponse) {
-    option (google.api.http) = {
-      post: "/v1/routing-rules:resolve"
       body: "*"
     };
   }

@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "sirosimes/michishirube/v1/routing.proto",
+    "title": "sirosimes/michishirube/v1/llm_router.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "RouteService"
+      "name": "LLMRouterService"
     }
   ],
   "consumes": [
@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/routes": {
+    "/v1/llm/providers": {
       "get": {
-        "operationId": "RouteService_ListRoutes",
+        "operationId": "LLMRouterService_ListLLMProviders",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListRoutesResponse"
+              "$ref": "#/definitions/v1ListLLMProvidersResponse"
             }
           },
           "default": {
@@ -71,42 +71,37 @@
             "default": "SORT_ORDER_UNSPECIFIED"
           },
           {
-            "name": "domain",
+            "name": "providerType",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "LLM_PROVIDER_TYPE_UNSPECIFIED",
+              "LLM_PROVIDER_TYPE_ANTHROPIC",
+              "LLM_PROVIDER_TYPE_OPENAI",
+              "LLM_PROVIDER_TYPE_GOOGLE",
+              "LLM_PROVIDER_TYPE_LOCAL"
+            ],
+            "default": "LLM_PROVIDER_TYPE_UNSPECIFIED"
           },
           {
             "name": "isActive",
             "in": "query",
             "required": false,
             "type": "boolean"
-          },
-          {
-            "name": "tlsMode",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "TLS_MODE_UNSPECIFIED",
-              "TLS_MODE_NONE",
-              "TLS_MODE_INTERNAL_CA",
-              "TLS_MODE_LETS_ENCRYPT"
-            ],
-            "default": "TLS_MODE_UNSPECIFIED"
           }
         ],
         "tags": [
-          "RouteService"
+          "LLMRouterService"
         ]
       },
       "post": {
-        "operationId": "RouteService_CreateRoute",
+        "operationId": "LLMRouterService_CreateLLMProvider",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateRouteResponse"
+              "$ref": "#/definitions/v1CreateLLMProviderResponse"
             }
           },
           "default": {
@@ -119,83 +114,27 @@
         "parameters": [
           {
             "name": "body",
-            "description": "CreateRouteRequest is the request for creating a route.",
+            "description": "CreateLLMProviderRequest is the request for creating an LLM provider.",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateRouteRequest"
+              "$ref": "#/definitions/v1CreateLLMProviderRequest"
             }
           }
         ],
         "tags": [
-          "RouteService"
+          "LLMRouterService"
         ]
       }
     },
-    "/v1/routes/{id}": {
-      "get": {
-        "operationId": "RouteService_GetRoute",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetRouteResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "RouteService"
-        ]
-      },
-      "delete": {
-        "operationId": "RouteService_DeleteRoute",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1DeleteRouteResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "RouteService"
-        ]
-      },
+    "/v1/llm/providers/{id}": {
       "patch": {
-        "operationId": "RouteService_UpdateRoute",
+        "operationId": "LLMRouterService_UpdateLLMProvider",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpdateRouteResponse"
+              "$ref": "#/definitions/v1UpdateLLMProviderResponse"
             }
           },
           "default": {
@@ -217,23 +156,23 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RouteServiceUpdateRouteBody"
+              "$ref": "#/definitions/LLMRouterServiceUpdateLLMProviderBody"
             }
           }
         ],
         "tags": [
-          "RouteService"
+          "LLMRouterService"
         ]
       }
     },
-    "/v1/routes/{routeId}/health": {
+    "/v1/llm/requests/{requestId}": {
       "get": {
-        "operationId": "RouteService_GetUpstreamHealth",
+        "operationId": "LLMRouterService_GetLLMRequestStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetUpstreamHealthResponse"
+              "$ref": "#/definitions/v1GetLLMRequestStatusResponse"
             }
           },
           "default": {
@@ -245,103 +184,25 @@
         },
         "parameters": [
           {
-            "name": "routeId",
+            "name": "requestId",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "RouteService"
+          "LLMRouterService"
         ]
       }
     },
-    "/v1/routing-rules": {
-      "get": {
-        "operationId": "RouteService_ListRoutingRules",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListRoutingRulesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "pagination.page",
-            "description": "Page number (1-indexed).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "pagination.pageSize",
-            "description": "Number of items per page (max enforced per-service).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "pagination.sortBy",
-            "description": "Field name to sort by.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "pagination.sortOrder",
-            "description": "Sort direction.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "SORT_ORDER_UNSPECIFIED",
-              "SORT_ORDER_ASC",
-              "SORT_ORDER_DESC"
-            ],
-            "default": "SORT_ORDER_UNSPECIFIED"
-          },
-          {
-            "name": "routeId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "action",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "ROUTING_RULE_ACTION_UNSPECIFIED",
-              "ROUTING_RULE_ACTION_ALLOW",
-              "ROUTING_RULE_ACTION_DENY",
-              "ROUTING_RULE_ACTION_REDIRECT",
-              "ROUTING_RULE_ACTION_RATE_LIMIT"
-            ],
-            "default": "ROUTING_RULE_ACTION_UNSPECIFIED"
-          }
-        ],
-        "tags": [
-          "RouteService"
-        ]
-      },
+    "/v1/llm/route": {
       "post": {
-        "operationId": "RouteService_CreateRoutingRule",
+        "operationId": "LLMRouterService_RouteLLMRequest",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateRoutingRuleResponse"
+              "$ref": "#/definitions/v1RouteLLMRequestResponse"
             }
           },
           "default": {
@@ -354,57 +215,43 @@
         "parameters": [
           {
             "name": "body",
-            "description": "CreateRoutingRuleRequest is the request for creating a routing rule.",
+            "description": "RouteLLMRequestRequest is the request for routing an LLM request.",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateRoutingRuleRequest"
+              "$ref": "#/definitions/v1RouteLLMRequestRequest"
             }
           }
         ],
         "tags": [
-          "RouteService"
+          "LLMRouterService"
         ]
       }
     }
   },
   "definitions": {
-    "RouteServiceUpdateRouteBody": {
+    "LLMRouterServiceUpdateLLMProviderBody": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
-        "domain": {
-          "type": "string"
-        },
-        "pathPrefix": {
-          "type": "string"
-        },
-        "upstreamUrl": {
+        "baseUrl": {
           "type": "string"
         },
         "isActive": {
           "type": "boolean"
         },
-        "tlsMode": {
-          "$ref": "#/definitions/v1TlsMode"
-        },
-        "healthCheckPath": {
-          "type": "string"
-        },
-        "timeoutMs": {
+        "rateLimit": {
           "type": "integer",
           "format": "int32"
         },
-        "routeMetadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+        "priority": {
+          "type": "integer",
+          "format": "int32"
         }
       },
-      "description": "UpdateRouteRequest is the request for updating a route."
+      "description": "UpdateLLMProviderRequest is the request for updating an LLM provider."
     },
     "protobufAny": {
       "type": "object",
@@ -414,14 +261,6 @@
         }
       },
       "additionalProperties": {}
-    },
-    "protobufNullValue": {
-      "type": "string",
-      "enum": [
-        "NULL_VALUE"
-      ],
-      "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "rpcStatus": {
       "type": "object",
@@ -442,133 +281,216 @@
         }
       }
     },
-    "v1CreateRouteRequest": {
+    "v1CreateLLMProviderRequest": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
-        "domain": {
-          "type": "string"
+        "providerType": {
+          "$ref": "#/definitions/v1LLMProviderType"
         },
-        "pathPrefix": {
-          "type": "string"
-        },
-        "upstreamUrl": {
+        "baseUrl": {
           "type": "string"
         },
         "isActive": {
           "type": "boolean"
         },
-        "tlsMode": {
-          "$ref": "#/definitions/v1TlsMode"
-        },
-        "healthCheckPath": {
-          "type": "string"
-        },
-        "timeoutMs": {
+        "rateLimit": {
           "type": "integer",
           "format": "int32"
         },
-        "routeMetadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "apiKey": {
+          "type": "string"
         }
       },
-      "description": "CreateRouteRequest is the request for creating a route."
+      "description": "CreateLLMProviderRequest is the request for creating an LLM provider."
     },
-    "v1CreateRouteResponse": {
+    "v1CreateLLMProviderResponse": {
       "type": "object",
       "properties": {
-        "route": {
-          "$ref": "#/definitions/v1Route"
+        "provider": {
+          "$ref": "#/definitions/v1LLMProvider"
         }
       },
-      "description": "CreateRouteResponse is the response after creating a route."
+      "description": "CreateLLMProviderResponse is the response after creating an LLM provider."
     },
-    "v1CreateRoutingRuleRequest": {
+    "v1GetLLMRequestStatusResponse": {
       "type": "object",
       "properties": {
-        "routeId": {
+        "request": {
+          "$ref": "#/definitions/v1LLMRequest"
+        },
+        "response": {
+          "$ref": "#/definitions/v1LLMResponse"
+        }
+      },
+      "description": "GetLLMRequestStatusResponse is the response containing LLM request status."
+    },
+    "v1LLMMessage": {
+      "type": "object",
+      "properties": {
+        "role": {
           "type": "string"
         },
-        "condition": {
-          "type": "object"
+        "content": {
+          "type": "string"
+        }
+      },
+      "description": "LLMMessage represents a single message in an LLM conversation."
+    },
+    "v1LLMProvider": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
         },
-        "action": {
-          "$ref": "#/definitions/v1RoutingRuleAction"
+        "name": {
+          "type": "string"
+        },
+        "providerType": {
+          "$ref": "#/definitions/v1LLMProviderType"
+        },
+        "baseUrl": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "rateLimit": {
+          "type": "integer",
+          "format": "int32"
         },
         "priority": {
           "type": "integer",
           "format": "int32"
         }
       },
-      "description": "CreateRoutingRuleRequest is the request for creating a routing rule."
+      "description": "LLMProvider represents a registered LLM API provider."
     },
-    "v1CreateRoutingRuleResponse": {
+    "v1LLMProviderType": {
+      "type": "string",
+      "enum": [
+        "LLM_PROVIDER_TYPE_UNSPECIFIED",
+        "LLM_PROVIDER_TYPE_ANTHROPIC",
+        "LLM_PROVIDER_TYPE_OPENAI",
+        "LLM_PROVIDER_TYPE_GOOGLE",
+        "LLM_PROVIDER_TYPE_LOCAL"
+      ],
+      "default": "LLM_PROVIDER_TYPE_UNSPECIFIED",
+      "description": "LLMProviderType classifies the LLM provider type."
+    },
+    "v1LLMRequest": {
       "type": "object",
       "properties": {
-        "rule": {
-          "$ref": "#/definitions/v1RoutingRule"
-        }
-      },
-      "description": "CreateRoutingRuleResponse is the response after creating a routing rule."
-    },
-    "v1DeleteRouteResponse": {
-      "type": "object",
-      "description": "DeleteRouteResponse is the response after deleting a route."
-    },
-    "v1GetRouteResponse": {
-      "type": "object",
-      "properties": {
-        "route": {
-          "$ref": "#/definitions/v1Route"
-        }
-      },
-      "description": "GetRouteResponse is the response containing a single route."
-    },
-    "v1GetUpstreamHealthResponse": {
-      "type": "object",
-      "properties": {
-        "health": {
-          "$ref": "#/definitions/v1UpstreamHealth"
-        }
-      },
-      "description": "GetUpstreamHealthResponse is the response containing upstream health."
-    },
-    "v1ListRoutesResponse": {
-      "type": "object",
-      "properties": {
-        "routes": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "providerId": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "messages": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Route"
+            "$ref": "#/definitions/v1LLMMessage"
+          }
+        },
+        "maxTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "temperature": {
+          "type": "number",
+          "format": "float"
+        },
+        "stream": {
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "#/definitions/v1LLMRequestStatus"
+        }
+      },
+      "description": "LLMRequest represents a request to be routed to an LLM provider."
+    },
+    "v1LLMRequestStatus": {
+      "type": "string",
+      "enum": [
+        "LLM_REQUEST_STATUS_UNSPECIFIED",
+        "LLM_REQUEST_STATUS_PENDING",
+        "LLM_REQUEST_STATUS_PROCESSING",
+        "LLM_REQUEST_STATUS_COMPLETED",
+        "LLM_REQUEST_STATUS_FAILED",
+        "LLM_REQUEST_STATUS_TIMEOUT"
+      ],
+      "default": "LLM_REQUEST_STATUS_UNSPECIFIED",
+      "description": "LLMRequestStatus classifies the status of an LLM request."
+    },
+    "v1LLMResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "usage": {
+          "$ref": "#/definitions/v1LLMUsage"
+        },
+        "latencyMs": {
+          "type": "number",
+          "format": "float"
+        },
+        "status": {
+          "$ref": "#/definitions/v1LLMRequestStatus"
+        }
+      },
+      "description": "LLMResponse represents the response from an LLM provider."
+    },
+    "v1LLMUsage": {
+      "type": "object",
+      "properties": {
+        "promptTokens": {
+          "type": "string",
+          "format": "int64"
+        },
+        "completionTokens": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalTokens": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "LLMUsage represents token usage for an LLM request."
+    },
+    "v1ListLLMProvidersResponse": {
+      "type": "object",
+      "properties": {
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LLMProvider"
           }
         },
         "pagination": {
           "$ref": "#/definitions/v1PaginationResponse"
         }
       },
-      "description": "ListRoutesResponse is the response for listing routes."
-    },
-    "v1ListRoutingRulesResponse": {
-      "type": "object",
-      "properties": {
-        "rules": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1RoutingRule"
-          }
-        },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
-        }
-      },
-      "description": "ListRoutingRulesResponse is the response for listing routing rules."
+      "description": "ListLLMProvidersResponse is the response for listing LLM providers."
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -679,79 +601,47 @@
       },
       "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
     },
-    "v1Route": {
+    "v1RouteLLMRequestRequest": {
       "type": "object",
       "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "name": {
+        "model": {
           "type": "string"
         },
-        "domain": {
-          "type": "string"
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LLMMessage"
+          }
         },
-        "pathPrefix": {
-          "type": "string"
+        "maxTokens": {
+          "type": "integer",
+          "format": "int32"
         },
-        "upstreamUrl": {
-          "type": "string"
+        "temperature": {
+          "type": "number",
+          "format": "float"
         },
-        "isActive": {
+        "stream": {
           "type": "boolean"
         },
-        "tlsMode": {
-          "$ref": "#/definitions/v1TlsMode"
-        },
-        "healthCheckPath": {
+        "preferredProviderId": {
           "type": "string"
-        },
-        "timeoutMs": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "routeMetadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
         }
       },
-      "description": "Route represents a reverse proxy route configuration."
+      "description": "RouteLLMRequestRequest is the request for routing an LLM request."
     },
-    "v1RoutingRule": {
+    "v1RouteLLMRequestResponse": {
       "type": "object",
       "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
+        "response": {
+          "$ref": "#/definitions/v1LLMResponse"
         },
-        "routeId": {
+        "routedProviderId": {
           "type": "string"
-        },
-        "condition": {
-          "type": "object"
-        },
-        "action": {
-          "$ref": "#/definitions/v1RoutingRuleAction"
-        },
-        "priority": {
-          "type": "integer",
-          "format": "int32"
         }
       },
-      "description": "RoutingRule represents a conditional routing rule applied to a route."
-    },
-    "v1RoutingRuleAction": {
-      "type": "string",
-      "enum": [
-        "ROUTING_RULE_ACTION_UNSPECIFIED",
-        "ROUTING_RULE_ACTION_ALLOW",
-        "ROUTING_RULE_ACTION_DENY",
-        "ROUTING_RULE_ACTION_REDIRECT",
-        "ROUTING_RULE_ACTION_RATE_LIMIT"
-      ],
-      "default": "ROUTING_RULE_ACTION_UNSPECIFIED",
-      "description": "RoutingRuleAction classifies the action for a routing rule."
+      "description": "RouteLLMRequestResponse is the response after routing an LLM request."
     },
     "v1SecurityLevel": {
       "type": "string",
@@ -775,56 +665,14 @@
       "default": "SORT_ORDER_UNSPECIFIED",
       "description": "SortOrder specifies the sort direction."
     },
-    "v1TlsMode": {
-      "type": "string",
-      "enum": [
-        "TLS_MODE_UNSPECIFIED",
-        "TLS_MODE_NONE",
-        "TLS_MODE_INTERNAL_CA",
-        "TLS_MODE_LETS_ENCRYPT"
-      ],
-      "default": "TLS_MODE_UNSPECIFIED",
-      "description": "TlsMode classifies the TLS termination mode for a route."
-    },
-    "v1UpdateRouteResponse": {
+    "v1UpdateLLMProviderResponse": {
       "type": "object",
       "properties": {
-        "route": {
-          "$ref": "#/definitions/v1Route"
+        "provider": {
+          "$ref": "#/definitions/v1LLMProvider"
         }
       },
-      "description": "UpdateRouteResponse is the response after updating a route."
-    },
-    "v1UpstreamHealth": {
-      "type": "object",
-      "properties": {
-        "routeId": {
-          "type": "string"
-        },
-        "status": {
-          "$ref": "#/definitions/v1UpstreamHealthStatus"
-        },
-        "lastCheckAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "responseTimeMs": {
-          "type": "number",
-          "format": "float"
-        }
-      },
-      "description": "UpstreamHealth represents the health status of a route upstream."
-    },
-    "v1UpstreamHealthStatus": {
-      "type": "string",
-      "enum": [
-        "UPSTREAM_HEALTH_STATUS_UNSPECIFIED",
-        "UPSTREAM_HEALTH_STATUS_HEALTHY",
-        "UPSTREAM_HEALTH_STATUS_UNHEALTHY",
-        "UPSTREAM_HEALTH_STATUS_UNKNOWN"
-      ],
-      "default": "UPSTREAM_HEALTH_STATUS_UNSPECIFIED",
-      "description": "UpstreamHealthStatus classifies the health state of an upstream target."
+      "description": "UpdateLLMProviderResponse is the response after updating an LLM provider."
     }
   }
 }

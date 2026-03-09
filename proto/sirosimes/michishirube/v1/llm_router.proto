@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package sirosimes.michishirube.v1;
+
+import "google/api/annotations.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// llm_router.proto — 道標（Michishirube）LLM APIルーティング。
+//
+// マルチプロバイダー（Anthropic, OpenAI, Google, ローカル等）対応の
+// LLMリクエストルーティング、プロバイダー管理、リクエスト状態追跡を管理する。
+//
+// Exposure: INTERNAL（全RPC）
+
+// LLMProviderType classifies the LLM provider type.
+enum LLMProviderType {
+  LLM_PROVIDER_TYPE_UNSPECIFIED = 0;
+  LLM_PROVIDER_TYPE_ANTHROPIC = 1;
+  LLM_PROVIDER_TYPE_OPENAI = 2;
+  LLM_PROVIDER_TYPE_GOOGLE = 3;
+  LLM_PROVIDER_TYPE_LOCAL = 4;
+}
+
+// LLMRequestStatus classifies the status of an LLM request.
+enum LLMRequestStatus {
+  LLM_REQUEST_STATUS_UNSPECIFIED = 0;
+  LLM_REQUEST_STATUS_PENDING = 1;
+  LLM_REQUEST_STATUS_PROCESSING = 2;
+  LLM_REQUEST_STATUS_COMPLETED = 3;
+  LLM_REQUEST_STATUS_FAILED = 4;
+  LLM_REQUEST_STATUS_TIMEOUT = 5;
+}
+
+// LLMProvider represents a registered LLM API provider.
+message LLMProvider {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  LLMProviderType provider_type = 3;
+  string base_url = 4;
+  bool is_active = 5;
+  int32 rate_limit = 6;
+  int32 priority = 7;
+}
+
+// LLMMessage represents a single message in an LLM conversation.
+message LLMMessage {
+  string role = 1;
+  string content = 2;
+}
+
+// LLMUsage represents token usage for an LLM request.
+message LLMUsage {
+  int64 prompt_tokens = 1;
+  int64 completion_tokens = 2;
+  int64 total_tokens = 3;
+}
+
+// LLMRequest represents a request to be routed to an LLM provider.
+message LLMRequest {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string provider_id = 2;
+  string model = 3;
+  repeated LLMMessage messages = 4;
+  int32 max_tokens = 5;
+  float temperature = 6;
+  bool stream = 7;
+  LLMRequestStatus status = 8;
+}
+
+// LLMResponse represents the response from an LLM provider.
+message LLMResponse {
+  string id = 1;
+  string request_id = 2;
+  string content = 3;
+  LLMUsage usage = 4;
+  float latency_ms = 5;
+  LLMRequestStatus status = 6;
+}
+
+// ListLLMProvidersRequest is the request for listing LLM providers.
+message ListLLMProvidersRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  LLMProviderType provider_type = 2;
+  bool is_active = 3;
+}
+
+// ListLLMProvidersResponse is the response for listing LLM providers.
+message ListLLMProvidersResponse {
+  repeated LLMProvider providers = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+// CreateLLMProviderRequest is the request for creating an LLM provider.
+message CreateLLMProviderRequest {
+  string name = 1;
+  LLMProviderType provider_type = 2;
+  string base_url = 3;
+  bool is_active = 4;
+  int32 rate_limit = 5;
+  int32 priority = 6;
+  string api_key = 7;
+}
+
+// CreateLLMProviderResponse is the response after creating an LLM provider.
+message CreateLLMProviderResponse {
+  LLMProvider provider = 1;
+}
+
+// UpdateLLMProviderRequest is the request for updating an LLM provider.
+message UpdateLLMProviderRequest {
+  string id = 1;
+  string name = 2;
+  string base_url = 3;
+  bool is_active = 4;
+  int32 rate_limit = 5;
+  int32 priority = 6;
+}
+
+// UpdateLLMProviderResponse is the response after updating an LLM provider.
+message UpdateLLMProviderResponse {
+  LLMProvider provider = 1;
+}
+
+// RouteLLMRequestRequest is the request for routing an LLM request.
+message RouteLLMRequestRequest {
+  string model = 1;
+  repeated LLMMessage messages = 2;
+  int32 max_tokens = 3;
+  float temperature = 4;
+  bool stream = 5;
+  string preferred_provider_id = 6;
+}
+
+// RouteLLMRequestResponse is the response after routing an LLM request.
+message RouteLLMRequestResponse {
+  LLMResponse response = 1;
+  string routed_provider_id = 2;
+}
+
+// GetLLMRequestStatusRequest is the request for checking LLM request status.
+message GetLLMRequestStatusRequest {
+  string request_id = 1;
+}
+
+// GetLLMRequestStatusResponse is the response containing LLM request status.
+message GetLLMRequestStatusResponse {
+  LLMRequest request = 1;
+  LLMResponse response = 2;
+}
+
+// LLMRouterService manages LLM API routing with multi-provider support.
+service LLMRouterService {
+  rpc ListLLMProviders(ListLLMProvidersRequest) returns (ListLLMProvidersResponse) {
+    option (google.api.http) = {
+      get: "/v1/llm/providers"
+    };
+  }
+  rpc CreateLLMProvider(CreateLLMProviderRequest) returns (CreateLLMProviderResponse) {
+    option (google.api.http) = {
+      post: "/v1/llm/providers"
+      body: "*"
+    };
+  }
+  rpc UpdateLLMProvider(UpdateLLMProviderRequest) returns (UpdateLLMProviderResponse) {
+    option (google.api.http) = {
+      patch: "/v1/llm/providers/{id}"
+      body: "*"
+    };
+  }
+  rpc RouteLLMRequest(RouteLLMRequestRequest) returns (RouteLLMRequestResponse) {
+    option (google.api.http) = {
+      post: "/v1/llm/route"
+      body: "*"
+    };
+  }
+  rpc GetLLMRequestStatus(GetLLMRequestStatusRequest) returns (GetLLMRequestStatusResponse) {
+    option (google.api.http) = {
+      get: "/v1/llm/requests/{request_id}"
+    };
+  }
+}

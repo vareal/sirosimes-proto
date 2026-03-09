@@ -3,61 +3,94 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3 } from "@bufbuild/protobuf";
+import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
 import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
- * RoutingStrategy classifies the load balancing strategy.
+ * TlsMode classifies the TLS termination mode for a route.
  *
- * @generated from enum sirosimes.michishirube.v1.RoutingStrategy
+ * @generated from enum sirosimes.michishirube.v1.TlsMode
  */
-export const RoutingStrategy = /*@__PURE__*/ proto3.makeEnum(
-  "sirosimes.michishirube.v1.RoutingStrategy",
+export const TlsMode = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.michishirube.v1.TlsMode",
   [
-    {no: 0, name: "ROUTING_STRATEGY_UNSPECIFIED", localName: "UNSPECIFIED"},
-    {no: 1, name: "ROUTING_STRATEGY_PRIORITY", localName: "PRIORITY"},
-    {no: 2, name: "ROUTING_STRATEGY_ROUND_ROBIN", localName: "ROUND_ROBIN"},
-    {no: 3, name: "ROUTING_STRATEGY_WEIGHTED", localName: "WEIGHTED"},
-    {no: 4, name: "ROUTING_STRATEGY_COST_OPTIMIZED", localName: "COST_OPTIMIZED"},
-    {no: 5, name: "ROUTING_STRATEGY_LATENCY_OPTIMIZED", localName: "LATENCY_OPTIMIZED"},
+    {no: 0, name: "TLS_MODE_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "TLS_MODE_NONE", localName: "NONE"},
+    {no: 2, name: "TLS_MODE_INTERNAL_CA", localName: "INTERNAL_CA"},
+    {no: 3, name: "TLS_MODE_LETS_ENCRYPT", localName: "LETS_ENCRYPT"},
   ],
 );
 
 /**
- * ModelMapping maps a model alias to a provider and its provider-specific model name.
+ * UpstreamHealthStatus classifies the health state of an upstream target.
  *
- * @generated from message sirosimes.michishirube.v1.ModelMapping
+ * @generated from enum sirosimes.michishirube.v1.UpstreamHealthStatus
  */
-export const ModelMapping = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.ModelMapping",
-  () => [
-    { no: 1, name: "model_alias", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "provider_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "provider_model", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "priority", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "weight", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 6, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+export const UpstreamHealthStatus = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.michishirube.v1.UpstreamHealthStatus",
+  [
+    {no: 0, name: "UPSTREAM_HEALTH_STATUS_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "UPSTREAM_HEALTH_STATUS_HEALTHY", localName: "HEALTHY"},
+    {no: 2, name: "UPSTREAM_HEALTH_STATUS_UNHEALTHY", localName: "UNHEALTHY"},
+    {no: 3, name: "UPSTREAM_HEALTH_STATUS_UNKNOWN", localName: "UNKNOWN"},
   ],
 );
 
 /**
- * FallbackRule defines a fallback provider chain for a model alias.
+ * RoutingRuleAction classifies the action for a routing rule.
  *
- * @generated from message sirosimes.michishirube.v1.FallbackRule
+ * @generated from enum sirosimes.michishirube.v1.RoutingRuleAction
  */
-export const FallbackRule = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.FallbackRule",
-  () => [
-    { no: 1, name: "model_alias", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "fallback_provider_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 3, name: "max_retries", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "retry_delay_ms", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+export const RoutingRuleAction = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.michishirube.v1.RoutingRuleAction",
+  [
+    {no: 0, name: "ROUTING_RULE_ACTION_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "ROUTING_RULE_ACTION_ALLOW", localName: "ALLOW"},
+    {no: 2, name: "ROUTING_RULE_ACTION_DENY", localName: "DENY"},
+    {no: 3, name: "ROUTING_RULE_ACTION_REDIRECT", localName: "REDIRECT"},
+    {no: 4, name: "ROUTING_RULE_ACTION_RATE_LIMIT", localName: "RATE_LIMIT"},
   ],
 );
 
 /**
- * RoutingRule represents a named routing configuration.
+ * Route represents a reverse proxy route configuration.
+ *
+ * @generated from message sirosimes.michishirube.v1.Route
+ */
+export const Route = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.Route",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "upstream_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 7, name: "tls_mode", kind: "enum", T: proto3.getEnumType(TlsMode) },
+    { no: 8, name: "health_check_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "timeout_ms", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 10, name: "route_metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ],
+);
+
+/**
+ * UpstreamHealth represents the health status of a route upstream.
+ *
+ * @generated from message sirosimes.michishirube.v1.UpstreamHealth
+ */
+export const UpstreamHealth = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.UpstreamHealth",
+  () => [
+    { no: 1, name: "route_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(UpstreamHealthStatus) },
+    { no: 3, name: "last_check_at", kind: "message", T: Timestamp },
+    { no: 4, name: "response_time_ms", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+  ],
+);
+
+/**
+ * RoutingRule represents a conditional routing rule applied to a route.
  *
  * @generated from message sirosimes.michishirube.v1.RoutingRule
  */
@@ -65,30 +98,173 @@ export const RoutingRule = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.michishirube.v1.RoutingRule",
   () => [
     { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "strategy", kind: "enum", T: proto3.getEnumType(RoutingStrategy) },
-    { no: 5, name: "mappings", kind: "message", T: ModelMapping, repeated: true },
-    { no: 6, name: "fallbacks", kind: "message", T: FallbackRule, repeated: true },
-    { no: 7, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "route_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "condition", kind: "message", T: Struct },
+    { no: 4, name: "action", kind: "enum", T: proto3.getEnumType(RoutingRuleAction) },
+    { no: 5, name: "priority", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ],
 );
 
 /**
- * RouteResolution represents the resolved provider for a request.
+ * ListRoutesRequest is the request for listing routes.
  *
- * @generated from message sirosimes.michishirube.v1.RouteResolution
+ * @generated from message sirosimes.michishirube.v1.ListRoutesRequest
  */
-export const RouteResolution = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.RouteResolution",
+export const ListRoutesRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.ListRoutesRequest",
   () => [
-    { no: 1, name: "provider_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "provider_model", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "model_alias", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "strategy_used", kind: "enum", T: proto3.getEnumType(RoutingStrategy) },
-    { no: 5, name: "fallback_used", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 6, name: "attempt_number", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "estimated_latency_ms", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "tls_mode", kind: "enum", T: proto3.getEnumType(TlsMode) },
+  ],
+);
+
+/**
+ * ListRoutesResponse is the response for listing routes.
+ *
+ * @generated from message sirosimes.michishirube.v1.ListRoutesResponse
+ */
+export const ListRoutesResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.ListRoutesResponse",
+  () => [
+    { no: 1, name: "routes", kind: "message", T: Route, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+  ],
+);
+
+/**
+ * CreateRouteRequest is the request for creating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.CreateRouteRequest
+ */
+export const CreateRouteRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.CreateRouteRequest",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "upstream_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "tls_mode", kind: "enum", T: proto3.getEnumType(TlsMode) },
+    { no: 7, name: "health_check_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "timeout_ms", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 9, name: "route_metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ],
+);
+
+/**
+ * CreateRouteResponse is the response after creating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.CreateRouteResponse
+ */
+export const CreateRouteResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.CreateRouteResponse",
+  () => [
+    { no: 1, name: "route", kind: "message", T: Route },
+  ],
+);
+
+/**
+ * GetRouteRequest is the request for retrieving a single route.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetRouteRequest
+ */
+export const GetRouteRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.GetRouteRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * GetRouteResponse is the response containing a single route.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetRouteResponse
+ */
+export const GetRouteResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.GetRouteResponse",
+  () => [
+    { no: 1, name: "route", kind: "message", T: Route },
+  ],
+);
+
+/**
+ * UpdateRouteRequest is the request for updating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.UpdateRouteRequest
+ */
+export const UpdateRouteRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.UpdateRouteRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "upstream_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 7, name: "tls_mode", kind: "enum", T: proto3.getEnumType(TlsMode) },
+    { no: 8, name: "health_check_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "timeout_ms", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 10, name: "route_metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ],
+);
+
+/**
+ * UpdateRouteResponse is the response after updating a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.UpdateRouteResponse
+ */
+export const UpdateRouteResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.UpdateRouteResponse",
+  () => [
+    { no: 1, name: "route", kind: "message", T: Route },
+  ],
+);
+
+/**
+ * DeleteRouteRequest is the request for deleting a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.DeleteRouteRequest
+ */
+export const DeleteRouteRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.DeleteRouteRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * DeleteRouteResponse is the response after deleting a route.
+ *
+ * @generated from message sirosimes.michishirube.v1.DeleteRouteResponse
+ */
+export const DeleteRouteResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.DeleteRouteResponse",
+  [],
+);
+
+/**
+ * GetUpstreamHealthRequest is the request for checking upstream health.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetUpstreamHealthRequest
+ */
+export const GetUpstreamHealthRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.GetUpstreamHealthRequest",
+  () => [
+    { no: 1, name: "route_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * GetUpstreamHealthResponse is the response containing upstream health.
+ *
+ * @generated from message sirosimes.michishirube.v1.GetUpstreamHealthResponse
+ */
+export const GetUpstreamHealthResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.michishirube.v1.GetUpstreamHealthResponse",
+  () => [
+    { no: 1, name: "health", kind: "message", T: UpstreamHealth },
   ],
 );
 
@@ -101,7 +277,8 @@ export const ListRoutingRulesRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.michishirube.v1.ListRoutingRulesRequest",
   () => [
     { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
-    { no: 2, name: "strategy", kind: "enum", T: proto3.getEnumType(RoutingStrategy) },
+    { no: 2, name: "route_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "action", kind: "enum", T: proto3.getEnumType(RoutingRuleAction) },
   ],
 );
 
@@ -119,30 +296,6 @@ export const ListRoutingRulesResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * GetRoutingRuleRequest is the request for retrieving a single routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.GetRoutingRuleRequest
- */
-export const GetRoutingRuleRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.GetRoutingRuleRequest",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * GetRoutingRuleResponse is the response containing a single routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.GetRoutingRuleResponse
- */
-export const GetRoutingRuleResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.GetRoutingRuleResponse",
-  () => [
-    { no: 1, name: "rule", kind: "message", T: RoutingRule },
-  ],
-);
-
-/**
  * CreateRoutingRuleRequest is the request for creating a routing rule.
  *
  * @generated from message sirosimes.michishirube.v1.CreateRoutingRuleRequest
@@ -150,12 +303,10 @@ export const GetRoutingRuleResponse = /*@__PURE__*/ proto3.makeMessageType(
 export const CreateRoutingRuleRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.michishirube.v1.CreateRoutingRuleRequest",
   () => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "strategy", kind: "enum", T: proto3.getEnumType(RoutingStrategy) },
-    { no: 4, name: "mappings", kind: "message", T: ModelMapping, repeated: true },
-    { no: 5, name: "fallbacks", kind: "message", T: FallbackRule, repeated: true },
-    { no: 6, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 1, name: "route_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "condition", kind: "message", T: Struct },
+    { no: 3, name: "action", kind: "enum", T: proto3.getEnumType(RoutingRuleAction) },
+    { no: 4, name: "priority", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ],
 );
 
@@ -168,84 +319,6 @@ export const CreateRoutingRuleResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.michishirube.v1.CreateRoutingRuleResponse",
   () => [
     { no: 1, name: "rule", kind: "message", T: RoutingRule },
-  ],
-);
-
-/**
- * UpdateRoutingRuleRequest is the request for updating a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.UpdateRoutingRuleRequest
- */
-export const UpdateRoutingRuleRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.UpdateRoutingRuleRequest",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "strategy", kind: "enum", T: proto3.getEnumType(RoutingStrategy) },
-    { no: 5, name: "mappings", kind: "message", T: ModelMapping, repeated: true },
-    { no: 6, name: "fallbacks", kind: "message", T: FallbackRule, repeated: true },
-    { no: 7, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * UpdateRoutingRuleResponse is the response after updating a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.UpdateRoutingRuleResponse
- */
-export const UpdateRoutingRuleResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.UpdateRoutingRuleResponse",
-  () => [
-    { no: 1, name: "rule", kind: "message", T: RoutingRule },
-  ],
-);
-
-/**
- * DeleteRoutingRuleRequest is the request for deleting a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.DeleteRoutingRuleRequest
- */
-export const DeleteRoutingRuleRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.DeleteRoutingRuleRequest",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * DeleteRoutingRuleResponse is the response after deleting a routing rule.
- *
- * @generated from message sirosimes.michishirube.v1.DeleteRoutingRuleResponse
- */
-export const DeleteRoutingRuleResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.DeleteRoutingRuleResponse",
-  [],
-);
-
-/**
- * ResolveRouteRequest is the request for resolving the best provider for a model.
- *
- * @generated from message sirosimes.michishirube.v1.ResolveRouteRequest
- */
-export const ResolveRouteRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.ResolveRouteRequest",
-  () => [
-    { no: 1, name: "model_alias", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "agent_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "priority", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * ResolveRouteResponse is the response containing the resolved route.
- *
- * @generated from message sirosimes.michishirube.v1.ResolveRouteResponse
- */
-export const ResolveRouteResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.michishirube.v1.ResolveRouteResponse",
-  () => [
-    { no: 1, name: "resolution", kind: "message", T: RouteResolution },
   ],
 );
 

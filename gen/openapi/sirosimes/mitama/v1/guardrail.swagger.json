@@ -45,6 +45,18 @@
         }
       }
     },
+    "sirosimesmitamav1DetectionType": {
+      "type": "string",
+      "enum": [
+        "DETECTION_TYPE_UNSPECIFIED",
+        "DETECTION_TYPE_REGEX",
+        "DETECTION_TYPE_SLM",
+        "DETECTION_TYPE_HYBRID",
+        "DETECTION_TYPE_KEYWORD"
+      ],
+      "default": "DETECTION_TYPE_UNSPECIFIED",
+      "description": "DetectionType classifies the detection mechanism."
+    },
     "v1CreateGuardrailResponse": {
       "type": "object",
       "properties": {
@@ -62,7 +74,7 @@
       "type": "object",
       "properties": {
         "type": {
-          "$ref": "#/definitions/v1DetectionType"
+          "$ref": "#/definitions/sirosimesmitamav1DetectionType"
         },
         "patterns": {
           "type": "array",
@@ -85,18 +97,6 @@
         }
       },
       "description": "DetectionConfig defines how the guardrail detects violations."
-    },
-    "v1DetectionType": {
-      "type": "string",
-      "enum": [
-        "DETECTION_TYPE_UNSPECIFIED",
-        "DETECTION_TYPE_REGEX",
-        "DETECTION_TYPE_SLM",
-        "DETECTION_TYPE_HYBRID",
-        "DETECTION_TYPE_KEYWORD"
-      ],
-      "default": "DETECTION_TYPE_UNSPECIFIED",
-      "description": "DetectionType classifies the detection mechanism."
     },
     "v1GetGuardrailResponse": {
       "type": "object",

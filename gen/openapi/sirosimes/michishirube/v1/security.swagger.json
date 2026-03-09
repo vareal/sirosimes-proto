@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "sirosimes/michishirube/v1/routing.proto",
+    "title": "sirosimes/michishirube/v1/security.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "RouteService"
+      "name": "SecurityService"
     }
   ],
   "consumes": [
@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/routes": {
+    "/v1/security/alerts": {
       "get": {
-        "operationId": "RouteService_ListRoutes",
+        "operationId": "SecurityService_ListAlerts",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListRoutesResponse"
+              "$ref": "#/definitions/v1ListAlertsResponse"
             }
           },
           "default": {
@@ -71,10 +71,160 @@
             "default": "SORT_ORDER_UNSPECIFIED"
           },
           {
-            "name": "domain",
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SCAN_SEVERITY_UNSPECIFIED",
+              "SCAN_SEVERITY_CRITICAL",
+              "SCAN_SEVERITY_WARNING",
+              "SCAN_SEVERITY_INFO"
+            ],
+            "default": "SCAN_SEVERITY_UNSPECIFIED"
+          },
+          {
+            "name": "targetAgent",
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "includeResolved",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "SecurityService"
+        ]
+      }
+    },
+    "/v1/security/alerts/{id}/resolve": {
+      "post": {
+        "operationId": "SecurityService_ResolveAlert",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ResolveAlertResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SecurityServiceResolveAlertBody"
+            }
+          }
+        ],
+        "tags": [
+          "SecurityService"
+        ]
+      }
+    },
+    "/v1/security/scan": {
+      "post": {
+        "operationId": "SecurityService_ScanMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ScanMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ScanMessageRequest is the request for scanning a message.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ScanMessageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SecurityService"
+        ]
+      }
+    },
+    "/v1/security/waf-rules": {
+      "get": {
+        "operationId": "SecurityService_ListWAFRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListWAFRulesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
           },
           {
             "name": "isActive",
@@ -83,30 +233,30 @@
             "type": "boolean"
           },
           {
-            "name": "tlsMode",
+            "name": "severity",
             "in": "query",
             "required": false,
             "type": "string",
             "enum": [
-              "TLS_MODE_UNSPECIFIED",
-              "TLS_MODE_NONE",
-              "TLS_MODE_INTERNAL_CA",
-              "TLS_MODE_LETS_ENCRYPT"
+              "SCAN_SEVERITY_UNSPECIFIED",
+              "SCAN_SEVERITY_CRITICAL",
+              "SCAN_SEVERITY_WARNING",
+              "SCAN_SEVERITY_INFO"
             ],
-            "default": "TLS_MODE_UNSPECIFIED"
+            "default": "SCAN_SEVERITY_UNSPECIFIED"
           }
         ],
         "tags": [
-          "RouteService"
+          "SecurityService"
         ]
       },
       "post": {
-        "operationId": "RouteService_CreateRoute",
+        "operationId": "SecurityService_CreateWAFRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateRouteResponse"
+              "$ref": "#/definitions/v1CreateWAFRuleResponse"
             }
           },
           "default": {
@@ -119,55 +269,27 @@
         "parameters": [
           {
             "name": "body",
-            "description": "CreateRouteRequest is the request for creating a route.",
+            "description": "CreateWAFRuleRequest is the request for creating a WAF rule.",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateRouteRequest"
+              "$ref": "#/definitions/v1CreateWAFRuleRequest"
             }
           }
         ],
         "tags": [
-          "RouteService"
+          "SecurityService"
         ]
       }
     },
-    "/v1/routes/{id}": {
-      "get": {
-        "operationId": "RouteService_GetRoute",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetRouteResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "RouteService"
-        ]
-      },
+    "/v1/security/waf-rules/{id}": {
       "delete": {
-        "operationId": "RouteService_DeleteRoute",
+        "operationId": "SecurityService_DeleteWAFRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1DeleteRouteResponse"
+              "$ref": "#/definitions/v1DeleteWAFRuleResponse"
             }
           },
           "default": {
@@ -186,16 +308,16 @@
           }
         ],
         "tags": [
-          "RouteService"
+          "SecurityService"
         ]
       },
       "patch": {
-        "operationId": "RouteService_UpdateRoute",
+        "operationId": "SecurityService_UpdateWAFRule",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpdateRouteResponse"
+              "$ref": "#/definitions/v1UpdateWAFRuleResponse"
             }
           },
           "default": {
@@ -217,194 +339,46 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RouteServiceUpdateRouteBody"
+              "$ref": "#/definitions/SecurityServiceUpdateWAFRuleBody"
             }
           }
         ],
         "tags": [
-          "RouteService"
-        ]
-      }
-    },
-    "/v1/routes/{routeId}/health": {
-      "get": {
-        "operationId": "RouteService_GetUpstreamHealth",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetUpstreamHealthResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "routeId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "RouteService"
-        ]
-      }
-    },
-    "/v1/routing-rules": {
-      "get": {
-        "operationId": "RouteService_ListRoutingRules",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListRoutingRulesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "pagination.page",
-            "description": "Page number (1-indexed).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "pagination.pageSize",
-            "description": "Number of items per page (max enforced per-service).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "pagination.sortBy",
-            "description": "Field name to sort by.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "pagination.sortOrder",
-            "description": "Sort direction.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "SORT_ORDER_UNSPECIFIED",
-              "SORT_ORDER_ASC",
-              "SORT_ORDER_DESC"
-            ],
-            "default": "SORT_ORDER_UNSPECIFIED"
-          },
-          {
-            "name": "routeId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "action",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "ROUTING_RULE_ACTION_UNSPECIFIED",
-              "ROUTING_RULE_ACTION_ALLOW",
-              "ROUTING_RULE_ACTION_DENY",
-              "ROUTING_RULE_ACTION_REDIRECT",
-              "ROUTING_RULE_ACTION_RATE_LIMIT"
-            ],
-            "default": "ROUTING_RULE_ACTION_UNSPECIFIED"
-          }
-        ],
-        "tags": [
-          "RouteService"
-        ]
-      },
-      "post": {
-        "operationId": "RouteService_CreateRoutingRule",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1CreateRoutingRuleResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "CreateRoutingRuleRequest is the request for creating a routing rule.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1CreateRoutingRuleRequest"
-            }
-          }
-        ],
-        "tags": [
-          "RouteService"
+          "SecurityService"
         ]
       }
     }
   },
   "definitions": {
-    "RouteServiceUpdateRouteBody": {
+    "SecurityServiceResolveAlertBody": {
+      "type": "object",
+      "properties": {
+        "resolutionNote": {
+          "type": "string"
+        }
+      },
+      "description": "ResolveAlertRequest is the request for resolving a security alert."
+    },
+    "SecurityServiceUpdateWAFRuleBody": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
-        "domain": {
+        "pattern": {
           "type": "string"
         },
-        "pathPrefix": {
-          "type": "string"
+        "severity": {
+          "$ref": "#/definitions/v1ScanSeverity"
         },
-        "upstreamUrl": {
-          "type": "string"
+        "action": {
+          "$ref": "#/definitions/v1WAFRuleAction"
         },
         "isActive": {
           "type": "boolean"
-        },
-        "tlsMode": {
-          "$ref": "#/definitions/v1TlsMode"
-        },
-        "healthCheckPath": {
-          "type": "string"
-        },
-        "timeoutMs": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "routeMetadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
         }
       },
-      "description": "UpdateRouteRequest is the request for updating a route."
+      "description": "UpdateWAFRuleRequest is the request for updating a WAF rule."
     },
     "protobufAny": {
       "type": "object",
@@ -414,14 +388,6 @@
         }
       },
       "additionalProperties": {}
-    },
-    "protobufNullValue": {
-      "type": "string",
-      "enum": [
-        "NULL_VALUE"
-      ],
-      "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "rpcStatus": {
       "type": "object",
@@ -442,133 +408,112 @@
         }
       }
     },
-    "v1CreateRouteRequest": {
+    "sirosimesmichishirubev1DetectionType": {
+      "type": "string",
+      "enum": [
+        "DETECTION_TYPE_UNSPECIFIED",
+        "DETECTION_TYPE_PROMPT_INJECTION",
+        "DETECTION_TYPE_COMMAND_INJECTION",
+        "DETECTION_TYPE_INFO_EXTRACTION",
+        "DETECTION_TYPE_DATA_EXFILTRATION",
+        "DETECTION_TYPE_PRIVILEGE_ESCALATION"
+      ],
+      "default": "DETECTION_TYPE_UNSPECIFIED",
+      "description": "DetectionType classifies the type of security threat detected."
+    },
+    "v1CreateWAFRuleRequest": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
-        "domain": {
+        "pattern": {
           "type": "string"
         },
-        "pathPrefix": {
-          "type": "string"
+        "severity": {
+          "$ref": "#/definitions/v1ScanSeverity"
         },
-        "upstreamUrl": {
-          "type": "string"
+        "action": {
+          "$ref": "#/definitions/v1WAFRuleAction"
         },
         "isActive": {
           "type": "boolean"
-        },
-        "tlsMode": {
-          "$ref": "#/definitions/v1TlsMode"
-        },
-        "healthCheckPath": {
-          "type": "string"
-        },
-        "timeoutMs": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "routeMetadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
         }
       },
-      "description": "CreateRouteRequest is the request for creating a route."
+      "description": "CreateWAFRuleRequest is the request for creating a WAF rule."
     },
-    "v1CreateRouteResponse": {
-      "type": "object",
-      "properties": {
-        "route": {
-          "$ref": "#/definitions/v1Route"
-        }
-      },
-      "description": "CreateRouteResponse is the response after creating a route."
-    },
-    "v1CreateRoutingRuleRequest": {
-      "type": "object",
-      "properties": {
-        "routeId": {
-          "type": "string"
-        },
-        "condition": {
-          "type": "object"
-        },
-        "action": {
-          "$ref": "#/definitions/v1RoutingRuleAction"
-        },
-        "priority": {
-          "type": "integer",
-          "format": "int32"
-        }
-      },
-      "description": "CreateRoutingRuleRequest is the request for creating a routing rule."
-    },
-    "v1CreateRoutingRuleResponse": {
+    "v1CreateWAFRuleResponse": {
       "type": "object",
       "properties": {
         "rule": {
-          "$ref": "#/definitions/v1RoutingRule"
+          "$ref": "#/definitions/v1WAFRule"
         }
       },
-      "description": "CreateRoutingRuleResponse is the response after creating a routing rule."
+      "description": "CreateWAFRuleResponse is the response after creating a WAF rule."
     },
-    "v1DeleteRouteResponse": {
+    "v1DeleteWAFRuleResponse": {
       "type": "object",
-      "description": "DeleteRouteResponse is the response after deleting a route."
+      "description": "DeleteWAFRuleResponse is the response after deleting a WAF rule."
     },
-    "v1GetRouteResponse": {
+    "v1InjectionScanResult": {
       "type": "object",
       "properties": {
-        "route": {
-          "$ref": "#/definitions/v1Route"
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/v1ScanSeverity"
+        },
+        "detectionType": {
+          "$ref": "#/definitions/sirosimesmichishirubev1DetectionType"
+        },
+        "patternMatched": {
+          "type": "string"
+        },
+        "actionTaken": {
+          "$ref": "#/definitions/v1ScanAction"
+        },
+        "scannedAt": {
+          "type": "string",
+          "format": "date-time"
         }
       },
-      "description": "GetRouteResponse is the response containing a single route."
+      "description": "InjectionScanResult represents the result of scanning a message for injections."
     },
-    "v1GetUpstreamHealthResponse": {
+    "v1ListAlertsResponse": {
       "type": "object",
       "properties": {
-        "health": {
-          "$ref": "#/definitions/v1UpstreamHealth"
-        }
-      },
-      "description": "GetUpstreamHealthResponse is the response containing upstream health."
-    },
-    "v1ListRoutesResponse": {
-      "type": "object",
-      "properties": {
-        "routes": {
+        "alerts": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Route"
+            "$ref": "#/definitions/v1SecurityAlert"
           }
         },
         "pagination": {
           "$ref": "#/definitions/v1PaginationResponse"
         }
       },
-      "description": "ListRoutesResponse is the response for listing routes."
+      "description": "ListAlertsResponse is the response for listing security alerts."
     },
-    "v1ListRoutingRulesResponse": {
+    "v1ListWAFRulesResponse": {
       "type": "object",
       "properties": {
         "rules": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1RoutingRule"
+            "$ref": "#/definitions/v1WAFRule"
           }
         },
         "pagination": {
           "$ref": "#/definitions/v1PaginationResponse"
         }
       },
-      "description": "ListRoutingRulesResponse is the response for listing routing rules."
+      "description": "ListWAFRulesResponse is the response for listing WAF rules."
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -622,6 +567,15 @@
         }
       },
       "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ResolveAlertResponse": {
+      "type": "object",
+      "properties": {
+        "alert": {
+          "$ref": "#/definitions/v1SecurityAlert"
+        }
+      },
+      "description": "ResolveAlertResponse is the response after resolving a security alert."
     },
     "v1ResourceMetadata": {
       "type": "object",
@@ -679,79 +633,86 @@
       },
       "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
     },
-    "v1Route": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "name": {
-          "type": "string"
-        },
-        "domain": {
-          "type": "string"
-        },
-        "pathPrefix": {
-          "type": "string"
-        },
-        "upstreamUrl": {
-          "type": "string"
-        },
-        "isActive": {
-          "type": "boolean"
-        },
-        "tlsMode": {
-          "$ref": "#/definitions/v1TlsMode"
-        },
-        "healthCheckPath": {
-          "type": "string"
-        },
-        "timeoutMs": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "routeMetadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "description": "Route represents a reverse proxy route configuration."
-    },
-    "v1RoutingRule": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "routeId": {
-          "type": "string"
-        },
-        "condition": {
-          "type": "object"
-        },
-        "action": {
-          "$ref": "#/definitions/v1RoutingRuleAction"
-        },
-        "priority": {
-          "type": "integer",
-          "format": "int32"
-        }
-      },
-      "description": "RoutingRule represents a conditional routing rule applied to a route."
-    },
-    "v1RoutingRuleAction": {
+    "v1ScanAction": {
       "type": "string",
       "enum": [
-        "ROUTING_RULE_ACTION_UNSPECIFIED",
-        "ROUTING_RULE_ACTION_ALLOW",
-        "ROUTING_RULE_ACTION_DENY",
-        "ROUTING_RULE_ACTION_REDIRECT",
-        "ROUTING_RULE_ACTION_RATE_LIMIT"
+        "SCAN_ACTION_UNSPECIFIED",
+        "SCAN_ACTION_BLOCKED",
+        "SCAN_ACTION_LOGGED",
+        "SCAN_ACTION_PASSED"
       ],
-      "default": "ROUTING_RULE_ACTION_UNSPECIFIED",
-      "description": "RoutingRuleAction classifies the action for a routing rule."
+      "default": "SCAN_ACTION_UNSPECIFIED",
+      "description": "ScanAction classifies the action taken on a scanned message."
+    },
+    "v1ScanMessageRequest": {
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "senderId": {
+          "type": "string"
+        },
+        "targetAgent": {
+          "type": "string"
+        }
+      },
+      "description": "ScanMessageRequest is the request for scanning a message."
+    },
+    "v1ScanMessageResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v1InjectionScanResult"
+        }
+      },
+      "description": "ScanMessageResponse is the response after scanning a message."
+    },
+    "v1ScanSeverity": {
+      "type": "string",
+      "enum": [
+        "SCAN_SEVERITY_UNSPECIFIED",
+        "SCAN_SEVERITY_CRITICAL",
+        "SCAN_SEVERITY_WARNING",
+        "SCAN_SEVERITY_INFO"
+      ],
+      "default": "SCAN_SEVERITY_UNSPECIFIED",
+      "description": "ScanSeverity classifies the severity level of a security scan finding."
+    },
+    "v1SecurityAlert": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "source": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/v1ScanSeverity"
+        },
+        "description": {
+          "type": "string"
+        },
+        "targetAgent": {
+          "type": "string"
+        },
+        "messagePreview": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "SecurityAlert represents a security alert raised by the system."
     },
     "v1SecurityLevel": {
       "type": "string",
@@ -775,56 +736,49 @@
       "default": "SORT_ORDER_UNSPECIFIED",
       "description": "SortOrder specifies the sort direction."
     },
-    "v1TlsMode": {
-      "type": "string",
-      "enum": [
-        "TLS_MODE_UNSPECIFIED",
-        "TLS_MODE_NONE",
-        "TLS_MODE_INTERNAL_CA",
-        "TLS_MODE_LETS_ENCRYPT"
-      ],
-      "default": "TLS_MODE_UNSPECIFIED",
-      "description": "TlsMode classifies the TLS termination mode for a route."
-    },
-    "v1UpdateRouteResponse": {
+    "v1UpdateWAFRuleResponse": {
       "type": "object",
       "properties": {
-        "route": {
-          "$ref": "#/definitions/v1Route"
+        "rule": {
+          "$ref": "#/definitions/v1WAFRule"
         }
       },
-      "description": "UpdateRouteResponse is the response after updating a route."
+      "description": "UpdateWAFRuleResponse is the response after updating a WAF rule."
     },
-    "v1UpstreamHealth": {
+    "v1WAFRule": {
       "type": "object",
       "properties": {
-        "routeId": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
           "type": "string"
         },
-        "status": {
-          "$ref": "#/definitions/v1UpstreamHealthStatus"
+        "pattern": {
+          "type": "string"
         },
-        "lastCheckAt": {
-          "type": "string",
-          "format": "date-time"
+        "severity": {
+          "$ref": "#/definitions/v1ScanSeverity"
         },
-        "responseTimeMs": {
-          "type": "number",
-          "format": "float"
+        "action": {
+          "$ref": "#/definitions/v1WAFRuleAction"
+        },
+        "isActive": {
+          "type": "boolean"
         }
       },
-      "description": "UpstreamHealth represents the health status of a route upstream."
+      "description": "WAFRule represents a Web Application Firewall rule."
     },
-    "v1UpstreamHealthStatus": {
+    "v1WAFRuleAction": {
       "type": "string",
       "enum": [
-        "UPSTREAM_HEALTH_STATUS_UNSPECIFIED",
-        "UPSTREAM_HEALTH_STATUS_HEALTHY",
-        "UPSTREAM_HEALTH_STATUS_UNHEALTHY",
-        "UPSTREAM_HEALTH_STATUS_UNKNOWN"
+        "WAF_RULE_ACTION_UNSPECIFIED",
+        "WAF_RULE_ACTION_BLOCK",
+        "WAF_RULE_ACTION_LOG",
+        "WAF_RULE_ACTION_ALERT"
       ],
-      "default": "UPSTREAM_HEALTH_STATUS_UNSPECIFIED",
-      "description": "UpstreamHealthStatus classifies the health state of an upstream target."
+      "default": "WAF_RULE_ACTION_UNSPECIFIED",
+      "description": "WAFRuleAction classifies the action a WAF rule performs."
     }
   }
 }

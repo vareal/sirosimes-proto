@@ -1,0 +1,247 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/michishirube/v1/proxy.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ProxyService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/proxy/dispatch/{messageId}": {
+      "get": {
+        "operationId": "ProxyService_GetDispatchStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetDispatchStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProxyService"
+        ]
+      }
+    },
+    "/v1/proxy/inbound": {
+      "post": {
+        "operationId": "ProxyService_ProxyInbound",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProxyInboundResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "ProxyInboundRequest is the request for processing an inbound message.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProxyInboundRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ProxyService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1DispatchAction": {
+      "type": "string",
+      "enum": [
+        "DISPATCH_ACTION_UNSPECIFIED",
+        "DISPATCH_ACTION_DISPATCHED",
+        "DISPATCH_ACTION_BLOCKED",
+        "DISPATCH_ACTION_WF_MATCHED"
+      ],
+      "default": "DISPATCH_ACTION_UNSPECIFIED",
+      "description": "DispatchAction classifies the action taken on a proxied message."
+    },
+    "v1DispatchResult": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1DispatchStatus"
+        },
+        "response": {
+          "type": "string"
+        },
+        "latencyMs": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "description": "DispatchResult represents the result of dispatching a message to an agent."
+    },
+    "v1DispatchStatus": {
+      "type": "string",
+      "enum": [
+        "DISPATCH_STATUS_UNSPECIFIED",
+        "DISPATCH_STATUS_DISPATCHED",
+        "DISPATCH_STATUS_BLOCKED",
+        "DISPATCH_STATUS_WF_MATCHED",
+        "DISPATCH_STATUS_ERROR"
+      ],
+      "default": "DISPATCH_STATUS_UNSPECIFIED",
+      "description": "DispatchStatus classifies the result status of a dispatch operation."
+    },
+    "v1GetDispatchStatusResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v1DispatchResult"
+        }
+      },
+      "description": "GetDispatchStatusResponse is the response containing dispatch status."
+    },
+    "v1InboundMessage": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/definitions/v1MessageSource"
+        },
+        "channelId": {
+          "type": "string"
+        },
+        "senderId": {
+          "type": "string"
+        },
+        "senderUsername": {
+          "type": "string"
+        },
+        "messageContent": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "InboundMessage represents an incoming message from an external platform."
+    },
+    "v1MessageSource": {
+      "type": "string",
+      "enum": [
+        "MESSAGE_SOURCE_UNSPECIFIED",
+        "MESSAGE_SOURCE_MATTERMOST",
+        "MESSAGE_SOURCE_TELEGRAM",
+        "MESSAGE_SOURCE_SIGNAL",
+        "MESSAGE_SOURCE_DISCORD",
+        "MESSAGE_SOURCE_WHATSAPP",
+        "MESSAGE_SOURCE_SLACK",
+        "MESSAGE_SOURCE_EMAIL",
+        "MESSAGE_SOURCE_API"
+      ],
+      "default": "MESSAGE_SOURCE_UNSPECIFIED",
+      "description": "MessageSource classifies the origin platform of a message."
+    },
+    "v1ProxyInboundRequest": {
+      "type": "object",
+      "properties": {
+        "inboundMessage": {
+          "$ref": "#/definitions/v1InboundMessage"
+        }
+      },
+      "description": "ProxyInboundRequest is the request for processing an inbound message."
+    },
+    "v1ProxyInboundResponse": {
+      "type": "object",
+      "properties": {
+        "proxyResponse": {
+          "$ref": "#/definitions/v1ProxyResponse"
+        },
+        "dispatchResult": {
+          "$ref": "#/definitions/v1DispatchResult"
+        }
+      },
+      "description": "ProxyInboundResponse is the response after processing an inbound message."
+    },
+    "v1ProxyResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "actionTaken": {
+          "$ref": "#/definitions/v1DispatchAction"
+        }
+      },
+      "description": "ProxyResponse represents the response after processing a proxied message."
+    }
+  }
+}

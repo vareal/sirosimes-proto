@@ -19,297 +19,371 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	RoutingService_ListRoutingRules_FullMethodName  = "/sirosimes.michishirube.v1.RoutingService/ListRoutingRules"
-	RoutingService_GetRoutingRule_FullMethodName    = "/sirosimes.michishirube.v1.RoutingService/GetRoutingRule"
-	RoutingService_CreateRoutingRule_FullMethodName = "/sirosimes.michishirube.v1.RoutingService/CreateRoutingRule"
-	RoutingService_UpdateRoutingRule_FullMethodName = "/sirosimes.michishirube.v1.RoutingService/UpdateRoutingRule"
-	RoutingService_DeleteRoutingRule_FullMethodName = "/sirosimes.michishirube.v1.RoutingService/DeleteRoutingRule"
-	RoutingService_ResolveRoute_FullMethodName      = "/sirosimes.michishirube.v1.RoutingService/ResolveRoute"
+	RouteService_ListRoutes_FullMethodName        = "/sirosimes.michishirube.v1.RouteService/ListRoutes"
+	RouteService_CreateRoute_FullMethodName       = "/sirosimes.michishirube.v1.RouteService/CreateRoute"
+	RouteService_GetRoute_FullMethodName          = "/sirosimes.michishirube.v1.RouteService/GetRoute"
+	RouteService_UpdateRoute_FullMethodName       = "/sirosimes.michishirube.v1.RouteService/UpdateRoute"
+	RouteService_DeleteRoute_FullMethodName       = "/sirosimes.michishirube.v1.RouteService/DeleteRoute"
+	RouteService_GetUpstreamHealth_FullMethodName = "/sirosimes.michishirube.v1.RouteService/GetUpstreamHealth"
+	RouteService_ListRoutingRules_FullMethodName  = "/sirosimes.michishirube.v1.RouteService/ListRoutingRules"
+	RouteService_CreateRoutingRule_FullMethodName = "/sirosimes.michishirube.v1.RouteService/CreateRoutingRule"
 )
 
-// RoutingServiceClient is the client API for RoutingService service.
+// RouteServiceClient is the client API for RouteService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// RoutingService manages request routing rules and route resolution.
-// Exposure: INTERNAL — all RPCs are for internal use only.
-type RoutingServiceClient interface {
+// RouteService manages reverse proxy routes, upstream health, and routing rules.
+type RouteServiceClient interface {
+	ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (*ListRoutesResponse, error)
+	CreateRoute(ctx context.Context, in *CreateRouteRequest, opts ...grpc.CallOption) (*CreateRouteResponse, error)
+	GetRoute(ctx context.Context, in *GetRouteRequest, opts ...grpc.CallOption) (*GetRouteResponse, error)
+	UpdateRoute(ctx context.Context, in *UpdateRouteRequest, opts ...grpc.CallOption) (*UpdateRouteResponse, error)
+	DeleteRoute(ctx context.Context, in *DeleteRouteRequest, opts ...grpc.CallOption) (*DeleteRouteResponse, error)
+	GetUpstreamHealth(ctx context.Context, in *GetUpstreamHealthRequest, opts ...grpc.CallOption) (*GetUpstreamHealthResponse, error)
 	ListRoutingRules(ctx context.Context, in *ListRoutingRulesRequest, opts ...grpc.CallOption) (*ListRoutingRulesResponse, error)
-	GetRoutingRule(ctx context.Context, in *GetRoutingRuleRequest, opts ...grpc.CallOption) (*GetRoutingRuleResponse, error)
 	CreateRoutingRule(ctx context.Context, in *CreateRoutingRuleRequest, opts ...grpc.CallOption) (*CreateRoutingRuleResponse, error)
-	UpdateRoutingRule(ctx context.Context, in *UpdateRoutingRuleRequest, opts ...grpc.CallOption) (*UpdateRoutingRuleResponse, error)
-	DeleteRoutingRule(ctx context.Context, in *DeleteRoutingRuleRequest, opts ...grpc.CallOption) (*DeleteRoutingRuleResponse, error)
-	ResolveRoute(ctx context.Context, in *ResolveRouteRequest, opts ...grpc.CallOption) (*ResolveRouteResponse, error)
 }
 
-type routingServiceClient struct {
+type routeServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRoutingServiceClient(cc grpc.ClientConnInterface) RoutingServiceClient {
-	return &routingServiceClient{cc}
+func NewRouteServiceClient(cc grpc.ClientConnInterface) RouteServiceClient {
+	return &routeServiceClient{cc}
 }
 
-func (c *routingServiceClient) ListRoutingRules(ctx context.Context, in *ListRoutingRulesRequest, opts ...grpc.CallOption) (*ListRoutingRulesResponse, error) {
+func (c *routeServiceClient) ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (*ListRoutesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRoutesResponse)
+	err := c.cc.Invoke(ctx, RouteService_ListRoutes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeServiceClient) CreateRoute(ctx context.Context, in *CreateRouteRequest, opts ...grpc.CallOption) (*CreateRouteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateRouteResponse)
+	err := c.cc.Invoke(ctx, RouteService_CreateRoute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeServiceClient) GetRoute(ctx context.Context, in *GetRouteRequest, opts ...grpc.CallOption) (*GetRouteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRouteResponse)
+	err := c.cc.Invoke(ctx, RouteService_GetRoute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeServiceClient) UpdateRoute(ctx context.Context, in *UpdateRouteRequest, opts ...grpc.CallOption) (*UpdateRouteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateRouteResponse)
+	err := c.cc.Invoke(ctx, RouteService_UpdateRoute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeServiceClient) DeleteRoute(ctx context.Context, in *DeleteRouteRequest, opts ...grpc.CallOption) (*DeleteRouteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteRouteResponse)
+	err := c.cc.Invoke(ctx, RouteService_DeleteRoute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeServiceClient) GetUpstreamHealth(ctx context.Context, in *GetUpstreamHealthRequest, opts ...grpc.CallOption) (*GetUpstreamHealthResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUpstreamHealthResponse)
+	err := c.cc.Invoke(ctx, RouteService_GetUpstreamHealth_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routeServiceClient) ListRoutingRules(ctx context.Context, in *ListRoutingRulesRequest, opts ...grpc.CallOption) (*ListRoutingRulesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListRoutingRulesResponse)
-	err := c.cc.Invoke(ctx, RoutingService_ListRoutingRules_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, RouteService_ListRoutingRules_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *routingServiceClient) GetRoutingRule(ctx context.Context, in *GetRoutingRuleRequest, opts ...grpc.CallOption) (*GetRoutingRuleResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetRoutingRuleResponse)
-	err := c.cc.Invoke(ctx, RoutingService_GetRoutingRule_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *routingServiceClient) CreateRoutingRule(ctx context.Context, in *CreateRoutingRuleRequest, opts ...grpc.CallOption) (*CreateRoutingRuleResponse, error) {
+func (c *routeServiceClient) CreateRoutingRule(ctx context.Context, in *CreateRoutingRuleRequest, opts ...grpc.CallOption) (*CreateRoutingRuleResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateRoutingRuleResponse)
-	err := c.cc.Invoke(ctx, RoutingService_CreateRoutingRule_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, RouteService_CreateRoutingRule_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *routingServiceClient) UpdateRoutingRule(ctx context.Context, in *UpdateRoutingRuleRequest, opts ...grpc.CallOption) (*UpdateRoutingRuleResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateRoutingRuleResponse)
-	err := c.cc.Invoke(ctx, RoutingService_UpdateRoutingRule_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *routingServiceClient) DeleteRoutingRule(ctx context.Context, in *DeleteRoutingRuleRequest, opts ...grpc.CallOption) (*DeleteRoutingRuleResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteRoutingRuleResponse)
-	err := c.cc.Invoke(ctx, RoutingService_DeleteRoutingRule_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *routingServiceClient) ResolveRoute(ctx context.Context, in *ResolveRouteRequest, opts ...grpc.CallOption) (*ResolveRouteResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ResolveRouteResponse)
-	err := c.cc.Invoke(ctx, RoutingService_ResolveRoute_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// RoutingServiceServer is the server API for RoutingService service.
-// All implementations must embed UnimplementedRoutingServiceServer
+// RouteServiceServer is the server API for RouteService service.
+// All implementations must embed UnimplementedRouteServiceServer
 // for forward compatibility.
 //
-// RoutingService manages request routing rules and route resolution.
-// Exposure: INTERNAL — all RPCs are for internal use only.
-type RoutingServiceServer interface {
+// RouteService manages reverse proxy routes, upstream health, and routing rules.
+type RouteServiceServer interface {
+	ListRoutes(context.Context, *ListRoutesRequest) (*ListRoutesResponse, error)
+	CreateRoute(context.Context, *CreateRouteRequest) (*CreateRouteResponse, error)
+	GetRoute(context.Context, *GetRouteRequest) (*GetRouteResponse, error)
+	UpdateRoute(context.Context, *UpdateRouteRequest) (*UpdateRouteResponse, error)
+	DeleteRoute(context.Context, *DeleteRouteRequest) (*DeleteRouteResponse, error)
+	GetUpstreamHealth(context.Context, *GetUpstreamHealthRequest) (*GetUpstreamHealthResponse, error)
 	ListRoutingRules(context.Context, *ListRoutingRulesRequest) (*ListRoutingRulesResponse, error)
-	GetRoutingRule(context.Context, *GetRoutingRuleRequest) (*GetRoutingRuleResponse, error)
 	CreateRoutingRule(context.Context, *CreateRoutingRuleRequest) (*CreateRoutingRuleResponse, error)
-	UpdateRoutingRule(context.Context, *UpdateRoutingRuleRequest) (*UpdateRoutingRuleResponse, error)
-	DeleteRoutingRule(context.Context, *DeleteRoutingRuleRequest) (*DeleteRoutingRuleResponse, error)
-	ResolveRoute(context.Context, *ResolveRouteRequest) (*ResolveRouteResponse, error)
-	mustEmbedUnimplementedRoutingServiceServer()
+	mustEmbedUnimplementedRouteServiceServer()
 }
 
-// UnimplementedRoutingServiceServer must be embedded to have
+// UnimplementedRouteServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedRoutingServiceServer struct{}
+type UnimplementedRouteServiceServer struct{}
 
-func (UnimplementedRoutingServiceServer) ListRoutingRules(context.Context, *ListRoutingRulesRequest) (*ListRoutingRulesResponse, error) {
+func (UnimplementedRouteServiceServer) ListRoutes(context.Context, *ListRoutesRequest) (*ListRoutesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRoutes not implemented")
+}
+func (UnimplementedRouteServiceServer) CreateRoute(context.Context, *CreateRouteRequest) (*CreateRouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRoute not implemented")
+}
+func (UnimplementedRouteServiceServer) GetRoute(context.Context, *GetRouteRequest) (*GetRouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoute not implemented")
+}
+func (UnimplementedRouteServiceServer) UpdateRoute(context.Context, *UpdateRouteRequest) (*UpdateRouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRoute not implemented")
+}
+func (UnimplementedRouteServiceServer) DeleteRoute(context.Context, *DeleteRouteRequest) (*DeleteRouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoute not implemented")
+}
+func (UnimplementedRouteServiceServer) GetUpstreamHealth(context.Context, *GetUpstreamHealthRequest) (*GetUpstreamHealthResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUpstreamHealth not implemented")
+}
+func (UnimplementedRouteServiceServer) ListRoutingRules(context.Context, *ListRoutingRulesRequest) (*ListRoutingRulesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListRoutingRules not implemented")
 }
-func (UnimplementedRoutingServiceServer) GetRoutingRule(context.Context, *GetRoutingRuleRequest) (*GetRoutingRuleResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRoutingRule not implemented")
-}
-func (UnimplementedRoutingServiceServer) CreateRoutingRule(context.Context, *CreateRoutingRuleRequest) (*CreateRoutingRuleResponse, error) {
+func (UnimplementedRouteServiceServer) CreateRoutingRule(context.Context, *CreateRoutingRuleRequest) (*CreateRoutingRuleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRoutingRule not implemented")
 }
-func (UnimplementedRoutingServiceServer) UpdateRoutingRule(context.Context, *UpdateRoutingRuleRequest) (*UpdateRoutingRuleResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateRoutingRule not implemented")
-}
-func (UnimplementedRoutingServiceServer) DeleteRoutingRule(context.Context, *DeleteRoutingRuleRequest) (*DeleteRoutingRuleResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoutingRule not implemented")
-}
-func (UnimplementedRoutingServiceServer) ResolveRoute(context.Context, *ResolveRouteRequest) (*ResolveRouteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ResolveRoute not implemented")
-}
-func (UnimplementedRoutingServiceServer) mustEmbedUnimplementedRoutingServiceServer() {}
-func (UnimplementedRoutingServiceServer) testEmbeddedByValue()                        {}
+func (UnimplementedRouteServiceServer) mustEmbedUnimplementedRouteServiceServer() {}
+func (UnimplementedRouteServiceServer) testEmbeddedByValue()                      {}
 
-// UnsafeRoutingServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to RoutingServiceServer will
+// UnsafeRouteServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to RouteServiceServer will
 // result in compilation errors.
-type UnsafeRoutingServiceServer interface {
-	mustEmbedUnimplementedRoutingServiceServer()
+type UnsafeRouteServiceServer interface {
+	mustEmbedUnimplementedRouteServiceServer()
 }
 
-func RegisterRoutingServiceServer(s grpc.ServiceRegistrar, srv RoutingServiceServer) {
-	// If the following call pancis, it indicates UnimplementedRoutingServiceServer was
+func RegisterRouteServiceServer(s grpc.ServiceRegistrar, srv RouteServiceServer) {
+	// If the following call pancis, it indicates UnimplementedRouteServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&RoutingService_ServiceDesc, srv)
+	s.RegisterService(&RouteService_ServiceDesc, srv)
 }
 
-func _RoutingService_ListRoutingRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RouteService_ListRoutes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRoutesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServiceServer).ListRoutes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RouteService_ListRoutes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServiceServer).ListRoutes(ctx, req.(*ListRoutesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RouteService_CreateRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRouteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServiceServer).CreateRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RouteService_CreateRoute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServiceServer).CreateRoute(ctx, req.(*CreateRouteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RouteService_GetRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRouteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServiceServer).GetRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RouteService_GetRoute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServiceServer).GetRoute(ctx, req.(*GetRouteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RouteService_UpdateRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRouteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServiceServer).UpdateRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RouteService_UpdateRoute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServiceServer).UpdateRoute(ctx, req.(*UpdateRouteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RouteService_DeleteRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRouteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServiceServer).DeleteRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RouteService_DeleteRoute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServiceServer).DeleteRoute(ctx, req.(*DeleteRouteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RouteService_GetUpstreamHealth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUpstreamHealthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RouteServiceServer).GetUpstreamHealth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RouteService_GetUpstreamHealth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RouteServiceServer).GetUpstreamHealth(ctx, req.(*GetUpstreamHealthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RouteService_ListRoutingRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListRoutingRulesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoutingServiceServer).ListRoutingRules(ctx, in)
+		return srv.(RouteServiceServer).ListRoutingRules(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: RoutingService_ListRoutingRules_FullMethodName,
+		FullMethod: RouteService_ListRoutingRules_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoutingServiceServer).ListRoutingRules(ctx, req.(*ListRoutingRulesRequest))
+		return srv.(RouteServiceServer).ListRoutingRules(ctx, req.(*ListRoutingRulesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoutingService_GetRoutingRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRoutingRuleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RoutingServiceServer).GetRoutingRule(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RoutingService_GetRoutingRule_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoutingServiceServer).GetRoutingRule(ctx, req.(*GetRoutingRuleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _RoutingService_CreateRoutingRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RouteService_CreateRoutingRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateRoutingRuleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoutingServiceServer).CreateRoutingRule(ctx, in)
+		return srv.(RouteServiceServer).CreateRoutingRule(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: RoutingService_CreateRoutingRule_FullMethodName,
+		FullMethod: RouteService_CreateRoutingRule_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoutingServiceServer).CreateRoutingRule(ctx, req.(*CreateRoutingRuleRequest))
+		return srv.(RouteServiceServer).CreateRoutingRule(ctx, req.(*CreateRoutingRuleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoutingService_UpdateRoutingRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateRoutingRuleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RoutingServiceServer).UpdateRoutingRule(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RoutingService_UpdateRoutingRule_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoutingServiceServer).UpdateRoutingRule(ctx, req.(*UpdateRoutingRuleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _RoutingService_DeleteRoutingRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteRoutingRuleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RoutingServiceServer).DeleteRoutingRule(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RoutingService_DeleteRoutingRule_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoutingServiceServer).DeleteRoutingRule(ctx, req.(*DeleteRoutingRuleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _RoutingService_ResolveRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ResolveRouteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RoutingServiceServer).ResolveRoute(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RoutingService_ResolveRoute_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoutingServiceServer).ResolveRoute(ctx, req.(*ResolveRouteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// RoutingService_ServiceDesc is the grpc.ServiceDesc for RoutingService service.
+// RouteService_ServiceDesc is the grpc.ServiceDesc for RouteService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var RoutingService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "sirosimes.michishirube.v1.RoutingService",
-	HandlerType: (*RoutingServiceServer)(nil),
+var RouteService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "sirosimes.michishirube.v1.RouteService",
+	HandlerType: (*RouteServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListRoutingRules",
-			Handler:    _RoutingService_ListRoutingRules_Handler,
+			MethodName: "ListRoutes",
+			Handler:    _RouteService_ListRoutes_Handler,
 		},
 		{
-			MethodName: "GetRoutingRule",
-			Handler:    _RoutingService_GetRoutingRule_Handler,
+			MethodName: "CreateRoute",
+			Handler:    _RouteService_CreateRoute_Handler,
+		},
+		{
+			MethodName: "GetRoute",
+			Handler:    _RouteService_GetRoute_Handler,
+		},
+		{
+			MethodName: "UpdateRoute",
+			Handler:    _RouteService_UpdateRoute_Handler,
+		},
+		{
+			MethodName: "DeleteRoute",
+			Handler:    _RouteService_DeleteRoute_Handler,
+		},
+		{
+			MethodName: "GetUpstreamHealth",
+			Handler:    _RouteService_GetUpstreamHealth_Handler,
+		},
+		{
+			MethodName: "ListRoutingRules",
+			Handler:    _RouteService_ListRoutingRules_Handler,
 		},
 		{
 			MethodName: "CreateRoutingRule",
-			Handler:    _RoutingService_CreateRoutingRule_Handler,
-		},
-		{
-			MethodName: "UpdateRoutingRule",
-			Handler:    _RoutingService_UpdateRoutingRule_Handler,
-		},
-		{
-			MethodName: "DeleteRoutingRule",
-			Handler:    _RoutingService_DeleteRoutingRule_Handler,
-		},
-		{
-			MethodName: "ResolveRoute",
-			Handler:    _RoutingService_ResolveRoute_Handler,
+			Handler:    _RouteService_CreateRoutingRule_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
