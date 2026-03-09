@@ -4,12 +4,29 @@ package sirosimes.common.v1;
 
 import "google/protobuf/timestamp.proto";
 
+// actor.proto — Defines entities that perform actions in the Sirosimes platform.
+//
+// An Actor represents any entity (human employee, AI employee, system process,
+// or external service) that can perform actions. Actors are referenced throughout
+// the system in audit logs, permission checks, and resource ownership.
+//
+// Relationship to other types:
+//   - Organization (organization.proto): Actors belong to Organizations, but this
+//     is modeled via domain-specific membership types, not embedded here.
+//   - AuditLog (audit.proto): Uses ActorRef to record who performed an action.
+//   - Permission/Role (permission.proto): Actors are granted Roles that contain Permissions.
+//   - ResourceMetadata (metadata.proto): created_by/updated_by fields reference Actor IDs.
+
 // ActorType classifies the entity performing actions.
 enum ActorType {
   ACTOR_TYPE_UNSPECIFIED = 0;
+  // A human employee of the Vareal Group.
   ACTOR_TYPE_HUMAN = 1;
+  // An AI employee (e.g., Fujiwara Ai, Stefan Skye).
   ACTOR_TYPE_AI_EMPLOYEE = 2;
+  // An automated system process (cron, workflow engine, etc.).
   ACTOR_TYPE_SYSTEM = 3;
+  // An external service or API client.
   ACTOR_TYPE_EXTERNAL_SERVICE = 4;
 }
 
@@ -23,17 +40,24 @@ enum ActorStatus {
 
 // Actor represents any entity that can perform actions in the system.
 message Actor {
+  // Unique identifier (UUID format).
   string id = 1;
+  // Classification of this actor.
   ActorType type = 2;
+  // Human-readable display name.
   string display_name = 3;
+  // Email address (may be empty for system actors).
   string email = 4;
+  // Login username.
   string username = 5;
+  // Current status.
   ActorStatus status = 6;
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
 }
 
 // ActorRef is a lightweight reference to an Actor (for embedding in other messages).
+// Use this instead of full Actor when only identity info is needed (e.g., in audit logs).
 message ActorRef {
   string id = 1;
   ActorType type = 2;

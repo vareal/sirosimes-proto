@@ -1,0 +1,25 @@
+when:
+  event: [push, pull_request]
+
+steps:
+  lint:
+    image: bufbuild/buf:1.28.1
+    commands:
+      - buf lint
+
+  breaking:
+    image: bufbuild/buf:1.28.1
+    commands:
+      - buf breaking --against ".git#branch=main"
+    when:
+      event: pull_request
+
+  generate-verify:
+    image: golang:1.22
+    commands:
+      - go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
+      - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
+      - curl -sSL https://github.com/bufbuild/buf/releases/download/v1.28.1/buf-Linux-$(uname -m) -o /usr/local/bin/buf
+      - chmod +x /usr/local/bin/buf
+      - buf generate
+      - git diff --exit-code gen/ || (echo "ERROR: Generated code out of sync" && exit 1)

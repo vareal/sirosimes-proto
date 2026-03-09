@@ -2,18 +2,41 @@ syntax = "proto3";
 
 package sirosimes.common.v1;
 
+// error.proto — Structured error types for the Sirosimes platform.
+//
+// Provides a unified error representation used across all products.
+//
+// Usage with gRPC vs REST:
+//   - gRPC endpoints: Return standard gRPC Status codes. Attach Error as
+//     detail metadata via status.WithDetails() for rich error information.
+//   - REST endpoints (via grpc-gateway): Error is serialized as the JSON
+//     response body. http_status maps to the HTTP status code.
+//   - Frontend: Always use the `code` field (machine-readable) for programmatic
+//     handling and `message` field (human-readable) for user display.
+//
+// Related types:
+//   - AuditLog (audit.proto): Errors may be recorded as audit events.
+
 // Error represents a structured API error response.
 message Error {
+  // Machine-readable error code (e.g., "NOT_FOUND", "VALIDATION_FAILED").
   string code = 1;
+  // Human-readable error message suitable for display to end users.
   string message = 2;
+  // HTTP status code equivalent (e.g., 404, 400, 500).
   int32 http_status = 3;
+  // Field-level error details for validation errors.
   repeated ErrorDetail details = 4;
+  // Unique request ID for tracing and debugging.
   string request_id = 5;
 }
 
-// ErrorDetail provides field-level error information.
+// ErrorDetail provides field-level error information for validation failures.
 message ErrorDetail {
+  // The field that caused the error (e.g., "email", "name").
   string field = 1;
+  // Human-readable description of the error.
   string description = 2;
+  // The constraint that was violated (e.g., "required", "max_length:255").
   string constraint = 3;
 }

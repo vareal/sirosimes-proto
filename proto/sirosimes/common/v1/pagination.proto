@@ -2,6 +2,18 @@ syntax = "proto3";
 
 package sirosimes.common.v1;
 
+// pagination.proto — Standard pagination and sorting types for list APIs.
+//
+// Provides both offset-based pagination (PaginationRequest/Response) and
+// cursor-based pagination (PageToken) for different use cases.
+//
+// Usage guide:
+//   - Offset-based (PaginationRequest): Best for UI with page numbers and total counts.
+//     Use when total count is needed and dataset is moderate size.
+//   - Cursor-based (PageToken): Best for infinite scroll, large datasets, and real-time
+//     feeds where total count is expensive. Use for high-performance APIs.
+//   - Each domain service chooses which pattern to use per endpoint.
+
 // SortOrder specifies the sort direction.
 enum SortOrder {
   SORT_ORDER_UNSPECIFIED = 0;
@@ -9,20 +21,43 @@ enum SortOrder {
   SORT_ORDER_DESC = 2;
 }
 
-// PaginationRequest is the standard pagination input.
+// PaginationRequest is the standard offset-based pagination input.
 message PaginationRequest {
+  // Page number (1-indexed).
   int32 page = 1;
+  // Number of items per page (max enforced per-service).
   int32 page_size = 2;
+  // Field name to sort by.
   string sort_by = 3;
+  // Sort direction.
   SortOrder sort_order = 4;
 }
 
-// PaginationResponse is the standard pagination output.
+// PaginationResponse is the standard offset-based pagination output.
 message PaginationResponse {
   int32 page = 1;
   int32 page_size = 2;
+  // Total number of matching items (may be expensive for large datasets).
   int32 total_items = 3;
   int32 total_pages = 4;
   bool has_next = 5;
   bool has_prev = 6;
+}
+
+// PageToken supports cursor-based pagination for large or real-time datasets.
+// The token is opaque to clients — internal structure is service-defined.
+message PageToken {
+  // Opaque cursor token. Pass to the next request to get the next page.
+  // Empty string means "start from the beginning".
+  string token = 1;
+  // Number of items to return.
+  int32 page_size = 2;
+}
+
+// PageTokenResponse is the cursor-based pagination output.
+message PageTokenResponse {
+  // Token for the next page. Empty if no more results.
+  string next_token = 1;
+  // Whether more results are available.
+  bool has_more = 2;
 }

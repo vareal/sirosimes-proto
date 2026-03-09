@@ -5,6 +5,8 @@ package sirosimes.common.v1;
 import "google/protobuf/timestamp.proto";
 
 // SecurityLevel classifies data sensitivity per CISO directive.
+// Used to enforce access control, encryption requirements, and audit policies
+// across all Sirosimes products. See SECURITY.md for control requirements per level.
 enum SecurityLevel {
   SECURITY_LEVEL_UNSPECIFIED = 0;
   SECURITY_LEVEL_PUBLIC = 1;
@@ -14,14 +16,32 @@ enum SecurityLevel {
 }
 
 // ResourceMetadata provides standard metadata for all Sirosimes resources.
+// Every domain entity across all products should embed this message to ensure
+// consistent tracking, versioning, and security classification.
+//
+// Related types:
+//   - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs
+//   - AuditLog (audit.proto): changes to resources are tracked via audit events
+//   - SecurityLevel: controls access, encryption, and retention policies
 message ResourceMetadata {
+  // Unique identifier (UUID format recommended).
   string id = 1;
+  // Timestamp when the resource was created.
   google.protobuf.Timestamp created_at = 2;
+  // Timestamp of the last update.
   google.protobuf.Timestamp updated_at = 3;
+  // Soft-delete timestamp (null if not deleted).
   google.protobuf.Timestamp deleted_at = 4;
+  // Actor ID who created this resource.
   string created_by = 5;
+  // Actor ID who last updated this resource.
   string updated_by = 6;
+  // Optimistic concurrency version counter.
   int64 version = 7;
+  // Arbitrary key-value labels for filtering and organization.
   map<string, string> labels = 8;
+  // Arbitrary key-value annotations for tooling metadata.
   map<string, string> annotations = 9;
+  // Security classification level for this resource (CISO directive).
+  SecurityLevel security_level = 10;
 }

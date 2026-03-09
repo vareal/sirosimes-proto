@@ -4,13 +4,30 @@ package sirosimes.common.v1;
 
 import "google/protobuf/timestamp.proto";
 
+// organization.proto — Defines organizational structure within the Vareal Group.
+//
+// Organizations represent structural units (group, company, department, team, tenant)
+// that contain Actors and own resources. The hierarchy is modeled via parent_id
+// for tree-structured navigation.
+//
+// Relationship to other types:
+//   - Actor (actor.proto): Actors belong to Organizations via domain-specific
+//     membership types (not embedded here to keep common types generic).
+//   - Permission (permission.proto): Permissions can be scoped to an Organization.
+//   - ResourceMetadata (metadata.proto): Resources may be owned by an Organization.
+
 // OrganizationType classifies the organizational unit.
 enum OrganizationType {
   ORGANIZATION_TYPE_UNSPECIFIED = 0;
+  // Top-level corporate group (e.g., Vareal Group).
   ORGANIZATION_TYPE_GROUP = 1;
+  // A legal entity / subsidiary.
   ORGANIZATION_TYPE_COMPANY = 2;
+  // A department within a company.
   ORGANIZATION_TYPE_DEPARTMENT = 3;
+  // A team within a department.
   ORGANIZATION_TYPE_TEAM = 4;
+  // A multi-tenant partition.
   ORGANIZATION_TYPE_TENANT = 5;
 }
 
@@ -20,6 +37,7 @@ message Organization {
   string name = 2;
   string slug = 3;
   OrganizationType type = 4;
+  // Parent organization ID for hierarchy (empty for root).
   string parent_id = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;

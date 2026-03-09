@@ -4,13 +4,21 @@ package sirosimes.common.v1;
 
 import "google/protobuf/timestamp.proto";
 
-// TimeRange represents a time interval.
+// timestamps.proto — Time-related utility types.
+//
+// Provides standard time range types used for filtering, scheduling,
+// and date-based queries across all products.
+//
+// Uses google.protobuf.Timestamp for precise time representation (UTC).
+// DateRange uses string format (YYYY-MM-DD) for date-only use cases.
+
+// TimeRange represents a precise time interval.
 message TimeRange {
   google.protobuf.Timestamp start = 1;
   google.protobuf.Timestamp end = 2;
 }
 
-// DateRange represents a date-only interval (YYYY-MM-DD).
+// DateRange represents a date-only interval (YYYY-MM-DD format, timezone-agnostic).
 message DateRange {
   string start_date = 1;
   string end_date = 2;

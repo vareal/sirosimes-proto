@@ -2,10 +2,23 @@ syntax = "proto3";
 
 package sirosimes.common.v1;
 
+// permission.proto — Access control primitives for the Sirosimes platform.
+//
+// Defines the building blocks for authorization: Permissions (resource+action+scope),
+// Roles (grouped permissions with trust levels), and AccessDecisions (authorization results).
+//
+// Relationship to other types:
+//   - Actor (actor.proto): Actors are granted Roles.
+//   - Organization (organization.proto): Permission scope can reference Organizations.
+//   - SecurityLevel (metadata.proto): Controls which SecurityLevel data a Role can access.
+
 // Permission defines an access control entry.
 message Permission {
+  // The resource being accessed (e.g., "task", "document", "workflow").
   string resource = 1;
+  // The action being performed (e.g., "read", "write", "delete", "execute").
   string action = 2;
+  // The scope of the permission (e.g., organization ID, "*" for global).
   string scope = 3;
 }
 
@@ -14,13 +27,18 @@ message Role {
   string id = 1;
   string name = 2;
   string description = 3;
+  // Permissions granted by this role.
   repeated Permission permissions = 4;
+  // Trust level (higher = more trusted). Used for privilege escalation checks.
   int32 trust_level = 5;
 }
 
 // AccessDecision represents the result of an authorization check.
 message AccessDecision {
+  // Whether the action is allowed.
   bool allowed = 1;
+  // Human-readable reason for the decision.
   string reason = 2;
+  // The system component that evaluated the decision (e.g., "mizugaki").
   string evaluated_by = 3;
 }

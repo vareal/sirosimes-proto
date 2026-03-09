@@ -4,6 +4,12 @@
 
 All product schemas are defined here and code is generated for Go, TypeScript, and OpenAPI.
 
+## Quick Start
+
+```bash
+git clone <repo-url> && cd sirosimes-proto && make all
+```
+
 ## Products Using This Schema
 
 | Product | Description |
@@ -20,10 +26,11 @@ All product schemas are defined here and code is generated for Go, TypeScript, a
 sirosimes-proto/
 ├── buf.yaml              # Buf module configuration
 ├── buf.gen.yaml          # Code generation configuration
+├── buf.lock              # Dependency lock file
 ├── proto/sirosimes/
-│   ├── common/v1/        # Shared types (8 files)
-│   ├── external/v1/      # External-facing API types
-│   └── internal/v1/      # Internal service types
+│   ├── common/v1/        # Shared types (classification-neutral)
+│   ├── external/v1/      # External-facing API types (PUBLIC/INTERNAL)
+│   └── internal/v1/      # Internal service types (CONFIDENTIAL/RESTRICTED)
 ├── gen/
 │   ├── go/               # Generated Go code
 │   ├── ts/               # Generated TypeScript code
@@ -62,6 +69,9 @@ make breaking
 # Generate code (Go, TypeScript, OpenAPI)
 make generate
 
+# Verify generated code matches committed code (CI check)
+make verify
+
 # Clean generated code
 make clean
 
@@ -71,33 +81,69 @@ make all
 
 ## Common Types (proto/sirosimes/common/v1/)
 
-| File | Description |
-|------|-------------|
-| `timestamps.proto` | TimeRange, DateRange |
-| `pagination.proto` | PaginationRequest/Response, SortOrder |
-| `error.proto` | Structured Error, ErrorDetail |
-| `actor.proto` | Actor, ActorRef, ActorType, ActorStatus |
-| `organization.proto` | Organization, OrganizationType |
-| `permission.proto` | Permission, Role, AccessDecision |
-| `audit.proto` | AuditLog, AuditSeverity |
-| `metadata.proto` | ResourceMetadata, SecurityLevel |
+| File | Purpose | Key Types |
+|------|---------|-----------|
+| `timestamps.proto` | Time utilities | TimeRange, DateRange |
+| `pagination.proto` | List API pagination & sorting | PaginationRequest/Response, PageToken/PageTokenResponse, SortOrder |
+| `error.proto` | Structured errors | Error, ErrorDetail |
+| `actor.proto` | Action performers | Actor, ActorRef, ActorType, ActorStatus |
+| `organization.proto` | Organizational structure | Organization, OrganizationType |
+| `permission.proto` | Access control | Permission, Role, AccessDecision |
+| `audit.proto` | Audit trail (immutable) | AuditLog, AuditSeverity |
+| `metadata.proto` | Resource metadata & security | ResourceMetadata, SecurityLevel |
+
+### Pagination Patterns
+
+This repository provides **two pagination patterns**. Each domain service chooses per endpoint:
+
+| Pattern | Type | Best For | Trade-offs |
+|---------|------|----------|------------|
+| **Offset-based** | `PaginationRequest` / `PaginationResponse` | UI with page numbers, admin dashboards, small-to-medium datasets | Requires total count (can be expensive), skip+limit performance degrades on large datasets |
+| **Cursor-based** | `PageToken` / `PageTokenResponse` | Infinite scroll, real-time feeds, large datasets, high-performance APIs | No total count, no random page access |
+
+### Error Handling
+
+- **gRPC endpoints**: Return standard gRPC status codes. Attach `Error` as detail metadata.
+- **REST endpoints**: `Error` is serialized as JSON body. `http_status` maps to HTTP status.
+- **Frontend**: Use `code` (machine-readable) for logic, `message` (human-readable) for display.
+
+See `error.proto` header comments for detailed guidance.
+
+## Security Classification
+
+All resources have a `SecurityLevel` (defined in `metadata.proto`):
+
+| Level | Label | Access |
+|-------|-------|--------|
+| 1 | PUBLIC | No restrictions |
+| 2 | INTERNAL | Internal use only |
+| 3 | CONFIDENTIAL | Need-to-know, CXO approval |
+| 4 | RESTRICTED | Highest sensitivity — PII, credentials |
+
+See [SECURITY.md](SECURITY.md) for full policy.
 
 ## Contributing
 
 1. Create a feature branch from `main`
-2. Add or modify `.proto` files
+2. Add or modify `.proto` files in `proto/`
 3. Run `make lint` to verify
-4. Run `make breaking` to check for breaking changes
+4. Run `make breaking` to check backward compatibility
 5. Run `make generate` to update generated code
-6. Open a Pull Request
+6. Run `make verify` to confirm reproducibility
+7. Open a Pull Request
 
 ### Proto Style Guide
 
 - Follow [Buf Style Guide](https://buf.build/docs/best-practices/style-guide/)
-- All messages and enums MUST have comments
+- All messages and enums MUST have doc comments
+- Each `.proto` file MUST have a header comment explaining purpose and relationships
 - Enum zero values MUST be `*_UNSPECIFIED`
 - Use `google.protobuf.Timestamp` for time fields
 - Use `string` with UUID format for identifiers
+
+## Architecture Decision Records
+
+- [ADR-001: Proto SSoT Foundation](docs/adr/001-proto-ssot-foundation.md) — Why protobuf, rejected alternatives
 
 ## License
 

@@ -9,5 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: bufbuild/buf-setup-action@v1
-      - run: buf breaking --against 'https://git.vareal.group/VarealGroup/sirosimes-proto.git#branch=main'
+        with:
+          version: 1.28.1
+      - run: buf breaking --against "https://git.vareal.group/VarealGroup/sirosimes-proto.git#branch=main"

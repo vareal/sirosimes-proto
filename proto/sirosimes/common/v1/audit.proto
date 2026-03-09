@@ -6,26 +6,54 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
 
+// audit.proto — Audit logging types for compliance and security monitoring.
+//
+// AuditLog records immutable events for all significant actions across
+// Sirosimes products. Logs are append-only with integrity verification
+// via chained hashes.
+//
+// Relationship to other types:
+//   - ActorRef (actor.proto): Identifies who performed the action.
+//   - SecurityLevel (metadata.proto): Audit events for RESTRICTED resources
+//     require additional retention and encryption.
+
 // AuditSeverity classifies the importance of an audit event.
 enum AuditSeverity {
   AUDIT_SEVERITY_UNSPECIFIED = 0;
+  // Normal operational event.
   AUDIT_SEVERITY_INFO = 1;
+  // Potentially concerning event that should be reviewed.
   AUDIT_SEVERITY_WARNING = 2;
+  // Security-relevant or high-impact event requiring immediate attention.
   AUDIT_SEVERITY_CRITICAL = 3;
 }
 
-// AuditLog records a single auditable event.
+// AuditLog records a single auditable event (append-only, immutable).
 message AuditLog {
+  // Unique audit event ID.
   string id = 1;
+  // When the event occurred.
   google.protobuf.Timestamp timestamp = 2;
+  // Who performed the action.
   ActorRef actor = 3;
+  // What action was performed (e.g., "create", "update", "delete", "login").
   string action = 4;
+  // Type of resource affected (e.g., "task", "document", "workflow").
   string resource_type = 5;
+  // ID of the affected resource.
   string resource_id = 6;
+  // Sirosimes product that generated this event (e.g., "tsukasa", "hataori").
   string product = 7;
+  // State before the action (for update/delete events).
   google.protobuf.Struct before = 8;
+  // State after the action (for create/update events).
   google.protobuf.Struct after = 9;
+  // Client IP address.
   string ip_address = 10;
+  // Client user agent string.
   string user_agent = 11;
+  // Severity classification.
   AuditSeverity severity = 12;
+  // SHA-256 hash of the previous audit log entry for tamper detection (chain integrity).
+  string integrity_hash = 13;
 }
