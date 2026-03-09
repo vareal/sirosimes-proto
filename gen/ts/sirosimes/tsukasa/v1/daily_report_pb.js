@@ -56,7 +56,7 @@ export const DailyReport = /*@__PURE__*/ proto3.makeMessageType(
     { no: 10, name: "reviewed_at", kind: "message", T: Timestamp },
     { no: 11, name: "review_comment", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 12, name: "reflection", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 13, name: "emotions", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 19, name: "emotion_tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 14, name: "created_at", kind: "message", T: Timestamp },
     { no: 15, name: "updated_at", kind: "message", T: Timestamp },
   ],
@@ -137,7 +137,7 @@ export const CreateReportRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 5, name: "summary", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "next_plan", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "reflection", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 8, name: "emotions", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "emotion_tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
 );
 

@@ -32,6 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // DailyReportService provides daily report management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type DailyReportServiceClient interface {
 	ListReports(ctx context.Context, in *ListReportsRequest, opts ...grpc.CallOption) (*ListReportsResponse, error)
 	CreateReport(ctx context.Context, in *CreateReportRequest, opts ...grpc.CallOption) (*CreateReportResponse, error)
@@ -114,6 +115,7 @@ func (c *dailyReportServiceClient) UpdateTemplate(ctx context.Context, in *Updat
 // for forward compatibility.
 //
 // DailyReportService provides daily report management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type DailyReportServiceServer interface {
 	ListReports(context.Context, *ListReportsRequest) (*ListReportsResponse, error)
 	CreateReport(context.Context, *CreateReportRequest) (*CreateReportResponse, error)

@@ -65,8 +65,7 @@
       "type": "object",
       "properties": {
         "identity": {
-          "$ref": "#/definitions/v1Identity",
-          "title": "作成されたアイデンティティ。"
+          "$ref": "#/definitions/v1Identity"
         }
       },
       "title": "CreateIdentityResponse はアイデンティティ作成レスポンスを表す。"
@@ -79,8 +78,7 @@
       "type": "object",
       "properties": {
         "identity": {
-          "$ref": "#/definitions/v1Identity",
-          "title": "取得したアイデンティティ。"
+          "$ref": "#/definitions/v1Identity"
         }
       },
       "title": "GetIdentityResponse はアイデンティティ取得レスポンスを表す。"
@@ -93,68 +91,55 @@
           "title": "リソースメタデータ（ID、タイムスタンプ、バージョン、セキュリティレベル）。"
         },
         "username": {
-          "type": "string",
-          "title": "ログイン用のユーザー名（一意）。"
+          "type": "string"
         },
         "email": {
           "type": "string",
-          "title": "メールアドレス（一意、RESTRICTED）。"
+          "title": "SecurityLevel: RESTRICTED — PII。"
         },
         "displayName": {
-          "type": "string",
-          "title": "表示名。"
+          "type": "string"
         },
         "nameKana": {
-          "type": "string",
-          "title": "名前のふりがな。"
+          "type": "string"
         },
         "actorType": {
-          "$ref": "#/definitions/v1ActorType",
-          "title": "アクター種別（human, ai_employee 等）。"
+          "$ref": "#/definitions/v1ActorType"
         },
         "status": {
-          "$ref": "#/definitions/v1IdentityStatus",
-          "title": "現在の状態。"
+          "$ref": "#/definitions/v1IdentityStatus"
         },
         "emailVerified": {
-          "type": "boolean",
-          "title": "メールアドレスが確認済みかどうか。"
+          "type": "boolean"
         },
         "mfaEnabled": {
-          "type": "boolean",
-          "title": "MFA が有効かどうか。"
+          "type": "boolean"
         },
         "mfaMethods": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1MfaMethod"
-          },
-          "title": "有効な MFA 方法。"
+          }
         },
         "avatarUrl": {
-          "type": "string",
-          "title": "アバター画像URL。"
+          "type": "string"
         },
         "organizationId": {
-          "type": "string",
-          "title": "所属組織ID。"
+          "type": "string"
         },
         "roleIds": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "title": "付与されたロールID一覧。"
+          }
         },
         "lastLoginAt": {
           "type": "string",
-          "format": "date-time",
-          "title": "最終ログイン日時。"
+          "format": "date-time"
         },
         "passwordChangedAt": {
           "type": "string",
-          "format": "date-time",
-          "title": "パスワード最終変更日時。"
+          "format": "date-time"
         }
       },
       "title": "Identity は瑞垣 SSO に登録されたユーザーアイデンティティを表す。"
@@ -169,7 +154,6 @@
         "IDENTITY_STATUS_PENDING_VERIFICATION"
       ],
       "default": "IDENTITY_STATUS_UNSPECIFIED",
-      "description": "- IDENTITY_STATUS_ACTIVE: アイデンティティは有効でログイン可能。\n - IDENTITY_STATUS_INACTIVE: アイデンティティは無効化されている。\n - IDENTITY_STATUS_SUSPENDED: アイデンティティは管理者によって停止されている。\n - IDENTITY_STATUS_PENDING_VERIFICATION: メールアドレスの確認待ち。",
       "title": "IdentityStatus はアイデンティティの状態を表す。"
     },
     "v1ListIdentitiesResponse": {
@@ -180,12 +164,10 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Identity"
-          },
-          "title": "アイデンティティ一覧。"
+          }
         },
         "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse",
-          "title": "ページネーション情報。"
+          "$ref": "#/definitions/v1PaginationResponse"
         }
       },
       "title": "ListIdentitiesResponse はアイデンティティ一覧取得レスポンスを表す。"
@@ -198,7 +180,7 @@
         "MFA_METHOD_WEBAUTHN"
       ],
       "default": "MFA_METHOD_UNSPECIFIED",
-      "description": "- MFA_METHOD_TOTP: 時間ベースのワンタイムパスワード (TOTP)。\n - MFA_METHOD_WEBAUTHN: WebAuthn / FIDO2 セキュリティキー。",
+      "description": "- MFA_METHOD_TOTP: TOTP（時間ベースのワンタイムパスワード）。SIMスワップリスクなし。\n - MFA_METHOD_WEBAUTHN: WebAuthn / FIDO2 セキュリティキー。最高セキュリティ。\n\nSMS は意図的に非サポート（SIMスワップリスク排除）。",
       "title": "MfaMethod は多要素認証の方法を分類する。"
     },
     "v1PaginationRequest": {
@@ -336,8 +318,7 @@
       "type": "object",
       "properties": {
         "identity": {
-          "$ref": "#/definitions/v1Identity",
-          "title": "更新されたアイデンティティ。"
+          "$ref": "#/definitions/v1Identity"
         }
       },
       "title": "UpdateIdentityResponse はアイデンティティ更新レスポンスを表す。"

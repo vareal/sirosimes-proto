@@ -56,12 +56,27 @@ export const Employee = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "joined_at", kind: "message", T: Timestamp },
     { no: 10, name: "model_provider", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 11, name: "ai_model_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 12, name: "container_host", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 13, name: "container_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 14, name: "mattermost_username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 15, name: "last_heartbeat_at", kind: "message", T: Timestamp },
     { no: 16, name: "created_at", kind: "message", T: Timestamp },
     { no: 17, name: "updated_at", kind: "message", T: Timestamp },
+  ],
+);
+
+/**
+ * EmployeeInfraConfig contains infrastructure-specific metadata for AI employees.
+ * Only returned to administrators via GetEmployee.
+ * SecurityLevel: CONFIDENTIAL — contains deployment topology information.
+ *
+ * @generated from message sirosimes.tsukasa.v1.EmployeeInfraConfig
+ */
+export const EmployeeInfraConfig = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tsukasa.v1.EmployeeInfraConfig",
+  () => [
+    { no: 1, name: "container_host", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "container_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "gateway_port", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "container_status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -166,6 +181,7 @@ export const GetEmployeeResponse = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "employee", kind: "message", T: EmployeeDetail },
     { no: 2, name: "departments", kind: "message", T: Department, repeated: true },
+    { no: 3, name: "infra_config", kind: "message", T: EmployeeInfraConfig },
   ],
 );
 

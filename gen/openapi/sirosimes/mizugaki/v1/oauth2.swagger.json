@@ -45,20 +45,29 @@
         }
       }
     },
+    "v1ActorType": {
+      "type": "string",
+      "enum": [
+        "ACTOR_TYPE_UNSPECIFIED",
+        "ACTOR_TYPE_HUMAN",
+        "ACTOR_TYPE_AI_EMPLOYEE",
+        "ACTOR_TYPE_SYSTEM",
+        "ACTOR_TYPE_EXTERNAL_SERVICE"
+      ],
+      "default": "ACTOR_TYPE_UNSPECIFIED",
+      "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
+    },
     "v1AuthorizeResponse": {
       "type": "object",
       "properties": {
         "code": {
-          "type": "string",
-          "title": "発行された認可コード。"
+          "type": "string"
         },
         "state": {
-          "type": "string",
-          "title": "リクエストで送信されたステート値（そのまま返却）。"
+          "type": "string"
         },
         "redirectUri": {
-          "type": "string",
-          "title": "リダイレクト先URI（code と state を含む）。"
+          "type": "string"
         }
       },
       "title": "AuthorizeResponse は OAuth2 認可レスポンスを表す。"
@@ -72,7 +81,6 @@
         "CLIENT_STATUS_SUSPENDED"
       ],
       "default": "CLIENT_STATUS_UNSPECIFIED",
-      "description": "- CLIENT_STATUS_ACTIVE: クライアントは有効で認可リクエストを受け付ける。\n - CLIENT_STATUS_INACTIVE: クライアントは無効化されている。\n - CLIENT_STATUS_SUSPENDED: クライアントは管理者によって停止されている。",
       "title": "ClientStatus は OAuth2 クライアントの状態を表す。"
     },
     "v1DeleteClientResponse": {
@@ -83,8 +91,7 @@
       "type": "object",
       "properties": {
         "client": {
-          "$ref": "#/definitions/v1OAuth2Client",
-          "title": "取得したクライアント（シークレットは含まない）。"
+          "$ref": "#/definitions/v1OAuth2Client"
         }
       },
       "title": "GetClientResponse は OAuth2 クライアント取得レスポンスを表す。"
@@ -98,7 +105,7 @@
         "GRANT_TYPE_CLIENT_CREDENTIALS"
       ],
       "default": "GRANT_TYPE_UNSPECIFIED",
-      "description": "- GRANT_TYPE_AUTHORIZATION_CODE: Authorization Code Grant — ユーザー認証を伴うフロー。\n - GRANT_TYPE_REFRESH_TOKEN: Refresh Token Grant — トークン更新。\n - GRANT_TYPE_CLIENT_CREDENTIALS: Client Credentials Grant — サービス間認証。",
+      "description": "- GRANT_TYPE_AUTHORIZATION_CODE: Authorization Code Grant — ユーザー認証を伴うフロー。PKCE必須。\n - GRANT_TYPE_REFRESH_TOKEN: Refresh Token Grant — トークン更新。\n - GRANT_TYPE_CLIENT_CREDENTIALS: Client Credentials Grant — サービス間認証。\n\nImplicit Grant: 意図的に未定義（廃止済み、RFC 9207）。\n ROPC Grant: 意図的に未定義（非推奨、OAuth 2.1 draft）。",
       "title": "GrantType は OAuth2 の認可タイプを分類する。"
     },
     "v1ListClientsResponse": {
@@ -109,12 +116,10 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1OAuth2Client"
-          },
-          "title": "クライアント一覧。"
+          }
         },
         "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse",
-          "title": "ページネーション情報。"
+          "$ref": "#/definitions/v1PaginationResponse"
         }
       },
       "title": "ListClientsResponse は OAuth2 クライアント一覧取得レスポンスを表す。"
@@ -123,74 +128,61 @@
       "type": "object",
       "properties": {
         "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata",
-          "title": "リソースメタデータ（ID、タイムスタンプ、バージョン、セキュリティレベル）。"
+          "$ref": "#/definitions/v1ResourceMetadata"
         },
         "clientId": {
-          "type": "string",
-          "title": "クライアントID（一意、公開値）。"
+          "type": "string"
         },
         "clientName": {
-          "type": "string",
-          "title": "クライアント表示名（例: \"司\", \"機織\"）。"
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "title": "クライアントの説明。"
+          "type": "string"
         },
         "redirectUris": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "title": "許可されたリダイレクトURI。"
+          }
         },
         "grantTypes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1GrantType"
-          },
-          "title": "許可された認可タイプ。"
+          }
         },
         "responseTypes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1ResponseType"
-          },
-          "title": "許可されたレスポンスタイプ。"
+          }
         },
         "scopes": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/v1ScopeType"
           },
-          "title": "許可されたスコープ（openid, profile, email, roles）。"
+          "title": "許可されたスコープ（enum型で有限集合管理）。"
         },
         "tokenEndpointAuthMethod": {
-          "$ref": "#/definitions/v1TokenEndpointAuthMethod",
-          "title": "トークンエンドポイント認証方法。"
+          "$ref": "#/definitions/v1TokenEndpointAuthMethod"
         },
         "status": {
-          "$ref": "#/definitions/v1ClientStatus",
-          "title": "現在の状態。"
+          "$ref": "#/definitions/v1ClientStatus"
         },
         "clientUri": {
-          "type": "string",
-          "title": "クライアントの Web サイトURL。"
+          "type": "string"
         },
         "logoUri": {
-          "type": "string",
-          "title": "クライアントのロゴURL。"
+          "type": "string"
         },
         "accessTokenTtlSeconds": {
           "type": "integer",
-          "format": "int32",
-          "title": "アクセストークンの有効期間（秒）。"
+          "format": "int32"
         },
         "refreshTokenTtlSeconds": {
           "type": "integer",
-          "format": "int32",
-          "title": "リフレッシュトークンの有効期間（秒）。"
+          "format": "int32"
         }
       },
       "title": "OAuth2Client は登録された OAuth2/OIDC クライアントアプリケーションを表す。"
@@ -252,8 +244,7 @@
       "type": "object",
       "properties": {
         "client": {
-          "$ref": "#/definitions/v1OAuth2Client",
-          "title": "登録されたクライアント。"
+          "$ref": "#/definitions/v1OAuth2Client"
         },
         "clientSecret": {
           "type": "string",
@@ -325,7 +316,6 @@
         "RESPONSE_TYPE_CODE"
       ],
       "default": "RESPONSE_TYPE_UNSPECIFIED",
-      "description": "- RESPONSE_TYPE_CODE: Authorization Code Flow で使用。",
       "title": "ResponseType は OAuth2 の応答タイプを分類する。"
     },
     "v1RotateClientSecretResponse": {
@@ -337,6 +327,20 @@
         }
       },
       "title": "RotateClientSecretResponse はクライアントシークレットローテーションレスポンスを表す。"
+    },
+    "v1ScopeType": {
+      "type": "string",
+      "enum": [
+        "SCOPE_TYPE_UNSPECIFIED",
+        "SCOPE_TYPE_OPENID",
+        "SCOPE_TYPE_PROFILE",
+        "SCOPE_TYPE_EMAIL",
+        "SCOPE_TYPE_ROLES",
+        "SCOPE_TYPE_OFFLINE_ACCESS"
+      ],
+      "default": "SCOPE_TYPE_UNSPECIFIED",
+      "description": "- SCOPE_TYPE_OPENID: OpenID Connect core scope.\n - SCOPE_TYPE_PROFILE: ユーザープロフィール情報（name, picture等）。\n - SCOPE_TYPE_EMAIL: メールアドレス。\n - SCOPE_TYPE_ROLES: ロール・権限情報。\n - SCOPE_TYPE_OFFLINE_ACCESS: オフラインアクセス（リフレッシュトークン発行）。",
+      "title": "ScopeType は許可されたOAuth2スコープの有限集合を定義する。\n任意文字列スコープの代わりにenum型で管理し、未定義スコープの要求を防止する。"
     },
     "v1SecurityLevel": {
       "type": "string",
@@ -368,36 +372,29 @@
         "TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_BASIC"
       ],
       "default": "TOKEN_ENDPOINT_AUTH_METHOD_UNSPECIFIED",
-      "description": "- TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_POST: リクエストボディで client_secret を送信。\n - TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_BASIC: HTTP Basic 認証で client_id:client_secret を送信。",
       "title": "TokenEndpointAuthMethod はトークンエンドポイントの認証方法を分類する。"
     },
     "v1TokenResponse": {
       "type": "object",
       "properties": {
         "accessToken": {
-          "type": "string",
-          "title": "アクセストークン。"
+          "type": "string"
         },
         "tokenType": {
-          "type": "string",
-          "title": "トークンタイプ（通常は \"Bearer\"）。"
+          "type": "string"
         },
         "expiresIn": {
           "type": "integer",
-          "format": "int32",
-          "title": "アクセストークンの有効期間（秒）。"
+          "format": "int32"
         },
         "refreshToken": {
-          "type": "string",
-          "title": "リフレッシュトークン。"
+          "type": "string"
         },
         "scope": {
-          "type": "string",
-          "title": "付与されたスコープ。"
+          "type": "string"
         },
         "idToken": {
-          "type": "string",
-          "title": "OIDC IDトークン（openid スコープが要求された場合）。"
+          "type": "string"
         }
       },
       "title": "TokenResponse は OAuth2 トークンレスポンスを表す。"
@@ -406,8 +403,7 @@
       "type": "object",
       "properties": {
         "client": {
-          "$ref": "#/definitions/v1OAuth2Client",
-          "title": "更新されたクライアント。"
+          "$ref": "#/definitions/v1OAuth2Client"
         }
       },
       "title": "UpdateClientResponse は OAuth2 クライアント更新レスポンスを表す。"
@@ -416,47 +412,39 @@
       "type": "object",
       "properties": {
         "sub": {
-          "type": "string",
-          "title": "Subject — ユーザーID。"
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "title": "ユーザー表示名。"
+          "type": "string"
         },
         "email": {
-          "type": "string",
-          "title": "メールアドレス。"
+          "type": "string"
         },
         "emailVerified": {
-          "type": "boolean",
-          "title": "メールアドレスが確認済みかどうか。"
+          "type": "boolean"
         },
         "roles": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "title": "付与されたロール一覧。"
+          }
         },
         "trustLevel": {
           "type": "integer",
-          "format": "int32",
-          "title": "信頼レベル。"
+          "format": "int32"
         },
         "actorType": {
-          "type": "string",
-          "title": "アクター種別。"
+          "$ref": "#/definitions/v1ActorType",
+          "title": "アクター種別（enum型で一貫性を保持）。"
         },
         "identifier": {
-          "type": "string",
-          "title": "ユーザー識別子。"
+          "type": "string"
         },
         "picture": {
-          "type": "string",
-          "title": "アバター画像URL。"
+          "type": "string"
         }
       },
-      "title": "UserinfoResponse は OIDC UserInfo レスポンスを表す。"
+      "title": "UserinfoResponse は OIDC UserInfo レスポンスを表す（OIDC Standard Claims準拠）。"
     }
   }
 }

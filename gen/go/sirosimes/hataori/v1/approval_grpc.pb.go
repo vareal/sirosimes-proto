@@ -21,9 +21,9 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	ApprovalService_ListApprovals_FullMethodName         = "/sirosimes.hataori.v1.ApprovalService/ListApprovals"
 	ApprovalService_GetApproval_FullMethodName           = "/sirosimes.hataori.v1.ApprovalService/GetApproval"
-	ApprovalService_ApproveRequest_FullMethodName        = "/sirosimes.hataori.v1.ApprovalService/ApproveRequest"
-	ApprovalService_RejectRequest_FullMethodName         = "/sirosimes.hataori.v1.ApprovalService/RejectRequest"
-	ApprovalService_DelegateRequest_FullMethodName       = "/sirosimes.hataori.v1.ApprovalService/DelegateRequest"
+	ApprovalService_ApproveApproval_FullMethodName       = "/sirosimes.hataori.v1.ApprovalService/ApproveApproval"
+	ApprovalService_RejectApproval_FullMethodName        = "/sirosimes.hataori.v1.ApprovalService/RejectApproval"
+	ApprovalService_DelegateApproval_FullMethodName      = "/sirosimes.hataori.v1.ApprovalService/DelegateApproval"
 	ApprovalService_ListDelegationChains_FullMethodName  = "/sirosimes.hataori.v1.ApprovalService/ListDelegationChains"
 	ApprovalService_CreateDelegationChain_FullMethodName = "/sirosimes.hataori.v1.ApprovalService/CreateDelegationChain"
 	ApprovalService_GetDelegationChain_FullMethodName    = "/sirosimes.hataori.v1.ApprovalService/GetDelegationChain"
@@ -34,12 +34,14 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // ApprovalService provides HITL approval and delegation chain management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type ApprovalServiceClient interface {
 	ListApprovals(ctx context.Context, in *ListApprovalsRequest, opts ...grpc.CallOption) (*ListApprovalsResponse, error)
 	GetApproval(ctx context.Context, in *GetApprovalRequest, opts ...grpc.CallOption) (*GetApprovalResponse, error)
-	ApproveRequest(ctx context.Context, in *ApproveRequestRequest, opts ...grpc.CallOption) (*ApproveRequestResponse, error)
-	RejectRequest(ctx context.Context, in *RejectRequestRequest, opts ...grpc.CallOption) (*RejectRequestResponse, error)
-	DelegateRequest(ctx context.Context, in *DelegateRequestRequest, opts ...grpc.CallOption) (*DelegateRequestResponse, error)
+	// Renamed from ApproveRequest/RejectRequest to avoid ApproveRequestRequest naming.
+	ApproveApproval(ctx context.Context, in *ApproveApprovalRequest, opts ...grpc.CallOption) (*ApproveApprovalResponse, error)
+	RejectApproval(ctx context.Context, in *RejectApprovalRequest, opts ...grpc.CallOption) (*RejectApprovalResponse, error)
+	DelegateApproval(ctx context.Context, in *DelegateApprovalRequest, opts ...grpc.CallOption) (*DelegateApprovalResponse, error)
 	ListDelegationChains(ctx context.Context, in *ListDelegationChainsRequest, opts ...grpc.CallOption) (*ListDelegationChainsResponse, error)
 	CreateDelegationChain(ctx context.Context, in *CreateDelegationChainRequest, opts ...grpc.CallOption) (*CreateDelegationChainResponse, error)
 	GetDelegationChain(ctx context.Context, in *GetDelegationChainRequest, opts ...grpc.CallOption) (*GetDelegationChainResponse, error)
@@ -73,30 +75,30 @@ func (c *approvalServiceClient) GetApproval(ctx context.Context, in *GetApproval
 	return out, nil
 }
 
-func (c *approvalServiceClient) ApproveRequest(ctx context.Context, in *ApproveRequestRequest, opts ...grpc.CallOption) (*ApproveRequestResponse, error) {
+func (c *approvalServiceClient) ApproveApproval(ctx context.Context, in *ApproveApprovalRequest, opts ...grpc.CallOption) (*ApproveApprovalResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ApproveRequestResponse)
-	err := c.cc.Invoke(ctx, ApprovalService_ApproveRequest_FullMethodName, in, out, cOpts...)
+	out := new(ApproveApprovalResponse)
+	err := c.cc.Invoke(ctx, ApprovalService_ApproveApproval_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *approvalServiceClient) RejectRequest(ctx context.Context, in *RejectRequestRequest, opts ...grpc.CallOption) (*RejectRequestResponse, error) {
+func (c *approvalServiceClient) RejectApproval(ctx context.Context, in *RejectApprovalRequest, opts ...grpc.CallOption) (*RejectApprovalResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RejectRequestResponse)
-	err := c.cc.Invoke(ctx, ApprovalService_RejectRequest_FullMethodName, in, out, cOpts...)
+	out := new(RejectApprovalResponse)
+	err := c.cc.Invoke(ctx, ApprovalService_RejectApproval_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *approvalServiceClient) DelegateRequest(ctx context.Context, in *DelegateRequestRequest, opts ...grpc.CallOption) (*DelegateRequestResponse, error) {
+func (c *approvalServiceClient) DelegateApproval(ctx context.Context, in *DelegateApprovalRequest, opts ...grpc.CallOption) (*DelegateApprovalResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DelegateRequestResponse)
-	err := c.cc.Invoke(ctx, ApprovalService_DelegateRequest_FullMethodName, in, out, cOpts...)
+	out := new(DelegateApprovalResponse)
+	err := c.cc.Invoke(ctx, ApprovalService_DelegateApproval_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,12 +140,14 @@ func (c *approvalServiceClient) GetDelegationChain(ctx context.Context, in *GetD
 // for forward compatibility.
 //
 // ApprovalService provides HITL approval and delegation chain management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type ApprovalServiceServer interface {
 	ListApprovals(context.Context, *ListApprovalsRequest) (*ListApprovalsResponse, error)
 	GetApproval(context.Context, *GetApprovalRequest) (*GetApprovalResponse, error)
-	ApproveRequest(context.Context, *ApproveRequestRequest) (*ApproveRequestResponse, error)
-	RejectRequest(context.Context, *RejectRequestRequest) (*RejectRequestResponse, error)
-	DelegateRequest(context.Context, *DelegateRequestRequest) (*DelegateRequestResponse, error)
+	// Renamed from ApproveRequest/RejectRequest to avoid ApproveRequestRequest naming.
+	ApproveApproval(context.Context, *ApproveApprovalRequest) (*ApproveApprovalResponse, error)
+	RejectApproval(context.Context, *RejectApprovalRequest) (*RejectApprovalResponse, error)
+	DelegateApproval(context.Context, *DelegateApprovalRequest) (*DelegateApprovalResponse, error)
 	ListDelegationChains(context.Context, *ListDelegationChainsRequest) (*ListDelegationChainsResponse, error)
 	CreateDelegationChain(context.Context, *CreateDelegationChainRequest) (*CreateDelegationChainResponse, error)
 	GetDelegationChain(context.Context, *GetDelegationChainRequest) (*GetDelegationChainResponse, error)
@@ -163,14 +167,14 @@ func (UnimplementedApprovalServiceServer) ListApprovals(context.Context, *ListAp
 func (UnimplementedApprovalServiceServer) GetApproval(context.Context, *GetApprovalRequest) (*GetApprovalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetApproval not implemented")
 }
-func (UnimplementedApprovalServiceServer) ApproveRequest(context.Context, *ApproveRequestRequest) (*ApproveRequestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ApproveRequest not implemented")
+func (UnimplementedApprovalServiceServer) ApproveApproval(context.Context, *ApproveApprovalRequest) (*ApproveApprovalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApproveApproval not implemented")
 }
-func (UnimplementedApprovalServiceServer) RejectRequest(context.Context, *RejectRequestRequest) (*RejectRequestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RejectRequest not implemented")
+func (UnimplementedApprovalServiceServer) RejectApproval(context.Context, *RejectApprovalRequest) (*RejectApprovalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RejectApproval not implemented")
 }
-func (UnimplementedApprovalServiceServer) DelegateRequest(context.Context, *DelegateRequestRequest) (*DelegateRequestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DelegateRequest not implemented")
+func (UnimplementedApprovalServiceServer) DelegateApproval(context.Context, *DelegateApprovalRequest) (*DelegateApprovalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelegateApproval not implemented")
 }
 func (UnimplementedApprovalServiceServer) ListDelegationChains(context.Context, *ListDelegationChainsRequest) (*ListDelegationChainsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListDelegationChains not implemented")
@@ -238,56 +242,56 @@ func _ApprovalService_GetApproval_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ApprovalService_ApproveRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApproveRequestRequest)
+func _ApprovalService_ApproveApproval_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApproveApprovalRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ApprovalServiceServer).ApproveRequest(ctx, in)
+		return srv.(ApprovalServiceServer).ApproveApproval(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ApprovalService_ApproveRequest_FullMethodName,
+		FullMethod: ApprovalService_ApproveApproval_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApprovalServiceServer).ApproveRequest(ctx, req.(*ApproveRequestRequest))
+		return srv.(ApprovalServiceServer).ApproveApproval(ctx, req.(*ApproveApprovalRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ApprovalService_RejectRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RejectRequestRequest)
+func _ApprovalService_RejectApproval_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RejectApprovalRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ApprovalServiceServer).RejectRequest(ctx, in)
+		return srv.(ApprovalServiceServer).RejectApproval(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ApprovalService_RejectRequest_FullMethodName,
+		FullMethod: ApprovalService_RejectApproval_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApprovalServiceServer).RejectRequest(ctx, req.(*RejectRequestRequest))
+		return srv.(ApprovalServiceServer).RejectApproval(ctx, req.(*RejectApprovalRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ApprovalService_DelegateRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DelegateRequestRequest)
+func _ApprovalService_DelegateApproval_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelegateApprovalRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ApprovalServiceServer).DelegateRequest(ctx, in)
+		return srv.(ApprovalServiceServer).DelegateApproval(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ApprovalService_DelegateRequest_FullMethodName,
+		FullMethod: ApprovalService_DelegateApproval_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApprovalServiceServer).DelegateRequest(ctx, req.(*DelegateRequestRequest))
+		return srv.(ApprovalServiceServer).DelegateApproval(ctx, req.(*DelegateApprovalRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -362,16 +366,16 @@ var ApprovalService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ApprovalService_GetApproval_Handler,
 		},
 		{
-			MethodName: "ApproveRequest",
-			Handler:    _ApprovalService_ApproveRequest_Handler,
+			MethodName: "ApproveApproval",
+			Handler:    _ApprovalService_ApproveApproval_Handler,
 		},
 		{
-			MethodName: "RejectRequest",
-			Handler:    _ApprovalService_RejectRequest_Handler,
+			MethodName: "RejectApproval",
+			Handler:    _ApprovalService_RejectApproval_Handler,
 		},
 		{
-			MethodName: "DelegateRequest",
-			Handler:    _ApprovalService_DelegateRequest_Handler,
+			MethodName: "DelegateApproval",
+			Handler:    _ApprovalService_DelegateApproval_Handler,
 		},
 		{
 			MethodName: "ListDelegationChains",

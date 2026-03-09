@@ -32,6 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // ProjectService provides project management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type ProjectServiceClient interface {
 	ListProjects(ctx context.Context, in *ListProjectsRequest, opts ...grpc.CallOption) (*ListProjectsResponse, error)
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
@@ -114,6 +115,7 @@ func (c *projectServiceClient) AddProjectMember(ctx context.Context, in *AddProj
 // for forward compatibility.
 //
 // ProjectService provides project management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type ProjectServiceServer interface {
 	ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error)
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)

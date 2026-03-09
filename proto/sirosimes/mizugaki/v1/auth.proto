@@ -12,167 +12,216 @@ import "sirosimes/common/v1/metadata.proto";
 // 認証成功時は mizugaki_token Cookie を発行し、Ed25519 (EdDSA) で署名された
 // JWT アクセストークンとリフレッシュトークンを返却する。
 //
+// ⚠️ トークン露出方針（CISO指令 A-1）:
+//   外部クライアントには BFF/Gateway が opaque session ID に変換して返却する。
+//   JWT 構造（ヘッダー、ペイロード、署名）は Internal API 間通信でのみ使用し、
+//   外部には一切露出しない。JWE暗号化は将来的なオプションとして検討する。
+//
+// Exposure:
+//   Login, Logout       → EXTERNAL（BFF/Gateway経由）
+//   VerifyToken          → INTERNAL（サービス間認証のみ）
+//   RefreshToken         → EXTERNAL（BFF/Gateway経由、opaque化）
+//   ListSessions         → INTERNAL
+//   RevokeSession        → INTERNAL
+//   CreateApiKey         → INTERNAL（管理者操作）
+//   RevokeApiKey         → INTERNAL（管理者操作）
+//
 // 関連型:
 //   - Actor/ActorRef (common/v1/actor.proto): 認証されたユーザーを識別する。
 //   - SecurityLevel (common/v1/metadata.proto): 認証情報は RESTRICTED レベル。
-//   - Token (token.proto): JWT トークンの発行・検証の詳細。
-//   - Identity (identity.proto): ユーザーアイデンティティの管理。
 
 // AuthMethod は認証に使用された方法を分類する。
 enum AuthMethod {
   AUTH_METHOD_UNSPECIFIED = 0;
-  // ユーザー名とパスワードによる認証。
   AUTH_METHOD_PASSWORD = 1;
-  // OAuth2/OIDC による外部プロバイダー認証。
   AUTH_METHOD_OAUTH2 = 2;
-  // API キーによる認証。
   AUTH_METHOD_API_KEY = 3;
-  // SSO Cookie (mizugaki_token) による認証。
   AUTH_METHOD_SSO_COOKIE = 4;
-  // リフレッシュトークンによるトークン更新。
   AUTH_METHOD_REFRESH_TOKEN = 5;
 }
 
 // SessionStatus はセッションの状態を表す。
 enum SessionStatus {
   SESSION_STATUS_UNSPECIFIED = 0;
-  // セッションは有効でアクティブ。
   SESSION_STATUS_ACTIVE = 1;
-  // セッションは期限切れ。
   SESSION_STATUS_EXPIRED = 2;
-  // セッションはユーザーまたは管理者によって取り消し済み。
   SESSION_STATUS_REVOKED = 3;
 }
 
 // AuthSession はユーザーの認証セッションを表す。
 message AuthSession {
-  // セッション一意識別子（UUID形式）。
   string id = 1;
-  // セッションに紐づくユーザーID。
   string user_id = 2;
-  // セッション作成時のアクター参照。
   sirosimes.common.v1.ActorRef actor_ref = 3;
-  // セッションの現在の状態。
   SessionStatus status = 4;
-  // 認証に使用された方法。
   AuthMethod auth_method = 5;
-  // アクセストークン（JWT）。セキュリティレベル: RESTRICTED。
+  // アクセストークン（JWT）。SecurityLevel: RESTRICTED。
+  // ⚠️ External APIではopaque session IDに変換して返却すること。
+  // JWT構造はInternal API間通信でのみ使用する。
   string access_token = 6;
-  // リフレッシュトークン。セキュリティレベル: RESTRICTED。
+  // リフレッシュトークン。SecurityLevel: RESTRICTED。
+  // ⚠️ 同上：外部にはopaque形式で返却。
   string refresh_token = 7;
-  // アクセストークンの有効期限。
   google.protobuf.Timestamp access_token_expires_at = 8;
-  // リフレッシュトークンの有効期限。
   google.protobuf.Timestamp refresh_token_expires_at = 9;
-  // クライアントIPアドレス（CONFIDENTIAL — 監査用）。
+  // クライアントIPアドレス。SecurityLevel: CONFIDENTIAL — 監査用。
   string ip_address = 10;
-  // クライアントのユーザーエージェント（CONFIDENTIAL — 監査用）。
+  // クライアントのユーザーエージェント。SecurityLevel: CONFIDENTIAL — 監査用。
   string user_agent = 11;
-  // セキュリティ分類レベル。認証セッションはデフォルト RESTRICTED。
   sirosimes.common.v1.SecurityLevel security_level = 12;
-  // セッション作成日時。
   google.protobuf.Timestamp created_at = 13;
-  // セッション最終更新日時。
   google.protobuf.Timestamp updated_at = 14;
 }
 
+// ApiKeyConfig は API キーの設定とライフサイクルを管理する。
+// API キーは長期有効トークンであるため、有効期限・スコープ制限・レート制限を必須とする。
+message ApiKeyConfig {
+  // API キーの一意識別子。
+  string id = 1;
+  // API キーの表示名（用途の説明）。
+  string name = 2;
+  // キーのハッシュ（元のキーは作成時のみ返却、保存しない）。SecurityLevel: RESTRICTED。
+  string key_hash = 3;
+  // キーの有効期限（必須 — 無期限キーは禁止）。
+  google.protobuf.Timestamp expires_at = 4;
+  // 許可されたスコープ（空 = 全スコープ禁止）。
+  repeated string allowed_scopes = 5;
+  // 1分あたりのレート制限（0 = デフォルト制限適用）。
+  int32 rate_limit_per_minute = 6;
+  // キーの所有者（作成者）。
+  string owner_id = 7;
+  // 最後に使用された日時。
+  google.protobuf.Timestamp last_used_at = 8;
+  // キーが有効かどうか。
+  bool enabled = 9;
+  google.protobuf.Timestamp created_at = 10;
+}
+
 // LoginRequest はログインリクエストを表す。
+// Exposure: EXTERNAL（BFF/Gateway経由）。
 message LoginRequest {
-  // ログインに使用する識別子（メールアドレスまたはユーザー名）。
   string identifier = 1;
-  // パスワード（AUTH_METHOD_PASSWORD の場合）。
   string password = 2;
-  // 認証方法。
   AuthMethod auth_method = 3;
-  // クライアントIPアドレス（ゲートウェイが付与）。
+  // クライアントIPアドレス（ゲートウェイが付与）。SecurityLevel: CONFIDENTIAL。
   string ip_address = 4;
-  // クライアントのユーザーエージェント。
   string user_agent = 5;
 }
 
 // LoginResponse はログインレスポンスを表す。
 message LoginResponse {
-  // 作成された認証セッション。
   AuthSession session = 1;
 }
 
 // LogoutRequest はログアウトリクエストを表す。
+// Exposure: EXTERNAL（BFF/Gateway経由）。
 message LogoutRequest {
-  // 無効化するセッションID。空の場合は現在のセッションを無効化。
   string session_id = 1;
-  // true の場合、ユーザーの全セッションを無効化する。
   bool revoke_all = 2;
 }
 
 // LogoutResponse はログアウトレスポンスを表す。
 message LogoutResponse {
-  // 無効化されたセッション数。
   int32 revoked_count = 1;
 }
 
 // VerifyTokenRequest はトークン検証リクエストを表す。
+// Exposure: INTERNAL — サービス間認証でのみ使用。外部クライアントからは呼べない。
 message VerifyTokenRequest {
-  // 検証するアクセストークン（JWT）。
   string access_token = 1;
 }
 
 // VerifyTokenResponse はトークン検証レスポンスを表す。
 message VerifyTokenResponse {
-  // トークンが有効かどうか。
   bool valid = 1;
-  // トークンから抽出されたユーザーID。
   string user_id = 2;
-  // トークンから抽出されたアクター参照。
   sirosimes.common.v1.ActorRef actor_ref = 3;
-  // トークンの有効期限。
   google.protobuf.Timestamp expires_at = 4;
-  // トークンに含まれるスコープ。
   repeated string scopes = 5;
-  // トークンに含まれるカスタムクレーム。
   map<string, string> claims = 6;
 }
 
 // RefreshTokenRequest はトークンリフレッシュリクエストを表す。
+// Exposure: EXTERNAL（BFF/Gateway経由、opaque化）。
 message RefreshTokenRequest {
-  // リフレッシュトークン。
   string refresh_token = 1;
 }
 
 // RefreshTokenResponse はトークンリフレッシュレスポンスを表す。
 message RefreshTokenResponse {
-  // 更新された認証セッション（新しいアクセストークンとリフレッシュトークンを含む）。
   AuthSession session = 1;
 }
 
 // ListSessionsRequest はセッション一覧取得リクエストを表す。
+// Exposure: INTERNAL。
 message ListSessionsRequest {
-  // セッションを取得するユーザーID。
   string user_id = 1;
-  // ステータスでフィルタ。
   SessionStatus status = 2;
 }
 
 // ListSessionsResponse はセッション一覧取得レスポンスを表す。
 message ListSessionsResponse {
-  // ユーザーのセッション一覧。
   repeated AuthSession sessions = 1;
 }
 
 // RevokeSessionRequest はセッション取り消しリクエストを表す。
+// Exposure: INTERNAL。
 message RevokeSessionRequest {
-  // 取り消すセッションID。
   string session_id = 1;
 }
 
 // RevokeSessionResponse はセッション取り消しレスポンスを表す。
 message RevokeSessionResponse {}
 
+// CreateApiKeyRequest は API キー作成リクエストを表す。
+// Exposure: INTERNAL（管理者操作）。
+message CreateApiKeyRequest {
+  // API キーの表示名。
+  string name = 1;
+  // 有効期限（必須）。
+  google.protobuf.Timestamp expires_at = 2;
+  // 許可するスコープ。
+  repeated string allowed_scopes = 3;
+  // レート制限（1分あたり）。
+  int32 rate_limit_per_minute = 4;
+  // キーの所有者ID。
+  string owner_id = 5;
+}
+
+// CreateApiKeyResponse は API キー作成レスポンスを表す。
+message CreateApiKeyResponse {
+  // 作成された API キー設定。
+  ApiKeyConfig api_key = 1;
+  // 平文の API キー（RESTRICTED — この応答でのみ返却、以降は取得不可）。
+  string raw_key = 2;
+}
+
+// RevokeApiKeyRequest は API キー失効リクエストを表す。
+// Exposure: INTERNAL（管理者操作）。
+message RevokeApiKeyRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+// RevokeApiKeyResponse は API キー失効レスポンスを表す。
+message RevokeApiKeyResponse {}
+
 // AuthService は瑞垣の認証操作を提供する。
 service AuthService {
+  // Exposure: EXTERNAL
   rpc Login(LoginRequest) returns (LoginResponse);
+  // Exposure: EXTERNAL
   rpc Logout(LogoutRequest) returns (LogoutResponse);
+  // Exposure: INTERNAL — サービス間認証のみ
   rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
+  // Exposure: EXTERNAL（opaque化必須）
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  // Exposure: INTERNAL
   rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+  // Exposure: INTERNAL
   rpc RevokeSession(RevokeSessionRequest) returns (RevokeSessionResponse);
+  // Exposure: INTERNAL — API キーのライフサイクル管理
+  rpc CreateApiKey(CreateApiKeyRequest) returns (CreateApiKeyResponse);
+  // Exposure: INTERNAL
+  rpc RevokeApiKey(RevokeApiKeyRequest) returns (RevokeApiKeyResponse);
 }

@@ -6,63 +6,43 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/pagination.proto";
 
-// execution.proto — Workflow execution tracking for the Hataori workflow engine.
+// execution.proto — 機織（Hataori）ワークフロー実行追跡サービス。
 //
-// Tracks the lifecycle of workflow runs and their individual steps.
-// Each execution is tied to a specific workflow version and records
-// inputs, outputs, errors, and timing information.
+// ワークフロー実行のライフサイクルと個々のステップを追跡する。
+//
+// Exposure: INTERNAL（全RPC）
 
 // ExecutionStatus represents the lifecycle state of a workflow execution.
 enum ExecutionStatus {
   EXECUTION_STATUS_UNSPECIFIED = 0;
-  // Execution is queued and waiting to start.
   EXECUTION_STATUS_PENDING = 1;
-  // Execution is actively running.
   EXECUTION_STATUS_RUNNING = 2;
-  // Execution completed successfully.
   EXECUTION_STATUS_COMPLETED = 3;
-  // Execution failed with an error.
   EXECUTION_STATUS_FAILED = 4;
-  // Execution was cancelled by a user or system.
   EXECUTION_STATUS_CANCELLED = 5;
-  // Execution is paused (e.g., waiting for approval).
   EXECUTION_STATUS_PAUSED = 6;
 }
 
 // ExecutionStepStatus represents the lifecycle state of an individual step.
 enum ExecutionStepStatus {
   EXECUTION_STEP_STATUS_UNSPECIFIED = 0;
-  // Step is queued and waiting to start.
   EXECUTION_STEP_STATUS_PENDING = 1;
-  // Step is actively running.
   EXECUTION_STEP_STATUS_RUNNING = 2;
-  // Step completed successfully.
   EXECUTION_STEP_STATUS_COMPLETED = 3;
-  // Step failed with an error.
   EXECUTION_STEP_STATUS_FAILED = 4;
-  // Step was skipped due to conditional logic.
   EXECUTION_STEP_STATUS_SKIPPED = 5;
-  // Step is waiting for an external event (e.g., approval, callback).
   EXECUTION_STEP_STATUS_WAITING = 6;
 }
 
 // Execution represents a single run of a workflow.
 message Execution {
-  // Unique identifier (UUID format).
   string id = 1;
-  // Workflow that was executed.
   string workflow_id = 2;
-  // Specific version that was executed.
   string version_id = 3;
-  // Current execution status.
   ExecutionStatus status = 4;
-  // Input data provided to the workflow.
   google.protobuf.Struct input = 5;
-  // Output data produced by the workflow.
   google.protobuf.Struct output = 6;
-  // Error details if the execution failed.
   string error = 7;
-  // Actor ID or trigger ID that initiated this execution.
   string triggered_by = 8;
   google.protobuf.Timestamp started_at = 9;
   google.protobuf.Timestamp finished_at = 10;
@@ -71,43 +51,32 @@ message Execution {
 
 // ExecutionStep represents a single step within a workflow execution.
 message ExecutionStep {
-  // Unique identifier (UUID format).
   string id = 1;
-  // Parent execution ID.
   string execution_id = 2;
-  // Name of this step as defined in the workflow DSL.
   string step_name = 3;
-  // Type of step (e.g., "llm", "http", "transform", "approval").
   string step_type = 4;
-  // Current step status.
   ExecutionStepStatus status = 5;
-  // Input data provided to this step.
   google.protobuf.Struct input = 6;
-  // Output data produced by this step.
   google.protobuf.Struct output = 7;
-  // Error details if the step failed.
   string error = 8;
-  // Number of retry attempts performed.
   int32 retries = 9;
   google.protobuf.Timestamp started_at = 10;
   google.protobuf.Timestamp finished_at = 11;
 }
 
 // ListExecutionsRequest is the request for listing executions with filters.
+// Uses cursor-based pagination for execution log streams.
 message ListExecutionsRequest {
-  sirosimes.common.v1.PaginationRequest pagination = 1;
-  // Filter by workflow ID.
+  sirosimes.common.v1.PageToken page_token = 1;
   string workflow_id = 2;
-  // Filter by execution status.
   ExecutionStatus status = 3;
-  // Filter by trigger source.
   string triggered_by = 4;
 }
 
 // ListExecutionsResponse is the response for listing executions.
 message ListExecutionsResponse {
   repeated Execution executions = 1;
-  sirosimes.common.v1.PaginationResponse pagination = 2;
+  sirosimes.common.v1.PageTokenResponse page_info = 2;
 }
 
 // GetExecutionRequest is the request for retrieving a single execution.
@@ -123,13 +92,9 @@ message GetExecutionResponse {
 
 // RunWorkflowRequest is the request for starting a new workflow execution.
 message RunWorkflowRequest {
-  // Workflow to execute.
   string workflow_id = 1;
-  // Specific version to execute (optional; uses latest active if empty).
   string version_id = 2;
-  // Input data for the workflow.
   google.protobuf.Struct input = 3;
-  // Actor ID or trigger ID initiating this execution.
   string triggered_by = 4;
 }
 
@@ -141,7 +106,6 @@ message RunWorkflowResponse {
 // CancelExecutionRequest is the request for cancelling a running execution.
 message CancelExecutionRequest {
   string id = 1;
-  // Reason for cancellation.
   string reason = 2;
 }
 
@@ -153,7 +117,6 @@ message CancelExecutionResponse {
 // ResumeExecutionRequest is the request for resuming a paused execution.
 message ResumeExecutionRequest {
   string id = 1;
-  // Additional input data to provide on resume.
   google.protobuf.Struct input = 2;
 }
 
@@ -163,6 +126,7 @@ message ResumeExecutionResponse {
 }
 
 // ExecutionService provides workflow execution management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 service ExecutionService {
   rpc ListExecutions(ListExecutionsRequest) returns (ListExecutionsResponse);
   rpc GetExecution(GetExecutionRequest) returns (GetExecutionResponse);

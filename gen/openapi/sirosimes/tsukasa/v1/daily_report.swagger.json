@@ -131,8 +131,11 @@
         "reflection": {
           "type": "string"
         },
-        "emotions": {
-          "type": "string"
+        "emotionTags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "createdAt": {
           "type": "string",

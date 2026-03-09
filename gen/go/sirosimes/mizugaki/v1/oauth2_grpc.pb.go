@@ -36,12 +36,14 @@ const (
 //
 // OAuth2Service は OAuth2/OIDC クライアント管理と認可操作を提供する。
 type OAuth2ServiceClient interface {
+	// Exposure: INTERNAL — 管理者操作
 	RegisterClient(ctx context.Context, in *RegisterClientRequest, opts ...grpc.CallOption) (*RegisterClientResponse, error)
 	GetClient(ctx context.Context, in *GetClientRequest, opts ...grpc.CallOption) (*GetClientResponse, error)
 	UpdateClient(ctx context.Context, in *UpdateClientRequest, opts ...grpc.CallOption) (*UpdateClientResponse, error)
 	DeleteClient(ctx context.Context, in *DeleteClientRequest, opts ...grpc.CallOption) (*DeleteClientResponse, error)
 	ListClients(ctx context.Context, in *ListClientsRequest, opts ...grpc.CallOption) (*ListClientsResponse, error)
 	RotateClientSecret(ctx context.Context, in *RotateClientSecretRequest, opts ...grpc.CallOption) (*RotateClientSecretResponse, error)
+	// Exposure: EXTERNAL — 公開エンドポイント
 	Authorize(ctx context.Context, in *AuthorizeRequest, opts ...grpc.CallOption) (*AuthorizeResponse, error)
 	Token(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenResponse, error)
 	Userinfo(ctx context.Context, in *UserinfoRequest, opts ...grpc.CallOption) (*UserinfoResponse, error)
@@ -151,12 +153,14 @@ func (c *oAuth2ServiceClient) Userinfo(ctx context.Context, in *UserinfoRequest,
 //
 // OAuth2Service は OAuth2/OIDC クライアント管理と認可操作を提供する。
 type OAuth2ServiceServer interface {
+	// Exposure: INTERNAL — 管理者操作
 	RegisterClient(context.Context, *RegisterClientRequest) (*RegisterClientResponse, error)
 	GetClient(context.Context, *GetClientRequest) (*GetClientResponse, error)
 	UpdateClient(context.Context, *UpdateClientRequest) (*UpdateClientResponse, error)
 	DeleteClient(context.Context, *DeleteClientRequest) (*DeleteClientResponse, error)
 	ListClients(context.Context, *ListClientsRequest) (*ListClientsResponse, error)
 	RotateClientSecret(context.Context, *RotateClientSecretRequest) (*RotateClientSecretResponse, error)
+	// Exposure: EXTERNAL — 公開エンドポイント
 	Authorize(context.Context, *AuthorizeRequest) (*AuthorizeResponse, error)
 	Token(context.Context, *TokenRequest) (*TokenResponse, error)
 	Userinfo(context.Context, *UserinfoRequest) (*UserinfoResponse, error)

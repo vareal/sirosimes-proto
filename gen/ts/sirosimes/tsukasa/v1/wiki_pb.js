@@ -3,9 +3,9 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Timestamp } from "@bufbuild/protobuf";
+import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
 import { ActorRef } from "../../common/v1/actor_pb.js";
-import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import { PageToken, PageTokenResponse, PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * WikiShelf represents a top-level grouping of wiki books.
@@ -38,6 +38,25 @@ export const WikiBook = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "shelf_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "sort_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 7, name: "created_at", kind: "message", T: Timestamp },
+    { no: 8, name: "updated_at", kind: "message", T: Timestamp },
+  ],
+);
+
+/**
+ * WikiChapter represents a grouping of documents within a book.
+ *
+ * @generated from message sirosimes.tsukasa.v1.WikiChapter
+ */
+export const WikiChapter = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tsukasa.v1.WikiChapter",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "book_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "sort_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 7, name: "created_at", kind: "message", T: Timestamp },
     { no: 8, name: "updated_at", kind: "message", T: Timestamp },
@@ -217,6 +236,7 @@ export const GetBookResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ListDocumentsRequest is the request for listing wiki documents.
+ * Uses cursor-based pagination for large document sets and real-time edits.
  *
  * @generated from message sirosimes.tsukasa.v1.ListDocumentsRequest
  */
@@ -224,7 +244,7 @@ export const ListDocumentsRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListDocumentsRequest",
   () => [
     { no: 1, name: "book_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 2, name: "page_token", kind: "message", T: PageToken },
     { no: 3, name: "search", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
@@ -238,7 +258,7 @@ export const ListDocumentsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListDocumentsResponse",
   () => [
     { no: 1, name: "documents", kind: "message", T: WikiDocumentDetail, repeated: true },
-    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+    { no: 2, name: "page_info", kind: "message", T: PageTokenResponse },
   ],
 );
 
@@ -309,6 +329,7 @@ export const UpdateDocumentRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "updated_by_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "revision_summary", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "update_mask", kind: "message", T: FieldMask },
   ],
 );
 
@@ -326,6 +347,7 @@ export const UpdateDocumentResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ListRevisionsRequest is the request for listing revisions of a document.
+ * Uses cursor-based pagination for append-only revision history.
  *
  * @generated from message sirosimes.tsukasa.v1.ListRevisionsRequest
  */
@@ -333,7 +355,7 @@ export const ListRevisionsRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListRevisionsRequest",
   () => [
     { no: 1, name: "document_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 2, name: "page_token", kind: "message", T: PageToken },
   ],
 );
 
@@ -346,12 +368,12 @@ export const ListRevisionsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListRevisionsResponse",
   () => [
     { no: 1, name: "revisions", kind: "message", T: WikiRevisionDetail, repeated: true },
-    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+    { no: 2, name: "page_info", kind: "message", T: PageTokenResponse },
   ],
 );
 
 /**
- * ListWikiCommentsRequest is the request for listing wiki document comments.
+ * ListCommentsRequest is the request for listing wiki document comments.
  *
  * @generated from message sirosimes.tsukasa.v1.ListWikiCommentsRequest
  */
@@ -364,7 +386,7 @@ export const ListWikiCommentsRequest = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * ListWikiCommentsResponse is the response for listing wiki document comments.
+ * ListCommentsResponse is the response for listing wiki document comments.
  *
  * @generated from message sirosimes.tsukasa.v1.ListWikiCommentsResponse
  */
@@ -377,7 +399,7 @@ export const ListWikiCommentsResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * CreateWikiCommentRequest is the request for creating a wiki document comment.
+ * CreateCommentRequest is the request for creating a wiki document comment.
  *
  * @generated from message sirosimes.tsukasa.v1.CreateWikiCommentRequest
  */
@@ -391,7 +413,7 @@ export const CreateWikiCommentRequest = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * CreateWikiCommentResponse is the response after creating a wiki document comment.
+ * CreateCommentResponse is the response after creating a wiki document comment.
  *
  * @generated from message sirosimes.tsukasa.v1.CreateWikiCommentResponse
  */

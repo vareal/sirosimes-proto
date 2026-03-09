@@ -34,6 +34,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // TaskService provides task management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type TaskServiceClient interface {
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
 	ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error)
@@ -138,6 +139,7 @@ func (c *taskServiceClient) RejectTask(ctx context.Context, in *RejectTaskReques
 // for forward compatibility.
 //
 // TaskService provides task management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type TaskServiceServer interface {
 	CreateTask(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)

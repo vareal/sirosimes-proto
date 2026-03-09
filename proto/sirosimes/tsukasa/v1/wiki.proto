@@ -2,9 +2,17 @@ syntax = "proto3";
 
 package sirosimes.tsukasa.v1;
 
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
 import "sirosimes/common/v1/pagination.proto";
+
+// wiki.proto — 司（Tsukasa）Wiki管理サービス。
+//
+// Shelf > Book > Chapter > Document の階層構造でWikiドキュメントを管理する。
+// リビジョン履歴とコメント機能を提供。
+//
+// Exposure: INTERNAL（全RPC）
 
 // WikiShelf represents a top-level grouping of wiki books.
 message WikiShelf {
@@ -29,6 +37,18 @@ message WikiBook {
   google.protobuf.Timestamp updated_at = 8;
 }
 
+// WikiChapter represents a grouping of documents within a book.
+message WikiChapter {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  string book_id = 5;
+  int32 sort_order = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
 // WikiDocument represents a single wiki page with markdown content.
 message WikiDocument {
   string id = 1;
@@ -36,6 +56,7 @@ message WikiDocument {
   string slug = 3;
   string content = 4;
   string book_id = 5;
+  // Reference to the containing chapter (see WikiChapter).
   string chapter_id = 6;
   string created_by_id = 7;
   string updated_by_id = 8;
@@ -117,16 +138,17 @@ message GetBookResponse {
 }
 
 // ListDocumentsRequest is the request for listing wiki documents.
+// Uses cursor-based pagination for large document sets and real-time edits.
 message ListDocumentsRequest {
   string book_id = 1;
-  sirosimes.common.v1.PaginationRequest pagination = 2;
+  sirosimes.common.v1.PageToken page_token = 2;
   string search = 3;
 }
 
 // ListDocumentsResponse is the response for listing wiki documents.
 message ListDocumentsResponse {
   repeated WikiDocumentDetail documents = 1;
-  sirosimes.common.v1.PaginationResponse pagination = 2;
+  sirosimes.common.v1.PageTokenResponse page_info = 2;
 }
 
 // CreateDocumentRequest is the request for creating a new wiki document.
@@ -162,6 +184,8 @@ message UpdateDocumentRequest {
   string content = 3;
   string updated_by_id = 4;
   string revision_summary = 5;
+  // Fields to update. If empty, all non-empty fields are updated.
+  google.protobuf.FieldMask update_mask = 6;
 }
 
 // UpdateDocumentResponse is the response after updating a wiki document.
@@ -170,42 +194,44 @@ message UpdateDocumentResponse {
 }
 
 // ListRevisionsRequest is the request for listing revisions of a document.
+// Uses cursor-based pagination for append-only revision history.
 message ListRevisionsRequest {
   string document_id = 1;
-  sirosimes.common.v1.PaginationRequest pagination = 2;
+  sirosimes.common.v1.PageToken page_token = 2;
 }
 
 // ListRevisionsResponse is the response for listing document revisions.
 message ListRevisionsResponse {
   repeated WikiRevisionDetail revisions = 1;
-  sirosimes.common.v1.PaginationResponse pagination = 2;
+  sirosimes.common.v1.PageTokenResponse page_info = 2;
 }
 
-// ListWikiCommentsRequest is the request for listing wiki document comments.
+// ListCommentsRequest is the request for listing wiki document comments.
 message ListWikiCommentsRequest {
   string document_id = 1;
   sirosimes.common.v1.PaginationRequest pagination = 2;
 }
 
-// ListWikiCommentsResponse is the response for listing wiki document comments.
+// ListCommentsResponse is the response for listing wiki document comments.
 message ListWikiCommentsResponse {
   repeated WikiCommentDetail comments = 1;
   sirosimes.common.v1.PaginationResponse pagination = 2;
 }
 
-// CreateWikiCommentRequest is the request for creating a wiki document comment.
+// CreateCommentRequest is the request for creating a wiki document comment.
 message CreateWikiCommentRequest {
   string document_id = 1;
   string author_id = 2;
   string content = 3;
 }
 
-// CreateWikiCommentResponse is the response after creating a wiki document comment.
+// CreateCommentResponse is the response after creating a wiki document comment.
 message CreateWikiCommentResponse {
   WikiCommentDetail comment = 1;
 }
 
 // WikiService provides wiki management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 service WikiService {
   rpc ListShelves(ListShelvesRequest) returns (ListShelvesResponse);
   rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
@@ -215,6 +241,7 @@ service WikiService {
   rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse);
   rpc UpdateDocument(UpdateDocumentRequest) returns (UpdateDocumentResponse);
   rpc ListRevisions(ListRevisionsRequest) returns (ListRevisionsResponse);
+  // Wiki prefix retained: same-package constraint requires unique message names.
   rpc ListWikiComments(ListWikiCommentsRequest) returns (ListWikiCommentsResponse);
   rpc CreateWikiComment(CreateWikiCommentRequest) returns (CreateWikiCommentResponse);
 }

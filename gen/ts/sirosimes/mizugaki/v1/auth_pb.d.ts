@@ -20,36 +20,26 @@ export declare enum AuthMethod {
   UNSPECIFIED = 0,
 
   /**
-   * ユーザー名とパスワードによる認証。
-   *
    * @generated from enum value: AUTH_METHOD_PASSWORD = 1;
    */
   PASSWORD = 1,
 
   /**
-   * OAuth2/OIDC による外部プロバイダー認証。
-   *
    * @generated from enum value: AUTH_METHOD_OAUTH2 = 2;
    */
   OAUTH2 = 2,
 
   /**
-   * API キーによる認証。
-   *
    * @generated from enum value: AUTH_METHOD_API_KEY = 3;
    */
   API_KEY = 3,
 
   /**
-   * SSO Cookie (mizugaki_token) による認証。
-   *
    * @generated from enum value: AUTH_METHOD_SSO_COOKIE = 4;
    */
   SSO_COOKIE = 4,
 
   /**
-   * リフレッシュトークンによるトークン更新。
-   *
    * @generated from enum value: AUTH_METHOD_REFRESH_TOKEN = 5;
    */
   REFRESH_TOKEN = 5,
@@ -67,22 +57,16 @@ export declare enum SessionStatus {
   UNSPECIFIED = 0,
 
   /**
-   * セッションは有効でアクティブ。
-   *
    * @generated from enum value: SESSION_STATUS_ACTIVE = 1;
    */
   ACTIVE = 1,
 
   /**
-   * セッションは期限切れ。
-   *
    * @generated from enum value: SESSION_STATUS_EXPIRED = 2;
    */
   EXPIRED = 2,
 
   /**
-   * セッションはユーザーまたは管理者によって取り消し済み。
-   *
    * @generated from enum value: SESSION_STATUS_REVOKED = 3;
    */
   REVOKED = 3,
@@ -95,99 +79,82 @@ export declare enum SessionStatus {
  */
 export declare class AuthSession extends Message<AuthSession> {
   /**
-   * セッション一意識別子（UUID形式）。
-   *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * セッションに紐づくユーザーID。
-   *
    * @generated from field: string user_id = 2;
    */
   userId: string;
 
   /**
-   * セッション作成時のアクター参照。
-   *
    * @generated from field: sirosimes.common.v1.ActorRef actor_ref = 3;
    */
   actorRef?: ActorRef;
 
   /**
-   * セッションの現在の状態。
-   *
    * @generated from field: sirosimes.mizugaki.v1.SessionStatus status = 4;
    */
   status: SessionStatus;
 
   /**
-   * 認証に使用された方法。
-   *
    * @generated from field: sirosimes.mizugaki.v1.AuthMethod auth_method = 5;
    */
   authMethod: AuthMethod;
 
   /**
-   * アクセストークン（JWT）。セキュリティレベル: RESTRICTED。
+   * アクセストークン（JWT）。SecurityLevel: RESTRICTED。
+   * ⚠️ External APIではopaque session IDに変換して返却すること。
+   * JWT構造はInternal API間通信でのみ使用する。
    *
    * @generated from field: string access_token = 6;
    */
   accessToken: string;
 
   /**
-   * リフレッシュトークン。セキュリティレベル: RESTRICTED。
+   * リフレッシュトークン。SecurityLevel: RESTRICTED。
+   * ⚠️ 同上：外部にはopaque形式で返却。
    *
    * @generated from field: string refresh_token = 7;
    */
   refreshToken: string;
 
   /**
-   * アクセストークンの有効期限。
-   *
    * @generated from field: google.protobuf.Timestamp access_token_expires_at = 8;
    */
   accessTokenExpiresAt?: Timestamp;
 
   /**
-   * リフレッシュトークンの有効期限。
-   *
    * @generated from field: google.protobuf.Timestamp refresh_token_expires_at = 9;
    */
   refreshTokenExpiresAt?: Timestamp;
 
   /**
-   * クライアントIPアドレス（CONFIDENTIAL — 監査用）。
+   * クライアントIPアドレス。SecurityLevel: CONFIDENTIAL — 監査用。
    *
    * @generated from field: string ip_address = 10;
    */
   ipAddress: string;
 
   /**
-   * クライアントのユーザーエージェント（CONFIDENTIAL — 監査用）。
+   * クライアントのユーザーエージェント。SecurityLevel: CONFIDENTIAL — 監査用。
    *
    * @generated from field: string user_agent = 11;
    */
   userAgent: string;
 
   /**
-   * セキュリティ分類レベル。認証セッションはデフォルト RESTRICTED。
-   *
    * @generated from field: sirosimes.common.v1.SecurityLevel security_level = 12;
    */
   securityLevel: SecurityLevel;
 
   /**
-   * セッション作成日時。
-   *
    * @generated from field: google.protobuf.Timestamp created_at = 13;
    */
   createdAt?: Timestamp;
 
   /**
-   * セッション最終更新日時。
-   *
    * @generated from field: google.protobuf.Timestamp updated_at = 14;
    */
   updatedAt?: Timestamp;
@@ -208,42 +175,125 @@ export declare class AuthSession extends Message<AuthSession> {
 }
 
 /**
+ * ApiKeyConfig は API キーの設定とライフサイクルを管理する。
+ * API キーは長期有効トークンであるため、有効期限・スコープ制限・レート制限を必須とする。
+ *
+ * @generated from message sirosimes.mizugaki.v1.ApiKeyConfig
+ */
+export declare class ApiKeyConfig extends Message<ApiKeyConfig> {
+  /**
+   * API キーの一意識別子。
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * API キーの表示名（用途の説明）。
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * キーのハッシュ（元のキーは作成時のみ返却、保存しない）。SecurityLevel: RESTRICTED。
+   *
+   * @generated from field: string key_hash = 3;
+   */
+  keyHash: string;
+
+  /**
+   * キーの有効期限（必須 — 無期限キーは禁止）。
+   *
+   * @generated from field: google.protobuf.Timestamp expires_at = 4;
+   */
+  expiresAt?: Timestamp;
+
+  /**
+   * 許可されたスコープ（空 = 全スコープ禁止）。
+   *
+   * @generated from field: repeated string allowed_scopes = 5;
+   */
+  allowedScopes: string[];
+
+  /**
+   * 1分あたりのレート制限（0 = デフォルト制限適用）。
+   *
+   * @generated from field: int32 rate_limit_per_minute = 6;
+   */
+  rateLimitPerMinute: number;
+
+  /**
+   * キーの所有者（作成者）。
+   *
+   * @generated from field: string owner_id = 7;
+   */
+  ownerId: string;
+
+  /**
+   * 最後に使用された日時。
+   *
+   * @generated from field: google.protobuf.Timestamp last_used_at = 8;
+   */
+  lastUsedAt?: Timestamp;
+
+  /**
+   * キーが有効かどうか。
+   *
+   * @generated from field: bool enabled = 9;
+   */
+  enabled: boolean;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 10;
+   */
+  createdAt?: Timestamp;
+
+  constructor(data?: PartialMessage<ApiKeyConfig>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.mizugaki.v1.ApiKeyConfig";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApiKeyConfig;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ApiKeyConfig;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ApiKeyConfig;
+
+  static equals(a: ApiKeyConfig | PlainMessage<ApiKeyConfig> | undefined, b: ApiKeyConfig | PlainMessage<ApiKeyConfig> | undefined): boolean;
+}
+
+/**
  * LoginRequest はログインリクエストを表す。
+ * Exposure: EXTERNAL（BFF/Gateway経由）。
  *
  * @generated from message sirosimes.mizugaki.v1.LoginRequest
  */
 export declare class LoginRequest extends Message<LoginRequest> {
   /**
-   * ログインに使用する識別子（メールアドレスまたはユーザー名）。
-   *
    * @generated from field: string identifier = 1;
    */
   identifier: string;
 
   /**
-   * パスワード（AUTH_METHOD_PASSWORD の場合）。
-   *
    * @generated from field: string password = 2;
    */
   password: string;
 
   /**
-   * 認証方法。
-   *
    * @generated from field: sirosimes.mizugaki.v1.AuthMethod auth_method = 3;
    */
   authMethod: AuthMethod;
 
   /**
-   * クライアントIPアドレス（ゲートウェイが付与）。
+   * クライアントIPアドレス（ゲートウェイが付与）。SecurityLevel: CONFIDENTIAL。
    *
    * @generated from field: string ip_address = 4;
    */
   ipAddress: string;
 
   /**
-   * クライアントのユーザーエージェント。
-   *
    * @generated from field: string user_agent = 5;
    */
   userAgent: string;
@@ -270,8 +320,6 @@ export declare class LoginRequest extends Message<LoginRequest> {
  */
 export declare class LoginResponse extends Message<LoginResponse> {
   /**
-   * 作成された認証セッション。
-   *
    * @generated from field: sirosimes.mizugaki.v1.AuthSession session = 1;
    */
   session?: AuthSession;
@@ -293,20 +341,17 @@ export declare class LoginResponse extends Message<LoginResponse> {
 
 /**
  * LogoutRequest はログアウトリクエストを表す。
+ * Exposure: EXTERNAL（BFF/Gateway経由）。
  *
  * @generated from message sirosimes.mizugaki.v1.LogoutRequest
  */
 export declare class LogoutRequest extends Message<LogoutRequest> {
   /**
-   * 無効化するセッションID。空の場合は現在のセッションを無効化。
-   *
    * @generated from field: string session_id = 1;
    */
   sessionId: string;
 
   /**
-   * true の場合、ユーザーの全セッションを無効化する。
-   *
    * @generated from field: bool revoke_all = 2;
    */
   revokeAll: boolean;
@@ -333,8 +378,6 @@ export declare class LogoutRequest extends Message<LogoutRequest> {
  */
 export declare class LogoutResponse extends Message<LogoutResponse> {
   /**
-   * 無効化されたセッション数。
-   *
    * @generated from field: int32 revoked_count = 1;
    */
   revokedCount: number;
@@ -356,13 +399,12 @@ export declare class LogoutResponse extends Message<LogoutResponse> {
 
 /**
  * VerifyTokenRequest はトークン検証リクエストを表す。
+ * Exposure: INTERNAL — サービス間認証でのみ使用。外部クライアントからは呼べない。
  *
  * @generated from message sirosimes.mizugaki.v1.VerifyTokenRequest
  */
 export declare class VerifyTokenRequest extends Message<VerifyTokenRequest> {
   /**
-   * 検証するアクセストークン（JWT）。
-   *
    * @generated from field: string access_token = 1;
    */
   accessToken: string;
@@ -389,43 +431,31 @@ export declare class VerifyTokenRequest extends Message<VerifyTokenRequest> {
  */
 export declare class VerifyTokenResponse extends Message<VerifyTokenResponse> {
   /**
-   * トークンが有効かどうか。
-   *
    * @generated from field: bool valid = 1;
    */
   valid: boolean;
 
   /**
-   * トークンから抽出されたユーザーID。
-   *
    * @generated from field: string user_id = 2;
    */
   userId: string;
 
   /**
-   * トークンから抽出されたアクター参照。
-   *
    * @generated from field: sirosimes.common.v1.ActorRef actor_ref = 3;
    */
   actorRef?: ActorRef;
 
   /**
-   * トークンの有効期限。
-   *
    * @generated from field: google.protobuf.Timestamp expires_at = 4;
    */
   expiresAt?: Timestamp;
 
   /**
-   * トークンに含まれるスコープ。
-   *
    * @generated from field: repeated string scopes = 5;
    */
   scopes: string[];
 
   /**
-   * トークンに含まれるカスタムクレーム。
-   *
    * @generated from field: map<string, string> claims = 6;
    */
   claims: { [key: string]: string };
@@ -447,13 +477,12 @@ export declare class VerifyTokenResponse extends Message<VerifyTokenResponse> {
 
 /**
  * RefreshTokenRequest はトークンリフレッシュリクエストを表す。
+ * Exposure: EXTERNAL（BFF/Gateway経由、opaque化）。
  *
  * @generated from message sirosimes.mizugaki.v1.RefreshTokenRequest
  */
 export declare class RefreshTokenRequest extends Message<RefreshTokenRequest> {
   /**
-   * リフレッシュトークン。
-   *
    * @generated from field: string refresh_token = 1;
    */
   refreshToken: string;
@@ -480,8 +509,6 @@ export declare class RefreshTokenRequest extends Message<RefreshTokenRequest> {
  */
 export declare class RefreshTokenResponse extends Message<RefreshTokenResponse> {
   /**
-   * 更新された認証セッション（新しいアクセストークンとリフレッシュトークンを含む）。
-   *
    * @generated from field: sirosimes.mizugaki.v1.AuthSession session = 1;
    */
   session?: AuthSession;
@@ -503,20 +530,17 @@ export declare class RefreshTokenResponse extends Message<RefreshTokenResponse> 
 
 /**
  * ListSessionsRequest はセッション一覧取得リクエストを表す。
+ * Exposure: INTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.ListSessionsRequest
  */
 export declare class ListSessionsRequest extends Message<ListSessionsRequest> {
   /**
-   * セッションを取得するユーザーID。
-   *
    * @generated from field: string user_id = 1;
    */
   userId: string;
 
   /**
-   * ステータスでフィルタ。
-   *
    * @generated from field: sirosimes.mizugaki.v1.SessionStatus status = 2;
    */
   status: SessionStatus;
@@ -543,8 +567,6 @@ export declare class ListSessionsRequest extends Message<ListSessionsRequest> {
  */
 export declare class ListSessionsResponse extends Message<ListSessionsResponse> {
   /**
-   * ユーザーのセッション一覧。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.AuthSession sessions = 1;
    */
   sessions: AuthSession[];
@@ -566,13 +588,12 @@ export declare class ListSessionsResponse extends Message<ListSessionsResponse> 
 
 /**
  * RevokeSessionRequest はセッション取り消しリクエストを表す。
+ * Exposure: INTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.RevokeSessionRequest
  */
 export declare class RevokeSessionRequest extends Message<RevokeSessionRequest> {
   /**
-   * 取り消すセッションID。
-   *
    * @generated from field: string session_id = 1;
    */
   sessionId: string;
@@ -611,5 +632,150 @@ export declare class RevokeSessionResponse extends Message<RevokeSessionResponse
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RevokeSessionResponse;
 
   static equals(a: RevokeSessionResponse | PlainMessage<RevokeSessionResponse> | undefined, b: RevokeSessionResponse | PlainMessage<RevokeSessionResponse> | undefined): boolean;
+}
+
+/**
+ * CreateApiKeyRequest は API キー作成リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
+ *
+ * @generated from message sirosimes.mizugaki.v1.CreateApiKeyRequest
+ */
+export declare class CreateApiKeyRequest extends Message<CreateApiKeyRequest> {
+  /**
+   * API キーの表示名。
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * 有効期限（必須）。
+   *
+   * @generated from field: google.protobuf.Timestamp expires_at = 2;
+   */
+  expiresAt?: Timestamp;
+
+  /**
+   * 許可するスコープ。
+   *
+   * @generated from field: repeated string allowed_scopes = 3;
+   */
+  allowedScopes: string[];
+
+  /**
+   * レート制限（1分あたり）。
+   *
+   * @generated from field: int32 rate_limit_per_minute = 4;
+   */
+  rateLimitPerMinute: number;
+
+  /**
+   * キーの所有者ID。
+   *
+   * @generated from field: string owner_id = 5;
+   */
+  ownerId: string;
+
+  constructor(data?: PartialMessage<CreateApiKeyRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.mizugaki.v1.CreateApiKeyRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateApiKeyRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateApiKeyRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateApiKeyRequest;
+
+  static equals(a: CreateApiKeyRequest | PlainMessage<CreateApiKeyRequest> | undefined, b: CreateApiKeyRequest | PlainMessage<CreateApiKeyRequest> | undefined): boolean;
+}
+
+/**
+ * CreateApiKeyResponse は API キー作成レスポンスを表す。
+ *
+ * @generated from message sirosimes.mizugaki.v1.CreateApiKeyResponse
+ */
+export declare class CreateApiKeyResponse extends Message<CreateApiKeyResponse> {
+  /**
+   * 作成された API キー設定。
+   *
+   * @generated from field: sirosimes.mizugaki.v1.ApiKeyConfig api_key = 1;
+   */
+  apiKey?: ApiKeyConfig;
+
+  /**
+   * 平文の API キー（RESTRICTED — この応答でのみ返却、以降は取得不可）。
+   *
+   * @generated from field: string raw_key = 2;
+   */
+  rawKey: string;
+
+  constructor(data?: PartialMessage<CreateApiKeyResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.mizugaki.v1.CreateApiKeyResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateApiKeyResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateApiKeyResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateApiKeyResponse;
+
+  static equals(a: CreateApiKeyResponse | PlainMessage<CreateApiKeyResponse> | undefined, b: CreateApiKeyResponse | PlainMessage<CreateApiKeyResponse> | undefined): boolean;
+}
+
+/**
+ * RevokeApiKeyRequest は API キー失効リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
+ *
+ * @generated from message sirosimes.mizugaki.v1.RevokeApiKeyRequest
+ */
+export declare class RevokeApiKeyRequest extends Message<RevokeApiKeyRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string reason = 2;
+   */
+  reason: string;
+
+  constructor(data?: PartialMessage<RevokeApiKeyRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.mizugaki.v1.RevokeApiKeyRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RevokeApiKeyRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RevokeApiKeyRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RevokeApiKeyRequest;
+
+  static equals(a: RevokeApiKeyRequest | PlainMessage<RevokeApiKeyRequest> | undefined, b: RevokeApiKeyRequest | PlainMessage<RevokeApiKeyRequest> | undefined): boolean;
+}
+
+/**
+ * RevokeApiKeyResponse は API キー失効レスポンスを表す。
+ *
+ * @generated from message sirosimes.mizugaki.v1.RevokeApiKeyResponse
+ */
+export declare class RevokeApiKeyResponse extends Message<RevokeApiKeyResponse> {
+  constructor(data?: PartialMessage<RevokeApiKeyResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.mizugaki.v1.RevokeApiKeyResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RevokeApiKeyResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RevokeApiKeyResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RevokeApiKeyResponse;
+
+  static equals(a: RevokeApiKeyResponse | PlainMessage<RevokeApiKeyResponse> | undefined, b: RevokeApiKeyResponse | PlainMessage<RevokeApiKeyResponse> | undefined): boolean;
 }
 

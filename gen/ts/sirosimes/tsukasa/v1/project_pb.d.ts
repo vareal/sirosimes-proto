@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ActorRef } from "../../common/v1/actor_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
@@ -635,6 +635,13 @@ export declare class UpdateProjectRequest extends Message<UpdateProjectRequest> 
    * @generated from field: map<string, string> metadata = 11;
    */
   metadata: { [key: string]: string };
+
+  /**
+   * Fields to update. If empty, all non-empty fields are updated.
+   *
+   * @generated from field: google.protobuf.FieldMask update_mask = 12;
+   */
+  updateMask?: FieldMask;
 
   constructor(data?: PartialMessage<UpdateProjectRequest>);
 

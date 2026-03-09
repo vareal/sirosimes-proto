@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Timestamp } from "@bufbuild/protobuf";
+import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
 import { ActorRef } from "../../common/v1/actor_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 import { TaskDetail } from "./task_pb.js";
@@ -237,6 +237,7 @@ export const UpdateProjectRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "priority", kind: "enum", T: proto3.getEnumType(ProjectPriority) },
     { no: 10, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 11, name: "metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 12, name: "update_mask", kind: "message", T: FieldMask },
   ],
 );
 

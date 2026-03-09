@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import type { PageToken, PageTokenResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * ExecutionStatus represents the lifecycle state of a workflow execution.
@@ -19,43 +19,31 @@ export declare enum ExecutionStatus {
   UNSPECIFIED = 0,
 
   /**
-   * Execution is queued and waiting to start.
-   *
    * @generated from enum value: EXECUTION_STATUS_PENDING = 1;
    */
   PENDING = 1,
 
   /**
-   * Execution is actively running.
-   *
    * @generated from enum value: EXECUTION_STATUS_RUNNING = 2;
    */
   RUNNING = 2,
 
   /**
-   * Execution completed successfully.
-   *
    * @generated from enum value: EXECUTION_STATUS_COMPLETED = 3;
    */
   COMPLETED = 3,
 
   /**
-   * Execution failed with an error.
-   *
    * @generated from enum value: EXECUTION_STATUS_FAILED = 4;
    */
   FAILED = 4,
 
   /**
-   * Execution was cancelled by a user or system.
-   *
    * @generated from enum value: EXECUTION_STATUS_CANCELLED = 5;
    */
   CANCELLED = 5,
 
   /**
-   * Execution is paused (e.g., waiting for approval).
-   *
    * @generated from enum value: EXECUTION_STATUS_PAUSED = 6;
    */
   PAUSED = 6,
@@ -73,43 +61,31 @@ export declare enum ExecutionStepStatus {
   UNSPECIFIED = 0,
 
   /**
-   * Step is queued and waiting to start.
-   *
    * @generated from enum value: EXECUTION_STEP_STATUS_PENDING = 1;
    */
   PENDING = 1,
 
   /**
-   * Step is actively running.
-   *
    * @generated from enum value: EXECUTION_STEP_STATUS_RUNNING = 2;
    */
   RUNNING = 2,
 
   /**
-   * Step completed successfully.
-   *
    * @generated from enum value: EXECUTION_STEP_STATUS_COMPLETED = 3;
    */
   COMPLETED = 3,
 
   /**
-   * Step failed with an error.
-   *
    * @generated from enum value: EXECUTION_STEP_STATUS_FAILED = 4;
    */
   FAILED = 4,
 
   /**
-   * Step was skipped due to conditional logic.
-   *
    * @generated from enum value: EXECUTION_STEP_STATUS_SKIPPED = 5;
    */
   SKIPPED = 5,
 
   /**
-   * Step is waiting for an external event (e.g., approval, callback).
-   *
    * @generated from enum value: EXECUTION_STEP_STATUS_WAITING = 6;
    */
   WAITING = 6,
@@ -122,57 +98,41 @@ export declare enum ExecutionStepStatus {
  */
 export declare class Execution extends Message<Execution> {
   /**
-   * Unique identifier (UUID format).
-   *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * Workflow that was executed.
-   *
    * @generated from field: string workflow_id = 2;
    */
   workflowId: string;
 
   /**
-   * Specific version that was executed.
-   *
    * @generated from field: string version_id = 3;
    */
   versionId: string;
 
   /**
-   * Current execution status.
-   *
    * @generated from field: sirosimes.hataori.v1.ExecutionStatus status = 4;
    */
   status: ExecutionStatus;
 
   /**
-   * Input data provided to the workflow.
-   *
    * @generated from field: google.protobuf.Struct input = 5;
    */
   input?: Struct;
 
   /**
-   * Output data produced by the workflow.
-   *
    * @generated from field: google.protobuf.Struct output = 6;
    */
   output?: Struct;
 
   /**
-   * Error details if the execution failed.
-   *
    * @generated from field: string error = 7;
    */
   error: string;
 
   /**
-   * Actor ID or trigger ID that initiated this execution.
-   *
    * @generated from field: string triggered_by = 8;
    */
   triggeredBy: string;
@@ -214,64 +174,46 @@ export declare class Execution extends Message<Execution> {
  */
 export declare class ExecutionStep extends Message<ExecutionStep> {
   /**
-   * Unique identifier (UUID format).
-   *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * Parent execution ID.
-   *
    * @generated from field: string execution_id = 2;
    */
   executionId: string;
 
   /**
-   * Name of this step as defined in the workflow DSL.
-   *
    * @generated from field: string step_name = 3;
    */
   stepName: string;
 
   /**
-   * Type of step (e.g., "llm", "http", "transform", "approval").
-   *
    * @generated from field: string step_type = 4;
    */
   stepType: string;
 
   /**
-   * Current step status.
-   *
    * @generated from field: sirosimes.hataori.v1.ExecutionStepStatus status = 5;
    */
   status: ExecutionStepStatus;
 
   /**
-   * Input data provided to this step.
-   *
    * @generated from field: google.protobuf.Struct input = 6;
    */
   input?: Struct;
 
   /**
-   * Output data produced by this step.
-   *
    * @generated from field: google.protobuf.Struct output = 7;
    */
   output?: Struct;
 
   /**
-   * Error details if the step failed.
-   *
    * @generated from field: string error = 8;
    */
   error: string;
 
   /**
-   * Number of retry attempts performed.
-   *
    * @generated from field: int32 retries = 9;
    */
   retries: number;
@@ -303,32 +245,27 @@ export declare class ExecutionStep extends Message<ExecutionStep> {
 
 /**
  * ListExecutionsRequest is the request for listing executions with filters.
+ * Uses cursor-based pagination for execution log streams.
  *
  * @generated from message sirosimes.hataori.v1.ListExecutionsRequest
  */
 export declare class ListExecutionsRequest extends Message<ListExecutionsRequest> {
   /**
-   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
+   * @generated from field: sirosimes.common.v1.PageToken page_token = 1;
    */
-  pagination?: PaginationRequest;
+  pageToken?: PageToken;
 
   /**
-   * Filter by workflow ID.
-   *
    * @generated from field: string workflow_id = 2;
    */
   workflowId: string;
 
   /**
-   * Filter by execution status.
-   *
    * @generated from field: sirosimes.hataori.v1.ExecutionStatus status = 3;
    */
   status: ExecutionStatus;
 
   /**
-   * Filter by trigger source.
-   *
    * @generated from field: string triggered_by = 4;
    */
   triggeredBy: string;
@@ -360,9 +297,9 @@ export declare class ListExecutionsResponse extends Message<ListExecutionsRespon
   executions: Execution[];
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageTokenResponse page_info = 2;
    */
-  pagination?: PaginationResponse;
+  pageInfo?: PageTokenResponse;
 
   constructor(data?: PartialMessage<ListExecutionsResponse>);
 
@@ -443,29 +380,21 @@ export declare class GetExecutionResponse extends Message<GetExecutionResponse> 
  */
 export declare class RunWorkflowRequest extends Message<RunWorkflowRequest> {
   /**
-   * Workflow to execute.
-   *
    * @generated from field: string workflow_id = 1;
    */
   workflowId: string;
 
   /**
-   * Specific version to execute (optional; uses latest active if empty).
-   *
    * @generated from field: string version_id = 2;
    */
   versionId: string;
 
   /**
-   * Input data for the workflow.
-   *
    * @generated from field: google.protobuf.Struct input = 3;
    */
   input?: Struct;
 
   /**
-   * Actor ID or trigger ID initiating this execution.
-   *
    * @generated from field: string triggered_by = 4;
    */
   triggeredBy: string;
@@ -523,8 +452,6 @@ export declare class CancelExecutionRequest extends Message<CancelExecutionReque
   id: string;
 
   /**
-   * Reason for cancellation.
-   *
    * @generated from field: string reason = 2;
    */
   reason: string;
@@ -582,8 +509,6 @@ export declare class ResumeExecutionRequest extends Message<ResumeExecutionReque
   id: string;
 
   /**
-   * Additional input data to provide on resume.
-   *
    * @generated from field: google.protobuf.Struct input = 2;
    */
   input?: Struct;

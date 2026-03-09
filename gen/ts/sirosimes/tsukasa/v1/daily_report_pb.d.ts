@@ -124,9 +124,9 @@ export declare class DailyReport extends Message<DailyReport> {
   reflection: string;
 
   /**
-   * @generated from field: string emotions = 13;
+   * @generated from field: repeated string emotion_tags = 19;
    */
-  emotions: string;
+  emotionTags: string[];
 
   /**
    * @generated from field: google.protobuf.Timestamp created_at = 14;
@@ -359,9 +359,11 @@ export declare class CreateReportRequest extends Message<CreateReportRequest> {
   reflection: string;
 
   /**
-   * @generated from field: string emotions = 8;
+   * Emotion tags for the day.
+   *
+   * @generated from field: repeated string emotion_tags = 8;
    */
-  emotions: string;
+  emotionTags: string[];
 
   constructor(data?: PartialMessage<CreateReportRequest>);
 

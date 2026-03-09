@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
-import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import { PageToken, PageTokenResponse, PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * ApprovalStatus represents the lifecycle state of an approval request.
@@ -91,13 +91,14 @@ export const DelegationChain = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ListApprovalsRequest is the request for listing approval requests with filters.
+ * Uses cursor-based pagination for real-time approval streams.
  *
  * @generated from message sirosimes.hataori.v1.ListApprovalsRequest
  */
 export const ListApprovalsRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.hataori.v1.ListApprovalsRequest",
   () => [
-    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 1, name: "page_token", kind: "message", T: PageToken },
     { no: 2, name: "execution_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "assignee", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "status", kind: "enum", T: proto3.getEnumType(ApprovalStatus) },
@@ -113,7 +114,7 @@ export const ListApprovalsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.hataori.v1.ListApprovalsResponse",
   () => [
     { no: 1, name: "approvals", kind: "message", T: ApprovalRequest, repeated: true },
-    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+    { no: 2, name: "page_info", kind: "message", T: PageTokenResponse },
   ],
 );
 
@@ -142,12 +143,13 @@ export const GetApprovalResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * ApproveRequestRequest is the request for granting an approval.
+ * ApproveApprovalRequest is the request for granting an approval.
+ * Renamed from ApproveRequestRequest to avoid double-Request naming (CEXO #3).
  *
- * @generated from message sirosimes.hataori.v1.ApproveRequestRequest
+ * @generated from message sirosimes.hataori.v1.ApproveApprovalRequest
  */
-export const ApproveRequestRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.hataori.v1.ApproveRequestRequest",
+export const ApproveApprovalRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.hataori.v1.ApproveApprovalRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "actor_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -156,24 +158,25 @@ export const ApproveRequestRequest = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * ApproveRequestResponse is the response after granting an approval.
+ * ApproveApprovalResponse is the response after granting an approval.
  *
- * @generated from message sirosimes.hataori.v1.ApproveRequestResponse
+ * @generated from message sirosimes.hataori.v1.ApproveApprovalResponse
  */
-export const ApproveRequestResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.hataori.v1.ApproveRequestResponse",
+export const ApproveApprovalResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.hataori.v1.ApproveApprovalResponse",
   () => [
     { no: 1, name: "approval", kind: "message", T: ApprovalRequest },
   ],
 );
 
 /**
- * RejectRequestRequest is the request for denying an approval.
+ * RejectApprovalRequest is the request for denying an approval.
+ * Renamed from RejectRequestRequest to avoid double-Request naming (CEXO #3).
  *
- * @generated from message sirosimes.hataori.v1.RejectRequestRequest
+ * @generated from message sirosimes.hataori.v1.RejectApprovalRequest
  */
-export const RejectRequestRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.hataori.v1.RejectRequestRequest",
+export const RejectApprovalRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.hataori.v1.RejectApprovalRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "actor_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -182,24 +185,25 @@ export const RejectRequestRequest = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * RejectRequestResponse is the response after denying an approval.
+ * RejectApprovalResponse is the response after denying an approval.
  *
- * @generated from message sirosimes.hataori.v1.RejectRequestResponse
+ * @generated from message sirosimes.hataori.v1.RejectApprovalResponse
  */
-export const RejectRequestResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.hataori.v1.RejectRequestResponse",
+export const RejectApprovalResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.hataori.v1.RejectApprovalResponse",
   () => [
     { no: 1, name: "approval", kind: "message", T: ApprovalRequest },
   ],
 );
 
 /**
- * DelegateRequestRequest is the request for delegating an approval to another actor.
+ * DelegateApprovalRequest is the request for delegating an approval to another actor.
+ * Renamed from DelegateRequestRequest for consistency.
  *
- * @generated from message sirosimes.hataori.v1.DelegateRequestRequest
+ * @generated from message sirosimes.hataori.v1.DelegateApprovalRequest
  */
-export const DelegateRequestRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.hataori.v1.DelegateRequestRequest",
+export const DelegateApprovalRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.hataori.v1.DelegateApprovalRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "actor_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -209,12 +213,12 @@ export const DelegateRequestRequest = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * DelegateRequestResponse is the response after delegating an approval.
+ * DelegateApprovalResponse is the response after delegating an approval.
  *
- * @generated from message sirosimes.hataori.v1.DelegateRequestResponse
+ * @generated from message sirosimes.hataori.v1.DelegateApprovalResponse
  */
-export const DelegateRequestResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.hataori.v1.DelegateRequestResponse",
+export const DelegateApprovalResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.hataori.v1.DelegateApprovalResponse",
   () => [
     { no: 1, name: "approval", kind: "message", T: ApprovalRequest },
   ],

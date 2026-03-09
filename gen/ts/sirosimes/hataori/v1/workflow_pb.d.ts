@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
@@ -19,29 +19,21 @@ export declare enum WorkflowStatus {
   UNSPECIFIED = 0,
 
   /**
-   * Workflow is being designed and is not yet available for execution.
-   *
    * @generated from enum value: WORKFLOW_STATUS_DRAFT = 1;
    */
   DRAFT = 1,
 
   /**
-   * Workflow is published and available for execution.
-   *
    * @generated from enum value: WORKFLOW_STATUS_ACTIVE = 2;
    */
   ACTIVE = 2,
 
   /**
-   * Workflow is temporarily disabled.
-   *
    * @generated from enum value: WORKFLOW_STATUS_INACTIVE = 3;
    */
   INACTIVE = 3,
 
   /**
-   * Workflow is retired and preserved for historical reference only.
-   *
    * @generated from enum value: WORKFLOW_STATUS_ARCHIVED = 4;
    */
   ARCHIVED = 4,
@@ -54,50 +46,36 @@ export declare enum WorkflowStatus {
  */
 export declare class Workflow extends Message<Workflow> {
   /**
-   * Unique identifier (UUID format).
-   *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * Human-readable workflow name.
-   *
    * @generated from field: string name = 2;
    */
   name: string;
 
   /**
-   * Detailed description of the workflow purpose and behavior.
-   *
    * @generated from field: string description = 3;
    */
   description: string;
 
   /**
-   * Current lifecycle status.
-   *
    * @generated from field: sirosimes.hataori.v1.WorkflowStatus status = 4;
    */
   status: WorkflowStatus;
 
   /**
-   * Tags for categorization and filtering.
-   *
    * @generated from field: repeated string tags = 5;
    */
   tags: string[];
 
   /**
-   * LLM configuration for AI-powered steps (model, temperature, etc.).
-   *
    * @generated from field: google.protobuf.Struct llm_config = 6;
    */
   llmConfig?: Struct;
 
   /**
-   * Actor ID who created this workflow.
-   *
    * @generated from field: string created_by = 7;
    */
   createdBy: string;
@@ -134,43 +112,31 @@ export declare class Workflow extends Message<Workflow> {
  */
 export declare class WorkflowVersion extends Message<WorkflowVersion> {
   /**
-   * Unique identifier (UUID format).
-   *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * Parent workflow ID.
-   *
    * @generated from field: string workflow_id = 2;
    */
   workflowId: string;
 
   /**
-   * Monotonically increasing version number.
-   *
    * @generated from field: int32 version = 3;
    */
   version: number;
 
   /**
-   * Workflow DSL definition as a flexible JSON structure.
-   *
    * @generated from field: google.protobuf.Struct dsl = 4;
    */
   dsl?: Struct;
 
   /**
-   * SHA-256 checksum of the DSL for integrity verification.
-   *
    * @generated from field: string checksum = 5;
    */
   checksum: string;
 
   /**
-   * Actor ID who created this version.
-   *
    * @generated from field: string created_by = 6;
    */
   createdBy: string;
@@ -279,22 +245,16 @@ export declare class ListWorkflowsRequest extends Message<ListWorkflowsRequest> 
   pagination?: PaginationRequest;
 
   /**
-   * Filter by workflow status.
-   *
    * @generated from field: sirosimes.hataori.v1.WorkflowStatus status = 2;
    */
   status: WorkflowStatus;
 
   /**
-   * Filter by tag (any match).
-   *
    * @generated from field: repeated string tags = 3;
    */
   tags: string[];
 
   /**
-   * Full-text search query.
-   *
    * @generated from field: string search = 4;
    */
   search: string;
@@ -432,6 +392,13 @@ export declare class UpdateWorkflowRequest extends Message<UpdateWorkflowRequest
    * @generated from field: google.protobuf.Struct llm_config = 6;
    */
   llmConfig?: Struct;
+
+  /**
+   * Fields to update. If empty, all non-empty fields are updated.
+   *
+   * @generated from field: google.protobuf.FieldMask update_mask = 7;
+   */
+  updateMask?: FieldMask;
 
   constructor(data?: PartialMessage<UpdateWorkflowRequest>);
 

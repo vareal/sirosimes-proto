@@ -66,36 +66,28 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier (UUID format)."
+          "type": "string"
         },
         "workflowId": {
-          "type": "string",
-          "description": "Workflow that was executed."
+          "type": "string"
         },
         "versionId": {
-          "type": "string",
-          "description": "Specific version that was executed."
+          "type": "string"
         },
         "status": {
-          "$ref": "#/definitions/v1ExecutionStatus",
-          "description": "Current execution status."
+          "$ref": "#/definitions/v1ExecutionStatus"
         },
         "input": {
-          "type": "object",
-          "description": "Input data provided to the workflow."
+          "type": "object"
         },
         "output": {
-          "type": "object",
-          "description": "Output data produced by the workflow."
+          "type": "object"
         },
         "error": {
-          "type": "string",
-          "description": "Error details if the execution failed."
+          "type": "string"
         },
         "triggeredBy": {
-          "type": "string",
-          "description": "Actor ID or trigger ID that initiated this execution."
+          "type": "string"
         },
         "startedAt": {
           "type": "string",
@@ -124,47 +116,38 @@
         "EXECUTION_STATUS_PAUSED"
       ],
       "default": "EXECUTION_STATUS_UNSPECIFIED",
-      "description": "ExecutionStatus represents the lifecycle state of a workflow execution.\n\n - EXECUTION_STATUS_PENDING: Execution is queued and waiting to start.\n - EXECUTION_STATUS_RUNNING: Execution is actively running.\n - EXECUTION_STATUS_COMPLETED: Execution completed successfully.\n - EXECUTION_STATUS_FAILED: Execution failed with an error.\n - EXECUTION_STATUS_CANCELLED: Execution was cancelled by a user or system.\n - EXECUTION_STATUS_PAUSED: Execution is paused (e.g., waiting for approval)."
+      "description": "ExecutionStatus represents the lifecycle state of a workflow execution."
     },
     "v1ExecutionStep": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier (UUID format)."
+          "type": "string"
         },
         "executionId": {
-          "type": "string",
-          "description": "Parent execution ID."
+          "type": "string"
         },
         "stepName": {
-          "type": "string",
-          "description": "Name of this step as defined in the workflow DSL."
+          "type": "string"
         },
         "stepType": {
-          "type": "string",
-          "description": "Type of step (e.g., \"llm\", \"http\", \"transform\", \"approval\")."
+          "type": "string"
         },
         "status": {
-          "$ref": "#/definitions/v1ExecutionStepStatus",
-          "description": "Current step status."
+          "$ref": "#/definitions/v1ExecutionStepStatus"
         },
         "input": {
-          "type": "object",
-          "description": "Input data provided to this step."
+          "type": "object"
         },
         "output": {
-          "type": "object",
-          "description": "Output data produced by this step."
+          "type": "object"
         },
         "error": {
-          "type": "string",
-          "description": "Error details if the step failed."
+          "type": "string"
         },
         "retries": {
           "type": "integer",
-          "format": "int32",
-          "description": "Number of retry attempts performed."
+          "format": "int32"
         },
         "startedAt": {
           "type": "string",
@@ -189,7 +172,7 @@
         "EXECUTION_STEP_STATUS_WAITING"
       ],
       "default": "EXECUTION_STEP_STATUS_UNSPECIFIED",
-      "description": "ExecutionStepStatus represents the lifecycle state of an individual step.\n\n - EXECUTION_STEP_STATUS_PENDING: Step is queued and waiting to start.\n - EXECUTION_STEP_STATUS_RUNNING: Step is actively running.\n - EXECUTION_STEP_STATUS_COMPLETED: Step completed successfully.\n - EXECUTION_STEP_STATUS_FAILED: Step failed with an error.\n - EXECUTION_STEP_STATUS_SKIPPED: Step was skipped due to conditional logic.\n - EXECUTION_STEP_STATUS_WAITING: Step is waiting for an external event (e.g., approval, callback)."
+      "description": "ExecutionStepStatus represents the lifecycle state of an individual step."
     },
     "v1GetExecutionResponse": {
       "type": "object",
@@ -217,64 +200,40 @@
             "$ref": "#/definitions/v1Execution"
           }
         },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
+        "pageInfo": {
+          "$ref": "#/definitions/v1PageTokenResponse"
         }
       },
       "description": "ListExecutionsResponse is the response for listing executions."
     },
-    "v1PaginationRequest": {
+    "v1PageToken": {
       "type": "object",
       "properties": {
-        "page": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Page number (1-indexed)."
-        },
-        "pageSize": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Number of items per page (max enforced per-service)."
-        },
-        "sortBy": {
+        "token": {
           "type": "string",
-          "description": "Field name to sort by."
-        },
-        "sortOrder": {
-          "$ref": "#/definitions/v1SortOrder",
-          "description": "Sort direction."
-        }
-      },
-      "description": "PaginationRequest is the standard offset-based pagination input."
-    },
-    "v1PaginationResponse": {
-      "type": "object",
-      "properties": {
-        "page": {
-          "type": "integer",
-          "format": "int32"
+          "description": "Opaque cursor token. Pass to the next request to get the next page.\nEmpty string means \"start from the beginning\"."
         },
         "pageSize": {
           "type": "integer",
-          "format": "int32"
-        },
-        "totalItems": {
-          "type": "integer",
           "format": "int32",
-          "description": "Total number of matching items (may be expensive for large datasets)."
-        },
-        "totalPages": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "hasNext": {
-          "type": "boolean"
-        },
-        "hasPrev": {
-          "type": "boolean"
+          "description": "Number of items to return."
         }
       },
-      "description": "PaginationResponse is the standard offset-based pagination output."
+      "description": "PageToken supports cursor-based pagination for large or real-time datasets.\nThe token is opaque to clients — internal structure is service-defined."
+    },
+    "v1PageTokenResponse": {
+      "type": "object",
+      "properties": {
+        "nextToken": {
+          "type": "string",
+          "description": "Token for the next page. Empty if no more results."
+        },
+        "hasMore": {
+          "type": "boolean",
+          "description": "Whether more results are available."
+        }
+      },
+      "description": "PageTokenResponse is the cursor-based pagination output."
     },
     "v1ResumeExecutionResponse": {
       "type": "object",
@@ -293,16 +252,6 @@
         }
       },
       "description": "RunWorkflowResponse is the response after starting a workflow execution."
-    },
-    "v1SortOrder": {
-      "type": "string",
-      "enum": [
-        "SORT_ORDER_UNSPECIFIED",
-        "SORT_ORDER_ASC",
-        "SORT_ORDER_DESC"
-      ],
-      "default": "SORT_ORDER_UNSPECIFIED",
-      "description": "SortOrder specifies the sort direction."
     }
   }
 }

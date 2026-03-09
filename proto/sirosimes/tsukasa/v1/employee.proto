@@ -6,6 +6,14 @@ import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
 import "sirosimes/common/v1/pagination.proto";
 
+// employee.proto — 司（Tsukasa）社員管理サービス。
+//
+// 人間社員とAI社員の統合管理を提供する。
+// インフラ情報（コンテナ等）は EmployeeInfraConfig に分離し、
+// 管理者向けGetEmployeeでのみ返却する。
+//
+// Exposure: INTERNAL（全RPC）
+
 // EmployeeType classifies an employee as human or AI.
 enum EmployeeType {
   EMPLOYEE_TYPE_UNSPECIFIED = 0;
@@ -35,12 +43,28 @@ message Employee {
   google.protobuf.Timestamp joined_at = 9;
   string model_provider = 10;
   string ai_model_name = 11;
-  string container_host = 12;
-  string container_name = 13;
+  // container_host and container_name moved to EmployeeInfraConfig.
+  // Fields 12-13 reserved for backward compatibility.
+  reserved 12, 13;
+  reserved "container_host", "container_name";
   string mattermost_username = 14;
   google.protobuf.Timestamp last_heartbeat_at = 15;
   google.protobuf.Timestamp created_at = 16;
   google.protobuf.Timestamp updated_at = 17;
+}
+
+// EmployeeInfraConfig contains infrastructure-specific metadata for AI employees.
+// Only returned to administrators via GetEmployee.
+// SecurityLevel: CONFIDENTIAL — contains deployment topology information.
+message EmployeeInfraConfig {
+  // Container host where the AI employee runs.
+  string container_host = 1;
+  // Container name.
+  string container_name = 2;
+  // Gateway port.
+  int32 gateway_port = 3;
+  // Last known container status.
+  string container_status = 4;
 }
 
 // Position represents a role assignment of an employee within a department.
@@ -96,6 +120,8 @@ message GetEmployeeRequest {
 message GetEmployeeResponse {
   EmployeeDetail employee = 1;
   repeated Department departments = 2;
+  // Infrastructure configuration (only populated for administrators).
+  EmployeeInfraConfig infra_config = 3;
 }
 
 // DashboardSummaryRequest is the request for the dashboard summary.
@@ -111,6 +137,7 @@ message DashboardSummaryResponse {
 }
 
 // EmployeeService provides employee management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 service EmployeeService {
   rpc ListEmployees(ListEmployeesRequest) returns (ListEmployeesResponse);
   rpc GetEmployee(GetEmployeeRequest) returns (GetEmployeeResponse);

@@ -136,8 +136,8 @@
             "$ref": "#/definitions/v1TaskCommentDetail"
           }
         },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
+        "pageInfo": {
+          "$ref": "#/definitions/v1PageTokenResponse"
         }
       },
       "description": "ListCommentsResponse is the response for listing task comments."
@@ -152,64 +152,40 @@
             "$ref": "#/definitions/v1TaskDetail"
           }
         },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
+        "pageInfo": {
+          "$ref": "#/definitions/v1PageTokenResponse"
         }
       },
       "description": "ListTasksResponse is the response for listing tasks."
     },
-    "v1PaginationRequest": {
+    "v1PageToken": {
       "type": "object",
       "properties": {
-        "page": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Page number (1-indexed)."
-        },
-        "pageSize": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Number of items per page (max enforced per-service)."
-        },
-        "sortBy": {
+        "token": {
           "type": "string",
-          "description": "Field name to sort by."
-        },
-        "sortOrder": {
-          "$ref": "#/definitions/v1SortOrder",
-          "description": "Sort direction."
-        }
-      },
-      "description": "PaginationRequest is the standard offset-based pagination input."
-    },
-    "v1PaginationResponse": {
-      "type": "object",
-      "properties": {
-        "page": {
-          "type": "integer",
-          "format": "int32"
+          "description": "Opaque cursor token. Pass to the next request to get the next page.\nEmpty string means \"start from the beginning\"."
         },
         "pageSize": {
           "type": "integer",
-          "format": "int32"
-        },
-        "totalItems": {
-          "type": "integer",
           "format": "int32",
-          "description": "Total number of matching items (may be expensive for large datasets)."
-        },
-        "totalPages": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "hasNext": {
-          "type": "boolean"
-        },
-        "hasPrev": {
-          "type": "boolean"
+          "description": "Number of items to return."
         }
       },
-      "description": "PaginationResponse is the standard offset-based pagination output."
+      "description": "PageToken supports cursor-based pagination for large or real-time datasets.\nThe token is opaque to clients — internal structure is service-defined."
+    },
+    "v1PageTokenResponse": {
+      "type": "object",
+      "properties": {
+        "nextToken": {
+          "type": "string",
+          "description": "Token for the next page. Empty if no more results."
+        },
+        "hasMore": {
+          "type": "boolean",
+          "description": "Whether more results are available."
+        }
+      },
+      "description": "PageTokenResponse is the cursor-based pagination output."
     },
     "v1RejectTaskResponse": {
       "type": "object",
@@ -219,16 +195,6 @@
         }
       },
       "description": "RejectTaskResponse is the response after rejecting a task."
-    },
-    "v1SortOrder": {
-      "type": "string",
-      "enum": [
-        "SORT_ORDER_UNSPECIFIED",
-        "SORT_ORDER_ASC",
-        "SORT_ORDER_DESC"
-      ],
-      "default": "SORT_ORDER_UNSPECIFIED",
-      "description": "SortOrder specifies the sort direction."
     },
     "v1Task": {
       "type": "object",

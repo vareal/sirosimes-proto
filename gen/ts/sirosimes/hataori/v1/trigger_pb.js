@@ -32,6 +32,23 @@ export const TriggerType = /*@__PURE__*/ proto3.makeEnum(
 );
 
 /**
+ * WebhookConfig provides security configuration for webhook triggers.
+ * Used when TriggerType is TRIGGER_TYPE_WEBHOOK.
+ *
+ * @generated from message sirosimes.hataori.v1.WebhookConfig
+ */
+export const WebhookConfig = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.hataori.v1.WebhookConfig",
+  () => [
+    { no: 1, name: "allowed_sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "rate_limit_per_minute", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "signature_verification", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "signature_header", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "shared_secret", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
  * Trigger defines a condition that automatically starts a workflow.
  *
  * @generated from message sirosimes.hataori.v1.Trigger
@@ -45,6 +62,7 @@ export const Trigger = /*@__PURE__*/ proto3.makeMessageType(
     { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "config", kind: "message", T: Struct },
     { no: 6, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "webhook_config", kind: "message", T: WebhookConfig },
     { no: 7, name: "created_at", kind: "message", T: Timestamp },
     { no: 8, name: "updated_at", kind: "message", T: Timestamp },
   ],
@@ -63,6 +81,7 @@ export const CreateTriggerRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "config", kind: "message", T: Struct },
     { no: 5, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "webhook_config", kind: "message", T: WebhookConfig },
   ],
 );
 
@@ -89,7 +108,7 @@ export const ListTriggersRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
     { no: 2, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "type", kind: "enum", T: proto3.getEnumType(TriggerType) },
-    { no: 4, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
   ],
 );
 
@@ -142,6 +161,7 @@ export const UpdateTriggerRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "config", kind: "message", T: Struct },
     { no: 4, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "webhook_config", kind: "message", T: WebhookConfig },
   ],
 );
 
@@ -181,6 +201,7 @@ export const DeleteTriggerResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * HandleWebhookRequest is the request for processing an incoming webhook.
+ * Exposure: will be EXTERNAL in Phase 2 (after External/Internal directory split).
  *
  * @generated from message sirosimes.hataori.v1.HandleWebhookRequest
  */

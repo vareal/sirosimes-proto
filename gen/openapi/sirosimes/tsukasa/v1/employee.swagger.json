@@ -163,12 +163,6 @@
         "aiModelName": {
           "type": "string"
         },
-        "containerHost": {
-          "type": "string"
-        },
-        "containerName": {
-          "type": "string"
-        },
         "mattermostUsername": {
           "type": "string"
         },
@@ -206,6 +200,29 @@
       },
       "description": "EmployeeDetail bundles an employee with positions and actor reference."
     },
+    "v1EmployeeInfraConfig": {
+      "type": "object",
+      "properties": {
+        "containerHost": {
+          "type": "string",
+          "description": "Container host where the AI employee runs."
+        },
+        "containerName": {
+          "type": "string",
+          "description": "Container name."
+        },
+        "gatewayPort": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Gateway port."
+        },
+        "containerStatus": {
+          "type": "string",
+          "description": "Last known container status."
+        }
+      },
+      "description": "EmployeeInfraConfig contains infrastructure-specific metadata for AI employees.\nOnly returned to administrators via GetEmployee.\nSecurityLevel: CONFIDENTIAL — contains deployment topology information."
+    },
     "v1EmployeeStatus": {
       "type": "string",
       "enum": [
@@ -240,6 +257,10 @@
             "type": "object",
             "$ref": "#/definitions/v1Department"
           }
+        },
+        "infraConfig": {
+          "$ref": "#/definitions/v1EmployeeInfraConfig",
+          "description": "Infrastructure configuration (only populated for administrators)."
         }
       },
       "description": "GetEmployeeResponse is the response containing a single employee."

@@ -1,17 +1,28 @@
 # Proto SSoT — コードオーナー定義
 # 全ての変更には以下のレビューが必要
 
-# セキュリティ関連
+# セキュリティ関連（CISO必須レビュー）
 proto/sirosimes/common/v1/permission.proto @katsuragi.makoto
 proto/sirosimes/common/v1/audit.proto @katsuragi.makoto
+proto/sirosimes/common/v1/metadata.proto @katsuragi.makoto
 SECURITY.md @katsuragi.makoto
 
-# External/Internal API分離
+# 瑞垣（認証基盤）— 全Proto CISO必須レビュー
+proto/sirosimes/mizugaki/v1/*.proto @katsuragi.makoto
+
+# External/Internal API分離（将来Phase 2）
 proto/sirosimes/external/ @katsuragi.makoto
 proto/sirosimes/internal/ @katsuragi.makoto
 
 # 共通型定義
 proto/sirosimes/common/ @fujiwara.ai
+
+# 司（Tsukasa）— セキュリティ関連フィールド変更のみCISOレビュー
+# （通常のCRUD RPC追加・変更はCQO/CEXOの判断に委ねる）
+# proto/sirosimes/tsukasa/v1/ — default reviewers
+
+# 機織（Hataori）— 同上
+# proto/sirosimes/hataori/v1/ — default reviewers
 
 # CI/CD
 .github/ @fujiwara.ai

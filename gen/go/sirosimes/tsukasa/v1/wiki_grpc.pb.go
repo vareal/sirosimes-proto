@@ -36,6 +36,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // WikiService provides wiki management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type WikiServiceClient interface {
 	ListShelves(ctx context.Context, in *ListShelvesRequest, opts ...grpc.CallOption) (*ListShelvesResponse, error)
 	ListBooks(ctx context.Context, in *ListBooksRequest, opts ...grpc.CallOption) (*ListBooksResponse, error)
@@ -45,6 +46,7 @@ type WikiServiceClient interface {
 	GetDocument(ctx context.Context, in *GetDocumentRequest, opts ...grpc.CallOption) (*GetDocumentResponse, error)
 	UpdateDocument(ctx context.Context, in *UpdateDocumentRequest, opts ...grpc.CallOption) (*UpdateDocumentResponse, error)
 	ListRevisions(ctx context.Context, in *ListRevisionsRequest, opts ...grpc.CallOption) (*ListRevisionsResponse, error)
+	// Wiki prefix retained: same-package constraint requires unique message names.
 	ListWikiComments(ctx context.Context, in *ListWikiCommentsRequest, opts ...grpc.CallOption) (*ListWikiCommentsResponse, error)
 	CreateWikiComment(ctx context.Context, in *CreateWikiCommentRequest, opts ...grpc.CallOption) (*CreateWikiCommentResponse, error)
 }
@@ -162,6 +164,7 @@ func (c *wikiServiceClient) CreateWikiComment(ctx context.Context, in *CreateWik
 // for forward compatibility.
 //
 // WikiService provides wiki management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type WikiServiceServer interface {
 	ListShelves(context.Context, *ListShelvesRequest) (*ListShelvesResponse, error)
 	ListBooks(context.Context, *ListBooksRequest) (*ListBooksResponse, error)
@@ -171,6 +174,7 @@ type WikiServiceServer interface {
 	GetDocument(context.Context, *GetDocumentRequest) (*GetDocumentResponse, error)
 	UpdateDocument(context.Context, *UpdateDocumentRequest) (*UpdateDocumentResponse, error)
 	ListRevisions(context.Context, *ListRevisionsRequest) (*ListRevisionsResponse, error)
+	// Wiki prefix retained: same-package constraint requires unique message names.
 	ListWikiComments(context.Context, *ListWikiCommentsRequest) (*ListWikiCommentsResponse, error)
 	CreateWikiComment(context.Context, *CreateWikiCommentRequest) (*CreateWikiCommentResponse, error)
 	mustEmbedUnimplementedWikiServiceServer()

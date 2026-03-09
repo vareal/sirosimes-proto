@@ -19,95 +19,126 @@ export declare enum TriggerType {
   UNSPECIFIED = 0,
 
   /**
-   * HTTP webhook callback.
-   *
    * @generated from enum value: TRIGGER_TYPE_WEBHOOK = 1;
    */
   WEBHOOK = 1,
 
   /**
-   * Cron-based scheduled execution.
-   *
    * @generated from enum value: TRIGGER_TYPE_CRON = 2;
    */
   CRON = 2,
 
   /**
-   * Database change event (CDC).
-   *
    * @generated from enum value: TRIGGER_TYPE_DB_CHANGE = 3;
    */
   DB_CHANGE = 3,
 
   /**
-   * Mattermost message or event.
-   *
    * @generated from enum value: TRIGGER_TYPE_MATTERMOST = 4;
    */
   MATTERMOST = 4,
 
   /**
-   * Manual user-initiated trigger.
-   *
    * @generated from enum value: TRIGGER_TYPE_MANUAL = 5;
    */
   MANUAL = 5,
 
   /**
-   * File system change event.
-   *
    * @generated from enum value: TRIGGER_TYPE_FILE_CHANGE = 6;
    */
   FILE_CHANGE = 6,
 
   /**
-   * Incoming email event.
-   *
    * @generated from enum value: TRIGGER_TYPE_MAIL = 7;
    */
   MAIL = 7,
 
   /**
-   * Pub/Sub message event.
-   *
    * @generated from enum value: TRIGGER_TYPE_PUBSUB = 8;
    */
   PUBSUB = 8,
 
   /**
-   * WebRTC signaling event.
-   *
    * @generated from enum value: TRIGGER_TYPE_WEBRTC = 9;
    */
   WEBRTC = 9,
 
   /**
-   * Tsukasa platform event (employee, task, wiki changes).
-   *
    * @generated from enum value: TRIGGER_TYPE_TSUKASA_EVENT = 10;
    */
   TSUKASA_EVENT = 10,
 
   /**
-   * Container lifecycle event (start, stop, crash).
-   *
    * @generated from enum value: TRIGGER_TYPE_CONTAINER = 11;
    */
   CONTAINER = 11,
 
   /**
-   * OS process event (start, exit, signal).
-   *
    * @generated from enum value: TRIGGER_TYPE_PROCESS = 12;
    */
   PROCESS = 12,
 
   /**
-   * Virtual machine lifecycle event.
-   *
    * @generated from enum value: TRIGGER_TYPE_VM_EVENT = 13;
    */
   VM_EVENT = 13,
+}
+
+/**
+ * WebhookConfig provides security configuration for webhook triggers.
+ * Used when TriggerType is TRIGGER_TYPE_WEBHOOK.
+ *
+ * @generated from message sirosimes.hataori.v1.WebhookConfig
+ */
+export declare class WebhookConfig extends Message<WebhookConfig> {
+  /**
+   * Allowed source IP ranges (CIDR notation). Empty = allow all.
+   *
+   * @generated from field: repeated string allowed_sources = 1;
+   */
+  allowedSources: string[];
+
+  /**
+   * Maximum requests per minute (0 = unlimited).
+   *
+   * @generated from field: int32 rate_limit_per_minute = 2;
+   */
+  rateLimitPerMinute: number;
+
+  /**
+   * Enable HMAC signature verification on webhook payloads.
+   *
+   * @generated from field: bool signature_verification = 3;
+   */
+  signatureVerification: boolean;
+
+  /**
+   * Signature header name (e.g., "X-Hub-Signature-256").
+   *
+   * @generated from field: string signature_header = 4;
+   */
+  signatureHeader: string;
+
+  /**
+   * Shared secret for HMAC signature verification (RESTRICTED).
+   *
+   * @generated from field: string shared_secret = 5;
+   */
+  sharedSecret: string;
+
+  constructor(data?: PartialMessage<WebhookConfig>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.hataori.v1.WebhookConfig";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WebhookConfig;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WebhookConfig;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WebhookConfig;
+
+  static equals(a: WebhookConfig | PlainMessage<WebhookConfig> | undefined, b: WebhookConfig | PlainMessage<WebhookConfig> | undefined): boolean;
 }
 
 /**
@@ -117,46 +148,45 @@ export declare enum TriggerType {
  */
 export declare class Trigger extends Message<Trigger> {
   /**
-   * Unique identifier (UUID format).
-   *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * Workflow to execute when this trigger fires.
-   *
    * @generated from field: string workflow_id = 2;
    */
   workflowId: string;
 
   /**
-   * Classification of the trigger source.
-   *
    * @generated from field: sirosimes.hataori.v1.TriggerType type = 3;
    */
   type: TriggerType;
 
   /**
-   * Human-readable trigger name.
-   *
    * @generated from field: string name = 4;
    */
   name: string;
 
   /**
-   * Type-specific configuration (e.g., cron expression, webhook path, filter rules).
+   * Type-specific configuration (e.g., cron expression, filter rules).
+   * For WEBHOOK type, use webhook_config instead.
    *
    * @generated from field: google.protobuf.Struct config = 5;
    */
   config?: Struct;
 
   /**
-   * Whether this trigger is currently active.
-   *
    * @generated from field: bool enabled = 6;
    */
   enabled: boolean;
+
+  /**
+   * Webhook-specific security configuration.
+   * Only populated when type is TRIGGER_TYPE_WEBHOOK.
+   *
+   * @generated from field: sirosimes.hataori.v1.WebhookConfig webhook_config = 9;
+   */
+  webhookConfig?: WebhookConfig;
 
   /**
    * @generated from field: google.protobuf.Timestamp created_at = 7;
@@ -214,6 +244,13 @@ export declare class CreateTriggerRequest extends Message<CreateTriggerRequest> 
    */
   enabled: boolean;
 
+  /**
+   * Webhook-specific security configuration.
+   *
+   * @generated from field: sirosimes.hataori.v1.WebhookConfig webhook_config = 6;
+   */
+  webhookConfig?: WebhookConfig;
+
   constructor(data?: PartialMessage<CreateTriggerRequest>);
 
   static readonly runtime: typeof proto3;
@@ -267,25 +304,21 @@ export declare class ListTriggersRequest extends Message<ListTriggersRequest> {
   pagination?: PaginationRequest;
 
   /**
-   * Filter by workflow ID.
-   *
    * @generated from field: string workflow_id = 2;
    */
   workflowId: string;
 
   /**
-   * Filter by trigger type.
-   *
    * @generated from field: sirosimes.hataori.v1.TriggerType type = 3;
    */
   type: TriggerType;
 
   /**
-   * Filter by enabled state.
+   * Filter by enabled state. Use optional to distinguish "filter disabled" from "no filter".
    *
-   * @generated from field: bool enabled = 4;
+   * @generated from field: optional bool enabled = 4;
    */
-  enabled: boolean;
+  enabled?: boolean;
 
   constructor(data?: PartialMessage<ListTriggersRequest>);
 
@@ -411,6 +444,13 @@ export declare class UpdateTriggerRequest extends Message<UpdateTriggerRequest> 
    */
   enabled: boolean;
 
+  /**
+   * Webhook-specific security configuration.
+   *
+   * @generated from field: sirosimes.hataori.v1.WebhookConfig webhook_config = 5;
+   */
+  webhookConfig?: WebhookConfig;
+
   constructor(data?: PartialMessage<UpdateTriggerRequest>);
 
   static readonly runtime: typeof proto3;
@@ -501,27 +541,22 @@ export declare class DeleteTriggerResponse extends Message<DeleteTriggerResponse
 
 /**
  * HandleWebhookRequest is the request for processing an incoming webhook.
+ * Exposure: will be EXTERNAL in Phase 2 (after External/Internal directory split).
  *
  * @generated from message sirosimes.hataori.v1.HandleWebhookRequest
  */
 export declare class HandleWebhookRequest extends Message<HandleWebhookRequest> {
   /**
-   * Trigger ID that this webhook maps to.
-   *
    * @generated from field: string trigger_id = 1;
    */
   triggerId: string;
 
   /**
-   * HTTP headers from the webhook request.
-   *
    * @generated from field: map<string, string> headers = 2;
    */
   headers: { [key: string]: string };
 
   /**
-   * Raw request body.
-   *
    * @generated from field: bytes body = 3;
    */
   body: Uint8Array;
@@ -548,15 +583,11 @@ export declare class HandleWebhookRequest extends Message<HandleWebhookRequest> 
  */
 export declare class HandleWebhookResponse extends Message<HandleWebhookResponse> {
   /**
-   * Execution started by the webhook (if any).
-   *
    * @generated from field: string execution_id = 1;
    */
   executionId: string;
 
   /**
-   * Whether the webhook was accepted and processed.
-   *
    * @generated from field: bool accepted = 2;
    */
   accepted: boolean;

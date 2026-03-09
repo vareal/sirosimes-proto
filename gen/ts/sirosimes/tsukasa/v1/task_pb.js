@@ -3,9 +3,9 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Timestamp } from "@bufbuild/protobuf";
+import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
 import { ActorRef } from "../../common/v1/actor_pb.js";
-import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import { PageToken, PageTokenResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * TaskStatus represents the workflow state of a task.
@@ -181,13 +181,14 @@ export const CreateTaskResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ListTasksRequest is the request for listing tasks with filters.
+ * Uses cursor-based pagination for real-time task feeds.
  *
  * @generated from message sirosimes.tsukasa.v1.ListTasksRequest
  */
 export const ListTasksRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListTasksRequest",
   () => [
-    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 1, name: "page_token", kind: "message", T: PageToken },
     { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(TaskStatus) },
     { no: 3, name: "priority", kind: "enum", T: proto3.getEnumType(TaskPriority) },
     { no: 4, name: "assignee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -206,7 +207,7 @@ export const ListTasksResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListTasksResponse",
   () => [
     { no: 1, name: "tasks", kind: "message", T: TaskDetail, repeated: true },
-    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+    { no: 2, name: "page_info", kind: "message", T: PageTokenResponse },
   ],
 );
 
@@ -252,6 +253,7 @@ export const UpdateTaskRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 7, name: "due_date", kind: "message", T: Timestamp },
     { no: 8, name: "estimated_hours", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
     { no: 9, name: "actual_hours", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 10, name: "update_mask", kind: "message", T: FieldMask },
   ],
 );
 
@@ -269,6 +271,7 @@ export const UpdateTaskResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ListCommentsRequest is the request for listing task comments.
+ * Uses cursor-based pagination for real-time comment streams.
  *
  * @generated from message sirosimes.tsukasa.v1.ListCommentsRequest
  */
@@ -276,7 +279,7 @@ export const ListCommentsRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListCommentsRequest",
   () => [
     { no: 1, name: "task_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 2, name: "page_token", kind: "message", T: PageToken },
   ],
 );
 
@@ -289,7 +292,7 @@ export const ListCommentsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.ListCommentsResponse",
   () => [
     { no: 1, name: "comments", kind: "message", T: TaskCommentDetail, repeated: true },
-    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+    { no: 2, name: "page_info", kind: "message", T: PageTokenResponse },
   ],
 );
 

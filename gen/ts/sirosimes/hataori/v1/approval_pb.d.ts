@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import type { PageToken, PageTokenResponse, PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * ApprovalStatus represents the lifecycle state of an approval request.
@@ -290,14 +290,15 @@ export declare class DelegationChain extends Message<DelegationChain> {
 
 /**
  * ListApprovalsRequest is the request for listing approval requests with filters.
+ * Uses cursor-based pagination for real-time approval streams.
  *
  * @generated from message sirosimes.hataori.v1.ListApprovalsRequest
  */
 export declare class ListApprovalsRequest extends Message<ListApprovalsRequest> {
   /**
-   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
+   * @generated from field: sirosimes.common.v1.PageToken page_token = 1;
    */
-  pagination?: PaginationRequest;
+  pageToken?: PageToken;
 
   /**
    * Filter by execution ID.
@@ -347,9 +348,9 @@ export declare class ListApprovalsResponse extends Message<ListApprovalsResponse
   approvals: ApprovalRequest[];
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageTokenResponse page_info = 2;
    */
-  pagination?: PaginationResponse;
+  pageInfo?: PageTokenResponse;
 
   constructor(data?: PartialMessage<ListApprovalsResponse>);
 
@@ -419,11 +420,12 @@ export declare class GetApprovalResponse extends Message<GetApprovalResponse> {
 }
 
 /**
- * ApproveRequestRequest is the request for granting an approval.
+ * ApproveApprovalRequest is the request for granting an approval.
+ * Renamed from ApproveRequestRequest to avoid double-Request naming (CEXO #3).
  *
- * @generated from message sirosimes.hataori.v1.ApproveRequestRequest
+ * @generated from message sirosimes.hataori.v1.ApproveApprovalRequest
  */
-export declare class ApproveRequestRequest extends Message<ApproveRequestRequest> {
+export declare class ApproveApprovalRequest extends Message<ApproveApprovalRequest> {
   /**
    * @generated from field: string id = 1;
    */
@@ -443,53 +445,54 @@ export declare class ApproveRequestRequest extends Message<ApproveRequestRequest
    */
   comment: string;
 
-  constructor(data?: PartialMessage<ApproveRequestRequest>);
+  constructor(data?: PartialMessage<ApproveApprovalRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.hataori.v1.ApproveRequestRequest";
+  static readonly typeName = "sirosimes.hataori.v1.ApproveApprovalRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApproveRequestRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApproveApprovalRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ApproveRequestRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ApproveApprovalRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ApproveRequestRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ApproveApprovalRequest;
 
-  static equals(a: ApproveRequestRequest | PlainMessage<ApproveRequestRequest> | undefined, b: ApproveRequestRequest | PlainMessage<ApproveRequestRequest> | undefined): boolean;
+  static equals(a: ApproveApprovalRequest | PlainMessage<ApproveApprovalRequest> | undefined, b: ApproveApprovalRequest | PlainMessage<ApproveApprovalRequest> | undefined): boolean;
 }
 
 /**
- * ApproveRequestResponse is the response after granting an approval.
+ * ApproveApprovalResponse is the response after granting an approval.
  *
- * @generated from message sirosimes.hataori.v1.ApproveRequestResponse
+ * @generated from message sirosimes.hataori.v1.ApproveApprovalResponse
  */
-export declare class ApproveRequestResponse extends Message<ApproveRequestResponse> {
+export declare class ApproveApprovalResponse extends Message<ApproveApprovalResponse> {
   /**
    * @generated from field: sirosimes.hataori.v1.ApprovalRequest approval = 1;
    */
   approval?: ApprovalRequest;
 
-  constructor(data?: PartialMessage<ApproveRequestResponse>);
+  constructor(data?: PartialMessage<ApproveApprovalResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.hataori.v1.ApproveRequestResponse";
+  static readonly typeName = "sirosimes.hataori.v1.ApproveApprovalResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApproveRequestResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApproveApprovalResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ApproveRequestResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ApproveApprovalResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ApproveRequestResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ApproveApprovalResponse;
 
-  static equals(a: ApproveRequestResponse | PlainMessage<ApproveRequestResponse> | undefined, b: ApproveRequestResponse | PlainMessage<ApproveRequestResponse> | undefined): boolean;
+  static equals(a: ApproveApprovalResponse | PlainMessage<ApproveApprovalResponse> | undefined, b: ApproveApprovalResponse | PlainMessage<ApproveApprovalResponse> | undefined): boolean;
 }
 
 /**
- * RejectRequestRequest is the request for denying an approval.
+ * RejectApprovalRequest is the request for denying an approval.
+ * Renamed from RejectRequestRequest to avoid double-Request naming (CEXO #3).
  *
- * @generated from message sirosimes.hataori.v1.RejectRequestRequest
+ * @generated from message sirosimes.hataori.v1.RejectApprovalRequest
  */
-export declare class RejectRequestRequest extends Message<RejectRequestRequest> {
+export declare class RejectApprovalRequest extends Message<RejectApprovalRequest> {
   /**
    * @generated from field: string id = 1;
    */
@@ -509,53 +512,54 @@ export declare class RejectRequestRequest extends Message<RejectRequestRequest> 
    */
   comment: string;
 
-  constructor(data?: PartialMessage<RejectRequestRequest>);
+  constructor(data?: PartialMessage<RejectApprovalRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.hataori.v1.RejectRequestRequest";
+  static readonly typeName = "sirosimes.hataori.v1.RejectApprovalRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RejectRequestRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RejectApprovalRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RejectRequestRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RejectApprovalRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RejectRequestRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RejectApprovalRequest;
 
-  static equals(a: RejectRequestRequest | PlainMessage<RejectRequestRequest> | undefined, b: RejectRequestRequest | PlainMessage<RejectRequestRequest> | undefined): boolean;
+  static equals(a: RejectApprovalRequest | PlainMessage<RejectApprovalRequest> | undefined, b: RejectApprovalRequest | PlainMessage<RejectApprovalRequest> | undefined): boolean;
 }
 
 /**
- * RejectRequestResponse is the response after denying an approval.
+ * RejectApprovalResponse is the response after denying an approval.
  *
- * @generated from message sirosimes.hataori.v1.RejectRequestResponse
+ * @generated from message sirosimes.hataori.v1.RejectApprovalResponse
  */
-export declare class RejectRequestResponse extends Message<RejectRequestResponse> {
+export declare class RejectApprovalResponse extends Message<RejectApprovalResponse> {
   /**
    * @generated from field: sirosimes.hataori.v1.ApprovalRequest approval = 1;
    */
   approval?: ApprovalRequest;
 
-  constructor(data?: PartialMessage<RejectRequestResponse>);
+  constructor(data?: PartialMessage<RejectApprovalResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.hataori.v1.RejectRequestResponse";
+  static readonly typeName = "sirosimes.hataori.v1.RejectApprovalResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RejectRequestResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RejectApprovalResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RejectRequestResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RejectApprovalResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RejectRequestResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RejectApprovalResponse;
 
-  static equals(a: RejectRequestResponse | PlainMessage<RejectRequestResponse> | undefined, b: RejectRequestResponse | PlainMessage<RejectRequestResponse> | undefined): boolean;
+  static equals(a: RejectApprovalResponse | PlainMessage<RejectApprovalResponse> | undefined, b: RejectApprovalResponse | PlainMessage<RejectApprovalResponse> | undefined): boolean;
 }
 
 /**
- * DelegateRequestRequest is the request for delegating an approval to another actor.
+ * DelegateApprovalRequest is the request for delegating an approval to another actor.
+ * Renamed from DelegateRequestRequest for consistency.
  *
- * @generated from message sirosimes.hataori.v1.DelegateRequestRequest
+ * @generated from message sirosimes.hataori.v1.DelegateApprovalRequest
  */
-export declare class DelegateRequestRequest extends Message<DelegateRequestRequest> {
+export declare class DelegateApprovalRequest extends Message<DelegateApprovalRequest> {
   /**
    * @generated from field: string id = 1;
    */
@@ -582,45 +586,45 @@ export declare class DelegateRequestRequest extends Message<DelegateRequestReque
    */
   comment: string;
 
-  constructor(data?: PartialMessage<DelegateRequestRequest>);
+  constructor(data?: PartialMessage<DelegateApprovalRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.hataori.v1.DelegateRequestRequest";
+  static readonly typeName = "sirosimes.hataori.v1.DelegateApprovalRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DelegateRequestRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DelegateApprovalRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DelegateRequestRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DelegateApprovalRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DelegateRequestRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DelegateApprovalRequest;
 
-  static equals(a: DelegateRequestRequest | PlainMessage<DelegateRequestRequest> | undefined, b: DelegateRequestRequest | PlainMessage<DelegateRequestRequest> | undefined): boolean;
+  static equals(a: DelegateApprovalRequest | PlainMessage<DelegateApprovalRequest> | undefined, b: DelegateApprovalRequest | PlainMessage<DelegateApprovalRequest> | undefined): boolean;
 }
 
 /**
- * DelegateRequestResponse is the response after delegating an approval.
+ * DelegateApprovalResponse is the response after delegating an approval.
  *
- * @generated from message sirosimes.hataori.v1.DelegateRequestResponse
+ * @generated from message sirosimes.hataori.v1.DelegateApprovalResponse
  */
-export declare class DelegateRequestResponse extends Message<DelegateRequestResponse> {
+export declare class DelegateApprovalResponse extends Message<DelegateApprovalResponse> {
   /**
    * @generated from field: sirosimes.hataori.v1.ApprovalRequest approval = 1;
    */
   approval?: ApprovalRequest;
 
-  constructor(data?: PartialMessage<DelegateRequestResponse>);
+  constructor(data?: PartialMessage<DelegateApprovalResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.hataori.v1.DelegateRequestResponse";
+  static readonly typeName = "sirosimes.hataori.v1.DelegateApprovalResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DelegateRequestResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DelegateApprovalResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DelegateRequestResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DelegateApprovalResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DelegateRequestResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DelegateApprovalResponse;
 
-  static equals(a: DelegateRequestResponse | PlainMessage<DelegateRequestResponse> | undefined, b: DelegateRequestResponse | PlainMessage<DelegateRequestResponse> | undefined): boolean;
+  static equals(a: DelegateApprovalResponse | PlainMessage<DelegateApprovalResponse> | undefined, b: DelegateApprovalResponse | PlainMessage<DelegateApprovalResponse> | undefined): boolean;
 }
 
 /**

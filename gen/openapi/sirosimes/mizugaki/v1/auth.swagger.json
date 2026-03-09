@@ -72,6 +72,58 @@
       "default": "ACTOR_TYPE_UNSPECIFIED",
       "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
     },
+    "v1ApiKeyConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "API キーの一意識別子。"
+        },
+        "name": {
+          "type": "string",
+          "title": "API キーの表示名（用途の説明）。"
+        },
+        "keyHash": {
+          "type": "string",
+          "title": "キーのハッシュ（元のキーは作成時のみ返却、保存しない）。SecurityLevel: RESTRICTED。"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "キーの有効期限（必須 — 無期限キーは禁止）。"
+        },
+        "allowedScopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "許可されたスコープ（空 = 全スコープ禁止）。"
+        },
+        "rateLimitPerMinute": {
+          "type": "integer",
+          "format": "int32",
+          "title": "1分あたりのレート制限（0 = デフォルト制限適用）。"
+        },
+        "ownerId": {
+          "type": "string",
+          "title": "キーの所有者（作成者）。"
+        },
+        "lastUsedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "最後に使用された日時。"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "キーが有効かどうか。"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "ApiKeyConfig は API キーの設定とライフサイクルを管理する。\nAPI キーは長期有効トークンであるため、有効期限・スコープ制限・レート制限を必須とする。"
+    },
     "v1AuthMethod": {
       "type": "string",
       "enum": [
@@ -83,74 +135,77 @@
         "AUTH_METHOD_REFRESH_TOKEN"
       ],
       "default": "AUTH_METHOD_UNSPECIFIED",
-      "description": "- AUTH_METHOD_PASSWORD: ユーザー名とパスワードによる認証。\n - AUTH_METHOD_OAUTH2: OAuth2/OIDC による外部プロバイダー認証。\n - AUTH_METHOD_API_KEY: API キーによる認証。\n - AUTH_METHOD_SSO_COOKIE: SSO Cookie (mizugaki_token) による認証。\n - AUTH_METHOD_REFRESH_TOKEN: リフレッシュトークンによるトークン更新。",
       "title": "AuthMethod は認証に使用された方法を分類する。"
     },
     "v1AuthSession": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "title": "セッション一意識別子（UUID形式）。"
+          "type": "string"
         },
         "userId": {
-          "type": "string",
-          "title": "セッションに紐づくユーザーID。"
+          "type": "string"
         },
         "actorRef": {
-          "$ref": "#/definitions/v1ActorRef",
-          "title": "セッション作成時のアクター参照。"
+          "$ref": "#/definitions/v1ActorRef"
         },
         "status": {
-          "$ref": "#/definitions/v1SessionStatus",
-          "title": "セッションの現在の状態。"
+          "$ref": "#/definitions/v1SessionStatus"
         },
         "authMethod": {
-          "$ref": "#/definitions/v1AuthMethod",
-          "title": "認証に使用された方法。"
+          "$ref": "#/definitions/v1AuthMethod"
         },
         "accessToken": {
           "type": "string",
-          "title": "アクセストークン（JWT）。セキュリティレベル: RESTRICTED。"
+          "title": "アクセストークン（JWT）。SecurityLevel: RESTRICTED。\n⚠️ External APIではopaque session IDに変換して返却すること。\nJWT構造はInternal API間通信でのみ使用する。"
         },
         "refreshToken": {
           "type": "string",
-          "title": "リフレッシュトークン。セキュリティレベル: RESTRICTED。"
+          "title": "リフレッシュトークン。SecurityLevel: RESTRICTED。\n⚠️ 同上：外部にはopaque形式で返却。"
         },
         "accessTokenExpiresAt": {
           "type": "string",
-          "format": "date-time",
-          "title": "アクセストークンの有効期限。"
+          "format": "date-time"
         },
         "refreshTokenExpiresAt": {
           "type": "string",
-          "format": "date-time",
-          "title": "リフレッシュトークンの有効期限。"
+          "format": "date-time"
         },
         "ipAddress": {
           "type": "string",
-          "title": "クライアントIPアドレス（CONFIDENTIAL — 監査用）。"
+          "title": "クライアントIPアドレス。SecurityLevel: CONFIDENTIAL — 監査用。"
         },
         "userAgent": {
           "type": "string",
-          "title": "クライアントのユーザーエージェント（CONFIDENTIAL — 監査用）。"
+          "title": "クライアントのユーザーエージェント。SecurityLevel: CONFIDENTIAL — 監査用。"
         },
         "securityLevel": {
-          "$ref": "#/definitions/v1SecurityLevel",
-          "title": "セキュリティ分類レベル。認証セッションはデフォルト RESTRICTED。"
+          "$ref": "#/definitions/v1SecurityLevel"
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time",
-          "title": "セッション作成日時。"
+          "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "format": "date-time",
-          "title": "セッション最終更新日時。"
+          "format": "date-time"
         }
       },
       "title": "AuthSession はユーザーの認証セッションを表す。"
+    },
+    "v1CreateApiKeyResponse": {
+      "type": "object",
+      "properties": {
+        "apiKey": {
+          "$ref": "#/definitions/v1ApiKeyConfig",
+          "title": "作成された API キー設定。"
+        },
+        "rawKey": {
+          "type": "string",
+          "title": "平文の API キー（RESTRICTED — この応答でのみ返却、以降は取得不可）。"
+        }
+      },
+      "title": "CreateApiKeyResponse は API キー作成レスポンスを表す。"
     },
     "v1ListSessionsResponse": {
       "type": "object",
@@ -160,8 +215,7 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1AuthSession"
-          },
-          "title": "ユーザーのセッション一覧。"
+          }
         }
       },
       "title": "ListSessionsResponse はセッション一覧取得レスポンスを表す。"
@@ -170,8 +224,7 @@
       "type": "object",
       "properties": {
         "session": {
-          "$ref": "#/definitions/v1AuthSession",
-          "title": "作成された認証セッション。"
+          "$ref": "#/definitions/v1AuthSession"
         }
       },
       "title": "LoginResponse はログインレスポンスを表す。"
@@ -181,8 +234,7 @@
       "properties": {
         "revokedCount": {
           "type": "integer",
-          "format": "int32",
-          "title": "無効化されたセッション数。"
+          "format": "int32"
         }
       },
       "title": "LogoutResponse はログアウトレスポンスを表す。"
@@ -191,11 +243,14 @@
       "type": "object",
       "properties": {
         "session": {
-          "$ref": "#/definitions/v1AuthSession",
-          "title": "更新された認証セッション（新しいアクセストークンとリフレッシュトークンを含む）。"
+          "$ref": "#/definitions/v1AuthSession"
         }
       },
       "title": "RefreshTokenResponse はトークンリフレッシュレスポンスを表す。"
+    },
+    "v1RevokeApiKeyResponse": {
+      "type": "object",
+      "title": "RevokeApiKeyResponse は API キー失効レスポンスを表す。"
     },
     "v1RevokeSessionResponse": {
       "type": "object",
@@ -222,42 +277,35 @@
         "SESSION_STATUS_REVOKED"
       ],
       "default": "SESSION_STATUS_UNSPECIFIED",
-      "description": "- SESSION_STATUS_ACTIVE: セッションは有効でアクティブ。\n - SESSION_STATUS_EXPIRED: セッションは期限切れ。\n - SESSION_STATUS_REVOKED: セッションはユーザーまたは管理者によって取り消し済み。",
       "title": "SessionStatus はセッションの状態を表す。"
     },
     "v1VerifyTokenResponse": {
       "type": "object",
       "properties": {
         "valid": {
-          "type": "boolean",
-          "title": "トークンが有効かどうか。"
+          "type": "boolean"
         },
         "userId": {
-          "type": "string",
-          "title": "トークンから抽出されたユーザーID。"
+          "type": "string"
         },
         "actorRef": {
-          "$ref": "#/definitions/v1ActorRef",
-          "title": "トークンから抽出されたアクター参照。"
+          "$ref": "#/definitions/v1ActorRef"
         },
         "expiresAt": {
           "type": "string",
-          "format": "date-time",
-          "title": "トークンの有効期限。"
+          "format": "date-time"
         },
         "scopes": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "title": "トークンに含まれるスコープ。"
+          }
         },
         "claims": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          },
-          "title": "トークンに含まれるカスタムクレーム。"
+          }
         }
       },
       "title": "VerifyTokenResponse はトークン検証レスポンスを表す。"

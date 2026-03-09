@@ -32,6 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // IdentityService はアイデンティティ管理操作を提供する。
+// Exposure: INTERNAL — フロントエンドはBFF経由でアクセスする。
 type IdentityServiceClient interface {
 	CreateIdentity(ctx context.Context, in *CreateIdentityRequest, opts ...grpc.CallOption) (*CreateIdentityResponse, error)
 	GetIdentity(ctx context.Context, in *GetIdentityRequest, opts ...grpc.CallOption) (*GetIdentityResponse, error)
@@ -114,6 +115,7 @@ func (c *identityServiceClient) ChangePassword(ctx context.Context, in *ChangePa
 // for forward compatibility.
 //
 // IdentityService はアイデンティティ管理操作を提供する。
+// Exposure: INTERNAL — フロントエンドはBFF経由でアクセスする。
 type IdentityServiceServer interface {
 	CreateIdentity(context.Context, *CreateIdentityRequest) (*CreateIdentityResponse, error)
 	GetIdentity(context.Context, *GetIdentityRequest) (*GetIdentityResponse, error)

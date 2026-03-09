@@ -192,35 +192,28 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier (UUID format)."
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "Human-readable workflow name."
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "description": "Detailed description of the workflow purpose and behavior."
+          "type": "string"
         },
         "status": {
-          "$ref": "#/definitions/v1WorkflowStatus",
-          "description": "Current lifecycle status."
+          "$ref": "#/definitions/v1WorkflowStatus"
         },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "description": "Tags for categorization and filtering."
+          }
         },
         "llmConfig": {
-          "type": "object",
-          "description": "LLM configuration for AI-powered steps (model, temperature, etc.)."
+          "type": "object"
         },
         "createdBy": {
-          "type": "string",
-          "description": "Actor ID who created this workflow."
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -243,35 +236,29 @@
         "WORKFLOW_STATUS_ARCHIVED"
       ],
       "default": "WORKFLOW_STATUS_UNSPECIFIED",
-      "description": "WorkflowStatus represents the lifecycle state of a workflow definition.\n\n - WORKFLOW_STATUS_DRAFT: Workflow is being designed and is not yet available for execution.\n - WORKFLOW_STATUS_ACTIVE: Workflow is published and available for execution.\n - WORKFLOW_STATUS_INACTIVE: Workflow is temporarily disabled.\n - WORKFLOW_STATUS_ARCHIVED: Workflow is retired and preserved for historical reference only."
+      "description": "WorkflowStatus represents the lifecycle state of a workflow definition."
     },
     "v1WorkflowVersion": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier (UUID format)."
+          "type": "string"
         },
         "workflowId": {
-          "type": "string",
-          "description": "Parent workflow ID."
+          "type": "string"
         },
         "version": {
           "type": "integer",
-          "format": "int32",
-          "description": "Monotonically increasing version number."
+          "format": "int32"
         },
         "dsl": {
-          "type": "object",
-          "description": "Workflow DSL definition as a flexible JSON structure."
+          "type": "object"
         },
         "checksum": {
-          "type": "string",
-          "description": "SHA-256 checksum of the DSL for integrity verification."
+          "type": "string"
         },
         "createdBy": {
-          "type": "string",
-          "description": "Actor ID who created this version."
+          "type": "string"
         },
         "createdAt": {
           "type": "string",

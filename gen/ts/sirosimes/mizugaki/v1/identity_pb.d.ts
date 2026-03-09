@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { ActorType } from "../../common/v1/actor_pb.js";
@@ -21,29 +21,21 @@ export declare enum IdentityStatus {
   UNSPECIFIED = 0,
 
   /**
-   * アイデンティティは有効でログイン可能。
-   *
    * @generated from enum value: IDENTITY_STATUS_ACTIVE = 1;
    */
   ACTIVE = 1,
 
   /**
-   * アイデンティティは無効化されている。
-   *
    * @generated from enum value: IDENTITY_STATUS_INACTIVE = 2;
    */
   INACTIVE = 2,
 
   /**
-   * アイデンティティは管理者によって停止されている。
-   *
    * @generated from enum value: IDENTITY_STATUS_SUSPENDED = 3;
    */
   SUSPENDED = 3,
 
   /**
-   * メールアドレスの確認待ち。
-   *
    * @generated from enum value: IDENTITY_STATUS_PENDING_VERIFICATION = 4;
    */
   PENDING_VERIFICATION = 4,
@@ -61,18 +53,91 @@ export declare enum MfaMethod {
   UNSPECIFIED = 0,
 
   /**
-   * 時間ベースのワンタイムパスワード (TOTP)。
+   * TOTP（時間ベースのワンタイムパスワード）。SIMスワップリスクなし。
    *
    * @generated from enum value: MFA_METHOD_TOTP = 1;
    */
   TOTP = 1,
 
   /**
-   * WebAuthn / FIDO2 セキュリティキー。
+   * WebAuthn / FIDO2 セキュリティキー。最高セキュリティ。
+   *
+   * SMS は意図的に非サポート（SIMスワップリスク排除）。
    *
    * @generated from enum value: MFA_METHOD_WEBAUTHN = 2;
    */
   WEBAUTHN = 2,
+}
+
+/**
+ * PasswordPolicy はパスワードポリシーを定義する。
+ * Proto SSoT としてポリシーの型を定義し、実装の一貫性を保証する。
+ *
+ * @generated from message sirosimes.mizugaki.v1.PasswordPolicy
+ */
+export declare class PasswordPolicy extends Message<PasswordPolicy> {
+  /**
+   * パスワード最小文字数（推奨: 12以上）。
+   *
+   * @generated from field: int32 min_length = 1;
+   */
+  minLength: number;
+
+  /**
+   * 大文字を含む必要があるか。
+   *
+   * @generated from field: bool require_uppercase = 2;
+   */
+  requireUppercase: boolean;
+
+  /**
+   * 小文字を含む必要があるか。
+   *
+   * @generated from field: bool require_lowercase = 3;
+   */
+  requireLowercase: boolean;
+
+  /**
+   * 数字を含む必要があるか。
+   *
+   * @generated from field: bool require_digit = 4;
+   */
+  requireDigit: boolean;
+
+  /**
+   * 特殊文字を含む必要があるか。
+   *
+   * @generated from field: bool require_special_char = 5;
+   */
+  requireSpecialChar: boolean;
+
+  /**
+   * パスワード最大有効期間（日）。0 = 無期限。
+   *
+   * @generated from field: int32 max_age_days = 6;
+   */
+  maxAgeDays: number;
+
+  /**
+   * パスワード履歴の保持数（過去N回と同じパスワードを禁止）。
+   *
+   * @generated from field: int32 history_count = 7;
+   */
+  historyCount: number;
+
+  constructor(data?: PartialMessage<PasswordPolicy>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.mizugaki.v1.PasswordPolicy";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PasswordPolicy;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PasswordPolicy;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PasswordPolicy;
+
+  static equals(a: PasswordPolicy | PlainMessage<PasswordPolicy> | undefined, b: PasswordPolicy | PlainMessage<PasswordPolicy> | undefined): boolean;
 }
 
 /**
@@ -89,99 +154,73 @@ export declare class Identity extends Message<Identity> {
   metadata?: ResourceMetadata;
 
   /**
-   * ログイン用のユーザー名（一意）。
-   *
    * @generated from field: string username = 2;
    */
   username: string;
 
   /**
-   * メールアドレス（一意、RESTRICTED）。
+   * SecurityLevel: RESTRICTED — PII。
    *
    * @generated from field: string email = 3;
    */
   email: string;
 
   /**
-   * 表示名。
-   *
    * @generated from field: string display_name = 4;
    */
   displayName: string;
 
   /**
-   * 名前のふりがな。
-   *
    * @generated from field: string name_kana = 5;
    */
   nameKana: string;
 
   /**
-   * アクター種別（human, ai_employee 等）。
-   *
    * @generated from field: sirosimes.common.v1.ActorType actor_type = 6;
    */
   actorType: ActorType;
 
   /**
-   * 現在の状態。
-   *
    * @generated from field: sirosimes.mizugaki.v1.IdentityStatus status = 7;
    */
   status: IdentityStatus;
 
   /**
-   * メールアドレスが確認済みかどうか。
-   *
    * @generated from field: bool email_verified = 8;
    */
   emailVerified: boolean;
 
   /**
-   * MFA が有効かどうか。
-   *
    * @generated from field: bool mfa_enabled = 9;
    */
   mfaEnabled: boolean;
 
   /**
-   * 有効な MFA 方法。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.MfaMethod mfa_methods = 10;
    */
   mfaMethods: MfaMethod[];
 
   /**
-   * アバター画像URL。
-   *
    * @generated from field: string avatar_url = 11;
    */
   avatarUrl: string;
 
   /**
-   * 所属組織ID。
-   *
    * @generated from field: string organization_id = 12;
    */
   organizationId: string;
 
   /**
-   * 付与されたロールID一覧。
-   *
    * @generated from field: repeated string role_ids = 13;
    */
   roleIds: string[];
 
   /**
-   * 最終ログイン日時。
-   *
    * @generated from field: google.protobuf.Timestamp last_login_at = 14;
    */
   lastLoginAt?: Timestamp;
 
   /**
-   * パスワード最終変更日時。
-   *
    * @generated from field: google.protobuf.Timestamp password_changed_at = 15;
    */
   passwordChangedAt?: Timestamp;
@@ -208,29 +247,21 @@ export declare class Identity extends Message<Identity> {
  */
 export declare class CreateIdentityRequest extends Message<CreateIdentityRequest> {
   /**
-   * ユーザー名（一意、必須）。
-   *
    * @generated from field: string username = 1;
    */
   username: string;
 
   /**
-   * メールアドレス（一意、必須）。
-   *
    * @generated from field: string email = 2;
    */
   email: string;
 
   /**
-   * 表示名。
-   *
    * @generated from field: string display_name = 3;
    */
   displayName: string;
 
   /**
-   * 名前のふりがな。
-   *
    * @generated from field: string name_kana = 4;
    */
   nameKana: string;
@@ -243,22 +274,16 @@ export declare class CreateIdentityRequest extends Message<CreateIdentityRequest
   password: string;
 
   /**
-   * アクター種別。
-   *
    * @generated from field: sirosimes.common.v1.ActorType actor_type = 6;
    */
   actorType: ActorType;
 
   /**
-   * 所属組織ID。
-   *
    * @generated from field: string organization_id = 7;
    */
   organizationId: string;
 
   /**
-   * 初期ロールID一覧。
-   *
    * @generated from field: repeated string role_ids = 8;
    */
   roleIds: string[];
@@ -285,8 +310,6 @@ export declare class CreateIdentityRequest extends Message<CreateIdentityRequest
  */
 export declare class CreateIdentityResponse extends Message<CreateIdentityResponse> {
   /**
-   * 作成されたアイデンティティ。
-   *
    * @generated from field: sirosimes.mizugaki.v1.Identity identity = 1;
    */
   identity?: Identity;
@@ -313,8 +336,6 @@ export declare class CreateIdentityResponse extends Message<CreateIdentityRespon
  */
 export declare class GetIdentityRequest extends Message<GetIdentityRequest> {
   /**
-   * 取得するアイデンティティのID。
-   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -341,8 +362,6 @@ export declare class GetIdentityRequest extends Message<GetIdentityRequest> {
  */
 export declare class GetIdentityResponse extends Message<GetIdentityResponse> {
   /**
-   * 取得したアイデンティティ。
-   *
    * @generated from field: sirosimes.mizugaki.v1.Identity identity = 1;
    */
   identity?: Identity;
@@ -369,60 +388,51 @@ export declare class GetIdentityResponse extends Message<GetIdentityResponse> {
  */
 export declare class UpdateIdentityRequest extends Message<UpdateIdentityRequest> {
   /**
-   * 更新対象のアイデンティティID。
-   *
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * 新しい表示名（空の場合は変更なし）。
-   *
    * @generated from field: string display_name = 2;
    */
   displayName: string;
 
   /**
-   * 新しいふりがな（空の場合は変更なし）。
-   *
    * @generated from field: string name_kana = 3;
    */
   nameKana: string;
 
   /**
-   * 新しいメールアドレス（空の場合は変更なし）。
-   *
    * @generated from field: string email = 4;
    */
   email: string;
 
   /**
-   * 新しいアバターURL（空の場合は変更なし）。
-   *
    * @generated from field: string avatar_url = 5;
    */
   avatarUrl: string;
 
   /**
-   * 新しい組織ID（空の場合は変更なし）。
-   *
    * @generated from field: string organization_id = 6;
    */
   organizationId: string;
 
   /**
-   * 新しいロールID一覧（空の場合は変更なし）。
-   *
    * @generated from field: repeated string role_ids = 7;
    */
   roleIds: string[];
 
   /**
-   * 新しいステータス。
-   *
    * @generated from field: sirosimes.mizugaki.v1.IdentityStatus status = 8;
    */
   status: IdentityStatus;
+
+  /**
+   * Fields to update. If empty, all non-empty fields are updated.
+   *
+   * @generated from field: google.protobuf.FieldMask update_mask = 9;
+   */
+  updateMask?: FieldMask;
 
   constructor(data?: PartialMessage<UpdateIdentityRequest>);
 
@@ -446,8 +456,6 @@ export declare class UpdateIdentityRequest extends Message<UpdateIdentityRequest
  */
 export declare class UpdateIdentityResponse extends Message<UpdateIdentityResponse> {
   /**
-   * 更新されたアイデンティティ。
-   *
    * @generated from field: sirosimes.mizugaki.v1.Identity identity = 1;
    */
   identity?: Identity;
@@ -474,8 +482,6 @@ export declare class UpdateIdentityResponse extends Message<UpdateIdentityRespon
  */
 export declare class DeleteIdentityRequest extends Message<DeleteIdentityRequest> {
   /**
-   * 削除するアイデンティティのID。
-   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -523,36 +529,26 @@ export declare class DeleteIdentityResponse extends Message<DeleteIdentityRespon
  */
 export declare class ListIdentitiesRequest extends Message<ListIdentitiesRequest> {
   /**
-   * ページネーション設定。
-   *
    * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
    */
   pagination?: PaginationRequest;
 
   /**
-   * ステータスでフィルタ。
-   *
    * @generated from field: sirosimes.mizugaki.v1.IdentityStatus status = 2;
    */
   status: IdentityStatus;
 
   /**
-   * アクター種別でフィルタ。
-   *
    * @generated from field: sirosimes.common.v1.ActorType actor_type = 3;
    */
   actorType: ActorType;
 
   /**
-   * 組織IDでフィルタ。
-   *
    * @generated from field: string organization_id = 4;
    */
   organizationId: string;
 
   /**
-   * 全文検索クエリ（ユーザー名、表示名、メールで検索）。
-   *
    * @generated from field: string search = 5;
    */
   search: string;
@@ -579,15 +575,11 @@ export declare class ListIdentitiesRequest extends Message<ListIdentitiesRequest
  */
 export declare class ListIdentitiesResponse extends Message<ListIdentitiesResponse> {
   /**
-   * アイデンティティ一覧。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.Identity identities = 1;
    */
   identities: Identity[];
 
   /**
-   * ページネーション情報。
-   *
    * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
    */
   pagination?: PaginationResponse;
@@ -609,13 +601,12 @@ export declare class ListIdentitiesResponse extends Message<ListIdentitiesRespon
 
 /**
  * ChangePasswordRequest はパスワード変更リクエストを表す。
+ * パスワード変更は特権操作であり、MFA有効ユーザーは再確認が必須。
  *
  * @generated from message sirosimes.mizugaki.v1.ChangePasswordRequest
  */
 export declare class ChangePasswordRequest extends Message<ChangePasswordRequest> {
   /**
-   * 対象アイデンティティID。
-   *
    * @generated from field: string id = 1;
    */
   id: string;
@@ -633,6 +624,14 @@ export declare class ChangePasswordRequest extends Message<ChangePasswordRequest
    * @generated from field: string new_password = 3;
    */
   newPassword: string;
+
+  /**
+   * MFA検証コード（TOTP 6桁コードまたはWebAuthnアサーション）。
+   * MFA有効ユーザーは必須。MFA未設定ユーザーは空で可。
+   *
+   * @generated from field: string mfa_verification_code = 4;
+   */
+  mfaVerificationCode: string;
 
   constructor(data?: PartialMessage<ChangePasswordRequest>);
 

@@ -3,10 +3,10 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ActorRef } from "../../common/v1/actor_pb.js";
-import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import type { PageToken, PageTokenResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * TaskStatus represents the workflow state of a task.
@@ -488,14 +488,15 @@ export declare class CreateTaskResponse extends Message<CreateTaskResponse> {
 
 /**
  * ListTasksRequest is the request for listing tasks with filters.
+ * Uses cursor-based pagination for real-time task feeds.
  *
  * @generated from message sirosimes.tsukasa.v1.ListTasksRequest
  */
 export declare class ListTasksRequest extends Message<ListTasksRequest> {
   /**
-   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
+   * @generated from field: sirosimes.common.v1.PageToken page_token = 1;
    */
-  pagination?: PaginationRequest;
+  pageToken?: PageToken;
 
   /**
    * @generated from field: sirosimes.tsukasa.v1.TaskStatus status = 2;
@@ -554,9 +555,9 @@ export declare class ListTasksResponse extends Message<ListTasksResponse> {
   tasks: TaskDetail[];
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageTokenResponse page_info = 2;
    */
-  pagination?: PaginationResponse;
+  pageInfo?: PageTokenResponse;
 
   constructor(data?: PartialMessage<ListTasksResponse>);
 
@@ -681,6 +682,13 @@ export declare class UpdateTaskRequest extends Message<UpdateTaskRequest> {
    */
   actualHours: number;
 
+  /**
+   * Fields to update. If empty, all non-empty fields are updated.
+   *
+   * @generated from field: google.protobuf.FieldMask update_mask = 10;
+   */
+  updateMask?: FieldMask;
+
   constructor(data?: PartialMessage<UpdateTaskRequest>);
 
   static readonly runtime: typeof proto3;
@@ -724,6 +732,7 @@ export declare class UpdateTaskResponse extends Message<UpdateTaskResponse> {
 
 /**
  * ListCommentsRequest is the request for listing task comments.
+ * Uses cursor-based pagination for real-time comment streams.
  *
  * @generated from message sirosimes.tsukasa.v1.ListCommentsRequest
  */
@@ -734,9 +743,9 @@ export declare class ListCommentsRequest extends Message<ListCommentsRequest> {
   taskId: string;
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageToken page_token = 2;
    */
-  pagination?: PaginationRequest;
+  pageToken?: PageToken;
 
   constructor(data?: PartialMessage<ListCommentsRequest>);
 
@@ -765,9 +774,9 @@ export declare class ListCommentsResponse extends Message<ListCommentsResponse> 
   comments: TaskCommentDetail[];
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageTokenResponse page_info = 2;
    */
-  pagination?: PaginationResponse;
+  pageInfo?: PageTokenResponse;
 
   constructor(data?: PartialMessage<ListCommentsResponse>);
 

@@ -6,6 +6,12 @@ import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
 import "sirosimes/common/v1/pagination.proto";
 
+// daily_report.proto — 司（Tsukasa）日報管理サービス。
+//
+// 社員の日次業務報告の作成・閲覧・レビューを提供する。
+//
+// Exposure: INTERNAL（全RPC）
+
 // ReportType classifies how a daily report was generated.
 enum ReportType {
   REPORT_TYPE_UNSPECIFIED = 0;
@@ -35,7 +41,12 @@ message DailyReport {
   google.protobuf.Timestamp reviewed_at = 10;
   string review_comment = 11;
   string reflection = 12;
-  string emotions = 13;
+  // Emotion tags for the day (e.g., "達成感", "困難", "やりがい").
+  // Used as tags in the UI for filtering and visualization.
+  // Field 13 reserved (was: string emotions).
+  reserved 13;
+  reserved "emotions";
+  repeated string emotion_tags = 19;
   google.protobuf.Timestamp created_at = 14;
   google.protobuf.Timestamp updated_at = 15;
 }
@@ -81,7 +92,8 @@ message CreateReportRequest {
   string summary = 5;
   string next_plan = 6;
   string reflection = 7;
-  string emotions = 8;
+  // Emotion tags for the day.
+  repeated string emotion_tags = 8;
 }
 
 // CreateReportResponse is the response after creating a daily report.
@@ -134,6 +146,7 @@ message UpdateTemplateResponse {
 }
 
 // DailyReportService provides daily report management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 service DailyReportService {
   rpc ListReports(ListReportsRequest) returns (ListReportsResponse);
   rpc CreateReport(CreateReportRequest) returns (CreateReportResponse);

@@ -25,6 +25,8 @@ const (
 	AuthService_RefreshToken_FullMethodName  = "/sirosimes.mizugaki.v1.AuthService/RefreshToken"
 	AuthService_ListSessions_FullMethodName  = "/sirosimes.mizugaki.v1.AuthService/ListSessions"
 	AuthService_RevokeSession_FullMethodName = "/sirosimes.mizugaki.v1.AuthService/RevokeSession"
+	AuthService_CreateApiKey_FullMethodName  = "/sirosimes.mizugaki.v1.AuthService/CreateApiKey"
+	AuthService_RevokeApiKey_FullMethodName  = "/sirosimes.mizugaki.v1.AuthService/RevokeApiKey"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -33,12 +35,22 @@ const (
 //
 // AuthService は瑞垣の認証操作を提供する。
 type AuthServiceClient interface {
+	// Exposure: EXTERNAL
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	// Exposure: EXTERNAL
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
+	// Exposure: INTERNAL — サービス間認証のみ
 	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*VerifyTokenResponse, error)
+	// Exposure: EXTERNAL（opaque化必須）
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error)
+	// Exposure: INTERNAL
 	ListSessions(ctx context.Context, in *ListSessionsRequest, opts ...grpc.CallOption) (*ListSessionsResponse, error)
+	// Exposure: INTERNAL
 	RevokeSession(ctx context.Context, in *RevokeSessionRequest, opts ...grpc.CallOption) (*RevokeSessionResponse, error)
+	// Exposure: INTERNAL — API キーのライフサイクル管理
+	CreateApiKey(ctx context.Context, in *CreateApiKeyRequest, opts ...grpc.CallOption) (*CreateApiKeyResponse, error)
+	// Exposure: INTERNAL
+	RevokeApiKey(ctx context.Context, in *RevokeApiKeyRequest, opts ...grpc.CallOption) (*RevokeApiKeyResponse, error)
 }
 
 type authServiceClient struct {
@@ -109,18 +121,48 @@ func (c *authServiceClient) RevokeSession(ctx context.Context, in *RevokeSession
 	return out, nil
 }
 
+func (c *authServiceClient) CreateApiKey(ctx context.Context, in *CreateApiKeyRequest, opts ...grpc.CallOption) (*CreateApiKeyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateApiKeyResponse)
+	err := c.cc.Invoke(ctx, AuthService_CreateApiKey_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) RevokeApiKey(ctx context.Context, in *RevokeApiKeyRequest, opts ...grpc.CallOption) (*RevokeApiKeyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RevokeApiKeyResponse)
+	err := c.cc.Invoke(ctx, AuthService_RevokeApiKey_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 //
 // AuthService は瑞垣の認証操作を提供する。
 type AuthServiceServer interface {
+	// Exposure: EXTERNAL
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	// Exposure: EXTERNAL
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	// Exposure: INTERNAL — サービス間認証のみ
 	VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenResponse, error)
+	// Exposure: EXTERNAL（opaque化必須）
 	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenResponse, error)
+	// Exposure: INTERNAL
 	ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsResponse, error)
+	// Exposure: INTERNAL
 	RevokeSession(context.Context, *RevokeSessionRequest) (*RevokeSessionResponse, error)
+	// Exposure: INTERNAL — API キーのライフサイクル管理
+	CreateApiKey(context.Context, *CreateApiKeyRequest) (*CreateApiKeyResponse, error)
+	// Exposure: INTERNAL
+	RevokeApiKey(context.Context, *RevokeApiKeyRequest) (*RevokeApiKeyResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -148,6 +190,12 @@ func (UnimplementedAuthServiceServer) ListSessions(context.Context, *ListSession
 }
 func (UnimplementedAuthServiceServer) RevokeSession(context.Context, *RevokeSessionRequest) (*RevokeSessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RevokeSession not implemented")
+}
+func (UnimplementedAuthServiceServer) CreateApiKey(context.Context, *CreateApiKeyRequest) (*CreateApiKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateApiKey not implemented")
+}
+func (UnimplementedAuthServiceServer) RevokeApiKey(context.Context, *RevokeApiKeyRequest) (*RevokeApiKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RevokeApiKey not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -278,6 +326,42 @@ func _AuthService_RevokeSession_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_CreateApiKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateApiKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).CreateApiKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_CreateApiKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).CreateApiKey(ctx, req.(*CreateApiKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_RevokeApiKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeApiKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RevokeApiKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RevokeApiKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RevokeApiKey(ctx, req.(*RevokeApiKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -308,6 +392,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RevokeSession",
 			Handler:    _AuthService_RevokeSession_Handler,
+		},
+		{
+			MethodName: "CreateApiKey",
+			Handler:    _AuthService_CreateApiKey_Handler,
+		},
+		{
+			MethodName: "RevokeApiKey",
+			Handler:    _AuthService_RevokeApiKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -29,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // EmployeeService provides employee management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type EmployeeServiceClient interface {
 	ListEmployees(ctx context.Context, in *ListEmployeesRequest, opts ...grpc.CallOption) (*ListEmployeesResponse, error)
 	GetEmployee(ctx context.Context, in *GetEmployeeRequest, opts ...grpc.CallOption) (*GetEmployeeResponse, error)
@@ -78,6 +79,7 @@ func (c *employeeServiceClient) DashboardSummary(ctx context.Context, in *Dashbo
 // for forward compatibility.
 //
 // EmployeeService provides employee management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type EmployeeServiceServer interface {
 	ListEmployees(context.Context, *ListEmployeesRequest) (*ListEmployeesResponse, error)
 	GetEmployee(context.Context, *GetEmployeeRequest) (*GetEmployeeResponse, error)

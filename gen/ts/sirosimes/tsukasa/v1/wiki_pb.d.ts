@@ -3,10 +3,10 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ActorRef } from "../../common/v1/actor_pb.js";
-import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import type { PageToken, PageTokenResponse, PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * WikiShelf represents a top-level grouping of wiki books.
@@ -126,6 +126,67 @@ export declare class WikiBook extends Message<WikiBook> {
 }
 
 /**
+ * WikiChapter represents a grouping of documents within a book.
+ *
+ * @generated from message sirosimes.tsukasa.v1.WikiChapter
+ */
+export declare class WikiChapter extends Message<WikiChapter> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string slug = 3;
+   */
+  slug: string;
+
+  /**
+   * @generated from field: string description = 4;
+   */
+  description: string;
+
+  /**
+   * @generated from field: string book_id = 5;
+   */
+  bookId: string;
+
+  /**
+   * @generated from field: int32 sort_order = 6;
+   */
+  sortOrder: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 7;
+   */
+  createdAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp updated_at = 8;
+   */
+  updatedAt?: Timestamp;
+
+  constructor(data?: PartialMessage<WikiChapter>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tsukasa.v1.WikiChapter";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WikiChapter;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WikiChapter;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WikiChapter;
+
+  static equals(a: WikiChapter | PlainMessage<WikiChapter> | undefined, b: WikiChapter | PlainMessage<WikiChapter> | undefined): boolean;
+}
+
+/**
  * WikiDocument represents a single wiki page with markdown content.
  *
  * @generated from message sirosimes.tsukasa.v1.WikiDocument
@@ -157,6 +218,8 @@ export declare class WikiDocument extends Message<WikiDocument> {
   bookId: string;
 
   /**
+   * Reference to the containing chapter (see WikiChapter).
+   *
    * @generated from field: string chapter_id = 6;
    */
   chapterId: string;
@@ -574,6 +637,7 @@ export declare class GetBookResponse extends Message<GetBookResponse> {
 
 /**
  * ListDocumentsRequest is the request for listing wiki documents.
+ * Uses cursor-based pagination for large document sets and real-time edits.
  *
  * @generated from message sirosimes.tsukasa.v1.ListDocumentsRequest
  */
@@ -584,9 +648,9 @@ export declare class ListDocumentsRequest extends Message<ListDocumentsRequest> 
   bookId: string;
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageToken page_token = 2;
    */
-  pagination?: PaginationRequest;
+  pageToken?: PageToken;
 
   /**
    * @generated from field: string search = 3;
@@ -620,9 +684,9 @@ export declare class ListDocumentsResponse extends Message<ListDocumentsResponse
   documents: WikiDocumentDetail[];
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageTokenResponse page_info = 2;
    */
-  pagination?: PaginationResponse;
+  pageInfo?: PageTokenResponse;
 
   constructor(data?: PartialMessage<ListDocumentsResponse>);
 
@@ -804,6 +868,13 @@ export declare class UpdateDocumentRequest extends Message<UpdateDocumentRequest
    */
   revisionSummary: string;
 
+  /**
+   * Fields to update. If empty, all non-empty fields are updated.
+   *
+   * @generated from field: google.protobuf.FieldMask update_mask = 6;
+   */
+  updateMask?: FieldMask;
+
   constructor(data?: PartialMessage<UpdateDocumentRequest>);
 
   static readonly runtime: typeof proto3;
@@ -847,6 +918,7 @@ export declare class UpdateDocumentResponse extends Message<UpdateDocumentRespon
 
 /**
  * ListRevisionsRequest is the request for listing revisions of a document.
+ * Uses cursor-based pagination for append-only revision history.
  *
  * @generated from message sirosimes.tsukasa.v1.ListRevisionsRequest
  */
@@ -857,9 +929,9 @@ export declare class ListRevisionsRequest extends Message<ListRevisionsRequest> 
   documentId: string;
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageToken page_token = 2;
    */
-  pagination?: PaginationRequest;
+  pageToken?: PageToken;
 
   constructor(data?: PartialMessage<ListRevisionsRequest>);
 
@@ -888,9 +960,9 @@ export declare class ListRevisionsResponse extends Message<ListRevisionsResponse
   revisions: WikiRevisionDetail[];
 
   /**
-   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   * @generated from field: sirosimes.common.v1.PageTokenResponse page_info = 2;
    */
-  pagination?: PaginationResponse;
+  pageInfo?: PageTokenResponse;
 
   constructor(data?: PartialMessage<ListRevisionsResponse>);
 
@@ -908,7 +980,7 @@ export declare class ListRevisionsResponse extends Message<ListRevisionsResponse
 }
 
 /**
- * ListWikiCommentsRequest is the request for listing wiki document comments.
+ * ListCommentsRequest is the request for listing wiki document comments.
  *
  * @generated from message sirosimes.tsukasa.v1.ListWikiCommentsRequest
  */
@@ -939,7 +1011,7 @@ export declare class ListWikiCommentsRequest extends Message<ListWikiCommentsReq
 }
 
 /**
- * ListWikiCommentsResponse is the response for listing wiki document comments.
+ * ListCommentsResponse is the response for listing wiki document comments.
  *
  * @generated from message sirosimes.tsukasa.v1.ListWikiCommentsResponse
  */
@@ -970,7 +1042,7 @@ export declare class ListWikiCommentsResponse extends Message<ListWikiCommentsRe
 }
 
 /**
- * CreateWikiCommentRequest is the request for creating a wiki document comment.
+ * CreateCommentRequest is the request for creating a wiki document comment.
  *
  * @generated from message sirosimes.tsukasa.v1.CreateWikiCommentRequest
  */
@@ -1006,7 +1078,7 @@ export declare class CreateWikiCommentRequest extends Message<CreateWikiCommentR
 }
 
 /**
- * CreateWikiCommentResponse is the response after creating a wiki document comment.
+ * CreateCommentResponse is the response after creating a wiki document comment.
  *
  * @generated from message sirosimes.tsukasa.v1.CreateWikiCommentResponse
  */

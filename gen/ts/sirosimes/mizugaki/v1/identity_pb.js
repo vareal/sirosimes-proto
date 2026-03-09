@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Timestamp } from "@bufbuild/protobuf";
+import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
 import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { ActorType } from "../../common/v1/actor_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
@@ -35,6 +35,25 @@ export const MfaMethod = /*@__PURE__*/ proto3.makeEnum(
     {no: 0, name: "MFA_METHOD_UNSPECIFIED", localName: "UNSPECIFIED"},
     {no: 1, name: "MFA_METHOD_TOTP", localName: "TOTP"},
     {no: 2, name: "MFA_METHOD_WEBAUTHN", localName: "WEBAUTHN"},
+  ],
+);
+
+/**
+ * PasswordPolicy はパスワードポリシーを定義する。
+ * Proto SSoT としてポリシーの型を定義し、実装の一貫性を保証する。
+ *
+ * @generated from message sirosimes.mizugaki.v1.PasswordPolicy
+ */
+export const PasswordPolicy = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.mizugaki.v1.PasswordPolicy",
+  () => [
+    { no: 1, name: "min_length", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "require_uppercase", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "require_lowercase", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "require_digit", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "require_special_char", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "max_age_days", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 7, name: "history_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ],
 );
 
@@ -135,6 +154,7 @@ export const UpdateIdentityRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 6, name: "organization_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "role_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 8, name: "status", kind: "enum", T: proto3.getEnumType(IdentityStatus) },
+    { no: 9, name: "update_mask", kind: "message", T: FieldMask },
   ],
 );
 
@@ -203,6 +223,7 @@ export const ListIdentitiesResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ChangePasswordRequest はパスワード変更リクエストを表す。
+ * パスワード変更は特権操作であり、MFA有効ユーザーは再確認が必須。
  *
  * @generated from message sirosimes.mizugaki.v1.ChangePasswordRequest
  */
@@ -212,6 +233,7 @@ export const ChangePasswordRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "current_password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "new_password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "mfa_verification_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

@@ -33,6 +33,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // WorkflowService provides workflow definition and version management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type WorkflowServiceClient interface {
 	ListWorkflows(ctx context.Context, in *ListWorkflowsRequest, opts ...grpc.CallOption) (*ListWorkflowsResponse, error)
 	CreateWorkflow(ctx context.Context, in *CreateWorkflowRequest, opts ...grpc.CallOption) (*CreateWorkflowResponse, error)
@@ -126,6 +127,7 @@ func (c *workflowServiceClient) ListVersions(ctx context.Context, in *ListVersio
 // for forward compatibility.
 //
 // WorkflowService provides workflow definition and version management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type WorkflowServiceServer interface {
 	ListWorkflows(context.Context, *ListWorkflowsRequest) (*ListWorkflowsResponse, error)
 	CreateWorkflow(context.Context, *CreateWorkflowRequest) (*CreateWorkflowResponse, error)

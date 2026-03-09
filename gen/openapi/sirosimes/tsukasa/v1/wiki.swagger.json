@@ -88,7 +88,7 @@
           "$ref": "#/definitions/v1WikiCommentDetail"
         }
       },
-      "description": "CreateWikiCommentResponse is the response after creating a wiki document comment."
+      "description": "CreateCommentResponse is the response after creating a wiki document comment."
     },
     "v1GetBookResponse": {
       "type": "object",
@@ -134,8 +134,8 @@
             "$ref": "#/definitions/v1WikiDocumentDetail"
           }
         },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
+        "pageInfo": {
+          "$ref": "#/definitions/v1PageTokenResponse"
         }
       },
       "description": "ListDocumentsResponse is the response for listing wiki documents."
@@ -150,8 +150,8 @@
             "$ref": "#/definitions/v1WikiRevisionDetail"
           }
         },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
+        "pageInfo": {
+          "$ref": "#/definitions/v1PageTokenResponse"
         }
       },
       "description": "ListRevisionsResponse is the response for listing document revisions."
@@ -186,7 +186,36 @@
           "$ref": "#/definitions/v1PaginationResponse"
         }
       },
-      "description": "ListWikiCommentsResponse is the response for listing wiki document comments."
+      "description": "ListCommentsResponse is the response for listing wiki document comments."
+    },
+    "v1PageToken": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "Opaque cursor token. Pass to the next request to get the next page.\nEmpty string means \"start from the beginning\"."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items to return."
+        }
+      },
+      "description": "PageToken supports cursor-based pagination for large or real-time datasets.\nThe token is opaque to clients — internal structure is service-defined."
+    },
+    "v1PageTokenResponse": {
+      "type": "object",
+      "properties": {
+        "nextToken": {
+          "type": "string",
+          "description": "Token for the next page. Empty if no more results."
+        },
+        "hasMore": {
+          "type": "boolean",
+          "description": "Whether more results are available."
+        }
+      },
+      "description": "PageTokenResponse is the cursor-based pagination output."
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -350,7 +379,8 @@
           "type": "string"
         },
         "chapterId": {
-          "type": "string"
+          "type": "string",
+          "description": "Reference to the containing chapter (see WikiChapter)."
         },
         "createdById": {
           "type": "string"

@@ -119,14 +119,14 @@
       "default": "APPROVAL_STATUS_UNSPECIFIED",
       "description": "ApprovalStatus represents the lifecycle state of an approval request.\n\n - APPROVAL_STATUS_PENDING: Approval is awaiting a decision.\n - APPROVAL_STATUS_APPROVED: Approval was granted.\n - APPROVAL_STATUS_REJECTED: Approval was denied.\n - APPROVAL_STATUS_DELEGATED: Approval was delegated to another actor.\n - APPROVAL_STATUS_ESCALATED: Approval was escalated due to policy or timeout.\n - APPROVAL_STATUS_TIMED_OUT: Approval expired without a response."
     },
-    "v1ApproveRequestResponse": {
+    "v1ApproveApprovalResponse": {
       "type": "object",
       "properties": {
         "approval": {
           "$ref": "#/definitions/v1ApprovalRequest"
         }
       },
-      "description": "ApproveRequestResponse is the response after granting an approval."
+      "description": "ApproveApprovalResponse is the response after granting an approval."
     },
     "v1CreateDelegationChainResponse": {
       "type": "object",
@@ -137,14 +137,14 @@
       },
       "description": "CreateDelegationChainResponse is the response after creating a delegation chain."
     },
-    "v1DelegateRequestResponse": {
+    "v1DelegateApprovalResponse": {
       "type": "object",
       "properties": {
         "approval": {
           "$ref": "#/definitions/v1ApprovalRequest"
         }
       },
-      "description": "DelegateRequestResponse is the response after delegating an approval."
+      "description": "DelegateApprovalResponse is the response after delegating an approval."
     },
     "v1DelegationChain": {
       "type": "object",
@@ -236,8 +236,8 @@
             "$ref": "#/definitions/v1ApprovalRequest"
           }
         },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
+        "pageInfo": {
+          "$ref": "#/definitions/v1PageTokenResponse"
         }
       },
       "description": "ListApprovalsResponse is the response for listing approval requests."
@@ -257,6 +257,35 @@
         }
       },
       "description": "ListDelegationChainsResponse is the response for listing delegation chains."
+    },
+    "v1PageToken": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "Opaque cursor token. Pass to the next request to get the next page.\nEmpty string means \"start from the beginning\"."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items to return."
+        }
+      },
+      "description": "PageToken supports cursor-based pagination for large or real-time datasets.\nThe token is opaque to clients — internal structure is service-defined."
+    },
+    "v1PageTokenResponse": {
+      "type": "object",
+      "properties": {
+        "nextToken": {
+          "type": "string",
+          "description": "Token for the next page. Empty if no more results."
+        },
+        "hasMore": {
+          "type": "boolean",
+          "description": "Whether more results are available."
+        }
+      },
+      "description": "PageTokenResponse is the cursor-based pagination output."
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -311,14 +340,14 @@
       },
       "description": "PaginationResponse is the standard offset-based pagination output."
     },
-    "v1RejectRequestResponse": {
+    "v1RejectApprovalResponse": {
       "type": "object",
       "properties": {
         "approval": {
           "$ref": "#/definitions/v1ApprovalRequest"
         }
       },
-      "description": "RejectRequestResponse is the response after denying an approval."
+      "description": "RejectApprovalResponse is the response after denying an approval."
     },
     "v1SortOrder": {
       "type": "string",

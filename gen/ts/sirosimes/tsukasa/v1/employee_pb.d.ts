@@ -124,16 +124,6 @@ export declare class Employee extends Message<Employee> {
   aiModelName: string;
 
   /**
-   * @generated from field: string container_host = 12;
-   */
-  containerHost: string;
-
-  /**
-   * @generated from field: string container_name = 13;
-   */
-  containerName: string;
-
-  /**
    * @generated from field: string mattermost_username = 14;
    */
   mattermostUsername: string;
@@ -166,6 +156,57 @@ export declare class Employee extends Message<Employee> {
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Employee;
 
   static equals(a: Employee | PlainMessage<Employee> | undefined, b: Employee | PlainMessage<Employee> | undefined): boolean;
+}
+
+/**
+ * EmployeeInfraConfig contains infrastructure-specific metadata for AI employees.
+ * Only returned to administrators via GetEmployee.
+ * SecurityLevel: CONFIDENTIAL — contains deployment topology information.
+ *
+ * @generated from message sirosimes.tsukasa.v1.EmployeeInfraConfig
+ */
+export declare class EmployeeInfraConfig extends Message<EmployeeInfraConfig> {
+  /**
+   * Container host where the AI employee runs.
+   *
+   * @generated from field: string container_host = 1;
+   */
+  containerHost: string;
+
+  /**
+   * Container name.
+   *
+   * @generated from field: string container_name = 2;
+   */
+  containerName: string;
+
+  /**
+   * Gateway port.
+   *
+   * @generated from field: int32 gateway_port = 3;
+   */
+  gatewayPort: number;
+
+  /**
+   * Last known container status.
+   *
+   * @generated from field: string container_status = 4;
+   */
+  containerStatus: string;
+
+  constructor(data?: PartialMessage<EmployeeInfraConfig>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tsukasa.v1.EmployeeInfraConfig";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EmployeeInfraConfig;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EmployeeInfraConfig;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EmployeeInfraConfig;
+
+  static equals(a: EmployeeInfraConfig | PlainMessage<EmployeeInfraConfig> | undefined, b: EmployeeInfraConfig | PlainMessage<EmployeeInfraConfig> | undefined): boolean;
 }
 
 /**
@@ -434,6 +475,13 @@ export declare class GetEmployeeResponse extends Message<GetEmployeeResponse> {
    * @generated from field: repeated sirosimes.tsukasa.v1.Department departments = 2;
    */
   departments: Department[];
+
+  /**
+   * Infrastructure configuration (only populated for administrators).
+   *
+   * @generated from field: sirosimes.tsukasa.v1.EmployeeInfraConfig infra_config = 3;
+   */
+  infraConfig?: EmployeeInfraConfig;
 
   constructor(data?: PartialMessage<GetEmployeeResponse>);
 

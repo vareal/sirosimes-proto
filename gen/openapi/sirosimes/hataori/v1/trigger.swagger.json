@@ -79,12 +79,10 @@
       "type": "object",
       "properties": {
         "executionId": {
-          "type": "string",
-          "description": "Execution started by the webhook (if any)."
+          "type": "string"
         },
         "accepted": {
-          "type": "boolean",
-          "description": "Whether the webhook was accepted and processed."
+          "type": "boolean"
         }
       },
       "description": "HandleWebhookResponse is the response after processing a webhook."
@@ -172,28 +170,27 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier (UUID format)."
+          "type": "string"
         },
         "workflowId": {
-          "type": "string",
-          "description": "Workflow to execute when this trigger fires."
+          "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/v1TriggerType",
-          "description": "Classification of the trigger source."
+          "$ref": "#/definitions/v1TriggerType"
         },
         "name": {
-          "type": "string",
-          "description": "Human-readable trigger name."
+          "type": "string"
         },
         "config": {
           "type": "object",
-          "description": "Type-specific configuration (e.g., cron expression, webhook path, filter rules)."
+          "description": "Type-specific configuration (e.g., cron expression, filter rules).\nFor WEBHOOK type, use webhook_config instead."
         },
         "enabled": {
-          "type": "boolean",
-          "description": "Whether this trigger is currently active."
+          "type": "boolean"
+        },
+        "webhookConfig": {
+          "$ref": "#/definitions/v1WebhookConfig",
+          "description": "Webhook-specific security configuration.\nOnly populated when type is TRIGGER_TYPE_WEBHOOK."
         },
         "createdAt": {
           "type": "string",
@@ -225,7 +222,7 @@
         "TRIGGER_TYPE_VM_EVENT"
       ],
       "default": "TRIGGER_TYPE_UNSPECIFIED",
-      "description": "TriggerType classifies the event source that initiates a workflow.\n\n - TRIGGER_TYPE_WEBHOOK: HTTP webhook callback.\n - TRIGGER_TYPE_CRON: Cron-based scheduled execution.\n - TRIGGER_TYPE_DB_CHANGE: Database change event (CDC).\n - TRIGGER_TYPE_MATTERMOST: Mattermost message or event.\n - TRIGGER_TYPE_MANUAL: Manual user-initiated trigger.\n - TRIGGER_TYPE_FILE_CHANGE: File system change event.\n - TRIGGER_TYPE_MAIL: Incoming email event.\n - TRIGGER_TYPE_PUBSUB: Pub/Sub message event.\n - TRIGGER_TYPE_WEBRTC: WebRTC signaling event.\n - TRIGGER_TYPE_TSUKASA_EVENT: Tsukasa platform event (employee, task, wiki changes).\n - TRIGGER_TYPE_CONTAINER: Container lifecycle event (start, stop, crash).\n - TRIGGER_TYPE_PROCESS: OS process event (start, exit, signal).\n - TRIGGER_TYPE_VM_EVENT: Virtual machine lifecycle event."
+      "description": "TriggerType classifies the event source that initiates a workflow."
     },
     "v1UpdateTriggerResponse": {
       "type": "object",
@@ -235,6 +232,36 @@
         }
       },
       "description": "UpdateTriggerResponse is the response after updating a trigger."
+    },
+    "v1WebhookConfig": {
+      "type": "object",
+      "properties": {
+        "allowedSources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Allowed source IP ranges (CIDR notation). Empty = allow all."
+        },
+        "rateLimitPerMinute": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum requests per minute (0 = unlimited)."
+        },
+        "signatureVerification": {
+          "type": "boolean",
+          "description": "Enable HMAC signature verification on webhook payloads."
+        },
+        "signatureHeader": {
+          "type": "string",
+          "description": "Signature header name (e.g., \"X-Hub-Signature-256\")."
+        },
+        "sharedSecret": {
+          "type": "string",
+          "description": "Shared secret for HMAC signature verification (RESTRICTED)."
+        }
+      },
+      "description": "WebhookConfig provides security configuration for webhook triggers.\nUsed when TriggerType is TRIGGER_TYPE_WEBHOOK."
     }
   }
 }

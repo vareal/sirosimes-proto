@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
+import { FieldMask, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
@@ -154,6 +154,7 @@ export const UpdateWorkflowRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 4, name: "status", kind: "enum", T: proto3.getEnumType(WorkflowStatus) },
     { no: 5, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 6, name: "llm_config", kind: "message", T: Struct },
+    { no: 7, name: "update_mask", kind: "message", T: FieldMask },
   ],
 );
 

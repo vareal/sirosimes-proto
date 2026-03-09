@@ -3,9 +3,10 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3 } from "@bufbuild/protobuf";
+import { FieldMask, proto3 } from "@bufbuild/protobuf";
 import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import { ActorType } from "../../common/v1/actor_pb.js";
 
 /**
  * GrantType は OAuth2 の認可タイプを分類する。
@@ -19,6 +20,24 @@ export const GrantType = /*@__PURE__*/ proto3.makeEnum(
     {no: 1, name: "GRANT_TYPE_AUTHORIZATION_CODE", localName: "AUTHORIZATION_CODE"},
     {no: 2, name: "GRANT_TYPE_REFRESH_TOKEN", localName: "REFRESH_TOKEN"},
     {no: 3, name: "GRANT_TYPE_CLIENT_CREDENTIALS", localName: "CLIENT_CREDENTIALS"},
+  ],
+);
+
+/**
+ * ScopeType は許可されたOAuth2スコープの有限集合を定義する。
+ * 任意文字列スコープの代わりにenum型で管理し、未定義スコープの要求を防止する。
+ *
+ * @generated from enum sirosimes.mizugaki.v1.ScopeType
+ */
+export const ScopeType = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.mizugaki.v1.ScopeType",
+  [
+    {no: 0, name: "SCOPE_TYPE_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "SCOPE_TYPE_OPENID", localName: "OPENID"},
+    {no: 2, name: "SCOPE_TYPE_PROFILE", localName: "PROFILE"},
+    {no: 3, name: "SCOPE_TYPE_EMAIL", localName: "EMAIL"},
+    {no: 4, name: "SCOPE_TYPE_ROLES", localName: "ROLES"},
+    {no: 5, name: "SCOPE_TYPE_OFFLINE_ACCESS", localName: "OFFLINE_ACCESS"},
   ],
 );
 
@@ -79,7 +98,7 @@ export const OAuth2Client = /*@__PURE__*/ proto3.makeMessageType(
     { no: 5, name: "redirect_uris", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 6, name: "grant_types", kind: "enum", T: proto3.getEnumType(GrantType), repeated: true },
     { no: 7, name: "response_types", kind: "enum", T: proto3.getEnumType(ResponseType), repeated: true },
-    { no: 8, name: "scopes", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 8, name: "scopes", kind: "enum", T: proto3.getEnumType(ScopeType), repeated: true },
     { no: 9, name: "token_endpoint_auth_method", kind: "enum", T: proto3.getEnumType(TokenEndpointAuthMethod) },
     { no: 10, name: "status", kind: "enum", T: proto3.getEnumType(ClientStatus) },
     { no: 11, name: "client_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -91,6 +110,7 @@ export const OAuth2Client = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * RegisterClientRequest は OAuth2 クライアント登録リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.RegisterClientRequest
  */
@@ -102,7 +122,7 @@ export const RegisterClientRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "redirect_uris", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 5, name: "grant_types", kind: "enum", T: proto3.getEnumType(GrantType), repeated: true },
-    { no: 6, name: "scopes", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "scopes", kind: "enum", T: proto3.getEnumType(ScopeType), repeated: true },
     { no: 7, name: "token_endpoint_auth_method", kind: "enum", T: proto3.getEnumType(TokenEndpointAuthMethod) },
     { no: 8, name: "client_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "access_token_ttl_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
@@ -125,6 +145,7 @@ export const RegisterClientResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * GetClientRequest は OAuth2 クライアント取得リクエストを表す。
+ * Exposure: INTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.GetClientRequest
  */
@@ -149,6 +170,7 @@ export const GetClientResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * UpdateClientRequest は OAuth2 クライアント更新リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.UpdateClientRequest
  */
@@ -160,10 +182,11 @@ export const UpdateClientRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "redirect_uris", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 5, name: "grant_types", kind: "enum", T: proto3.getEnumType(GrantType), repeated: true },
-    { no: 6, name: "scopes", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "scopes", kind: "enum", T: proto3.getEnumType(ScopeType), repeated: true },
     { no: 7, name: "status", kind: "enum", T: proto3.getEnumType(ClientStatus) },
     { no: 8, name: "access_token_ttl_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 9, name: "refresh_token_ttl_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 10, name: "update_mask", kind: "message", T: FieldMask },
   ],
 );
 
@@ -181,6 +204,7 @@ export const UpdateClientResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * DeleteClientRequest は OAuth2 クライアント削除リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.DeleteClientRequest
  */
@@ -203,6 +227,7 @@ export const DeleteClientResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ListClientsRequest は OAuth2 クライアント一覧取得リクエストを表す。
+ * Exposure: INTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.ListClientsRequest
  */
@@ -230,6 +255,7 @@ export const ListClientsResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * RotateClientSecretRequest はクライアントシークレットローテーションリクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.RotateClientSecretRequest
  */
@@ -254,6 +280,7 @@ export const RotateClientSecretResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * AuthorizeRequest は OAuth2 認可リクエストを表す。
+ * Exposure: EXTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.AuthorizeRequest
  */
@@ -286,6 +313,7 @@ export const AuthorizeResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * TokenRequest は OAuth2 トークンリクエストを表す。
+ * Exposure: EXTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.TokenRequest
  */
@@ -322,6 +350,7 @@ export const TokenResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * UserinfoRequest は OIDC UserInfo リクエストを表す。
+ * Exposure: EXTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.UserinfoRequest
  */
@@ -333,7 +362,7 @@ export const UserinfoRequest = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * UserinfoResponse は OIDC UserInfo レスポンスを表す。
+ * UserinfoResponse は OIDC UserInfo レスポンスを表す（OIDC Standard Claims準拠）。
  *
  * @generated from message sirosimes.mizugaki.v1.UserinfoResponse
  */
@@ -346,7 +375,7 @@ export const UserinfoResponse = /*@__PURE__*/ proto3.makeMessageType(
     { no: 4, name: "email_verified", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "roles", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 6, name: "trust_level", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "actor_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "actor_type", kind: "enum", T: proto3.getEnumType(ActorType) },
     { no: 8, name: "identifier", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "picture", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],

@@ -3,10 +3,11 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import type { ActorType } from "../../common/v1/actor_pb.js";
 
 /**
  * GrantType は OAuth2 の認可タイプを分類する。
@@ -20,7 +21,7 @@ export declare enum GrantType {
   UNSPECIFIED = 0,
 
   /**
-   * Authorization Code Grant — ユーザー認証を伴うフロー。
+   * Authorization Code Grant — ユーザー認証を伴うフロー。PKCE必須。
    *
    * @generated from enum value: GRANT_TYPE_AUTHORIZATION_CODE = 1;
    */
@@ -36,9 +37,60 @@ export declare enum GrantType {
   /**
    * Client Credentials Grant — サービス間認証。
    *
+   * Implicit Grant: 意図的に未定義（廃止済み、RFC 9207）。
+   * ROPC Grant: 意図的に未定義（非推奨、OAuth 2.1 draft）。
+   *
    * @generated from enum value: GRANT_TYPE_CLIENT_CREDENTIALS = 3;
    */
   CLIENT_CREDENTIALS = 3,
+}
+
+/**
+ * ScopeType は許可されたOAuth2スコープの有限集合を定義する。
+ * 任意文字列スコープの代わりにenum型で管理し、未定義スコープの要求を防止する。
+ *
+ * @generated from enum sirosimes.mizugaki.v1.ScopeType
+ */
+export declare enum ScopeType {
+  /**
+   * @generated from enum value: SCOPE_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * OpenID Connect core scope.
+   *
+   * @generated from enum value: SCOPE_TYPE_OPENID = 1;
+   */
+  OPENID = 1,
+
+  /**
+   * ユーザープロフィール情報（name, picture等）。
+   *
+   * @generated from enum value: SCOPE_TYPE_PROFILE = 2;
+   */
+  PROFILE = 2,
+
+  /**
+   * メールアドレス。
+   *
+   * @generated from enum value: SCOPE_TYPE_EMAIL = 3;
+   */
+  EMAIL = 3,
+
+  /**
+   * ロール・権限情報。
+   *
+   * @generated from enum value: SCOPE_TYPE_ROLES = 4;
+   */
+  ROLES = 4,
+
+  /**
+   * オフラインアクセス（リフレッシュトークン発行）。
+   *
+   * @generated from enum value: SCOPE_TYPE_OFFLINE_ACCESS = 5;
+   */
+  OFFLINE_ACCESS = 5,
 }
 
 /**
@@ -53,8 +105,6 @@ export declare enum ResponseType {
   UNSPECIFIED = 0,
 
   /**
-   * Authorization Code Flow で使用。
-   *
    * @generated from enum value: RESPONSE_TYPE_CODE = 1;
    */
   CODE = 1,
@@ -72,15 +122,11 @@ export declare enum TokenEndpointAuthMethod {
   UNSPECIFIED = 0,
 
   /**
-   * リクエストボディで client_secret を送信。
-   *
    * @generated from enum value: TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_POST = 1;
    */
   CLIENT_SECRET_POST = 1,
 
   /**
-   * HTTP Basic 認証で client_id:client_secret を送信。
-   *
    * @generated from enum value: TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET_BASIC = 2;
    */
   CLIENT_SECRET_BASIC = 2,
@@ -98,22 +144,16 @@ export declare enum ClientStatus {
   UNSPECIFIED = 0,
 
   /**
-   * クライアントは有効で認可リクエストを受け付ける。
-   *
    * @generated from enum value: CLIENT_STATUS_ACTIVE = 1;
    */
   ACTIVE = 1,
 
   /**
-   * クライアントは無効化されている。
-   *
    * @generated from enum value: CLIENT_STATUS_INACTIVE = 2;
    */
   INACTIVE = 2,
 
   /**
-   * クライアントは管理者によって停止されている。
-   *
    * @generated from enum value: CLIENT_STATUS_SUSPENDED = 3;
    */
   SUSPENDED = 3,
@@ -126,99 +166,73 @@ export declare enum ClientStatus {
  */
 export declare class OAuth2Client extends Message<OAuth2Client> {
   /**
-   * リソースメタデータ（ID、タイムスタンプ、バージョン、セキュリティレベル）。
-   *
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
    */
   metadata?: ResourceMetadata;
 
   /**
-   * クライアントID（一意、公開値）。
-   *
    * @generated from field: string client_id = 2;
    */
   clientId: string;
 
   /**
-   * クライアント表示名（例: "司", "機織"）。
-   *
    * @generated from field: string client_name = 3;
    */
   clientName: string;
 
   /**
-   * クライアントの説明。
-   *
    * @generated from field: string description = 4;
    */
   description: string;
 
   /**
-   * 許可されたリダイレクトURI。
-   *
    * @generated from field: repeated string redirect_uris = 5;
    */
   redirectUris: string[];
 
   /**
-   * 許可された認可タイプ。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.GrantType grant_types = 6;
    */
   grantTypes: GrantType[];
 
   /**
-   * 許可されたレスポンスタイプ。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.ResponseType response_types = 7;
    */
   responseTypes: ResponseType[];
 
   /**
-   * 許可されたスコープ（openid, profile, email, roles）。
+   * 許可されたスコープ（enum型で有限集合管理）。
    *
-   * @generated from field: repeated string scopes = 8;
+   * @generated from field: repeated sirosimes.mizugaki.v1.ScopeType scopes = 8;
    */
-  scopes: string[];
+  scopes: ScopeType[];
 
   /**
-   * トークンエンドポイント認証方法。
-   *
    * @generated from field: sirosimes.mizugaki.v1.TokenEndpointAuthMethod token_endpoint_auth_method = 9;
    */
   tokenEndpointAuthMethod: TokenEndpointAuthMethod;
 
   /**
-   * 現在の状態。
-   *
    * @generated from field: sirosimes.mizugaki.v1.ClientStatus status = 10;
    */
   status: ClientStatus;
 
   /**
-   * クライアントの Web サイトURL。
-   *
    * @generated from field: string client_uri = 11;
    */
   clientUri: string;
 
   /**
-   * クライアントのロゴURL。
-   *
    * @generated from field: string logo_uri = 12;
    */
   logoUri: string;
 
   /**
-   * アクセストークンの有効期間（秒）。
-   *
    * @generated from field: int32 access_token_ttl_seconds = 13;
    */
   accessTokenTtlSeconds: number;
 
   /**
-   * リフレッシュトークンの有効期間（秒）。
-   *
    * @generated from field: int32 refresh_token_ttl_seconds = 14;
    */
   refreshTokenTtlSeconds: number;
@@ -240,76 +254,57 @@ export declare class OAuth2Client extends Message<OAuth2Client> {
 
 /**
  * RegisterClientRequest は OAuth2 クライアント登録リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.RegisterClientRequest
  */
 export declare class RegisterClientRequest extends Message<RegisterClientRequest> {
   /**
-   * クライアントID（一意、必須）。
-   *
    * @generated from field: string client_id = 1;
    */
   clientId: string;
 
   /**
-   * クライアント表示名。
-   *
    * @generated from field: string client_name = 2;
    */
   clientName: string;
 
   /**
-   * クライアントの説明。
-   *
    * @generated from field: string description = 3;
    */
   description: string;
 
   /**
-   * リダイレクトURI。
-   *
    * @generated from field: repeated string redirect_uris = 4;
    */
   redirectUris: string[];
 
   /**
-   * 許可する認可タイプ。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.GrantType grant_types = 5;
    */
   grantTypes: GrantType[];
 
   /**
-   * 許可するスコープ。
-   *
-   * @generated from field: repeated string scopes = 6;
+   * @generated from field: repeated sirosimes.mizugaki.v1.ScopeType scopes = 6;
    */
-  scopes: string[];
+  scopes: ScopeType[];
 
   /**
-   * トークンエンドポイント認証方法。
-   *
    * @generated from field: sirosimes.mizugaki.v1.TokenEndpointAuthMethod token_endpoint_auth_method = 7;
    */
   tokenEndpointAuthMethod: TokenEndpointAuthMethod;
 
   /**
-   * クライアントの Web サイトURL。
-   *
    * @generated from field: string client_uri = 8;
    */
   clientUri: string;
 
   /**
-   * アクセストークンの有効期間（秒）。
-   *
    * @generated from field: int32 access_token_ttl_seconds = 9;
    */
   accessTokenTtlSeconds: number;
 
   /**
-   * リフレッシュトークンの有効期間（秒）。
-   *
    * @generated from field: int32 refresh_token_ttl_seconds = 10;
    */
   refreshTokenTtlSeconds: number;
@@ -336,8 +331,6 @@ export declare class RegisterClientRequest extends Message<RegisterClientRequest
  */
 export declare class RegisterClientResponse extends Message<RegisterClientResponse> {
   /**
-   * 登録されたクライアント。
-   *
    * @generated from field: sirosimes.mizugaki.v1.OAuth2Client client = 1;
    */
   client?: OAuth2Client;
@@ -366,13 +359,12 @@ export declare class RegisterClientResponse extends Message<RegisterClientRespon
 
 /**
  * GetClientRequest は OAuth2 クライアント取得リクエストを表す。
+ * Exposure: INTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.GetClientRequest
  */
 export declare class GetClientRequest extends Message<GetClientRequest> {
   /**
-   * 取得するクライアントID。
-   *
    * @generated from field: string client_id = 1;
    */
   clientId: string;
@@ -399,8 +391,6 @@ export declare class GetClientRequest extends Message<GetClientRequest> {
  */
 export declare class GetClientResponse extends Message<GetClientResponse> {
   /**
-   * 取得したクライアント（シークレットは含まない）。
-   *
    * @generated from field: sirosimes.mizugaki.v1.OAuth2Client client = 1;
    */
   client?: OAuth2Client;
@@ -422,72 +412,62 @@ export declare class GetClientResponse extends Message<GetClientResponse> {
 
 /**
  * UpdateClientRequest は OAuth2 クライアント更新リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.UpdateClientRequest
  */
 export declare class UpdateClientRequest extends Message<UpdateClientRequest> {
   /**
-   * 更新対象のクライアントID。
-   *
    * @generated from field: string client_id = 1;
    */
   clientId: string;
 
   /**
-   * 新しい表示名（空の場合は変更なし）。
-   *
    * @generated from field: string client_name = 2;
    */
   clientName: string;
 
   /**
-   * 新しい説明（空の場合は変更なし）。
-   *
    * @generated from field: string description = 3;
    */
   description: string;
 
   /**
-   * 新しいリダイレクトURI（空の場合は変更なし）。
-   *
    * @generated from field: repeated string redirect_uris = 4;
    */
   redirectUris: string[];
 
   /**
-   * 新しい認可タイプ（空の場合は変更なし）。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.GrantType grant_types = 5;
    */
   grantTypes: GrantType[];
 
   /**
-   * 新しいスコープ（空の場合は変更なし）。
-   *
-   * @generated from field: repeated string scopes = 6;
+   * @generated from field: repeated sirosimes.mizugaki.v1.ScopeType scopes = 6;
    */
-  scopes: string[];
+  scopes: ScopeType[];
 
   /**
-   * 新しいステータス。
-   *
    * @generated from field: sirosimes.mizugaki.v1.ClientStatus status = 7;
    */
   status: ClientStatus;
 
   /**
-   * アクセストークンの有効期間（秒）。
-   *
    * @generated from field: int32 access_token_ttl_seconds = 8;
    */
   accessTokenTtlSeconds: number;
 
   /**
-   * リフレッシュトークンの有効期間（秒）。
-   *
    * @generated from field: int32 refresh_token_ttl_seconds = 9;
    */
   refreshTokenTtlSeconds: number;
+
+  /**
+   * Fields to update. If empty, all non-empty fields are updated.
+   *
+   * @generated from field: google.protobuf.FieldMask update_mask = 10;
+   */
+  updateMask?: FieldMask;
 
   constructor(data?: PartialMessage<UpdateClientRequest>);
 
@@ -511,8 +491,6 @@ export declare class UpdateClientRequest extends Message<UpdateClientRequest> {
  */
 export declare class UpdateClientResponse extends Message<UpdateClientResponse> {
   /**
-   * 更新されたクライアント。
-   *
    * @generated from field: sirosimes.mizugaki.v1.OAuth2Client client = 1;
    */
   client?: OAuth2Client;
@@ -534,13 +512,12 @@ export declare class UpdateClientResponse extends Message<UpdateClientResponse> 
 
 /**
  * DeleteClientRequest は OAuth2 クライアント削除リクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.DeleteClientRequest
  */
 export declare class DeleteClientRequest extends Message<DeleteClientRequest> {
   /**
-   * 削除するクライアントID。
-   *
    * @generated from field: string client_id = 1;
    */
   clientId: string;
@@ -583,27 +560,22 @@ export declare class DeleteClientResponse extends Message<DeleteClientResponse> 
 
 /**
  * ListClientsRequest は OAuth2 クライアント一覧取得リクエストを表す。
+ * Exposure: INTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.ListClientsRequest
  */
 export declare class ListClientsRequest extends Message<ListClientsRequest> {
   /**
-   * ページネーション設定。
-   *
    * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
    */
   pagination?: PaginationRequest;
 
   /**
-   * ステータスでフィルタ。
-   *
    * @generated from field: sirosimes.mizugaki.v1.ClientStatus status = 2;
    */
   status: ClientStatus;
 
   /**
-   * 全文検索クエリ。
-   *
    * @generated from field: string search = 3;
    */
   search: string;
@@ -630,15 +602,11 @@ export declare class ListClientsRequest extends Message<ListClientsRequest> {
  */
 export declare class ListClientsResponse extends Message<ListClientsResponse> {
   /**
-   * クライアント一覧。
-   *
    * @generated from field: repeated sirosimes.mizugaki.v1.OAuth2Client clients = 1;
    */
   clients: OAuth2Client[];
 
   /**
-   * ページネーション情報。
-   *
    * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
    */
   pagination?: PaginationResponse;
@@ -660,13 +628,12 @@ export declare class ListClientsResponse extends Message<ListClientsResponse> {
 
 /**
  * RotateClientSecretRequest はクライアントシークレットローテーションリクエストを表す。
+ * Exposure: INTERNAL（管理者操作）。
  *
  * @generated from message sirosimes.mizugaki.v1.RotateClientSecretRequest
  */
 export declare class RotateClientSecretRequest extends Message<RotateClientSecretRequest> {
   /**
-   * 対象クライアントID。
-   *
    * @generated from field: string client_id = 1;
    */
   clientId: string;
@@ -716,54 +683,52 @@ export declare class RotateClientSecretResponse extends Message<RotateClientSecr
 
 /**
  * AuthorizeRequest は OAuth2 認可リクエストを表す。
+ * Exposure: EXTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.AuthorizeRequest
  */
 export declare class AuthorizeRequest extends Message<AuthorizeRequest> {
   /**
-   * クライアントID。
-   *
    * @generated from field: string client_id = 1;
    */
   clientId: string;
 
   /**
-   * レスポンスタイプ（通常は "code"）。
-   *
    * @generated from field: sirosimes.mizugaki.v1.ResponseType response_type = 2;
    */
   responseType: ResponseType;
 
   /**
-   * リダイレクトURI。
-   *
    * @generated from field: string redirect_uri = 3;
    */
   redirectUri: string;
 
   /**
-   * 要求するスコープ（スペース区切り）。
+   * 要求するスコープ（スペース区切り文字列 — OAuth2仕様互換）。
    *
    * @generated from field: string scope = 4;
    */
   scope: string;
 
   /**
-   * CSRF対策用ステート値。
+   * CSRF対策用ステート値（必須）。
    *
    * @generated from field: string state = 5;
    */
   state: string;
 
   /**
-   * PKCE code_challenge（推奨）。
+   * PKCE code_challenge。
+   * ⚠️ PKCE REQUIRED for all grant types using authorization code
+   * (RFC 9126 / OAuth 2.1 draft 準拠)。全クライアント（Confidential含む）で必須。
+   * code_challenge_method は "S256" のみ許可（"plain" は禁止）。
    *
    * @generated from field: string code_challenge = 6;
    */
   codeChallenge: string;
 
   /**
-   * PKCE code_challenge_method（"S256" 推奨）。
+   * PKCE code_challenge_method（"S256" のみ許可）。
    *
    * @generated from field: string code_challenge_method = 7;
    */
@@ -791,22 +756,16 @@ export declare class AuthorizeRequest extends Message<AuthorizeRequest> {
  */
 export declare class AuthorizeResponse extends Message<AuthorizeResponse> {
   /**
-   * 発行された認可コード。
-   *
    * @generated from field: string code = 1;
    */
   code: string;
 
   /**
-   * リクエストで送信されたステート値（そのまま返却）。
-   *
    * @generated from field: string state = 2;
    */
   state: string;
 
   /**
-   * リダイレクト先URI（code と state を含む）。
-   *
    * @generated from field: string redirect_uri = 3;
    */
   redirectUri: string;
@@ -828,61 +787,50 @@ export declare class AuthorizeResponse extends Message<AuthorizeResponse> {
 
 /**
  * TokenRequest は OAuth2 トークンリクエストを表す。
+ * Exposure: EXTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.TokenRequest
  */
 export declare class TokenRequest extends Message<TokenRequest> {
   /**
-   * 認可タイプ。
-   *
    * @generated from field: sirosimes.mizugaki.v1.GrantType grant_type = 1;
    */
   grantType: GrantType;
 
   /**
-   * クライアントID。
-   *
    * @generated from field: string client_id = 2;
    */
   clientId: string;
 
   /**
-   * クライアントシークレット（RESTRICTED）。
+   * SecurityLevel: RESTRICTED。
    *
    * @generated from field: string client_secret = 3;
    */
   clientSecret: string;
 
   /**
-   * 認可コード（authorization_code grant の場合）。
-   *
    * @generated from field: string code = 4;
    */
   code: string;
 
   /**
-   * リダイレクトURI（authorization_code grant の場合）。
-   *
    * @generated from field: string redirect_uri = 5;
    */
   redirectUri: string;
 
   /**
-   * リフレッシュトークン（refresh_token grant の場合）。
-   *
    * @generated from field: string refresh_token = 6;
    */
   refreshToken: string;
 
   /**
-   * 要求するスコープ。
-   *
    * @generated from field: string scope = 7;
    */
   scope: string;
 
   /**
-   * PKCE code_verifier。
+   * PKCE code_verifier（authorization_code grant では必須）。
    *
    * @generated from field: string code_verifier = 8;
    */
@@ -910,43 +858,31 @@ export declare class TokenRequest extends Message<TokenRequest> {
  */
 export declare class TokenResponse extends Message<TokenResponse> {
   /**
-   * アクセストークン。
-   *
    * @generated from field: string access_token = 1;
    */
   accessToken: string;
 
   /**
-   * トークンタイプ（通常は "Bearer"）。
-   *
    * @generated from field: string token_type = 2;
    */
   tokenType: string;
 
   /**
-   * アクセストークンの有効期間（秒）。
-   *
    * @generated from field: int32 expires_in = 3;
    */
   expiresIn: number;
 
   /**
-   * リフレッシュトークン。
-   *
    * @generated from field: string refresh_token = 4;
    */
   refreshToken: string;
 
   /**
-   * 付与されたスコープ。
-   *
    * @generated from field: string scope = 5;
    */
   scope: string;
 
   /**
-   * OIDC IDトークン（openid スコープが要求された場合）。
-   *
    * @generated from field: string id_token = 6;
    */
   idToken: string;
@@ -968,13 +904,12 @@ export declare class TokenResponse extends Message<TokenResponse> {
 
 /**
  * UserinfoRequest は OIDC UserInfo リクエストを表す。
+ * Exposure: EXTERNAL。
  *
  * @generated from message sirosimes.mizugaki.v1.UserinfoRequest
  */
 export declare class UserinfoRequest extends Message<UserinfoRequest> {
   /**
-   * アクセストークン（Bearer トークン）。
-   *
    * @generated from field: string access_token = 1;
    */
   accessToken: string;
@@ -995,70 +930,54 @@ export declare class UserinfoRequest extends Message<UserinfoRequest> {
 }
 
 /**
- * UserinfoResponse は OIDC UserInfo レスポンスを表す。
+ * UserinfoResponse は OIDC UserInfo レスポンスを表す（OIDC Standard Claims準拠）。
  *
  * @generated from message sirosimes.mizugaki.v1.UserinfoResponse
  */
 export declare class UserinfoResponse extends Message<UserinfoResponse> {
   /**
-   * Subject — ユーザーID。
-   *
    * @generated from field: string sub = 1;
    */
   sub: string;
 
   /**
-   * ユーザー表示名。
-   *
    * @generated from field: string name = 2;
    */
   name: string;
 
   /**
-   * メールアドレス。
-   *
    * @generated from field: string email = 3;
    */
   email: string;
 
   /**
-   * メールアドレスが確認済みかどうか。
-   *
    * @generated from field: bool email_verified = 4;
    */
   emailVerified: boolean;
 
   /**
-   * 付与されたロール一覧。
-   *
    * @generated from field: repeated string roles = 5;
    */
   roles: string[];
 
   /**
-   * 信頼レベル。
-   *
    * @generated from field: int32 trust_level = 6;
    */
   trustLevel: number;
 
   /**
-   * アクター種別。
+   * アクター種別（enum型で一貫性を保持）。
    *
-   * @generated from field: string actor_type = 7;
+   * @generated from field: sirosimes.common.v1.ActorType actor_type = 7;
    */
-  actorType: string;
+  actorType: ActorType;
 
   /**
-   * ユーザー識別子。
-   *
    * @generated from field: string identifier = 8;
    */
   identifier: string;
 
   /**
-   * アバター画像URL。
-   *
    * @generated from field: string picture = 9;
    */
   picture: string;

@@ -32,6 +32,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // TriggerService provides trigger management and webhook handling operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+// Note: HandleWebhook will move to External API in Phase 2.
 type TriggerServiceClient interface {
 	ListTriggers(ctx context.Context, in *ListTriggersRequest, opts ...grpc.CallOption) (*ListTriggersResponse, error)
 	CreateTrigger(ctx context.Context, in *CreateTriggerRequest, opts ...grpc.CallOption) (*CreateTriggerResponse, error)
@@ -114,6 +116,8 @@ func (c *triggerServiceClient) HandleWebhook(ctx context.Context, in *HandleWebh
 // for forward compatibility.
 //
 // TriggerService provides trigger management and webhook handling operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
+// Note: HandleWebhook will move to External API in Phase 2.
 type TriggerServiceServer interface {
 	ListTriggers(context.Context, *ListTriggersRequest) (*ListTriggersResponse, error)
 	CreateTrigger(context.Context, *CreateTriggerRequest) (*CreateTriggerResponse, error)

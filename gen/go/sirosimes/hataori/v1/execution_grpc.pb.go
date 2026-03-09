@@ -31,6 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // ExecutionService provides workflow execution management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type ExecutionServiceClient interface {
 	ListExecutions(ctx context.Context, in *ListExecutionsRequest, opts ...grpc.CallOption) (*ListExecutionsResponse, error)
 	GetExecution(ctx context.Context, in *GetExecutionRequest, opts ...grpc.CallOption) (*GetExecutionResponse, error)
@@ -102,6 +103,7 @@ func (c *executionServiceClient) ResumeExecution(ctx context.Context, in *Resume
 // for forward compatibility.
 //
 // ExecutionService provides workflow execution management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 type ExecutionServiceServer interface {
 	ListExecutions(context.Context, *ListExecutionsRequest) (*ListExecutionsResponse, error)
 	GetExecution(context.Context, *GetExecutionRequest) (*GetExecutionResponse, error)

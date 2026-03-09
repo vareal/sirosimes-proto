@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
-import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
+import { PageToken, PageTokenResponse } from "../../common/v1/pagination_pb.js";
 
 /**
  * ExecutionStatus represents the lifecycle state of a workflow execution.
@@ -88,13 +88,14 @@ export const ExecutionStep = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * ListExecutionsRequest is the request for listing executions with filters.
+ * Uses cursor-based pagination for execution log streams.
  *
  * @generated from message sirosimes.hataori.v1.ListExecutionsRequest
  */
 export const ListExecutionsRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.hataori.v1.ListExecutionsRequest",
   () => [
-    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 1, name: "page_token", kind: "message", T: PageToken },
     { no: 2, name: "workflow_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(ExecutionStatus) },
     { no: 4, name: "triggered_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -110,7 +111,7 @@ export const ListExecutionsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.hataori.v1.ListExecutionsResponse",
   () => [
     { no: 1, name: "executions", kind: "message", T: Execution, repeated: true },
-    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+    { no: 2, name: "page_info", kind: "message", T: PageTokenResponse },
   ],
 );
 

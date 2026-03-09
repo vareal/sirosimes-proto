@@ -2,10 +2,15 @@ syntax = "proto3";
 
 package sirosimes.tsukasa.v1;
 
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
 import "sirosimes/common/v1/pagination.proto";
 import "sirosimes/tsukasa/v1/task.proto";
+
+// project.proto — 司（Tsukasa）プロジェクト管理サービス。
+//
+// Exposure: INTERNAL（全RPC）
 
 // ProjectStatus represents the lifecycle state of a project.
 enum ProjectStatus {
@@ -139,6 +144,8 @@ message UpdateProjectRequest {
   ProjectPriority priority = 9;
   repeated string tags = 10;
   map<string, string> metadata = 11;
+  // Fields to update. If empty, all non-empty fields are updated.
+  google.protobuf.FieldMask update_mask = 12;
 }
 
 // UpdateProjectResponse is the response after updating a project.
@@ -171,6 +178,7 @@ message AddProjectMemberResponse {
 }
 
 // ProjectService provides project management operations.
+// Exposure: INTERNAL — all RPCs are for internal use only.
 service ProjectService {
   rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
   rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
