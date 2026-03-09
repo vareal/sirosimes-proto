@@ -5,7 +5,6 @@ package sirosimes.tamanoya.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
-import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
 

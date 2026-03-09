@@ -19,31 +19,44 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AssessmentService_ListAssessments_FullMethodName  = "/sirosimes.tamanoya.v1.AssessmentService/ListAssessments"
-	AssessmentService_GetAssessment_FullMethodName    = "/sirosimes.tamanoya.v1.AssessmentService/GetAssessment"
-	AssessmentService_CreateAssessment_FullMethodName = "/sirosimes.tamanoya.v1.AssessmentService/CreateAssessment"
-	AssessmentService_UpdateAssessment_FullMethodName = "/sirosimes.tamanoya.v1.AssessmentService/UpdateAssessment"
-	AssessmentService_DeleteAssessment_FullMethodName = "/sirosimes.tamanoya.v1.AssessmentService/DeleteAssessment"
-	AssessmentService_SubmitAssessment_FullMethodName = "/sirosimes.tamanoya.v1.AssessmentService/SubmitAssessment"
-	AssessmentService_GradeSubmission_FullMethodName  = "/sirosimes.tamanoya.v1.AssessmentService/GradeSubmission"
-	AssessmentService_ListSubmissions_FullMethodName  = "/sirosimes.tamanoya.v1.AssessmentService/ListSubmissions"
+	AssessmentService_GetAssessmentPeriod_FullMethodName    = "/sirosimes.tamanoya.v1.AssessmentService/GetAssessmentPeriod"
+	AssessmentService_ListAssessmentPeriods_FullMethodName  = "/sirosimes.tamanoya.v1.AssessmentService/ListAssessmentPeriods"
+	AssessmentService_CreateAssessmentPeriod_FullMethodName = "/sirosimes.tamanoya.v1.AssessmentService/CreateAssessmentPeriod"
+	AssessmentService_UpdateAssessmentPeriod_FullMethodName = "/sirosimes.tamanoya.v1.AssessmentService/UpdateAssessmentPeriod"
+	AssessmentService_GetSubmission_FullMethodName          = "/sirosimes.tamanoya.v1.AssessmentService/GetSubmission"
+	AssessmentService_ListSubmissions_FullMethodName        = "/sirosimes.tamanoya.v1.AssessmentService/ListSubmissions"
+	AssessmentService_StartAssessment_FullMethodName        = "/sirosimes.tamanoya.v1.AssessmentService/StartAssessment"
+	AssessmentService_SubmitAssessment_FullMethodName       = "/sirosimes.tamanoya.v1.AssessmentService/SubmitAssessment"
+	AssessmentService_AutoSave_FullMethodName               = "/sirosimes.tamanoya.v1.AssessmentService/AutoSave"
+	AssessmentService_GetQuestionSettings_FullMethodName    = "/sirosimes.tamanoya.v1.AssessmentService/GetQuestionSettings"
+	AssessmentService_ListQuestionSettings_FullMethodName   = "/sirosimes.tamanoya.v1.AssessmentService/ListQuestionSettings"
+	AssessmentService_UpdateQuestionSettings_FullMethodName = "/sirosimes.tamanoya.v1.AssessmentService/UpdateQuestionSettings"
 )
 
 // AssessmentServiceClient is the client API for AssessmentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AssessmentService manages assessments and submissions.
-// Exposure: INTERNAL — all RPCs are for internal use only.
+// AssessmentService はアセスメントの期間・セッション・提出を管理するサービス。
 type AssessmentServiceClient interface {
-	ListAssessments(ctx context.Context, in *ListAssessmentsRequest, opts ...grpc.CallOption) (*ListAssessmentsResponse, error)
-	GetAssessment(ctx context.Context, in *GetAssessmentRequest, opts ...grpc.CallOption) (*GetAssessmentResponse, error)
-	CreateAssessment(ctx context.Context, in *CreateAssessmentRequest, opts ...grpc.CallOption) (*CreateAssessmentResponse, error)
-	UpdateAssessment(ctx context.Context, in *UpdateAssessmentRequest, opts ...grpc.CallOption) (*UpdateAssessmentResponse, error)
-	DeleteAssessment(ctx context.Context, in *DeleteAssessmentRequest, opts ...grpc.CallOption) (*DeleteAssessmentResponse, error)
-	SubmitAssessment(ctx context.Context, in *SubmitAssessmentRequest, opts ...grpc.CallOption) (*SubmitAssessmentResponse, error)
-	GradeSubmission(ctx context.Context, in *GradeSubmissionRequest, opts ...grpc.CallOption) (*GradeSubmissionResponse, error)
+	// --- 期間管理 ---
+	GetAssessmentPeriod(ctx context.Context, in *GetAssessmentPeriodRequest, opts ...grpc.CallOption) (*GetAssessmentPeriodResponse, error)
+	ListAssessmentPeriods(ctx context.Context, in *ListAssessmentPeriodsRequest, opts ...grpc.CallOption) (*ListAssessmentPeriodsResponse, error)
+	CreateAssessmentPeriod(ctx context.Context, in *CreateAssessmentPeriodRequest, opts ...grpc.CallOption) (*CreateAssessmentPeriodResponse, error)
+	UpdateAssessmentPeriod(ctx context.Context, in *UpdateAssessmentPeriodRequest, opts ...grpc.CallOption) (*UpdateAssessmentPeriodResponse, error)
+	// --- 提出管理 ---
+	GetSubmission(ctx context.Context, in *GetSubmissionRequest, opts ...grpc.CallOption) (*GetSubmissionResponse, error)
 	ListSubmissions(ctx context.Context, in *ListSubmissionsRequest, opts ...grpc.CallOption) (*ListSubmissionsResponse, error)
+	// アセスメント開始（セッション生成 + 問題出題）
+	StartAssessment(ctx context.Context, in *StartAssessmentRequest, opts ...grpc.CallOption) (*StartAssessmentResponse, error)
+	// アセスメント提出
+	SubmitAssessment(ctx context.Context, in *SubmitAssessmentRequest, opts ...grpc.CallOption) (*SubmitAssessmentResponse, error)
+	// 自動保存
+	AutoSave(ctx context.Context, in *AutoSaveRequest, opts ...grpc.CallOption) (*AutoSaveResponse, error)
+	// --- 出題設定 ---
+	GetQuestionSettings(ctx context.Context, in *GetQuestionSettingsRequest, opts ...grpc.CallOption) (*GetQuestionSettingsResponse, error)
+	ListQuestionSettings(ctx context.Context, in *ListQuestionSettingsRequest, opts ...grpc.CallOption) (*ListQuestionSettingsResponse, error)
+	UpdateQuestionSettings(ctx context.Context, in *UpdateQuestionSettingsRequest, opts ...grpc.CallOption) (*UpdateQuestionSettingsResponse, error)
 }
 
 type assessmentServiceClient struct {
@@ -54,70 +67,50 @@ func NewAssessmentServiceClient(cc grpc.ClientConnInterface) AssessmentServiceCl
 	return &assessmentServiceClient{cc}
 }
 
-func (c *assessmentServiceClient) ListAssessments(ctx context.Context, in *ListAssessmentsRequest, opts ...grpc.CallOption) (*ListAssessmentsResponse, error) {
+func (c *assessmentServiceClient) GetAssessmentPeriod(ctx context.Context, in *GetAssessmentPeriodRequest, opts ...grpc.CallOption) (*GetAssessmentPeriodResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListAssessmentsResponse)
-	err := c.cc.Invoke(ctx, AssessmentService_ListAssessments_FullMethodName, in, out, cOpts...)
+	out := new(GetAssessmentPeriodResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_GetAssessmentPeriod_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *assessmentServiceClient) GetAssessment(ctx context.Context, in *GetAssessmentRequest, opts ...grpc.CallOption) (*GetAssessmentResponse, error) {
+func (c *assessmentServiceClient) ListAssessmentPeriods(ctx context.Context, in *ListAssessmentPeriodsRequest, opts ...grpc.CallOption) (*ListAssessmentPeriodsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAssessmentResponse)
-	err := c.cc.Invoke(ctx, AssessmentService_GetAssessment_FullMethodName, in, out, cOpts...)
+	out := new(ListAssessmentPeriodsResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_ListAssessmentPeriods_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *assessmentServiceClient) CreateAssessment(ctx context.Context, in *CreateAssessmentRequest, opts ...grpc.CallOption) (*CreateAssessmentResponse, error) {
+func (c *assessmentServiceClient) CreateAssessmentPeriod(ctx context.Context, in *CreateAssessmentPeriodRequest, opts ...grpc.CallOption) (*CreateAssessmentPeriodResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateAssessmentResponse)
-	err := c.cc.Invoke(ctx, AssessmentService_CreateAssessment_FullMethodName, in, out, cOpts...)
+	out := new(CreateAssessmentPeriodResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_CreateAssessmentPeriod_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *assessmentServiceClient) UpdateAssessment(ctx context.Context, in *UpdateAssessmentRequest, opts ...grpc.CallOption) (*UpdateAssessmentResponse, error) {
+func (c *assessmentServiceClient) UpdateAssessmentPeriod(ctx context.Context, in *UpdateAssessmentPeriodRequest, opts ...grpc.CallOption) (*UpdateAssessmentPeriodResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateAssessmentResponse)
-	err := c.cc.Invoke(ctx, AssessmentService_UpdateAssessment_FullMethodName, in, out, cOpts...)
+	out := new(UpdateAssessmentPeriodResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_UpdateAssessmentPeriod_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *assessmentServiceClient) DeleteAssessment(ctx context.Context, in *DeleteAssessmentRequest, opts ...grpc.CallOption) (*DeleteAssessmentResponse, error) {
+func (c *assessmentServiceClient) GetSubmission(ctx context.Context, in *GetSubmissionRequest, opts ...grpc.CallOption) (*GetSubmissionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteAssessmentResponse)
-	err := c.cc.Invoke(ctx, AssessmentService_DeleteAssessment_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *assessmentServiceClient) SubmitAssessment(ctx context.Context, in *SubmitAssessmentRequest, opts ...grpc.CallOption) (*SubmitAssessmentResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SubmitAssessmentResponse)
-	err := c.cc.Invoke(ctx, AssessmentService_SubmitAssessment_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *assessmentServiceClient) GradeSubmission(ctx context.Context, in *GradeSubmissionRequest, opts ...grpc.CallOption) (*GradeSubmissionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GradeSubmissionResponse)
-	err := c.cc.Invoke(ctx, AssessmentService_GradeSubmission_FullMethodName, in, out, cOpts...)
+	out := new(GetSubmissionResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_GetSubmission_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,21 +127,90 @@ func (c *assessmentServiceClient) ListSubmissions(ctx context.Context, in *ListS
 	return out, nil
 }
 
+func (c *assessmentServiceClient) StartAssessment(ctx context.Context, in *StartAssessmentRequest, opts ...grpc.CallOption) (*StartAssessmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartAssessmentResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_StartAssessment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assessmentServiceClient) SubmitAssessment(ctx context.Context, in *SubmitAssessmentRequest, opts ...grpc.CallOption) (*SubmitAssessmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SubmitAssessmentResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_SubmitAssessment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assessmentServiceClient) AutoSave(ctx context.Context, in *AutoSaveRequest, opts ...grpc.CallOption) (*AutoSaveResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AutoSaveResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_AutoSave_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assessmentServiceClient) GetQuestionSettings(ctx context.Context, in *GetQuestionSettingsRequest, opts ...grpc.CallOption) (*GetQuestionSettingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetQuestionSettingsResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_GetQuestionSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assessmentServiceClient) ListQuestionSettings(ctx context.Context, in *ListQuestionSettingsRequest, opts ...grpc.CallOption) (*ListQuestionSettingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListQuestionSettingsResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_ListQuestionSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assessmentServiceClient) UpdateQuestionSettings(ctx context.Context, in *UpdateQuestionSettingsRequest, opts ...grpc.CallOption) (*UpdateQuestionSettingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateQuestionSettingsResponse)
+	err := c.cc.Invoke(ctx, AssessmentService_UpdateQuestionSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AssessmentServiceServer is the server API for AssessmentService service.
 // All implementations must embed UnimplementedAssessmentServiceServer
 // for forward compatibility.
 //
-// AssessmentService manages assessments and submissions.
-// Exposure: INTERNAL — all RPCs are for internal use only.
+// AssessmentService はアセスメントの期間・セッション・提出を管理するサービス。
 type AssessmentServiceServer interface {
-	ListAssessments(context.Context, *ListAssessmentsRequest) (*ListAssessmentsResponse, error)
-	GetAssessment(context.Context, *GetAssessmentRequest) (*GetAssessmentResponse, error)
-	CreateAssessment(context.Context, *CreateAssessmentRequest) (*CreateAssessmentResponse, error)
-	UpdateAssessment(context.Context, *UpdateAssessmentRequest) (*UpdateAssessmentResponse, error)
-	DeleteAssessment(context.Context, *DeleteAssessmentRequest) (*DeleteAssessmentResponse, error)
-	SubmitAssessment(context.Context, *SubmitAssessmentRequest) (*SubmitAssessmentResponse, error)
-	GradeSubmission(context.Context, *GradeSubmissionRequest) (*GradeSubmissionResponse, error)
+	// --- 期間管理 ---
+	GetAssessmentPeriod(context.Context, *GetAssessmentPeriodRequest) (*GetAssessmentPeriodResponse, error)
+	ListAssessmentPeriods(context.Context, *ListAssessmentPeriodsRequest) (*ListAssessmentPeriodsResponse, error)
+	CreateAssessmentPeriod(context.Context, *CreateAssessmentPeriodRequest) (*CreateAssessmentPeriodResponse, error)
+	UpdateAssessmentPeriod(context.Context, *UpdateAssessmentPeriodRequest) (*UpdateAssessmentPeriodResponse, error)
+	// --- 提出管理 ---
+	GetSubmission(context.Context, *GetSubmissionRequest) (*GetSubmissionResponse, error)
 	ListSubmissions(context.Context, *ListSubmissionsRequest) (*ListSubmissionsResponse, error)
+	// アセスメント開始（セッション生成 + 問題出題）
+	StartAssessment(context.Context, *StartAssessmentRequest) (*StartAssessmentResponse, error)
+	// アセスメント提出
+	SubmitAssessment(context.Context, *SubmitAssessmentRequest) (*SubmitAssessmentResponse, error)
+	// 自動保存
+	AutoSave(context.Context, *AutoSaveRequest) (*AutoSaveResponse, error)
+	// --- 出題設定 ---
+	GetQuestionSettings(context.Context, *GetQuestionSettingsRequest) (*GetQuestionSettingsResponse, error)
+	ListQuestionSettings(context.Context, *ListQuestionSettingsRequest) (*ListQuestionSettingsResponse, error)
+	UpdateQuestionSettings(context.Context, *UpdateQuestionSettingsRequest) (*UpdateQuestionSettingsResponse, error)
 	mustEmbedUnimplementedAssessmentServiceServer()
 }
 
@@ -159,29 +221,41 @@ type AssessmentServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAssessmentServiceServer struct{}
 
-func (UnimplementedAssessmentServiceServer) ListAssessments(context.Context, *ListAssessmentsRequest) (*ListAssessmentsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListAssessments not implemented")
+func (UnimplementedAssessmentServiceServer) GetAssessmentPeriod(context.Context, *GetAssessmentPeriodRequest) (*GetAssessmentPeriodResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAssessmentPeriod not implemented")
 }
-func (UnimplementedAssessmentServiceServer) GetAssessment(context.Context, *GetAssessmentRequest) (*GetAssessmentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAssessment not implemented")
+func (UnimplementedAssessmentServiceServer) ListAssessmentPeriods(context.Context, *ListAssessmentPeriodsRequest) (*ListAssessmentPeriodsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAssessmentPeriods not implemented")
 }
-func (UnimplementedAssessmentServiceServer) CreateAssessment(context.Context, *CreateAssessmentRequest) (*CreateAssessmentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateAssessment not implemented")
+func (UnimplementedAssessmentServiceServer) CreateAssessmentPeriod(context.Context, *CreateAssessmentPeriodRequest) (*CreateAssessmentPeriodResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAssessmentPeriod not implemented")
 }
-func (UnimplementedAssessmentServiceServer) UpdateAssessment(context.Context, *UpdateAssessmentRequest) (*UpdateAssessmentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAssessment not implemented")
+func (UnimplementedAssessmentServiceServer) UpdateAssessmentPeriod(context.Context, *UpdateAssessmentPeriodRequest) (*UpdateAssessmentPeriodResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAssessmentPeriod not implemented")
 }
-func (UnimplementedAssessmentServiceServer) DeleteAssessment(context.Context, *DeleteAssessmentRequest) (*DeleteAssessmentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteAssessment not implemented")
+func (UnimplementedAssessmentServiceServer) GetSubmission(context.Context, *GetSubmissionRequest) (*GetSubmissionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubmission not implemented")
+}
+func (UnimplementedAssessmentServiceServer) ListSubmissions(context.Context, *ListSubmissionsRequest) (*ListSubmissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSubmissions not implemented")
+}
+func (UnimplementedAssessmentServiceServer) StartAssessment(context.Context, *StartAssessmentRequest) (*StartAssessmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartAssessment not implemented")
 }
 func (UnimplementedAssessmentServiceServer) SubmitAssessment(context.Context, *SubmitAssessmentRequest) (*SubmitAssessmentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitAssessment not implemented")
 }
-func (UnimplementedAssessmentServiceServer) GradeSubmission(context.Context, *GradeSubmissionRequest) (*GradeSubmissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GradeSubmission not implemented")
+func (UnimplementedAssessmentServiceServer) AutoSave(context.Context, *AutoSaveRequest) (*AutoSaveResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AutoSave not implemented")
 }
-func (UnimplementedAssessmentServiceServer) ListSubmissions(context.Context, *ListSubmissionsRequest) (*ListSubmissionsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListSubmissions not implemented")
+func (UnimplementedAssessmentServiceServer) GetQuestionSettings(context.Context, *GetQuestionSettingsRequest) (*GetQuestionSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetQuestionSettings not implemented")
+}
+func (UnimplementedAssessmentServiceServer) ListQuestionSettings(context.Context, *ListQuestionSettingsRequest) (*ListQuestionSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListQuestionSettings not implemented")
+}
+func (UnimplementedAssessmentServiceServer) UpdateQuestionSettings(context.Context, *UpdateQuestionSettingsRequest) (*UpdateQuestionSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateQuestionSettings not implemented")
 }
 func (UnimplementedAssessmentServiceServer) mustEmbedUnimplementedAssessmentServiceServer() {}
 func (UnimplementedAssessmentServiceServer) testEmbeddedByValue()                           {}
@@ -204,128 +278,92 @@ func RegisterAssessmentServiceServer(s grpc.ServiceRegistrar, srv AssessmentServ
 	s.RegisterService(&AssessmentService_ServiceDesc, srv)
 }
 
-func _AssessmentService_ListAssessments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListAssessmentsRequest)
+func _AssessmentService_GetAssessmentPeriod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAssessmentPeriodRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AssessmentServiceServer).ListAssessments(ctx, in)
+		return srv.(AssessmentServiceServer).GetAssessmentPeriod(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AssessmentService_ListAssessments_FullMethodName,
+		FullMethod: AssessmentService_GetAssessmentPeriod_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssessmentServiceServer).ListAssessments(ctx, req.(*ListAssessmentsRequest))
+		return srv.(AssessmentServiceServer).GetAssessmentPeriod(ctx, req.(*GetAssessmentPeriodRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AssessmentService_GetAssessment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAssessmentRequest)
+func _AssessmentService_ListAssessmentPeriods_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAssessmentPeriodsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AssessmentServiceServer).GetAssessment(ctx, in)
+		return srv.(AssessmentServiceServer).ListAssessmentPeriods(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AssessmentService_GetAssessment_FullMethodName,
+		FullMethod: AssessmentService_ListAssessmentPeriods_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssessmentServiceServer).GetAssessment(ctx, req.(*GetAssessmentRequest))
+		return srv.(AssessmentServiceServer).ListAssessmentPeriods(ctx, req.(*ListAssessmentPeriodsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AssessmentService_CreateAssessment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateAssessmentRequest)
+func _AssessmentService_CreateAssessmentPeriod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAssessmentPeriodRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AssessmentServiceServer).CreateAssessment(ctx, in)
+		return srv.(AssessmentServiceServer).CreateAssessmentPeriod(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AssessmentService_CreateAssessment_FullMethodName,
+		FullMethod: AssessmentService_CreateAssessmentPeriod_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssessmentServiceServer).CreateAssessment(ctx, req.(*CreateAssessmentRequest))
+		return srv.(AssessmentServiceServer).CreateAssessmentPeriod(ctx, req.(*CreateAssessmentPeriodRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AssessmentService_UpdateAssessment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateAssessmentRequest)
+func _AssessmentService_UpdateAssessmentPeriod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAssessmentPeriodRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AssessmentServiceServer).UpdateAssessment(ctx, in)
+		return srv.(AssessmentServiceServer).UpdateAssessmentPeriod(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AssessmentService_UpdateAssessment_FullMethodName,
+		FullMethod: AssessmentService_UpdateAssessmentPeriod_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssessmentServiceServer).UpdateAssessment(ctx, req.(*UpdateAssessmentRequest))
+		return srv.(AssessmentServiceServer).UpdateAssessmentPeriod(ctx, req.(*UpdateAssessmentPeriodRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AssessmentService_DeleteAssessment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteAssessmentRequest)
+func _AssessmentService_GetSubmission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSubmissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AssessmentServiceServer).DeleteAssessment(ctx, in)
+		return srv.(AssessmentServiceServer).GetSubmission(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AssessmentService_DeleteAssessment_FullMethodName,
+		FullMethod: AssessmentService_GetSubmission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssessmentServiceServer).DeleteAssessment(ctx, req.(*DeleteAssessmentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AssessmentService_SubmitAssessment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SubmitAssessmentRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AssessmentServiceServer).SubmitAssessment(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AssessmentService_SubmitAssessment_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssessmentServiceServer).SubmitAssessment(ctx, req.(*SubmitAssessmentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AssessmentService_GradeSubmission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GradeSubmissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AssessmentServiceServer).GradeSubmission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AssessmentService_GradeSubmission_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssessmentServiceServer).GradeSubmission(ctx, req.(*GradeSubmissionRequest))
+		return srv.(AssessmentServiceServer).GetSubmission(ctx, req.(*GetSubmissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -348,6 +386,114 @@ func _AssessmentService_ListSubmissions_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AssessmentService_StartAssessment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartAssessmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssessmentServiceServer).StartAssessment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssessmentService_StartAssessment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssessmentServiceServer).StartAssessment(ctx, req.(*StartAssessmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssessmentService_SubmitAssessment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubmitAssessmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssessmentServiceServer).SubmitAssessment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssessmentService_SubmitAssessment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssessmentServiceServer).SubmitAssessment(ctx, req.(*SubmitAssessmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssessmentService_AutoSave_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AutoSaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssessmentServiceServer).AutoSave(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssessmentService_AutoSave_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssessmentServiceServer).AutoSave(ctx, req.(*AutoSaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssessmentService_GetQuestionSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetQuestionSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssessmentServiceServer).GetQuestionSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssessmentService_GetQuestionSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssessmentServiceServer).GetQuestionSettings(ctx, req.(*GetQuestionSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssessmentService_ListQuestionSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListQuestionSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssessmentServiceServer).ListQuestionSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssessmentService_ListQuestionSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssessmentServiceServer).ListQuestionSettings(ctx, req.(*ListQuestionSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssessmentService_UpdateQuestionSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateQuestionSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssessmentServiceServer).UpdateQuestionSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssessmentService_UpdateQuestionSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssessmentServiceServer).UpdateQuestionSettings(ctx, req.(*UpdateQuestionSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AssessmentService_ServiceDesc is the grpc.ServiceDesc for AssessmentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -356,36 +502,52 @@ var AssessmentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AssessmentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListAssessments",
-			Handler:    _AssessmentService_ListAssessments_Handler,
+			MethodName: "GetAssessmentPeriod",
+			Handler:    _AssessmentService_GetAssessmentPeriod_Handler,
 		},
 		{
-			MethodName: "GetAssessment",
-			Handler:    _AssessmentService_GetAssessment_Handler,
+			MethodName: "ListAssessmentPeriods",
+			Handler:    _AssessmentService_ListAssessmentPeriods_Handler,
 		},
 		{
-			MethodName: "CreateAssessment",
-			Handler:    _AssessmentService_CreateAssessment_Handler,
+			MethodName: "CreateAssessmentPeriod",
+			Handler:    _AssessmentService_CreateAssessmentPeriod_Handler,
 		},
 		{
-			MethodName: "UpdateAssessment",
-			Handler:    _AssessmentService_UpdateAssessment_Handler,
+			MethodName: "UpdateAssessmentPeriod",
+			Handler:    _AssessmentService_UpdateAssessmentPeriod_Handler,
 		},
 		{
-			MethodName: "DeleteAssessment",
-			Handler:    _AssessmentService_DeleteAssessment_Handler,
+			MethodName: "GetSubmission",
+			Handler:    _AssessmentService_GetSubmission_Handler,
+		},
+		{
+			MethodName: "ListSubmissions",
+			Handler:    _AssessmentService_ListSubmissions_Handler,
+		},
+		{
+			MethodName: "StartAssessment",
+			Handler:    _AssessmentService_StartAssessment_Handler,
 		},
 		{
 			MethodName: "SubmitAssessment",
 			Handler:    _AssessmentService_SubmitAssessment_Handler,
 		},
 		{
-			MethodName: "GradeSubmission",
-			Handler:    _AssessmentService_GradeSubmission_Handler,
+			MethodName: "AutoSave",
+			Handler:    _AssessmentService_AutoSave_Handler,
 		},
 		{
-			MethodName: "ListSubmissions",
-			Handler:    _AssessmentService_ListSubmissions_Handler,
+			MethodName: "GetQuestionSettings",
+			Handler:    _AssessmentService_GetQuestionSettings_Handler,
+		},
+		{
+			MethodName: "ListQuestionSettings",
+			Handler:    _AssessmentService_ListQuestionSettings_Handler,
+		},
+		{
+			MethodName: "UpdateQuestionSettings",
+			Handler:    _AssessmentService_UpdateQuestionSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/skill-categories": {
+    "/api/v1/skill-definitions": {
       "get": {
-        "operationId": "SkillService_ListSkillCategories",
+        "operationId": "SkillService_ListSkillDefinitions",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListSkillCategoriesResponse"
+              "$ref": "#/definitions/v1ListSkillDefinitionsResponse"
             }
           },
           "default": {
@@ -71,7 +71,53 @@
             "default": "SORT_ORDER_UNSPECIFIED"
           },
           {
-            "name": "parentCategoryId",
+            "name": "largeCategory",
+            "description": "フィルタ",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "mediumCategory",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SKILL_DIFFICULTY_UNSPECIFIED",
+              "SKILL_DIFFICULTY_BEGINNER",
+              "SKILL_DIFFICULTY_ELEMENTARY",
+              "SKILL_DIFFICULTY_INTERMEDIATE",
+              "SKILL_DIFFICULTY_ADVANCED",
+              "SKILL_DIFFICULTY_EXPERT"
+            ],
+            "default": "SKILL_DIFFICULTY_UNSPECIFIED"
+          },
+          {
+            "name": "tagCodes",
+            "description": "タグコードでフィルタ",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "query",
+            "description": "検索クエリ（カテゴリ名/詳細部分一致）",
             "in": "query",
             "required": false,
             "type": "string"
@@ -82,12 +128,12 @@
         ]
       },
       "post": {
-        "operationId": "SkillService_CreateSkillCategory",
+        "operationId": "SkillService_CreateSkillDefinition",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateSkillCategoryResponse"
+              "$ref": "#/definitions/v1CreateSkillDefinitionResponse"
             }
           },
           "default": {
@@ -100,11 +146,10 @@
         "parameters": [
           {
             "name": "body",
-            "description": "CreateSkillCategoryRequest is the request for creating a skill category.",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateSkillCategoryRequest"
+              "$ref": "#/definitions/v1CreateSkillDefinitionRequest"
             }
           }
         ],
@@ -113,14 +158,48 @@
         ]
       }
     },
-    "/v1/skill-categories/{id}": {
-      "get": {
-        "operationId": "SkillService_GetSkillCategory",
+    "/api/v1/skill-definitions/import": {
+      "post": {
+        "summary": "--- CSV Import ---",
+        "operationId": "SkillService_ImportSkillsFromCsv",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetSkillCategoryResponse"
+              "$ref": "#/definitions/v1ImportSkillsFromCsvResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ImportSkillsFromCsvRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SkillService"
+        ]
+      }
+    },
+    "/api/v1/skill-definitions/{id}": {
+      "get": {
+        "summary": "--- スキル定義 ---",
+        "operationId": "SkillService_GetSkillDefinition",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSkillDefinitionResponse"
             }
           },
           "default": {
@@ -143,12 +222,12 @@
         ]
       },
       "delete": {
-        "operationId": "SkillService_DeleteSkillCategory",
+        "operationId": "SkillService_DeleteSkillDefinition",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1DeleteSkillCategoryResponse"
+              "$ref": "#/definitions/v1DeleteSkillDefinitionResponse"
             }
           },
           "default": {
@@ -171,12 +250,12 @@
         ]
       },
       "patch": {
-        "operationId": "SkillService_UpdateSkillCategory",
+        "operationId": "SkillService_UpdateSkillDefinition",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpdateSkillCategoryResponse"
+              "$ref": "#/definitions/v1UpdateSkillDefinitionResponse"
             }
           },
           "default": {
@@ -198,7 +277,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/SkillServiceUpdateSkillCategoryBody"
+              "$ref": "#/definitions/SkillServiceUpdateSkillDefinitionBody"
             }
           }
         ],
@@ -207,14 +286,14 @@
         ]
       }
     },
-    "/v1/skills": {
+    "/api/v1/skill-tags": {
       "get": {
-        "operationId": "SkillService_ListSkills",
+        "operationId": "SkillService_ListSkillTags",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListSkillsResponse"
+              "$ref": "#/definitions/v1ListSkillTagsResponse"
             }
           },
           "default": {
@@ -262,43 +341,25 @@
             "default": "SORT_ORDER_UNSPECIFIED"
           },
           {
-            "name": "categoryId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "status",
+            "name": "category",
+            "description": " - SKILL_TAG_CATEGORY_SKILL_TYPE: スキルタイプ（ハード/ソフト/AI等）\n - SKILL_TAG_CATEGORY_DOMAIN: ドメイン（セキュリティ、会計等）\n - SKILL_TAG_CATEGORY_ROLE: 役割（上流/コーディング）\n - SKILL_TAG_CATEGORY_CUSTOM: カスタムタグ",
             "in": "query",
             "required": false,
             "type": "string",
             "enum": [
-              "SKILL_STATUS_UNSPECIFIED",
-              "SKILL_STATUS_ACTIVE",
-              "SKILL_STATUS_DRAFT",
-              "SKILL_STATUS_ARCHIVED"
+              "SKILL_TAG_CATEGORY_UNSPECIFIED",
+              "SKILL_TAG_CATEGORY_SKILL_TYPE",
+              "SKILL_TAG_CATEGORY_DOMAIN",
+              "SKILL_TAG_CATEGORY_ROLE",
+              "SKILL_TAG_CATEGORY_CUSTOM"
             ],
-            "default": "SKILL_STATUS_UNSPECIFIED"
+            "default": "SKILL_TAG_CATEGORY_UNSPECIFIED"
           },
           {
-            "name": "level",
+            "name": "activeOnly",
             "in": "query",
             "required": false,
-            "type": "string",
-            "enum": [
-              "SKILL_LEVEL_UNSPECIFIED",
-              "SKILL_LEVEL_BEGINNER",
-              "SKILL_LEVEL_INTERMEDIATE",
-              "SKILL_LEVEL_ADVANCED",
-              "SKILL_LEVEL_EXPERT"
-            ],
-            "default": "SKILL_LEVEL_UNSPECIFIED"
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -306,12 +367,12 @@
         ]
       },
       "post": {
-        "operationId": "SkillService_CreateSkill",
+        "operationId": "SkillService_CreateSkillTag",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateSkillResponse"
+              "$ref": "#/definitions/v1CreateSkillTagResponse"
             }
           },
           "default": {
@@ -324,11 +385,10 @@
         "parameters": [
           {
             "name": "body",
-            "description": "CreateSkillRequest is the request for creating a skill.",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateSkillRequest"
+              "$ref": "#/definitions/v1CreateSkillTagRequest"
             }
           }
         ],
@@ -337,14 +397,15 @@
         ]
       }
     },
-    "/v1/skills/{id}": {
+    "/api/v1/skill-tags/{id}": {
       "get": {
-        "operationId": "SkillService_GetSkill",
+        "summary": "--- タグ ---",
+        "operationId": "SkillService_GetSkillTag",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetSkillResponse"
+              "$ref": "#/definitions/v1GetSkillTagResponse"
             }
           },
           "default": {
@@ -367,12 +428,12 @@
         ]
       },
       "delete": {
-        "operationId": "SkillService_DeleteSkill",
+        "operationId": "SkillService_DeleteSkillTag",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1DeleteSkillResponse"
+              "$ref": "#/definitions/v1DeleteSkillTagResponse"
             }
           },
           "default": {
@@ -395,12 +456,12 @@
         ]
       },
       "patch": {
-        "operationId": "SkillService_UpdateSkill",
+        "operationId": "SkillService_UpdateSkillTag",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpdateSkillResponse"
+              "$ref": "#/definitions/v1UpdateSkillTagResponse"
             }
           },
           "default": {
@@ -422,7 +483,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/SkillServiceUpdateSkillBody"
+              "$ref": "#/definitions/SkillServiceUpdateSkillTagBody"
             }
           }
         ],
@@ -433,54 +494,64 @@
     }
   },
   "definitions": {
-    "SkillServiceUpdateSkillBody": {
+    "SkillServiceUpdateSkillDefinitionBody": {
       "type": "object",
       "properties": {
-        "name": {
+        "updateMask": {
           "type": "string"
         },
-        "description": {
+        "largeCategory": {
           "type": "string"
         },
-        "categoryId": {
+        "mediumCategory": {
           "type": "string"
         },
-        "defaultLevel": {
-          "$ref": "#/definitions/v1SkillLevel"
+        "smallCategory": {
+          "type": "string"
         },
-        "status": {
-          "$ref": "#/definitions/v1SkillStatus"
+        "skillDetail": {
+          "type": "string"
         },
-        "prerequisiteSkillIds": {
+        "difficulty": {
+          "$ref": "#/definitions/v1SkillDifficulty"
+        },
+        "tagIds": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "isActive": {
+          "type": "boolean"
         }
-      },
-      "description": "UpdateSkillRequest is the request for updating a skill."
+      }
     },
-    "SkillServiceUpdateSkillCategoryBody": {
+    "SkillServiceUpdateSkillTagBody": {
       "type": "object",
       "properties": {
+        "updateMask": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/definitions/v1SkillTagCategory"
         },
         "description": {
           "type": "string"
         },
-        "sortOrder": {
+        "displayOrder": {
           "type": "integer",
           "format": "int32"
+        },
+        "isActive": {
+          "type": "boolean"
         }
-      },
-      "description": "UpdateSkillCategoryRequest is the request for updating a skill category."
+      }
     },
     "protobufAny": {
       "type": "object",
@@ -510,136 +581,212 @@
         }
       }
     },
-    "v1CreateSkillCategoryRequest": {
+    "v1CreateSkillDefinitionRequest": {
       "type": "object",
       "properties": {
-        "name": {
+        "skillCode": {
           "type": "string"
         },
-        "slug": {
+        "largeCategory": {
           "type": "string"
         },
-        "description": {
+        "mediumCategory": {
           "type": "string"
         },
-        "parentCategoryId": {
+        "smallCategory": {
           "type": "string"
         },
-        "sortOrder": {
-          "type": "integer",
-          "format": "int32"
-        }
-      },
-      "description": "CreateSkillCategoryRequest is the request for creating a skill category."
-    },
-    "v1CreateSkillCategoryResponse": {
-      "type": "object",
-      "properties": {
-        "category": {
-          "$ref": "#/definitions/v1SkillCategory"
-        }
-      },
-      "description": "CreateSkillCategoryResponse is the response after creating a skill category."
-    },
-    "v1CreateSkillRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
+        "skillDetail": {
           "type": "string"
         },
-        "slug": {
-          "type": "string"
+        "difficulty": {
+          "$ref": "#/definitions/v1SkillDifficulty"
         },
-        "description": {
-          "type": "string"
-        },
-        "categoryId": {
-          "type": "string"
-        },
-        "defaultLevel": {
-          "$ref": "#/definitions/v1SkillLevel"
-        },
-        "prerequisiteSkillIds": {
+        "tagIds": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "description": "CreateSkillRequest is the request for creating a skill."
-    },
-    "v1CreateSkillResponse": {
-      "type": "object",
-      "properties": {
-        "skill": {
-          "$ref": "#/definitions/v1Skill"
-        }
-      },
-      "description": "CreateSkillResponse is the response after creating a skill."
-    },
-    "v1DeleteSkillCategoryResponse": {
-      "type": "object",
-      "description": "DeleteSkillCategoryResponse is the response after deleting a skill category."
-    },
-    "v1DeleteSkillResponse": {
-      "type": "object",
-      "description": "DeleteSkillResponse is the response after deleting a skill."
-    },
-    "v1GetSkillCategoryResponse": {
-      "type": "object",
-      "properties": {
-        "category": {
-          "$ref": "#/definitions/v1SkillCategory"
-        }
-      },
-      "description": "GetSkillCategoryResponse is the response containing a single skill category."
-    },
-    "v1GetSkillResponse": {
-      "type": "object",
-      "properties": {
-        "skill": {
-          "$ref": "#/definitions/v1Skill"
-        }
-      },
-      "description": "GetSkillResponse is the response containing a single skill."
-    },
-    "v1ListSkillCategoriesResponse": {
-      "type": "object",
-      "properties": {
-        "categories": {
+        "measurementMethods": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1SkillCategory"
+            "$ref": "#/definitions/v1MeasurementMethodInput"
+          }
+        }
+      }
+    },
+    "v1CreateSkillDefinitionResponse": {
+      "type": "object",
+      "properties": {
+        "skill": {
+          "$ref": "#/definitions/v1SkillDefinition"
+        }
+      }
+    },
+    "v1CreateSkillTagRequest": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/definitions/v1SkillTagCategory"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1CreateSkillTagResponse": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "$ref": "#/definitions/v1SkillTag"
+        }
+      }
+    },
+    "v1DeleteSkillDefinitionResponse": {
+      "type": "object"
+    },
+    "v1DeleteSkillTagResponse": {
+      "type": "object"
+    },
+    "v1GetSkillDefinitionResponse": {
+      "type": "object",
+      "properties": {
+        "skill": {
+          "$ref": "#/definitions/v1SkillDefinition"
+        }
+      }
+    },
+    "v1GetSkillTagResponse": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "$ref": "#/definitions/v1SkillTag"
+        }
+      }
+    },
+    "v1ImportSkillsFromCsvRequest": {
+      "type": "object",
+      "properties": {
+        "csvData": {
+          "type": "string",
+          "format": "byte",
+          "title": "CSVファイルのバイナリデータ"
+        },
+        "category": {
+          "type": "string",
+          "title": "カテゴリ（hard_skills, soft_skills, ai_skills）"
+        },
+        "importedBy": {
+          "type": "string",
+          "title": "インポート者"
+        }
+      }
+    },
+    "v1ImportSkillsFromCsvResponse": {
+      "type": "object",
+      "properties": {
+        "importedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skippedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
+        "version": {
+          "type": "integer",
+          "format": "int32"
         }
-      },
-      "description": "ListSkillCategoriesResponse is the response for listing skill categories."
+      }
     },
-    "v1ListSkillsResponse": {
+    "v1ListSkillDefinitionsResponse": {
       "type": "object",
       "properties": {
         "skills": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Skill"
+            "$ref": "#/definitions/v1SkillDefinition"
           }
         },
         "pagination": {
           "$ref": "#/definitions/v1PaginationResponse"
         }
+      }
+    },
+    "v1ListSkillTagsResponse": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SkillTag"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1MeasurementMethodInput": {
+      "type": "object",
+      "properties": {
+        "methodType": {
+          "$ref": "#/definitions/v1MeasurementMethodType"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isRecommended": {
+          "type": "boolean"
+        }
       },
-      "description": "ListSkillsResponse is the response for listing skills."
+      "title": "MeasurementMethodInput は測定方法の入力用メッセージ。"
+    },
+    "v1MeasurementMethodType": {
+      "type": "string",
+      "enum": [
+        "MEASUREMENT_METHOD_TYPE_UNSPECIFIED",
+        "MEASUREMENT_METHOD_TYPE_CODING",
+        "MEASUREMENT_METHOD_TYPE_MULTIPLE_CHOICE",
+        "MEASUREMENT_METHOD_TYPE_FREE_TEXT",
+        "MEASUREMENT_METHOD_TYPE_VIDEO",
+        "MEASUREMENT_METHOD_TYPE_PRESENTATION",
+        "MEASUREMENT_METHOD_TYPE_ROLE_PLAY",
+        "MEASUREMENT_METHOD_TYPE_DOCUMENT",
+        "MEASUREMENT_METHOD_TYPE_INTERVIEW"
+      ],
+      "default": "MEASUREMENT_METHOD_TYPE_UNSPECIFIED",
+      "title": "MeasurementMethodType はスキルの測定方法を表す。"
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -762,92 +909,172 @@
       "default": "SECURITY_LEVEL_UNSPECIFIED",
       "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
     },
-    "v1Skill": {
+    "v1SkillDefinition": {
       "type": "object",
       "properties": {
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata"
         },
-        "name": {
-          "type": "string"
+        "skillCode": {
+          "type": "string",
+          "title": "スキルコード（例: TH-001）"
         },
-        "slug": {
-          "type": "string"
+        "largeCategory": {
+          "type": "string",
+          "title": "大分類"
         },
-        "description": {
-          "type": "string"
+        "mediumCategory": {
+          "type": "string",
+          "title": "中分類"
         },
-        "categoryId": {
-          "type": "string"
+        "smallCategory": {
+          "type": "string",
+          "title": "小分類"
         },
-        "defaultLevel": {
-          "$ref": "#/definitions/v1SkillLevel"
+        "skillDetail": {
+          "type": "string",
+          "title": "スキル項目詳細"
         },
-        "status": {
-          "$ref": "#/definitions/v1SkillStatus"
+        "difficulty": {
+          "$ref": "#/definitions/v1SkillDifficulty",
+          "title": "難易度"
         },
-        "prerequisiteSkillIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "isActive": {
+          "type": "boolean",
+          "title": "アクティブフラグ"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "title": "バージョン（インポートバージョン）"
+        },
+        "sourceFile": {
+          "type": "string",
+          "title": "インポート元ファイル名"
         },
         "tags": {
           "type": "array",
           "items": {
-            "type": "string"
-          }
+            "type": "object",
+            "$ref": "#/definitions/v1SkillTag"
+          },
+          "title": "付与されたタグ"
+        },
+        "measurementMethods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SkillMeasurementMethod"
+          },
+          "title": "測定方法"
         }
       },
-      "description": "Skill represents a defined competency or capability."
+      "title": "SkillDefinition はスキル定義。"
     },
-    "v1SkillCategory": {
+    "v1SkillDifficulty": {
+      "type": "string",
+      "enum": [
+        "SKILL_DIFFICULTY_UNSPECIFIED",
+        "SKILL_DIFFICULTY_BEGINNER",
+        "SKILL_DIFFICULTY_ELEMENTARY",
+        "SKILL_DIFFICULTY_INTERMEDIATE",
+        "SKILL_DIFFICULTY_ADVANCED",
+        "SKILL_DIFFICULTY_EXPERT"
+      ],
+      "default": "SKILL_DIFFICULTY_UNSPECIFIED"
+    },
+    "v1SkillMeasurementMethod": {
       "type": "object",
       "properties": {
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata"
         },
-        "name": {
-          "type": "string"
+        "skillDefinitionId": {
+          "type": "string",
+          "title": "スキル定義ID"
         },
-        "slug": {
-          "type": "string"
+        "methodType": {
+          "$ref": "#/definitions/v1MeasurementMethodType",
+          "title": "測定方法タイプ"
+        },
+        "displayName": {
+          "type": "string",
+          "title": "表示名"
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "title": "説明"
         },
-        "parentCategoryId": {
-          "type": "string"
-        },
-        "sortOrder": {
+        "priority": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "優先度（推奨度）"
+        },
+        "isRecommended": {
+          "type": "boolean",
+          "title": "推奨フラグ"
+        },
+        "isExcluded": {
+          "type": "boolean",
+          "title": "除外フラグ（このスキルには適用不可）"
+        },
+        "exclusionReason": {
+          "type": "string",
+          "title": "除外理由"
         }
       },
-      "description": "SkillCategory represents a grouping of related skills."
+      "title": "SkillMeasurementMethod はスキル測定方法。"
     },
-    "v1SkillLevel": {
+    "v1SkillTag": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "code": {
+          "type": "string",
+          "title": "タグコード（例: hard_skill, soft_skill）"
+        },
+        "name": {
+          "type": "string",
+          "title": "表示名（日本語）"
+        },
+        "nameEn": {
+          "type": "string",
+          "title": "英語表示名"
+        },
+        "category": {
+          "$ref": "#/definitions/v1SkillTagCategory",
+          "title": "カテゴリ"
+        },
+        "description": {
+          "type": "string",
+          "title": "説明"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32",
+          "title": "表示順序"
+        },
+        "isActive": {
+          "type": "boolean",
+          "title": "アクティブフラグ"
+        }
+      },
+      "title": "SkillTag はスキルタグマスタ。"
+    },
+    "v1SkillTagCategory": {
       "type": "string",
       "enum": [
-        "SKILL_LEVEL_UNSPECIFIED",
-        "SKILL_LEVEL_BEGINNER",
-        "SKILL_LEVEL_INTERMEDIATE",
-        "SKILL_LEVEL_ADVANCED",
-        "SKILL_LEVEL_EXPERT"
+        "SKILL_TAG_CATEGORY_UNSPECIFIED",
+        "SKILL_TAG_CATEGORY_SKILL_TYPE",
+        "SKILL_TAG_CATEGORY_DOMAIN",
+        "SKILL_TAG_CATEGORY_ROLE",
+        "SKILL_TAG_CATEGORY_CUSTOM"
       ],
-      "default": "SKILL_LEVEL_UNSPECIFIED",
-      "description": "SkillLevel classifies the proficiency level of a skill."
-    },
-    "v1SkillStatus": {
-      "type": "string",
-      "enum": [
-        "SKILL_STATUS_UNSPECIFIED",
-        "SKILL_STATUS_ACTIVE",
-        "SKILL_STATUS_DRAFT",
-        "SKILL_STATUS_ARCHIVED"
-      ],
-      "default": "SKILL_STATUS_UNSPECIFIED",
-      "description": "SkillStatus represents the lifecycle state of a skill."
+      "default": "SKILL_TAG_CATEGORY_UNSPECIFIED",
+      "description": "- SKILL_TAG_CATEGORY_SKILL_TYPE: スキルタイプ（ハード/ソフト/AI等）\n - SKILL_TAG_CATEGORY_DOMAIN: ドメイン（セキュリティ、会計等）\n - SKILL_TAG_CATEGORY_ROLE: 役割（上流/コーディング）\n - SKILL_TAG_CATEGORY_CUSTOM: カスタムタグ",
+      "title": "SkillTagCategory はスキルタグのカテゴリを表す。"
     },
     "v1SortOrder": {
       "type": "string",
@@ -859,23 +1086,21 @@
       "default": "SORT_ORDER_UNSPECIFIED",
       "description": "SortOrder specifies the sort direction."
     },
-    "v1UpdateSkillCategoryResponse": {
-      "type": "object",
-      "properties": {
-        "category": {
-          "$ref": "#/definitions/v1SkillCategory"
-        }
-      },
-      "description": "UpdateSkillCategoryResponse is the response after updating a skill category."
-    },
-    "v1UpdateSkillResponse": {
+    "v1UpdateSkillDefinitionResponse": {
       "type": "object",
       "properties": {
         "skill": {
-          "$ref": "#/definitions/v1Skill"
+          "$ref": "#/definitions/v1SkillDefinition"
         }
-      },
-      "description": "UpdateSkillResponse is the response after updating a skill."
+      }
+    },
+    "v1UpdateSkillTagResponse": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "$ref": "#/definitions/v1SkillTag"
+        }
+      }
     }
   }
 }

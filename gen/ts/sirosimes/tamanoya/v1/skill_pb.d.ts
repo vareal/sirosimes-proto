@@ -3,13 +3,14 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
- * SkillLevel classifies the proficiency level of a skill.
+ * SkillDifficulty はスキルの難易度を表す。
+ * SkillLevel は習熟度レベルを表す。
  *
  * @generated from enum sirosimes.tamanoya.v1.SkillLevel
  */
@@ -41,345 +42,511 @@ export declare enum SkillLevel {
 }
 
 /**
- * SkillStatus represents the lifecycle state of a skill.
- *
- * @generated from enum sirosimes.tamanoya.v1.SkillStatus
+ * @generated from enum sirosimes.tamanoya.v1.SkillDifficulty
  */
-export declare enum SkillStatus {
+export declare enum SkillDifficulty {
   /**
-   * @generated from enum value: SKILL_STATUS_UNSPECIFIED = 0;
+   * @generated from enum value: SKILL_DIFFICULTY_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: SKILL_STATUS_ACTIVE = 1;
+   * @generated from enum value: SKILL_DIFFICULTY_BEGINNER = 1;
    */
-  ACTIVE = 1,
+  BEGINNER = 1,
 
   /**
-   * @generated from enum value: SKILL_STATUS_DRAFT = 2;
+   * @generated from enum value: SKILL_DIFFICULTY_ELEMENTARY = 2;
    */
-  DRAFT = 2,
+  ELEMENTARY = 2,
 
   /**
-   * @generated from enum value: SKILL_STATUS_ARCHIVED = 3;
+   * @generated from enum value: SKILL_DIFFICULTY_INTERMEDIATE = 3;
    */
-  ARCHIVED = 3,
+  INTERMEDIATE = 3,
+
+  /**
+   * @generated from enum value: SKILL_DIFFICULTY_ADVANCED = 4;
+   */
+  ADVANCED = 4,
+
+  /**
+   * @generated from enum value: SKILL_DIFFICULTY_EXPERT = 5;
+   */
+  EXPERT = 5,
 }
 
 /**
- * SkillCategory represents a grouping of related skills.
+ * MeasurementMethodType はスキルの測定方法を表す。
  *
- * @generated from message sirosimes.tamanoya.v1.SkillCategory
+ * @generated from enum sirosimes.tamanoya.v1.MeasurementMethodType
  */
-export declare class SkillCategory extends Message<SkillCategory> {
+export declare enum MeasurementMethodType {
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_CODING = 1;
+   */
+  CODING = 1,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_MULTIPLE_CHOICE = 2;
+   */
+  MULTIPLE_CHOICE = 2,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_FREE_TEXT = 3;
+   */
+  FREE_TEXT = 3,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_VIDEO = 4;
+   */
+  VIDEO = 4,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_PRESENTATION = 5;
+   */
+  PRESENTATION = 5,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_ROLE_PLAY = 6;
+   */
+  ROLE_PLAY = 6,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_DOCUMENT = 7;
+   */
+  DOCUMENT = 7,
+
+  /**
+   * @generated from enum value: MEASUREMENT_METHOD_TYPE_INTERVIEW = 8;
+   */
+  INTERVIEW = 8,
+}
+
+/**
+ * SkillTagCategory はスキルタグのカテゴリを表す。
+ *
+ * @generated from enum sirosimes.tamanoya.v1.SkillTagCategory
+ */
+export declare enum SkillTagCategory {
+  /**
+   * @generated from enum value: SKILL_TAG_CATEGORY_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * スキルタイプ（ハード/ソフト/AI等）
+   *
+   * @generated from enum value: SKILL_TAG_CATEGORY_SKILL_TYPE = 1;
+   */
+  SKILL_TYPE = 1,
+
+  /**
+   * ドメイン（セキュリティ、会計等）
+   *
+   * @generated from enum value: SKILL_TAG_CATEGORY_DOMAIN = 2;
+   */
+  DOMAIN = 2,
+
+  /**
+   * 役割（上流/コーディング）
+   *
+   * @generated from enum value: SKILL_TAG_CATEGORY_ROLE = 3;
+   */
+  ROLE = 3,
+
+  /**
+   * カスタムタグ
+   *
+   * @generated from enum value: SKILL_TAG_CATEGORY_CUSTOM = 4;
+   */
+  CUSTOM = 4,
+}
+
+/**
+ * SkillTag はスキルタグマスタ。
+ *
+ * @generated from message sirosimes.tamanoya.v1.SkillTag
+ */
+export declare class SkillTag extends Message<SkillTag> {
   /**
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
    */
   metadata?: ResourceMetadata;
 
   /**
-   * @generated from field: string name = 2;
+   * タグコード（例: hard_skill, soft_skill）
+   *
+   * @generated from field: string code = 2;
+   */
+  code: string;
+
+  /**
+   * 表示名（日本語）
+   *
+   * @generated from field: string name = 3;
    */
   name: string;
 
   /**
-   * @generated from field: string slug = 3;
+   * 英語表示名
+   *
+   * @generated from field: string name_en = 4;
    */
-  slug: string;
+  nameEn: string;
 
   /**
-   * @generated from field: string description = 4;
+   * カテゴリ
+   *
+   * @generated from field: sirosimes.tamanoya.v1.SkillTagCategory category = 5;
+   */
+  category: SkillTagCategory;
+
+  /**
+   * 説明
+   *
+   * @generated from field: string description = 6;
    */
   description: string;
 
   /**
-   * @generated from field: string parent_category_id = 5;
+   * 表示順序
+   *
+   * @generated from field: int32 display_order = 7;
    */
-  parentCategoryId: string;
+  displayOrder: number;
 
   /**
-   * @generated from field: int32 sort_order = 6;
+   * アクティブフラグ
+   *
+   * @generated from field: bool is_active = 8;
    */
-  sortOrder: number;
+  isActive: boolean;
 
-  constructor(data?: PartialMessage<SkillCategory>);
+  constructor(data?: PartialMessage<SkillTag>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.SkillCategory";
+  static readonly typeName = "sirosimes.tamanoya.v1.SkillTag";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SkillCategory;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SkillTag;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SkillCategory;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SkillTag;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SkillCategory;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SkillTag;
 
-  static equals(a: SkillCategory | PlainMessage<SkillCategory> | undefined, b: SkillCategory | PlainMessage<SkillCategory> | undefined): boolean;
+  static equals(a: SkillTag | PlainMessage<SkillTag> | undefined, b: SkillTag | PlainMessage<SkillTag> | undefined): boolean;
 }
 
 /**
- * Skill represents a defined competency or capability.
+ * SkillDefinition はスキル定義。
  *
- * @generated from message sirosimes.tamanoya.v1.Skill
+ * @generated from message sirosimes.tamanoya.v1.SkillDefinition
  */
-export declare class Skill extends Message<Skill> {
+export declare class SkillDefinition extends Message<SkillDefinition> {
   /**
    * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
    */
   metadata?: ResourceMetadata;
 
   /**
-   * @generated from field: string name = 2;
+   * スキルコード（例: TH-001）
+   *
+   * @generated from field: string skill_code = 2;
    */
-  name: string;
+  skillCode: string;
 
   /**
-   * @generated from field: string slug = 3;
+   * 大分類
+   *
+   * @generated from field: string large_category = 3;
    */
-  slug: string;
+  largeCategory: string;
 
   /**
-   * @generated from field: string description = 4;
+   * 中分類
+   *
+   * @generated from field: string medium_category = 4;
+   */
+  mediumCategory: string;
+
+  /**
+   * 小分類
+   *
+   * @generated from field: string small_category = 5;
+   */
+  smallCategory: string;
+
+  /**
+   * スキル項目詳細
+   *
+   * @generated from field: string skill_detail = 6;
+   */
+  skillDetail: string;
+
+  /**
+   * 難易度
+   *
+   * @generated from field: sirosimes.tamanoya.v1.SkillDifficulty difficulty = 7;
+   */
+  difficulty: SkillDifficulty;
+
+  /**
+   * アクティブフラグ
+   *
+   * @generated from field: bool is_active = 8;
+   */
+  isActive: boolean;
+
+  /**
+   * バージョン（インポートバージョン）
+   *
+   * @generated from field: int32 version = 9;
+   */
+  version: number;
+
+  /**
+   * インポート元ファイル名
+   *
+   * @generated from field: string source_file = 10;
+   */
+  sourceFile: string;
+
+  /**
+   * 付与されたタグ
+   *
+   * @generated from field: repeated sirosimes.tamanoya.v1.SkillTag tags = 11;
+   */
+  tags: SkillTag[];
+
+  /**
+   * 測定方法
+   *
+   * @generated from field: repeated sirosimes.tamanoya.v1.SkillMeasurementMethod measurement_methods = 12;
+   */
+  measurementMethods: SkillMeasurementMethod[];
+
+  constructor(data?: PartialMessage<SkillDefinition>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.SkillDefinition";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SkillDefinition;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SkillDefinition;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SkillDefinition;
+
+  static equals(a: SkillDefinition | PlainMessage<SkillDefinition> | undefined, b: SkillDefinition | PlainMessage<SkillDefinition> | undefined): boolean;
+}
+
+/**
+ * SkillMeasurementMethod はスキル測定方法。
+ *
+ * @generated from message sirosimes.tamanoya.v1.SkillMeasurementMethod
+ */
+export declare class SkillMeasurementMethod extends Message<SkillMeasurementMethod> {
+  /**
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   */
+  metadata?: ResourceMetadata;
+
+  /**
+   * スキル定義ID
+   *
+   * @generated from field: string skill_definition_id = 2;
+   */
+  skillDefinitionId: string;
+
+  /**
+   * 測定方法タイプ
+   *
+   * @generated from field: sirosimes.tamanoya.v1.MeasurementMethodType method_type = 3;
+   */
+  methodType: MeasurementMethodType;
+
+  /**
+   * 表示名
+   *
+   * @generated from field: string display_name = 4;
+   */
+  displayName: string;
+
+  /**
+   * 説明
+   *
+   * @generated from field: string description = 5;
    */
   description: string;
 
   /**
-   * @generated from field: string category_id = 5;
+   * 優先度（推奨度）
+   *
+   * @generated from field: int32 priority = 6;
    */
-  categoryId: string;
+  priority: number;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillLevel default_level = 6;
+   * 推奨フラグ
+   *
+   * @generated from field: bool is_recommended = 7;
    */
-  defaultLevel: SkillLevel;
+  isRecommended: boolean;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillStatus status = 7;
+   * 除外フラグ（このスキルには適用不可）
+   *
+   * @generated from field: bool is_excluded = 8;
    */
-  status: SkillStatus;
+  isExcluded: boolean;
 
   /**
-   * @generated from field: repeated string prerequisite_skill_ids = 8;
+   * 除外理由
+   *
+   * @generated from field: string exclusion_reason = 9;
    */
-  prerequisiteSkillIds: string[];
+  exclusionReason: string;
 
-  /**
-   * @generated from field: repeated string tags = 9;
-   */
-  tags: string[];
-
-  constructor(data?: PartialMessage<Skill>);
+  constructor(data?: PartialMessage<SkillMeasurementMethod>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.Skill";
+  static readonly typeName = "sirosimes.tamanoya.v1.SkillMeasurementMethod";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Skill;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SkillMeasurementMethod;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Skill;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SkillMeasurementMethod;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Skill;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SkillMeasurementMethod;
 
-  static equals(a: Skill | PlainMessage<Skill> | undefined, b: Skill | PlainMessage<Skill> | undefined): boolean;
+  static equals(a: SkillMeasurementMethod | PlainMessage<SkillMeasurementMethod> | undefined, b: SkillMeasurementMethod | PlainMessage<SkillMeasurementMethod> | undefined): boolean;
 }
 
 /**
- * ListSkillCategoriesRequest is the request for listing skill categories.
- *
- * @generated from message sirosimes.tamanoya.v1.ListSkillCategoriesRequest
+ * @generated from message sirosimes.tamanoya.v1.GetSkillTagRequest
  */
-export declare class ListSkillCategoriesRequest extends Message<ListSkillCategoriesRequest> {
+export declare class GetSkillTagRequest extends Message<GetSkillTagRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  constructor(data?: PartialMessage<GetSkillTagRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillTagRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillTagRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillTagRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillTagRequest;
+
+  static equals(a: GetSkillTagRequest | PlainMessage<GetSkillTagRequest> | undefined, b: GetSkillTagRequest | PlainMessage<GetSkillTagRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetSkillTagResponse
+ */
+export declare class GetSkillTagResponse extends Message<GetSkillTagResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.SkillTag tag = 1;
+   */
+  tag?: SkillTag;
+
+  constructor(data?: PartialMessage<GetSkillTagResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillTagResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillTagResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillTagResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillTagResponse;
+
+  static equals(a: GetSkillTagResponse | PlainMessage<GetSkillTagResponse> | undefined, b: GetSkillTagResponse | PlainMessage<GetSkillTagResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListSkillTagsRequest
+ */
+export declare class ListSkillTagsRequest extends Message<ListSkillTagsRequest> {
   /**
    * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
    */
   pagination?: PaginationRequest;
 
   /**
-   * @generated from field: string parent_category_id = 2;
+   * @generated from field: sirosimes.tamanoya.v1.SkillTagCategory category = 2;
    */
-  parentCategoryId: string;
+  category: SkillTagCategory;
 
-  constructor(data?: PartialMessage<ListSkillCategoriesRequest>);
+  /**
+   * @generated from field: bool active_only = 3;
+   */
+  activeOnly: boolean;
+
+  constructor(data?: PartialMessage<ListSkillTagsRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillCategoriesRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillTagsRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillCategoriesRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillTagsRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillCategoriesRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillTagsRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillCategoriesRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillTagsRequest;
 
-  static equals(a: ListSkillCategoriesRequest | PlainMessage<ListSkillCategoriesRequest> | undefined, b: ListSkillCategoriesRequest | PlainMessage<ListSkillCategoriesRequest> | undefined): boolean;
+  static equals(a: ListSkillTagsRequest | PlainMessage<ListSkillTagsRequest> | undefined, b: ListSkillTagsRequest | PlainMessage<ListSkillTagsRequest> | undefined): boolean;
 }
 
 /**
- * ListSkillCategoriesResponse is the response for listing skill categories.
- *
- * @generated from message sirosimes.tamanoya.v1.ListSkillCategoriesResponse
+ * @generated from message sirosimes.tamanoya.v1.ListSkillTagsResponse
  */
-export declare class ListSkillCategoriesResponse extends Message<ListSkillCategoriesResponse> {
+export declare class ListSkillTagsResponse extends Message<ListSkillTagsResponse> {
   /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.SkillCategory categories = 1;
+   * @generated from field: repeated sirosimes.tamanoya.v1.SkillTag tags = 1;
    */
-  categories: SkillCategory[];
+  tags: SkillTag[];
 
   /**
    * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
    */
   pagination?: PaginationResponse;
 
-  constructor(data?: PartialMessage<ListSkillCategoriesResponse>);
+  constructor(data?: PartialMessage<ListSkillTagsResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillCategoriesResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillTagsResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillCategoriesResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillTagsResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillCategoriesResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillTagsResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillCategoriesResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillTagsResponse;
 
-  static equals(a: ListSkillCategoriesResponse | PlainMessage<ListSkillCategoriesResponse> | undefined, b: ListSkillCategoriesResponse | PlainMessage<ListSkillCategoriesResponse> | undefined): boolean;
+  static equals(a: ListSkillTagsResponse | PlainMessage<ListSkillTagsResponse> | undefined, b: ListSkillTagsResponse | PlainMessage<ListSkillTagsResponse> | undefined): boolean;
 }
 
 /**
- * GetSkillCategoryRequest is the request for retrieving a single skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.GetSkillCategoryRequest
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillTagRequest
  */
-export declare class GetSkillCategoryRequest extends Message<GetSkillCategoryRequest> {
+export declare class CreateSkillTagRequest extends Message<CreateSkillTagRequest> {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string code = 1;
    */
-  id: string;
-
-  constructor(data?: PartialMessage<GetSkillCategoryRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillCategoryRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillCategoryRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillCategoryRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillCategoryRequest;
-
-  static equals(a: GetSkillCategoryRequest | PlainMessage<GetSkillCategoryRequest> | undefined, b: GetSkillCategoryRequest | PlainMessage<GetSkillCategoryRequest> | undefined): boolean;
-}
-
-/**
- * GetSkillCategoryResponse is the response containing a single skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.GetSkillCategoryResponse
- */
-export declare class GetSkillCategoryResponse extends Message<GetSkillCategoryResponse> {
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillCategory category = 1;
-   */
-  category?: SkillCategory;
-
-  constructor(data?: PartialMessage<GetSkillCategoryResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillCategoryResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillCategoryResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillCategoryResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillCategoryResponse;
-
-  static equals(a: GetSkillCategoryResponse | PlainMessage<GetSkillCategoryResponse> | undefined, b: GetSkillCategoryResponse | PlainMessage<GetSkillCategoryResponse> | undefined): boolean;
-}
-
-/**
- * CreateSkillCategoryRequest is the request for creating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillCategoryRequest
- */
-export declare class CreateSkillCategoryRequest extends Message<CreateSkillCategoryRequest> {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * @generated from field: string slug = 2;
-   */
-  slug: string;
-
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
-
-  /**
-   * @generated from field: string parent_category_id = 4;
-   */
-  parentCategoryId: string;
-
-  /**
-   * @generated from field: int32 sort_order = 5;
-   */
-  sortOrder: number;
-
-  constructor(data?: PartialMessage<CreateSkillCategoryRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillCategoryRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillCategoryRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillCategoryRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillCategoryRequest;
-
-  static equals(a: CreateSkillCategoryRequest | PlainMessage<CreateSkillCategoryRequest> | undefined, b: CreateSkillCategoryRequest | PlainMessage<CreateSkillCategoryRequest> | undefined): boolean;
-}
-
-/**
- * CreateSkillCategoryResponse is the response after creating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillCategoryResponse
- */
-export declare class CreateSkillCategoryResponse extends Message<CreateSkillCategoryResponse> {
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillCategory category = 1;
-   */
-  category?: SkillCategory;
-
-  constructor(data?: PartialMessage<CreateSkillCategoryResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillCategoryResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillCategoryResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillCategoryResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillCategoryResponse;
-
-  static equals(a: CreateSkillCategoryResponse | PlainMessage<CreateSkillCategoryResponse> | undefined, b: CreateSkillCategoryResponse | PlainMessage<CreateSkillCategoryResponse> | undefined): boolean;
-}
-
-/**
- * UpdateSkillCategoryRequest is the request for updating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillCategoryRequest
- */
-export declare class UpdateSkillCategoryRequest extends Message<UpdateSkillCategoryRequest> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+  code: string;
 
   /**
    * @generated from field: string name = 2;
@@ -387,247 +554,401 @@ export declare class UpdateSkillCategoryRequest extends Message<UpdateSkillCateg
   name: string;
 
   /**
-   * @generated from field: string description = 3;
+   * @generated from field: string name_en = 3;
+   */
+  nameEn: string;
+
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.SkillTagCategory category = 4;
+   */
+  category: SkillTagCategory;
+
+  /**
+   * @generated from field: string description = 5;
    */
   description: string;
 
   /**
-   * @generated from field: int32 sort_order = 4;
+   * @generated from field: int32 display_order = 6;
    */
-  sortOrder: number;
+  displayOrder: number;
 
-  constructor(data?: PartialMessage<UpdateSkillCategoryRequest>);
+  constructor(data?: PartialMessage<CreateSkillTagRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillCategoryRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillTagRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillCategoryRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillTagRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillCategoryRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillTagRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillCategoryRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillTagRequest;
 
-  static equals(a: UpdateSkillCategoryRequest | PlainMessage<UpdateSkillCategoryRequest> | undefined, b: UpdateSkillCategoryRequest | PlainMessage<UpdateSkillCategoryRequest> | undefined): boolean;
+  static equals(a: CreateSkillTagRequest | PlainMessage<CreateSkillTagRequest> | undefined, b: CreateSkillTagRequest | PlainMessage<CreateSkillTagRequest> | undefined): boolean;
 }
 
 /**
- * UpdateSkillCategoryResponse is the response after updating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillCategoryResponse
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillTagResponse
  */
-export declare class UpdateSkillCategoryResponse extends Message<UpdateSkillCategoryResponse> {
+export declare class CreateSkillTagResponse extends Message<CreateSkillTagResponse> {
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillCategory category = 1;
+   * @generated from field: sirosimes.tamanoya.v1.SkillTag tag = 1;
    */
-  category?: SkillCategory;
+  tag?: SkillTag;
 
-  constructor(data?: PartialMessage<UpdateSkillCategoryResponse>);
+  constructor(data?: PartialMessage<CreateSkillTagResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillCategoryResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillTagResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillCategoryResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillTagResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillCategoryResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillTagResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillCategoryResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillTagResponse;
 
-  static equals(a: UpdateSkillCategoryResponse | PlainMessage<UpdateSkillCategoryResponse> | undefined, b: UpdateSkillCategoryResponse | PlainMessage<UpdateSkillCategoryResponse> | undefined): boolean;
+  static equals(a: CreateSkillTagResponse | PlainMessage<CreateSkillTagResponse> | undefined, b: CreateSkillTagResponse | PlainMessage<CreateSkillTagResponse> | undefined): boolean;
 }
 
 /**
- * DeleteSkillCategoryRequest is the request for deleting a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillCategoryRequest
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillTagRequest
  */
-export declare class DeleteSkillCategoryRequest extends Message<DeleteSkillCategoryRequest> {
+export declare class UpdateSkillTagRequest extends Message<UpdateSkillTagRequest> {
   /**
    * @generated from field: string id = 1;
    */
   id: string;
 
-  constructor(data?: PartialMessage<DeleteSkillCategoryRequest>);
+  /**
+   * @generated from field: google.protobuf.FieldMask update_mask = 2;
+   */
+  updateMask?: FieldMask;
+
+  /**
+   * @generated from field: string name = 3;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string name_en = 4;
+   */
+  nameEn: string;
+
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.SkillTagCategory category = 5;
+   */
+  category: SkillTagCategory;
+
+  /**
+   * @generated from field: string description = 6;
+   */
+  description: string;
+
+  /**
+   * @generated from field: int32 display_order = 7;
+   */
+  displayOrder: number;
+
+  /**
+   * @generated from field: bool is_active = 8;
+   */
+  isActive: boolean;
+
+  constructor(data?: PartialMessage<UpdateSkillTagRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillCategoryRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillTagRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillCategoryRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillTagRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillCategoryRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillTagRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillCategoryRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillTagRequest;
 
-  static equals(a: DeleteSkillCategoryRequest | PlainMessage<DeleteSkillCategoryRequest> | undefined, b: DeleteSkillCategoryRequest | PlainMessage<DeleteSkillCategoryRequest> | undefined): boolean;
+  static equals(a: UpdateSkillTagRequest | PlainMessage<UpdateSkillTagRequest> | undefined, b: UpdateSkillTagRequest | PlainMessage<UpdateSkillTagRequest> | undefined): boolean;
 }
 
 /**
- * DeleteSkillCategoryResponse is the response after deleting a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillCategoryResponse
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillTagResponse
  */
-export declare class DeleteSkillCategoryResponse extends Message<DeleteSkillCategoryResponse> {
-  constructor(data?: PartialMessage<DeleteSkillCategoryResponse>);
+export declare class UpdateSkillTagResponse extends Message<UpdateSkillTagResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.SkillTag tag = 1;
+   */
+  tag?: SkillTag;
+
+  constructor(data?: PartialMessage<UpdateSkillTagResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillCategoryResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillTagResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillCategoryResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillTagResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillCategoryResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillTagResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillCategoryResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillTagResponse;
 
-  static equals(a: DeleteSkillCategoryResponse | PlainMessage<DeleteSkillCategoryResponse> | undefined, b: DeleteSkillCategoryResponse | PlainMessage<DeleteSkillCategoryResponse> | undefined): boolean;
+  static equals(a: UpdateSkillTagResponse | PlainMessage<UpdateSkillTagResponse> | undefined, b: UpdateSkillTagResponse | PlainMessage<UpdateSkillTagResponse> | undefined): boolean;
 }
 
 /**
- * ListSkillsRequest is the request for listing skills.
- *
- * @generated from message sirosimes.tamanoya.v1.ListSkillsRequest
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillTagRequest
  */
-export declare class ListSkillsRequest extends Message<ListSkillsRequest> {
+export declare class DeleteSkillTagRequest extends Message<DeleteSkillTagRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  constructor(data?: PartialMessage<DeleteSkillTagRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillTagRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillTagRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillTagRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillTagRequest;
+
+  static equals(a: DeleteSkillTagRequest | PlainMessage<DeleteSkillTagRequest> | undefined, b: DeleteSkillTagRequest | PlainMessage<DeleteSkillTagRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillTagResponse
+ */
+export declare class DeleteSkillTagResponse extends Message<DeleteSkillTagResponse> {
+  constructor(data?: PartialMessage<DeleteSkillTagResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillTagResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillTagResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillTagResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillTagResponse;
+
+  static equals(a: DeleteSkillTagResponse | PlainMessage<DeleteSkillTagResponse> | undefined, b: DeleteSkillTagResponse | PlainMessage<DeleteSkillTagResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetSkillDefinitionRequest
+ */
+export declare class GetSkillDefinitionRequest extends Message<GetSkillDefinitionRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  constructor(data?: PartialMessage<GetSkillDefinitionRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillDefinitionRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillDefinitionRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillDefinitionRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillDefinitionRequest;
+
+  static equals(a: GetSkillDefinitionRequest | PlainMessage<GetSkillDefinitionRequest> | undefined, b: GetSkillDefinitionRequest | PlainMessage<GetSkillDefinitionRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetSkillDefinitionResponse
+ */
+export declare class GetSkillDefinitionResponse extends Message<GetSkillDefinitionResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.SkillDefinition skill = 1;
+   */
+  skill?: SkillDefinition;
+
+  constructor(data?: PartialMessage<GetSkillDefinitionResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillDefinitionResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillDefinitionResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillDefinitionResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillDefinitionResponse;
+
+  static equals(a: GetSkillDefinitionResponse | PlainMessage<GetSkillDefinitionResponse> | undefined, b: GetSkillDefinitionResponse | PlainMessage<GetSkillDefinitionResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListSkillDefinitionsRequest
+ */
+export declare class ListSkillDefinitionsRequest extends Message<ListSkillDefinitionsRequest> {
   /**
    * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
    */
   pagination?: PaginationRequest;
 
   /**
-   * @generated from field: string category_id = 2;
+   * フィルタ
+   *
+   * @generated from field: string large_category = 2;
    */
-  categoryId: string;
+  largeCategory: string;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillStatus status = 3;
+   * @generated from field: string medium_category = 3;
    */
-  status: SkillStatus;
+  mediumCategory: string;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillLevel level = 4;
+   * @generated from field: sirosimes.tamanoya.v1.SkillDifficulty difficulty = 4;
    */
-  level: SkillLevel;
+  difficulty: SkillDifficulty;
 
   /**
-   * @generated from field: string search = 5;
+   * タグコードでフィルタ
+   *
+   * @generated from field: repeated string tag_codes = 5;
    */
-  search: string;
+  tagCodes: string[];
 
-  constructor(data?: PartialMessage<ListSkillsRequest>);
+  /**
+   * @generated from field: bool active_only = 6;
+   */
+  activeOnly: boolean;
+
+  /**
+   * 検索クエリ（カテゴリ名/詳細部分一致）
+   *
+   * @generated from field: string query = 7;
+   */
+  query: string;
+
+  constructor(data?: PartialMessage<ListSkillDefinitionsRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillsRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillDefinitionsRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillsRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillDefinitionsRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillsRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillDefinitionsRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillsRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillDefinitionsRequest;
 
-  static equals(a: ListSkillsRequest | PlainMessage<ListSkillsRequest> | undefined, b: ListSkillsRequest | PlainMessage<ListSkillsRequest> | undefined): boolean;
+  static equals(a: ListSkillDefinitionsRequest | PlainMessage<ListSkillDefinitionsRequest> | undefined, b: ListSkillDefinitionsRequest | PlainMessage<ListSkillDefinitionsRequest> | undefined): boolean;
 }
 
 /**
- * ListSkillsResponse is the response for listing skills.
- *
- * @generated from message sirosimes.tamanoya.v1.ListSkillsResponse
+ * @generated from message sirosimes.tamanoya.v1.ListSkillDefinitionsResponse
  */
-export declare class ListSkillsResponse extends Message<ListSkillsResponse> {
+export declare class ListSkillDefinitionsResponse extends Message<ListSkillDefinitionsResponse> {
   /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Skill skills = 1;
+   * @generated from field: repeated sirosimes.tamanoya.v1.SkillDefinition skills = 1;
    */
-  skills: Skill[];
+  skills: SkillDefinition[];
 
   /**
    * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
    */
   pagination?: PaginationResponse;
 
-  constructor(data?: PartialMessage<ListSkillsResponse>);
+  constructor(data?: PartialMessage<ListSkillDefinitionsResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillsResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.ListSkillDefinitionsResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillsResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListSkillDefinitionsResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillsResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListSkillDefinitionsResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillsResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSkillDefinitionsResponse;
 
-  static equals(a: ListSkillsResponse | PlainMessage<ListSkillsResponse> | undefined, b: ListSkillsResponse | PlainMessage<ListSkillsResponse> | undefined): boolean;
+  static equals(a: ListSkillDefinitionsResponse | PlainMessage<ListSkillDefinitionsResponse> | undefined, b: ListSkillDefinitionsResponse | PlainMessage<ListSkillDefinitionsResponse> | undefined): boolean;
 }
 
 /**
- * GetSkillRequest is the request for retrieving a single skill.
- *
- * @generated from message sirosimes.tamanoya.v1.GetSkillRequest
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillDefinitionRequest
  */
-export declare class GetSkillRequest extends Message<GetSkillRequest> {
+export declare class CreateSkillDefinitionRequest extends Message<CreateSkillDefinitionRequest> {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string skill_code = 1;
    */
-  id: string;
+  skillCode: string;
 
-  constructor(data?: PartialMessage<GetSkillRequest>);
+  /**
+   * @generated from field: string large_category = 2;
+   */
+  largeCategory: string;
+
+  /**
+   * @generated from field: string medium_category = 3;
+   */
+  mediumCategory: string;
+
+  /**
+   * @generated from field: string small_category = 4;
+   */
+  smallCategory: string;
+
+  /**
+   * @generated from field: string skill_detail = 5;
+   */
+  skillDetail: string;
+
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.SkillDifficulty difficulty = 6;
+   */
+  difficulty: SkillDifficulty;
+
+  /**
+   * @generated from field: repeated string tag_ids = 7;
+   */
+  tagIds: string[];
+
+  /**
+   * @generated from field: repeated sirosimes.tamanoya.v1.MeasurementMethodInput measurement_methods = 8;
+   */
+  measurementMethods: MeasurementMethodInput[];
+
+  constructor(data?: PartialMessage<CreateSkillDefinitionRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillDefinitionRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillDefinitionRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillDefinitionRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillDefinitionRequest;
 
-  static equals(a: GetSkillRequest | PlainMessage<GetSkillRequest> | undefined, b: GetSkillRequest | PlainMessage<GetSkillRequest> | undefined): boolean;
+  static equals(a: CreateSkillDefinitionRequest | PlainMessage<CreateSkillDefinitionRequest> | undefined, b: CreateSkillDefinitionRequest | PlainMessage<CreateSkillDefinitionRequest> | undefined): boolean;
 }
 
 /**
- * GetSkillResponse is the response containing a single skill.
+ * MeasurementMethodInput は測定方法の入力用メッセージ。
  *
- * @generated from message sirosimes.tamanoya.v1.GetSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.MeasurementMethodInput
  */
-export declare class GetSkillResponse extends Message<GetSkillResponse> {
+export declare class MeasurementMethodInput extends Message<MeasurementMethodInput> {
   /**
-   * @generated from field: sirosimes.tamanoya.v1.Skill skill = 1;
+   * @generated from field: sirosimes.tamanoya.v1.MeasurementMethodType method_type = 1;
    */
-  skill?: Skill;
-
-  constructor(data?: PartialMessage<GetSkillResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GetSkillResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSkillResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSkillResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSkillResponse;
-
-  static equals(a: GetSkillResponse | PlainMessage<GetSkillResponse> | undefined, b: GetSkillResponse | PlainMessage<GetSkillResponse> | undefined): boolean;
-}
-
-/**
- * CreateSkillRequest is the request for creating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillRequest
- */
-export declare class CreateSkillRequest extends Message<CreateSkillRequest> {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
+  methodType: MeasurementMethodType;
 
   /**
-   * @generated from field: string slug = 2;
+   * @generated from field: string display_name = 2;
    */
-  slug: string;
+  displayName: string;
 
   /**
    * @generated from field: string description = 3;
@@ -635,197 +956,261 @@ export declare class CreateSkillRequest extends Message<CreateSkillRequest> {
   description: string;
 
   /**
-   * @generated from field: string category_id = 4;
+   * @generated from field: int32 priority = 4;
    */
-  categoryId: string;
+  priority: number;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillLevel default_level = 5;
+   * @generated from field: bool is_recommended = 5;
    */
-  defaultLevel: SkillLevel;
+  isRecommended: boolean;
 
-  /**
-   * @generated from field: repeated string prerequisite_skill_ids = 6;
-   */
-  prerequisiteSkillIds: string[];
-
-  /**
-   * @generated from field: repeated string tags = 7;
-   */
-  tags: string[];
-
-  constructor(data?: PartialMessage<CreateSkillRequest>);
+  constructor(data?: PartialMessage<MeasurementMethodInput>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.MeasurementMethodInput";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MeasurementMethodInput;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MeasurementMethodInput;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MeasurementMethodInput;
 
-  static equals(a: CreateSkillRequest | PlainMessage<CreateSkillRequest> | undefined, b: CreateSkillRequest | PlainMessage<CreateSkillRequest> | undefined): boolean;
+  static equals(a: MeasurementMethodInput | PlainMessage<MeasurementMethodInput> | undefined, b: MeasurementMethodInput | PlainMessage<MeasurementMethodInput> | undefined): boolean;
 }
 
 /**
- * CreateSkillResponse is the response after creating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillDefinitionResponse
  */
-export declare class CreateSkillResponse extends Message<CreateSkillResponse> {
+export declare class CreateSkillDefinitionResponse extends Message<CreateSkillDefinitionResponse> {
   /**
-   * @generated from field: sirosimes.tamanoya.v1.Skill skill = 1;
+   * @generated from field: sirosimes.tamanoya.v1.SkillDefinition skill = 1;
    */
-  skill?: Skill;
+  skill?: SkillDefinition;
 
-  constructor(data?: PartialMessage<CreateSkillResponse>);
+  constructor(data?: PartialMessage<CreateSkillDefinitionResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.CreateSkillDefinitionResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateSkillDefinitionResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateSkillDefinitionResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateSkillDefinitionResponse;
 
-  static equals(a: CreateSkillResponse | PlainMessage<CreateSkillResponse> | undefined, b: CreateSkillResponse | PlainMessage<CreateSkillResponse> | undefined): boolean;
+  static equals(a: CreateSkillDefinitionResponse | PlainMessage<CreateSkillDefinitionResponse> | undefined, b: CreateSkillDefinitionResponse | PlainMessage<CreateSkillDefinitionResponse> | undefined): boolean;
 }
 
 /**
- * UpdateSkillRequest is the request for updating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillRequest
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillDefinitionRequest
  */
-export declare class UpdateSkillRequest extends Message<UpdateSkillRequest> {
+export declare class UpdateSkillDefinitionRequest extends Message<UpdateSkillDefinitionRequest> {
   /**
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * @generated from field: string name = 2;
+   * @generated from field: google.protobuf.FieldMask update_mask = 2;
    */
-  name: string;
+  updateMask?: FieldMask;
 
   /**
-   * @generated from field: string description = 3;
+   * @generated from field: string large_category = 3;
    */
-  description: string;
+  largeCategory: string;
 
   /**
-   * @generated from field: string category_id = 4;
+   * @generated from field: string medium_category = 4;
    */
-  categoryId: string;
+  mediumCategory: string;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillLevel default_level = 5;
+   * @generated from field: string small_category = 5;
    */
-  defaultLevel: SkillLevel;
+  smallCategory: string;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SkillStatus status = 6;
+   * @generated from field: string skill_detail = 6;
    */
-  status: SkillStatus;
+  skillDetail: string;
 
   /**
-   * @generated from field: repeated string prerequisite_skill_ids = 7;
+   * @generated from field: sirosimes.tamanoya.v1.SkillDifficulty difficulty = 7;
    */
-  prerequisiteSkillIds: string[];
+  difficulty: SkillDifficulty;
 
   /**
-   * @generated from field: repeated string tags = 8;
+   * @generated from field: repeated string tag_ids = 8;
    */
-  tags: string[];
+  tagIds: string[];
 
-  constructor(data?: PartialMessage<UpdateSkillRequest>);
+  /**
+   * @generated from field: bool is_active = 9;
+   */
+  isActive: boolean;
+
+  constructor(data?: PartialMessage<UpdateSkillDefinitionRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillDefinitionRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillDefinitionRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillDefinitionRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillDefinitionRequest;
 
-  static equals(a: UpdateSkillRequest | PlainMessage<UpdateSkillRequest> | undefined, b: UpdateSkillRequest | PlainMessage<UpdateSkillRequest> | undefined): boolean;
+  static equals(a: UpdateSkillDefinitionRequest | PlainMessage<UpdateSkillDefinitionRequest> | undefined, b: UpdateSkillDefinitionRequest | PlainMessage<UpdateSkillDefinitionRequest> | undefined): boolean;
 }
 
 /**
- * UpdateSkillResponse is the response after updating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillDefinitionResponse
  */
-export declare class UpdateSkillResponse extends Message<UpdateSkillResponse> {
+export declare class UpdateSkillDefinitionResponse extends Message<UpdateSkillDefinitionResponse> {
   /**
-   * @generated from field: sirosimes.tamanoya.v1.Skill skill = 1;
+   * @generated from field: sirosimes.tamanoya.v1.SkillDefinition skill = 1;
    */
-  skill?: Skill;
+  skill?: SkillDefinition;
 
-  constructor(data?: PartialMessage<UpdateSkillResponse>);
+  constructor(data?: PartialMessage<UpdateSkillDefinitionResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateSkillDefinitionResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSkillDefinitionResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSkillDefinitionResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSkillDefinitionResponse;
 
-  static equals(a: UpdateSkillResponse | PlainMessage<UpdateSkillResponse> | undefined, b: UpdateSkillResponse | PlainMessage<UpdateSkillResponse> | undefined): boolean;
+  static equals(a: UpdateSkillDefinitionResponse | PlainMessage<UpdateSkillDefinitionResponse> | undefined, b: UpdateSkillDefinitionResponse | PlainMessage<UpdateSkillDefinitionResponse> | undefined): boolean;
 }
 
 /**
- * DeleteSkillRequest is the request for deleting a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillRequest
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillDefinitionRequest
  */
-export declare class DeleteSkillRequest extends Message<DeleteSkillRequest> {
+export declare class DeleteSkillDefinitionRequest extends Message<DeleteSkillDefinitionRequest> {
   /**
    * @generated from field: string id = 1;
    */
   id: string;
 
-  constructor(data?: PartialMessage<DeleteSkillRequest>);
+  constructor(data?: PartialMessage<DeleteSkillDefinitionRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillDefinitionRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillDefinitionRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillDefinitionRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillDefinitionRequest;
 
-  static equals(a: DeleteSkillRequest | PlainMessage<DeleteSkillRequest> | undefined, b: DeleteSkillRequest | PlainMessage<DeleteSkillRequest> | undefined): boolean;
+  static equals(a: DeleteSkillDefinitionRequest | PlainMessage<DeleteSkillDefinitionRequest> | undefined, b: DeleteSkillDefinitionRequest | PlainMessage<DeleteSkillDefinitionRequest> | undefined): boolean;
 }
 
 /**
- * DeleteSkillResponse is the response after deleting a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillDefinitionResponse
  */
-export declare class DeleteSkillResponse extends Message<DeleteSkillResponse> {
-  constructor(data?: PartialMessage<DeleteSkillResponse>);
+export declare class DeleteSkillDefinitionResponse extends Message<DeleteSkillDefinitionResponse> {
+  constructor(data?: PartialMessage<DeleteSkillDefinitionResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.DeleteSkillDefinitionResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteSkillDefinitionResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteSkillDefinitionResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteSkillDefinitionResponse;
 
-  static equals(a: DeleteSkillResponse | PlainMessage<DeleteSkillResponse> | undefined, b: DeleteSkillResponse | PlainMessage<DeleteSkillResponse> | undefined): boolean;
+  static equals(a: DeleteSkillDefinitionResponse | PlainMessage<DeleteSkillDefinitionResponse> | undefined, b: DeleteSkillDefinitionResponse | PlainMessage<DeleteSkillDefinitionResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ImportSkillsFromCsvRequest
+ */
+export declare class ImportSkillsFromCsvRequest extends Message<ImportSkillsFromCsvRequest> {
+  /**
+   * CSVファイルのバイナリデータ
+   *
+   * @generated from field: bytes csv_data = 1;
+   */
+  csvData: Uint8Array;
+
+  /**
+   * カテゴリ（hard_skills, soft_skills, ai_skills）
+   *
+   * @generated from field: string category = 2;
+   */
+  category: string;
+
+  /**
+   * インポート者
+   *
+   * @generated from field: string imported_by = 3;
+   */
+  importedBy: string;
+
+  constructor(data?: PartialMessage<ImportSkillsFromCsvRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.ImportSkillsFromCsvRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImportSkillsFromCsvRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImportSkillsFromCsvRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImportSkillsFromCsvRequest;
+
+  static equals(a: ImportSkillsFromCsvRequest | PlainMessage<ImportSkillsFromCsvRequest> | undefined, b: ImportSkillsFromCsvRequest | PlainMessage<ImportSkillsFromCsvRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ImportSkillsFromCsvResponse
+ */
+export declare class ImportSkillsFromCsvResponse extends Message<ImportSkillsFromCsvResponse> {
+  /**
+   * @generated from field: int32 imported_count = 1;
+   */
+  importedCount: number;
+
+  /**
+   * @generated from field: int32 skipped_count = 2;
+   */
+  skippedCount: number;
+
+  /**
+   * @generated from field: repeated string errors = 3;
+   */
+  errors: string[];
+
+  /**
+   * @generated from field: int32 version = 4;
+   */
+  version: number;
+
+  constructor(data?: PartialMessage<ImportSkillsFromCsvResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.ImportSkillsFromCsvResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImportSkillsFromCsvResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImportSkillsFromCsvResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImportSkillsFromCsvResponse;
+
+  static equals(a: ImportSkillsFromCsvResponse | PlainMessage<ImportSkillsFromCsvResponse> | undefined, b: ImportSkillsFromCsvResponse | PlainMessage<ImportSkillsFromCsvResponse> | undefined): boolean;
 }
 

@@ -368,7 +368,7 @@
         }
       }
     },
-    "v1AccessDecision": {
+    "sirosimesmikurav1AccessDecision": {
       "type": "object",
       "properties": {
         "id": {
@@ -426,7 +426,7 @@
       "type": "object",
       "properties": {
         "decision": {
-          "$ref": "#/definitions/v1AccessDecision"
+          "$ref": "#/definitions/sirosimesmikurav1AccessDecision"
         }
       },
       "description": "CheckAccessResponse is the response containing the access decision."
@@ -507,7 +507,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1AccessDecision"
+            "$ref": "#/definitions/sirosimesmikurav1AccessDecision"
           }
         },
         "pagination": {

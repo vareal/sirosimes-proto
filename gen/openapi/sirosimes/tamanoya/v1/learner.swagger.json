@@ -888,7 +888,7 @@
         "SKILL_LEVEL_EXPERT"
       ],
       "default": "SKILL_LEVEL_UNSPECIFIED",
-      "description": "SkillLevel classifies the proficiency level of a skill."
+      "title": "SkillDifficulty はスキルの難易度を表す。\nSkillLevel は習熟度レベルを表す。"
     },
     "v1SkillRecommendation": {
       "type": "object",

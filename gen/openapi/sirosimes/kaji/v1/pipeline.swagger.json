@@ -23,7 +23,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListPipelinesResponse"
+              "$ref": "#/definitions/sirosimeskajiv1ListPipelinesResponse"
             }
           },
           "default": {
@@ -106,7 +106,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreatePipelineResponse"
+              "$ref": "#/definitions/sirosimeskajiv1CreatePipelineResponse"
             }
           },
           "default": {
@@ -123,7 +123,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreatePipelineRequest"
+              "$ref": "#/definitions/sirosimeskajiv1CreatePipelineRequest"
             }
           }
         ],
@@ -349,7 +349,7 @@
         }
       }
     },
-    "v1CreatePipelineRequest": {
+    "sirosimeskajiv1CreatePipelineRequest": {
       "type": "object",
       "properties": {
         "name": {
@@ -389,7 +389,7 @@
       },
       "description": "CreatePipelineRequest is the request for creating a pipeline."
     },
-    "v1CreatePipelineResponse": {
+    "sirosimeskajiv1CreatePipelineResponse": {
       "type": "object",
       "properties": {
         "pipeline": {
@@ -398,20 +398,7 @@
       },
       "description": "CreatePipelineResponse is the response after creating a pipeline."
     },
-    "v1DeletePipelineResponse": {
-      "type": "object",
-      "description": "DeletePipelineResponse is the response after deleting a pipeline."
-    },
-    "v1GetPipelineResponse": {
-      "type": "object",
-      "properties": {
-        "pipeline": {
-          "$ref": "#/definitions/v1Pipeline"
-        }
-      },
-      "description": "GetPipelineResponse is the response containing a single pipeline."
-    },
-    "v1ListPipelinesResponse": {
+    "sirosimeskajiv1ListPipelinesResponse": {
       "type": "object",
       "properties": {
         "pipelines": {
@@ -426,6 +413,19 @@
         }
       },
       "description": "ListPipelinesResponse is the response for listing pipelines."
+    },
+    "v1DeletePipelineResponse": {
+      "type": "object",
+      "description": "DeletePipelineResponse is the response after deleting a pipeline."
+    },
+    "v1GetPipelineResponse": {
+      "type": "object",
+      "properties": {
+        "pipeline": {
+          "$ref": "#/definitions/v1Pipeline"
+        }
+      },
+      "description": "GetPipelineResponse is the response containing a single pipeline."
     },
     "v1PaginationRequest": {
       "type": "object",

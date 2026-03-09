@@ -45,6 +45,24 @@
         }
       }
     },
+    "sirosimesmizugakiv1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "$ref": "#/definitions/v1AuthSession"
+        }
+      },
+      "title": "LoginResponse はログインレスポンスを表す。"
+    },
+    "sirosimesmizugakiv1RefreshTokenResponse": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "$ref": "#/definitions/v1AuthSession"
+        }
+      },
+      "title": "RefreshTokenResponse はトークンリフレッシュレスポンスを表す。"
+    },
     "v1ActorRef": {
       "type": "object",
       "properties": {
@@ -141,15 +159,6 @@
       },
       "title": "AuthSession はユーザーの認証セッションを表す。"
     },
-    "v1LoginResponse": {
-      "type": "object",
-      "properties": {
-        "session": {
-          "$ref": "#/definitions/v1AuthSession"
-        }
-      },
-      "title": "LoginResponse はログインレスポンスを表す。"
-    },
     "v1LogoutResponse": {
       "type": "object",
       "properties": {
@@ -159,15 +168,6 @@
         }
       },
       "title": "LogoutResponse はログアウトレスポンスを表す。"
-    },
-    "v1RefreshTokenResponse": {
-      "type": "object",
-      "properties": {
-        "session": {
-          "$ref": "#/definitions/v1AuthSession"
-        }
-      },
-      "title": "RefreshTokenResponse はトークンリフレッシュレスポンスを表す。"
     },
     "v1SecurityLevel": {
       "type": "string",

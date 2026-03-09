@@ -1,0 +1,740 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tamanoya/v1/user.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "UserService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/auth/google": {
+      "post": {
+        "summary": "Google SSO ログイン",
+        "operationId": "UserService_GoogleLogin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GoogleLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GoogleLoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "summary": "メール/パスワードログイン",
+        "operationId": "UserService_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/sirosimestamanoyav1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/sirosimestamanoyav1LoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "summary": "トークンリフレッシュ",
+        "operationId": "UserService_RefreshToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/sirosimestamanoyav1RefreshTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/sirosimestamanoyav1RefreshTokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "summary": "ユーザー一覧",
+        "operationId": "UserService_ListUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "department",
+            "description": "フィルタ: 部門",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DEPARTMENT_CODE_UNSPECIFIED",
+              "DEPARTMENT_CODE_ENGINEERING",
+              "DEPARTMENT_CODE_SALES",
+              "DEPARTMENT_CODE_ADMINISTRATION",
+              "DEPARTMENT_CODE_MANAGEMENT"
+            ],
+            "default": "DEPARTMENT_CODE_UNSPECIFIED"
+          },
+          {
+            "name": "role",
+            "description": "フィルタ: ロール\n\n - USER_ROLE_EMPLOYEE: 被評価者（一般社員）\n - USER_ROLE_REVIEWER: 評価者（レビュアー）\n - USER_ROLE_ADMIN: 人事管理者\n - USER_ROLE_EXECUTIVE: 経営層",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "USER_ROLE_UNSPECIFIED",
+              "USER_ROLE_EMPLOYEE",
+              "USER_ROLE_REVIEWER",
+              "USER_ROLE_ADMIN",
+              "USER_ROLE_EXECUTIVE"
+            ],
+            "default": "USER_ROLE_UNSPECIFIED"
+          },
+          {
+            "name": "grade",
+            "description": "フィルタ: 等級",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "activeOnly",
+            "description": "フィルタ: アクティブのみ",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "query",
+            "description": "フィルタ: 検索クエリ（名前/メール部分一致）",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "post": {
+        "summary": "ユーザー作成",
+        "operationId": "UserService_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "summary": "ユーザー取得",
+        "operationId": "UserService_GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "delete": {
+        "summary": "ユーザー削除（論理削除）",
+        "operationId": "UserService_DeleteUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "patch": {
+        "summary": "ユーザー更新",
+        "operationId": "UserService_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserServiceUpdateUserBody"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "UserServiceUpdateUserBody": {
+      "type": "object",
+      "properties": {
+        "updateMask": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "title": "更新可能フィールド"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserRole"
+          }
+        },
+        "department": {
+          "$ref": "#/definitions/v1DepartmentCode"
+        },
+        "jobType": {
+          "type": "string"
+        },
+        "grade": {
+          "type": "string"
+        },
+        "roleAxis": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "sirosimestamanoyav1LoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "totpCode": {
+          "type": "string",
+          "title": "TOTP コード（2FA有効時）"
+        }
+      }
+    },
+    "sirosimestamanoyav1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "tokenType": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "user": {
+          "$ref": "#/definitions/v1UserView"
+        },
+        "requiresRoleSelection": {
+          "type": "boolean",
+          "title": "ロール選択が必要か"
+        },
+        "availableRoles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserRole"
+          }
+        }
+      }
+    },
+    "sirosimestamanoyav1RefreshTokenRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "sirosimestamanoyav1RefreshTokenResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserRole"
+          }
+        },
+        "department": {
+          "$ref": "#/definitions/v1DepartmentCode"
+        },
+        "jobType": {
+          "type": "string"
+        },
+        "grade": {
+          "type": "string"
+        },
+        "roleAxis": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1UserView"
+        }
+      }
+    },
+    "v1DeleteUserResponse": {
+      "type": "object"
+    },
+    "v1DepartmentCode": {
+      "type": "string",
+      "enum": [
+        "DEPARTMENT_CODE_UNSPECIFIED",
+        "DEPARTMENT_CODE_ENGINEERING",
+        "DEPARTMENT_CODE_SALES",
+        "DEPARTMENT_CODE_ADMINISTRATION",
+        "DEPARTMENT_CODE_MANAGEMENT"
+      ],
+      "default": "DEPARTMENT_CODE_UNSPECIFIED",
+      "title": "DepartmentCode は部門コードを表す。"
+    },
+    "v1GetUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1UserView"
+        }
+      }
+    },
+    "v1GoogleLoginRequest": {
+      "type": "object",
+      "properties": {
+        "credential": {
+          "type": "string",
+          "title": "Google ID Token"
+        },
+        "role": {
+          "$ref": "#/definitions/v1UserRole",
+          "title": "選択されたロール（マルチロール時）"
+        }
+      }
+    },
+    "v1GoogleLoginResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "tokenType": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "user": {
+          "$ref": "#/definitions/v1UserView"
+        },
+        "isNewUser": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ListUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserView"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1UserView"
+        }
+      }
+    },
+    "v1UserRole": {
+      "type": "string",
+      "enum": [
+        "USER_ROLE_UNSPECIFIED",
+        "USER_ROLE_EMPLOYEE",
+        "USER_ROLE_REVIEWER",
+        "USER_ROLE_ADMIN",
+        "USER_ROLE_EXECUTIVE"
+      ],
+      "default": "USER_ROLE_UNSPECIFIED",
+      "description": "- USER_ROLE_EMPLOYEE: 被評価者（一般社員）\n - USER_ROLE_REVIEWER: 評価者（レビュアー）\n - USER_ROLE_ADMIN: 人事管理者\n - USER_ROLE_EXECUTIVE: 経営層",
+      "title": "UserRole はシステム内のユーザー権限を表す。"
+    },
+    "v1UserView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserRole"
+          }
+        },
+        "department": {
+          "$ref": "#/definitions/v1DepartmentCode"
+        },
+        "jobType": {
+          "type": "string"
+        },
+        "grade": {
+          "type": "string"
+        },
+        "roleAxis": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "UserView はAPI応答用のユーザー情報（機密フィールドを除外）。"
+    }
+  }
+}

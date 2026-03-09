@@ -1,0 +1,1683 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tamanoya/v1/content.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ContentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/learning/domains": {
+      "get": {
+        "operationId": "ContentService_ListLearningDomains",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLearningDomainsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "LEARNING_DOMAIN_CATEGORY_UNSPECIFIED",
+              "LEARNING_DOMAIN_CATEGORY_MATHEMATICS",
+              "LEARNING_DOMAIN_CATEGORY_MACHINE_LEARNING",
+              "LEARNING_DOMAIN_CATEGORY_COMPUTER_SCIENCE",
+              "LEARNING_DOMAIN_CATEGORY_PROGRAMMING",
+              "LEARNING_DOMAIN_CATEGORY_DATA_SCIENCE",
+              "LEARNING_DOMAIN_CATEGORY_STATISTICS",
+              "LEARNING_DOMAIN_CATEGORY_BUSINESS",
+              "LEARNING_DOMAIN_CATEGORY_SECURITY",
+              "LEARNING_DOMAIN_CATEGORY_ACCOUNTING",
+              "LEARNING_DOMAIN_CATEGORY_MANAGEMENT",
+              "LEARNING_DOMAIN_CATEGORY_OTHER"
+            ],
+            "default": "LEARNING_DOMAIN_CATEGORY_UNSPECIFIED"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      },
+      "post": {
+        "operationId": "ContentService_CreateLearningDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateLearningDomainResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateLearningDomainRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/domains/{id}": {
+      "get": {
+        "summary": "--- ドメイン ---",
+        "operationId": "ContentService_GetLearningDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetLearningDomainResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      },
+      "patch": {
+        "operationId": "ContentService_UpdateLearningDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateLearningDomainResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ContentServiceUpdateLearningDomainBody"
+            }
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/materials": {
+      "post": {
+        "operationId": "ContentService_CreateReadingMaterial",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateReadingMaterialResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateReadingMaterialRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/materials/{id}": {
+      "get": {
+        "summary": "--- 読み物 ---",
+        "operationId": "ContentService_GetReadingMaterial",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetReadingMaterialResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/progress/mark-read": {
+      "post": {
+        "operationId": "ContentService_MarkMaterialRead",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MarkMaterialReadResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MarkMaterialReadRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/progress/{userId}": {
+      "get": {
+        "operationId": "ContentService_ListLearningProgress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLearningProgressResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domainId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/progress/{userId}/{topicId}": {
+      "get": {
+        "summary": "--- 進捗 ---",
+        "operationId": "ContentService_GetLearningProgress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetLearningProgressResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "topicId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/roadmap/{userId}": {
+      "get": {
+        "summary": "--- ロードマップ ---",
+        "operationId": "ContentService_GetLearningRoadmap",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetLearningRoadmapResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "evaluationPeriod",
+            "description": "最新の評価期間から自動生成する場合は空",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/tests/{id}": {
+      "get": {
+        "summary": "--- 知識テスト ---",
+        "operationId": "ContentService_GetKnowledgeTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetKnowledgeTestResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/tests/{testId}/submit": {
+      "post": {
+        "operationId": "ContentService_SubmitKnowledgeTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SubmitKnowledgeTestResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ContentServiceSubmitKnowledgeTestBody"
+            }
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/topics": {
+      "get": {
+        "operationId": "ContentService_ListLearningTopics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListLearningTopicsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "domainId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TOPIC_DIFFICULTY_UNSPECIFIED",
+              "TOPIC_DIFFICULTY_BEGINNER",
+              "TOPIC_DIFFICULTY_INTERMEDIATE",
+              "TOPIC_DIFFICULTY_ADVANCED",
+              "TOPIC_DIFFICULTY_EXPERT"
+            ],
+            "default": "TOPIC_DIFFICULTY_UNSPECIFIED"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      },
+      "post": {
+        "operationId": "ContentService_CreateLearningTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateLearningTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateLearningTopicRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    },
+    "/api/v1/learning/topics/{id}": {
+      "get": {
+        "summary": "--- トピック ---",
+        "operationId": "ContentService_GetLearningTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetLearningTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContentService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ContentServiceSubmitKnowledgeTestBody": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TestAnswerInput"
+          }
+        }
+      }
+    },
+    "ContentServiceUpdateLearningDomainBody": {
+      "type": "object",
+      "properties": {
+        "updateMask": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/definitions/v1LearningDomainCategory"
+        },
+        "description": {
+          "type": "string"
+        },
+        "descriptionEn": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Attachment": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "caption": {
+          "type": "string"
+        }
+      },
+      "title": "Attachment は添付ファイル情報。"
+    },
+    "v1ContentStatus": {
+      "type": "string",
+      "enum": [
+        "CONTENT_STATUS_UNSPECIFIED",
+        "CONTENT_STATUS_DRAFT",
+        "CONTENT_STATUS_REVIEW",
+        "CONTENT_STATUS_PUBLISHED",
+        "CONTENT_STATUS_ARCHIVED"
+      ],
+      "default": "CONTENT_STATUS_UNSPECIFIED",
+      "title": "ContentStatus はコンテンツステータス。"
+    },
+    "v1CreateLearningDomainRequest": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/definitions/v1LearningDomainCategory"
+        },
+        "description": {
+          "type": "string"
+        },
+        "descriptionEn": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateLearningDomainResponse": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "$ref": "#/definitions/v1LearningDomain"
+        }
+      }
+    },
+    "v1CreateLearningTopicRequest": {
+      "type": "object",
+      "properties": {
+        "domainId": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "descriptionEn": {
+          "type": "string"
+        },
+        "difficulty": {
+          "$ref": "#/definitions/v1TopicDifficulty"
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "targetGrades": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prerequisiteTopicIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1CreateLearningTopicResponse": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/v1LearningTopic"
+        }
+      }
+    },
+    "v1CreateReadingMaterialRequest": {
+      "type": "object",
+      "properties": {
+        "topicId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "titleEn": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1CreateReadingMaterialResponse": {
+      "type": "object",
+      "properties": {
+        "material": {
+          "$ref": "#/definitions/v1ReadingMaterial"
+        }
+      }
+    },
+    "v1GetKnowledgeTestResponse": {
+      "type": "object",
+      "properties": {
+        "test": {
+          "$ref": "#/definitions/v1KnowledgeTest"
+        }
+      }
+    },
+    "v1GetLearningDomainResponse": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "$ref": "#/definitions/v1LearningDomain"
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LearningTopic"
+          }
+        }
+      }
+    },
+    "v1GetLearningProgressResponse": {
+      "type": "object",
+      "properties": {
+        "progress": {
+          "$ref": "#/definitions/v1LearningProgress"
+        }
+      }
+    },
+    "v1GetLearningRoadmapResponse": {
+      "type": "object",
+      "properties": {
+        "roadmap": {
+          "$ref": "#/definitions/v1LearningRoadmap"
+        }
+      }
+    },
+    "v1GetLearningTopicResponse": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/v1LearningTopic"
+        },
+        "materials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ReadingMaterial"
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1KnowledgeTest"
+          }
+        }
+      }
+    },
+    "v1GetReadingMaterialResponse": {
+      "type": "object",
+      "properties": {
+        "material": {
+          "$ref": "#/definitions/v1ReadingMaterial"
+        }
+      }
+    },
+    "v1KnowledgeTest": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "topicId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "timeLimitMinutes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passingScore": {
+          "type": "integer",
+          "format": "int32",
+          "title": "合格ライン（%）"
+        },
+        "questionCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ContentStatus"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "format": "int32",
+          "title": "再受験可能回数（-1 = 無制限）"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1KnowledgeTestQuestion"
+          },
+          "title": "テスト問題"
+        }
+      },
+      "title": "KnowledgeTest は知識定着テスト。"
+    },
+    "v1KnowledgeTestQuestion": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "testId": {
+          "type": "string"
+        },
+        "questionType": {
+          "$ref": "#/definitions/v1TestQuestionType"
+        },
+        "questionText": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TestOption"
+          },
+          "title": "選択肢（多肢選択の場合）"
+        },
+        "correctAnswer": {
+          "type": "string",
+          "title": "正解（短答式用）"
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "points": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      },
+      "title": "KnowledgeTestQuestion は知識テストの問題。"
+    },
+    "v1KnowledgeTestResult": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "testId": {
+          "type": "string"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "score": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isPassed": {
+          "type": "boolean"
+        },
+        "attemptNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TestAnswerDetail"
+          },
+          "title": "回答詳細"
+        }
+      },
+      "title": "KnowledgeTestResult はテスト受験結果。"
+    },
+    "v1LearningDomain": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "code": {
+          "type": "string",
+          "title": "ドメインコード（例: math, ml, cs）"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/definitions/v1LearningDomainCategory"
+        },
+        "description": {
+          "type": "string"
+        },
+        "descriptionEn": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string",
+          "title": "UIアイコン名"
+        },
+        "color": {
+          "type": "string",
+          "title": "UIテーマ色"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "topicCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "配下のトピック数（リスト表示用）"
+        }
+      },
+      "title": "LearningDomain はスキル学習ドメイン（分野）。"
+    },
+    "v1LearningDomainCategory": {
+      "type": "string",
+      "enum": [
+        "LEARNING_DOMAIN_CATEGORY_UNSPECIFIED",
+        "LEARNING_DOMAIN_CATEGORY_MATHEMATICS",
+        "LEARNING_DOMAIN_CATEGORY_MACHINE_LEARNING",
+        "LEARNING_DOMAIN_CATEGORY_COMPUTER_SCIENCE",
+        "LEARNING_DOMAIN_CATEGORY_PROGRAMMING",
+        "LEARNING_DOMAIN_CATEGORY_DATA_SCIENCE",
+        "LEARNING_DOMAIN_CATEGORY_STATISTICS",
+        "LEARNING_DOMAIN_CATEGORY_BUSINESS",
+        "LEARNING_DOMAIN_CATEGORY_SECURITY",
+        "LEARNING_DOMAIN_CATEGORY_ACCOUNTING",
+        "LEARNING_DOMAIN_CATEGORY_MANAGEMENT",
+        "LEARNING_DOMAIN_CATEGORY_OTHER"
+      ],
+      "default": "LEARNING_DOMAIN_CATEGORY_UNSPECIFIED",
+      "title": "LearningDomainCategory は学習ドメインのカテゴリ。"
+    },
+    "v1LearningProgress": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "topicId": {
+          "type": "string"
+        },
+        "completedMaterialIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "読了済みの読み物ID"
+        },
+        "passedTestIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "合格済みのテストID"
+        },
+        "progressPercent": {
+          "type": "integer",
+          "format": "int32",
+          "title": "進捗率（%）"
+        },
+        "lastAccessedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "LearningProgress はユーザーの学習進捗。"
+    },
+    "v1LearningRoadmap": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "evaluationPeriod": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RoadmapStep"
+          },
+          "title": "推奨学習パス"
+        },
+        "totalEstimatedMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "title": "全体の推定学習時間（分）"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "LearningRoadmap はスキル評価に基づく学習ロードマップ。"
+    },
+    "v1LearningTopic": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "domainId": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string",
+          "title": "トピックコード（例: calculus, linear_algebra）"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "descriptionEn": {
+          "type": "string"
+        },
+        "difficulty": {
+          "$ref": "#/definitions/v1TopicDifficulty"
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "title": "推定学習時間（分）"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "targetGrades": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "対象グレード"
+        },
+        "prerequisiteTopicIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "前提トピックID"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "materialCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "配下コンテンツ数"
+        },
+        "testCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "LearningTopic は学習トピック。"
+    },
+    "v1ListLearningDomainsResponse": {
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LearningDomain"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListLearningProgressResponse": {
+      "type": "object",
+      "properties": {
+        "progressList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LearningProgress"
+          }
+        },
+        "overallProgressPercent": {
+          "type": "integer",
+          "format": "int32",
+          "title": "全体進捗率"
+        }
+      }
+    },
+    "v1ListLearningTopicsResponse": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LearningTopic"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1MarkMaterialReadRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "materialId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MarkMaterialReadResponse": {
+      "type": "object",
+      "properties": {
+        "progress": {
+          "$ref": "#/definitions/v1LearningProgress"
+        }
+      }
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ReadingMaterial": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "topicId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "titleEn": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string",
+          "title": "本文（Markdown形式）"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ContentStatus"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Attachment"
+          },
+          "title": "添付ファイル"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Reference"
+          },
+          "title": "参考リンク"
+        }
+      },
+      "title": "ReadingMaterial は読み物コンテンツ。"
+    },
+    "v1Reference": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "title": "Reference は参考リンク。"
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1RoadmapStep": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "domainId": {
+          "type": "string"
+        },
+        "domainName": {
+          "type": "string"
+        },
+        "topicId": {
+          "type": "string"
+        },
+        "topicName": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "title": "なぜこのトピックが推奨されるか"
+        },
+        "priority": {
+          "type": "string",
+          "title": "優先度（high/medium/low）"
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "relatedWeaknessAreas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "関連する弱点スキルエリア"
+        }
+      },
+      "title": "RoadmapStep はロードマップの1ステップ。"
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1SubmitKnowledgeTestResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v1KnowledgeTestResult"
+        }
+      }
+    },
+    "v1TestAnswerDetail": {
+      "type": "object",
+      "properties": {
+        "questionId": {
+          "type": "string"
+        },
+        "userAnswer": {
+          "type": "string"
+        },
+        "isCorrect": {
+          "type": "boolean"
+        },
+        "points": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "TestAnswerDetail はテスト回答の詳細。"
+    },
+    "v1TestAnswerInput": {
+      "type": "object",
+      "properties": {
+        "questionId": {
+          "type": "string"
+        },
+        "answer": {
+          "type": "string"
+        }
+      }
+    },
+    "v1TestOption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "isCorrect": {
+          "type": "boolean"
+        }
+      },
+      "title": "TestOption はテストの選択肢。"
+    },
+    "v1TestQuestionType": {
+      "type": "string",
+      "enum": [
+        "TEST_QUESTION_TYPE_UNSPECIFIED",
+        "TEST_QUESTION_TYPE_MULTIPLE_CHOICE",
+        "TEST_QUESTION_TYPE_TRUE_FALSE",
+        "TEST_QUESTION_TYPE_FILL_IN_BLANK",
+        "TEST_QUESTION_TYPE_SHORT_ANSWER"
+      ],
+      "default": "TEST_QUESTION_TYPE_UNSPECIFIED",
+      "title": "TestQuestionType は知識テストの問題タイプ。"
+    },
+    "v1TopicDifficulty": {
+      "type": "string",
+      "enum": [
+        "TOPIC_DIFFICULTY_UNSPECIFIED",
+        "TOPIC_DIFFICULTY_BEGINNER",
+        "TOPIC_DIFFICULTY_INTERMEDIATE",
+        "TOPIC_DIFFICULTY_ADVANCED",
+        "TOPIC_DIFFICULTY_EXPERT"
+      ],
+      "default": "TOPIC_DIFFICULTY_UNSPECIFIED",
+      "title": "TopicDifficulty はトピック難易度。"
+    },
+    "v1UpdateLearningDomainResponse": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "$ref": "#/definitions/v1LearningDomain"
+        }
+      }
+    }
+  }
+}

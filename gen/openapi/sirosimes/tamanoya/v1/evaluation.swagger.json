@@ -1,0 +1,1779 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/tamanoya/v1/evaluation.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EvaluationService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/admin/dashboard": {
+      "get": {
+        "summary": "--- ダッシュボード ---",
+        "operationId": "EvaluationService_GetAdminDashboard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAdminDashboardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "periodId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/criteria/departments": {
+      "get": {
+        "operationId": "EvaluationService_ListDepartmentCriteria",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListDepartmentCriteriaResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/criteria/grades": {
+      "get": {
+        "summary": "--- 評価基準マスタ ---",
+        "operationId": "EvaluationService_ListGradeCriteria",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListGradeCriteriaResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/criteria/rubrics": {
+      "get": {
+        "operationId": "EvaluationService_ListEvaluationRubrics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEvaluationRubricsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "criterionCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "RUBRIC_LEVEL_UNSPECIFIED",
+              "RUBRIC_LEVEL_L1",
+              "RUBRIC_LEVEL_L2",
+              "RUBRIC_LEVEL_L3",
+              "RUBRIC_LEVEL_L4",
+              "RUBRIC_LEVEL_L5"
+            ],
+            "default": "RUBRIC_LEVEL_UNSPECIFIED"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/evaluations": {
+      "get": {
+        "operationId": "EvaluationService_ListEvaluationSessions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListEvaluationSessionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "evaluationPeriod",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "EVALUATION_STATUS_UNSPECIFIED",
+              "EVALUATION_STATUS_PENDING",
+              "EVALUATION_STATUS_PROCESSING",
+              "EVALUATION_STATUS_ANALYZING",
+              "EVALUATION_STATUS_EVALUATING",
+              "EVALUATION_STATUS_COMPLETED",
+              "EVALUATION_STATUS_FAILED",
+              "EVALUATION_STATUS_CANCELLED"
+            ],
+            "default": "EVALUATION_STATUS_UNSPECIFIED"
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/evaluations/audit-logs": {
+      "get": {
+        "summary": "--- 監査ログ ---",
+        "operationId": "EvaluationService_ListAuditLogs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListAuditLogsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "submissionId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "changedBy",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "changeType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "EVALUATION_CHANGE_TYPE_UNSPECIFIED",
+              "EVALUATION_CHANGE_TYPE_SCORE_MODIFIED",
+              "EVALUATION_CHANGE_TYPE_TIER_MODIFIED",
+              "EVALUATION_CHANGE_TYPE_FEEDBACK_MODIFIED",
+              "EVALUATION_CHANGE_TYPE_APPROVAL_STATUS_CHANGED",
+              "EVALUATION_CHANGE_TYPE_ANSWER_SCORE_MODIFIED"
+            ],
+            "default": "EVALUATION_CHANGE_TYPE_UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/evaluations/prompt-logs": {
+      "get": {
+        "summary": "--- プロンプトログ ---",
+        "operationId": "EvaluationService_ListPromptLogs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPromptLogsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "evaluationSessionId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/evaluations/{id}": {
+      "get": {
+        "summary": "--- 評価セッション ---",
+        "operationId": "EvaluationService_GetEvaluationSession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetEvaluationSessionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/evaluations/{submissionId}/approve": {
+      "post": {
+        "summary": "--- 承認ワークフロー ---",
+        "operationId": "EvaluationService_ApproveEvaluation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ApproveEvaluationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "submissionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvaluationServiceApproveEvaluationBody"
+            }
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/evaluations/{submissionId}/modify": {
+      "post": {
+        "operationId": "EvaluationService_ModifyEvaluation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ModifyEvaluationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "submissionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvaluationServiceModifyEvaluationBody"
+            }
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/evaluations/{submissionId}/reject": {
+      "post": {
+        "operationId": "EvaluationService_RejectEvaluation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RejectEvaluationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "submissionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvaluationServiceRejectEvaluationBody"
+            }
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/sads": {
+      "get": {
+        "operationId": "EvaluationService_ListSADs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSADsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "employeeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "evaluationPeriod",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    },
+    "/api/v1/sads/{id}": {
+      "get": {
+        "summary": "--- SAD（スキル評価データ） ---",
+        "operationId": "EvaluationService_GetSAD",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSADResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EvaluationService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "EvaluationServiceApproveEvaluationBody": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        }
+      }
+    },
+    "EvaluationServiceModifyEvaluationBody": {
+      "type": "object",
+      "properties": {
+        "totalScore": {
+          "type": "number",
+          "format": "double",
+          "title": "変更後のスコア（空の場合は変更なし）"
+        },
+        "evaluationTier": {
+          "type": "string"
+        },
+        "feedback": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "answerModifications": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AnswerScoreModification"
+          },
+          "title": "個別回答のスコア変更"
+        }
+      }
+    },
+    "EvaluationServiceRejectEvaluationBody": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "sirosimestamanoyav1ApprovalStatus": {
+      "type": "string",
+      "enum": [
+        "APPROVAL_STATUS_UNSPECIFIED",
+        "APPROVAL_STATUS_PENDING_REVIEW",
+        "APPROVAL_STATUS_APPROVED",
+        "APPROVAL_STATUS_REJECTED",
+        "APPROVAL_STATUS_MODIFIED"
+      ],
+      "default": "APPROVAL_STATUS_UNSPECIFIED",
+      "description": "- APPROVAL_STATUS_PENDING_REVIEW: AI評価完了、人事管理者の承認待ち\n - APPROVAL_STATUS_APPROVED: 人事管理者が承認済み\n - APPROVAL_STATUS_REJECTED: 人事管理者が却下（再評価必要）\n - APPROVAL_STATUS_MODIFIED: 人事管理者が一部変更後承認",
+      "title": "ApprovalStatus は承認ワークフローのステータス。"
+    },
+    "v1AnswerScoreModification": {
+      "type": "object",
+      "properties": {
+        "answerId": {
+          "type": "string"
+        },
+        "newScore": {
+          "type": "number",
+          "format": "double"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ApproveEvaluationResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/sirosimestamanoyav1ApprovalStatus"
+        }
+      }
+    },
+    "v1CodeAnalysisResult": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "evaluationSessionId": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "totalLines": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "codeLines": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "commentLines": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cyclomaticComplexityAvg": {
+          "type": "number",
+          "format": "double",
+          "title": "循環的複雑度（平均）"
+        },
+        "cyclomaticComplexityMax": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cognitiveComplexityAvg": {
+          "type": "number",
+          "format": "double"
+        },
+        "maintainabilityIndex": {
+          "type": "number",
+          "format": "double"
+        },
+        "linterErrors": {
+          "type": "integer",
+          "format": "int32",
+          "title": "リンター結果"
+        },
+        "linterWarnings": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "securityIssuesCritical": {
+          "type": "integer",
+          "format": "int32",
+          "title": "セキュリティ問題数（重要度別）"
+        },
+        "securityIssuesHigh": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "securityIssuesMedium": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "securityIssuesLow": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "complexityScore": {
+          "type": "number",
+          "format": "double",
+          "title": "スコア"
+        },
+        "qualityScore": {
+          "type": "number",
+          "format": "double"
+        },
+        "securityScore": {
+          "type": "number",
+          "format": "double"
+        },
+        "totalScore": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "title": "CodeAnalysisResult はコード静的解析結果。"
+    },
+    "v1DepartmentCriteria": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "department": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "weightAdjustments": {
+          "type": "object"
+        },
+        "skillCategories": {
+          "type": "object"
+        },
+        "measurementMethods": {
+          "type": "object"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      },
+      "title": "DepartmentCriteria は部門別評価基準。"
+    },
+    "v1DevelopmentRecommendation": {
+      "type": "object",
+      "properties": {
+        "skillArea": {
+          "type": "string"
+        },
+        "recommendation": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "suggestedAction": {
+          "type": "string"
+        }
+      },
+      "title": "DevelopmentRecommendation は育成推奨。"
+    },
+    "v1EvaluationAuditLog": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "submissionId": {
+          "type": "string"
+        },
+        "changeType": {
+          "$ref": "#/definitions/v1EvaluationChangeType"
+        },
+        "changedBy": {
+          "type": "string"
+        },
+        "changedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fieldName": {
+          "type": "string"
+        },
+        "oldValue": {
+          "type": "object"
+        },
+        "newValue": {
+          "type": "object"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "ipAddress": {
+          "type": "string"
+        }
+      },
+      "title": "EvaluationAuditLog は評価変更の監査ログ。"
+    },
+    "v1EvaluationChangeType": {
+      "type": "string",
+      "enum": [
+        "EVALUATION_CHANGE_TYPE_UNSPECIFIED",
+        "EVALUATION_CHANGE_TYPE_SCORE_MODIFIED",
+        "EVALUATION_CHANGE_TYPE_TIER_MODIFIED",
+        "EVALUATION_CHANGE_TYPE_FEEDBACK_MODIFIED",
+        "EVALUATION_CHANGE_TYPE_APPROVAL_STATUS_CHANGED",
+        "EVALUATION_CHANGE_TYPE_ANSWER_SCORE_MODIFIED"
+      ],
+      "default": "EVALUATION_CHANGE_TYPE_UNSPECIFIED",
+      "title": "EvaluationChangeType は評価変更の種別（監査ログ用）。"
+    },
+    "v1EvaluationPromptLog": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "evaluationSessionId": {
+          "type": "string"
+        },
+        "llmEvaluationId": {
+          "type": "string"
+        },
+        "promptType": {
+          "type": "string"
+        },
+        "promptTemplateName": {
+          "type": "string"
+        },
+        "systemPrompt": {
+          "type": "string"
+        },
+        "userPrompt": {
+          "type": "string"
+        },
+        "promptParameters": {
+          "type": "object"
+        },
+        "llmProvider": {
+          "type": "string"
+        },
+        "llmModel": {
+          "type": "string"
+        },
+        "temperature": {
+          "type": "number",
+          "format": "double"
+        },
+        "maxTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "llmResponse": {
+          "type": "string"
+        },
+        "llmResponseParsed": {
+          "type": "object"
+        },
+        "inputTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "outputTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "processingTimeMs": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isSuccessful": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      },
+      "title": "EvaluationPromptLog はAI評価プロンプト履歴。"
+    },
+    "v1EvaluationRubric": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "criterionName": {
+          "type": "string"
+        },
+        "criterionCode": {
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/definitions/v1RubricLevel"
+        },
+        "levelName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "behavioralIndicators": {
+          "type": "object"
+        },
+        "scoringGuide": {
+          "type": "object"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      },
+      "title": "EvaluationRubric は評価ルーブリック定義。"
+    },
+    "v1EvaluationSession": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "employeeId": {
+          "type": "string",
+          "title": "--- 社員情報 ---"
+        },
+        "employeeName": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "jobTitle": {
+          "type": "string"
+        },
+        "grade": {
+          "type": "string"
+        },
+        "roleType": {
+          "type": "string"
+        },
+        "evaluationPeriod": {
+          "type": "string",
+          "title": "--- 評価メタデータ ---"
+        },
+        "scheduledDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "$ref": "#/definitions/v1EvaluationStatus",
+          "title": "--- 状態 ---"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "totalScore": {
+          "type": "number",
+          "format": "double",
+          "title": "--- スコア ---"
+        },
+        "tier": {
+          "$ref": "#/definitions/v1EvaluationTier"
+        },
+        "hardSkillScore": {
+          "type": "number",
+          "format": "double"
+        },
+        "softSkillScore": {
+          "type": "number",
+          "format": "double"
+        },
+        "requiresHumanReview": {
+          "type": "boolean",
+          "title": "--- 人間レビュー ---"
+        },
+        "humanReviewed": {
+          "type": "boolean"
+        },
+        "humanReviewerId": {
+          "type": "string"
+        },
+        "humanReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "humanReviewNotes": {
+          "type": "string"
+        },
+        "sadId": {
+          "type": "string",
+          "title": "--- SAD参照 ---"
+        }
+      },
+      "title": "EvaluationSession は評価セッション（1回の評価プロセス全体）。"
+    },
+    "v1EvaluationStatus": {
+      "type": "string",
+      "enum": [
+        "EVALUATION_STATUS_UNSPECIFIED",
+        "EVALUATION_STATUS_PENDING",
+        "EVALUATION_STATUS_PROCESSING",
+        "EVALUATION_STATUS_ANALYZING",
+        "EVALUATION_STATUS_EVALUATING",
+        "EVALUATION_STATUS_COMPLETED",
+        "EVALUATION_STATUS_FAILED",
+        "EVALUATION_STATUS_CANCELLED"
+      ],
+      "default": "EVALUATION_STATUS_UNSPECIFIED",
+      "title": "EvaluationStatus は評価セッションのステータス。"
+    },
+    "v1EvaluationTier": {
+      "type": "string",
+      "enum": [
+        "EVALUATION_TIER_UNSPECIFIED",
+        "EVALUATION_TIER_S",
+        "EVALUATION_TIER_A",
+        "EVALUATION_TIER_B",
+        "EVALUATION_TIER_C",
+        "EVALUATION_TIER_D"
+      ],
+      "default": "EVALUATION_TIER_UNSPECIFIED",
+      "title": "EvaluationTier は評価ティア（等級）。"
+    },
+    "v1GetAdminDashboardResponse": {
+      "type": "object",
+      "properties": {
+        "totalSubmissions": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "evaluatedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pendingApprovalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "approvedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tierDistribution": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "ティア別分布"
+        },
+        "departmentAvgScores": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "部門別平均スコア"
+        }
+      }
+    },
+    "v1GetEvaluationSessionResponse": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "$ref": "#/definitions/v1EvaluationSession"
+        },
+        "codeAnalyses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CodeAnalysisResult"
+          }
+        },
+        "llmEvaluations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LLMEvaluation"
+          }
+        }
+      }
+    },
+    "v1GetSADResponse": {
+      "type": "object",
+      "properties": {
+        "sad": {
+          "$ref": "#/definitions/v1SkillAssessmentData"
+        }
+      }
+    },
+    "v1GradeCriteria": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "grade": {
+          "type": "string"
+        },
+        "gradeGroup": {
+          "$ref": "#/definitions/v1GradeGroup"
+        },
+        "gradeLabel": {
+          "type": "string"
+        },
+        "rubricLevel": {
+          "$ref": "#/definitions/v1RubricLevel"
+        },
+        "minLevel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "maxLevel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weightPerformance": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weightSkill": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "expectations": {
+          "type": "string"
+        },
+        "careerStage": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      },
+      "title": "GradeCriteria は等級別評価基準。"
+    },
+    "v1GradeGroup": {
+      "type": "string",
+      "enum": [
+        "GRADE_GROUP_UNSPECIFIED",
+        "GRADE_GROUP_JUNIOR",
+        "GRADE_GROUP_MIDDLE",
+        "GRADE_GROUP_SENIOR",
+        "GRADE_GROUP_EXPERT",
+        "GRADE_GROUP_EXECUTIVE"
+      ],
+      "default": "GRADE_GROUP_UNSPECIFIED",
+      "description": "- GRADE_GROUP_JUNIOR: G1-G3: 基礎育成期～自律期\n - GRADE_GROUP_MIDDLE: G4-G5: 専門性発揮期\n - GRADE_GROUP_SENIOR: G6-G7: 管理職期/専門職\n - GRADE_GROUP_EXPERT: G8-G9: 部門責任者期\n - GRADE_GROUP_EXECUTIVE: G10-G11: 経営層",
+      "title": "GradeGroup はグレードグループ。"
+    },
+    "v1LLMEvaluation": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "evaluationSessionId": {
+          "type": "string"
+        },
+        "llmProvider": {
+          "type": "string",
+          "title": "LLMプロバイダー/モデル"
+        },
+        "llmModel": {
+          "type": "string"
+        },
+        "evaluationType": {
+          "type": "string"
+        },
+        "skillType": {
+          "$ref": "#/definitions/v1SkillType"
+        },
+        "score": {
+          "type": "number",
+          "format": "double",
+          "title": "スコア"
+        },
+        "confidence": {
+          "type": "number",
+          "format": "double"
+        },
+        "tier": {
+          "$ref": "#/definitions/v1EvaluationTier"
+        },
+        "evaluationCriteria": {
+          "type": "object",
+          "title": "詳細"
+        },
+        "strengths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "explanation": {
+          "type": "string",
+          "title": "XAI（説明可能AI）"
+        },
+        "reasoningChain": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inputTokens": {
+          "type": "integer",
+          "format": "int32",
+          "title": "トークン使用量"
+        },
+        "outputTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "processingTimeMs": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "LLMEvaluation はLLMによる評価結果。"
+    },
+    "v1ListAuditLogsResponse": {
+      "type": "object",
+      "properties": {
+        "logs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EvaluationAuditLog"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListDepartmentCriteriaResponse": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DepartmentCriteria"
+          }
+        }
+      }
+    },
+    "v1ListEvaluationRubricsResponse": {
+      "type": "object",
+      "properties": {
+        "rubrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EvaluationRubric"
+          }
+        }
+      }
+    },
+    "v1ListEvaluationSessionsResponse": {
+      "type": "object",
+      "properties": {
+        "sessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EvaluationSession"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListGradeCriteriaResponse": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GradeCriteria"
+          }
+        }
+      }
+    },
+    "v1ListPromptLogsResponse": {
+      "type": "object",
+      "properties": {
+        "logs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EvaluationPromptLog"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListSADsResponse": {
+      "type": "object",
+      "properties": {
+        "sads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SkillAssessmentData"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ModifyEvaluationResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/sirosimestamanoyav1ApprovalStatus"
+        }
+      }
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1RejectEvaluationResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/sirosimestamanoyav1ApprovalStatus"
+        }
+      }
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1RubricLevel": {
+      "type": "string",
+      "enum": [
+        "RUBRIC_LEVEL_UNSPECIFIED",
+        "RUBRIC_LEVEL_L1",
+        "RUBRIC_LEVEL_L2",
+        "RUBRIC_LEVEL_L3",
+        "RUBRIC_LEVEL_L4",
+        "RUBRIC_LEVEL_L5"
+      ],
+      "default": "RUBRIC_LEVEL_UNSPECIFIED",
+      "title": "RubricLevel は評価ルーブリックの5段階レベル。"
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SkillAssessmentData": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "employeeId": {
+          "type": "string",
+          "title": "社員情報"
+        },
+        "employeeName": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "currentGrade": {
+          "type": "string"
+        },
+        "roleType": {
+          "type": "string"
+        },
+        "evaluationPeriod": {
+          "type": "string",
+          "title": "評価期間"
+        },
+        "evaluationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evaluationSessionId": {
+          "type": "string"
+        },
+        "totalScore": {
+          "type": "number",
+          "format": "double",
+          "title": "総合スコア"
+        },
+        "tier": {
+          "$ref": "#/definitions/v1EvaluationTier"
+        },
+        "hardSkillScore": {
+          "type": "number",
+          "format": "double",
+          "title": "ハード/ソフトスキル"
+        },
+        "hardSkillDetails": {
+          "type": "object"
+        },
+        "softSkillScore": {
+          "type": "number",
+          "format": "double"
+        },
+        "softSkillDetails": {
+          "type": "object"
+        },
+        "skillScores": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "個別スキルスコア"
+        },
+        "strengths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "強み・弱み"
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DevelopmentRecommendation"
+          },
+          "title": "推奨事項"
+        },
+        "recommendedGrade": {
+          "type": "string",
+          "title": "等級推奨"
+        },
+        "gradeChangeRationale": {
+          "type": "string"
+        },
+        "hrSyncStatus": {
+          "type": "string",
+          "title": "HR連携"
+        },
+        "hrSyncedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sadVersion": {
+          "type": "string",
+          "title": "SADバージョン"
+        }
+      },
+      "title": "SkillAssessmentData (SAD) は最終評価出力。"
+    },
+    "v1SkillType": {
+      "type": "string",
+      "enum": [
+        "SKILL_TYPE_UNSPECIFIED",
+        "SKILL_TYPE_HARD",
+        "SKILL_TYPE_SOFT"
+      ],
+      "default": "SKILL_TYPE_UNSPECIFIED",
+      "title": "SkillType はスキルタイプ（ハード/ソフト）。"
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    }
+  }
+}

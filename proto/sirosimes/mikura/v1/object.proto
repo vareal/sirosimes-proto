@@ -3,7 +3,6 @@ syntax = "proto3";
 package sirosimes.mikura.v1;
 
 import "google/api/annotations.proto";
-import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
 

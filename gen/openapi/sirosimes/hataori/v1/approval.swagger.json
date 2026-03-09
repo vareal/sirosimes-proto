@@ -53,6 +53,20 @@
         }
       }
     },
+    "sirosimeshataoriv1ApprovalStatus": {
+      "type": "string",
+      "enum": [
+        "APPROVAL_STATUS_UNSPECIFIED",
+        "APPROVAL_STATUS_PENDING",
+        "APPROVAL_STATUS_APPROVED",
+        "APPROVAL_STATUS_REJECTED",
+        "APPROVAL_STATUS_DELEGATED",
+        "APPROVAL_STATUS_ESCALATED",
+        "APPROVAL_STATUS_TIMED_OUT"
+      ],
+      "default": "APPROVAL_STATUS_UNSPECIFIED",
+      "description": "ApprovalStatus represents the lifecycle state of an approval request.\n\n - APPROVAL_STATUS_PENDING: Approval is awaiting a decision.\n - APPROVAL_STATUS_APPROVED: Approval was granted.\n - APPROVAL_STATUS_REJECTED: Approval was denied.\n - APPROVAL_STATUS_DELEGATED: Approval was delegated to another actor.\n - APPROVAL_STATUS_ESCALATED: Approval was escalated due to policy or timeout.\n - APPROVAL_STATUS_TIMED_OUT: Approval expired without a response."
+    },
     "v1ApprovalRequest": {
       "type": "object",
       "properties": {
@@ -77,7 +91,7 @@
           "description": "Actor ID to whom this request was delegated (if any)."
         },
         "status": {
-          "$ref": "#/definitions/v1ApprovalStatus",
+          "$ref": "#/definitions/sirosimeshataoriv1ApprovalStatus",
           "description": "Current approval status."
         },
         "comment": {
@@ -109,20 +123,6 @@
         }
       },
       "description": "ApprovalRequest represents a pending human decision within a workflow execution."
-    },
-    "v1ApprovalStatus": {
-      "type": "string",
-      "enum": [
-        "APPROVAL_STATUS_UNSPECIFIED",
-        "APPROVAL_STATUS_PENDING",
-        "APPROVAL_STATUS_APPROVED",
-        "APPROVAL_STATUS_REJECTED",
-        "APPROVAL_STATUS_DELEGATED",
-        "APPROVAL_STATUS_ESCALATED",
-        "APPROVAL_STATUS_TIMED_OUT"
-      ],
-      "default": "APPROVAL_STATUS_UNSPECIFIED",
-      "description": "ApprovalStatus represents the lifecycle state of an approval request.\n\n - APPROVAL_STATUS_PENDING: Approval is awaiting a decision.\n - APPROVAL_STATUS_APPROVED: Approval was granted.\n - APPROVAL_STATUS_REJECTED: Approval was denied.\n - APPROVAL_STATUS_DELEGATED: Approval was delegated to another actor.\n - APPROVAL_STATUS_ESCALATED: Approval was escalated due to policy or timeout.\n - APPROVAL_STATUS_TIMED_OUT: Approval expired without a response."
     },
     "v1ApproveApprovalResponse": {
       "type": "object",

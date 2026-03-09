@@ -53,7 +53,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListPipelinesResponse"
+              "$ref": "#/definitions/sirosimesmikurav1ListPipelinesResponse"
             }
           },
           "default": {
@@ -117,7 +117,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreatePipelineResponse"
+              "$ref": "#/definitions/sirosimesmikurav1CreatePipelineResponse"
             }
           },
           "default": {
@@ -134,7 +134,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreatePipelineRequest"
+              "$ref": "#/definitions/sirosimesmikurav1CreatePipelineRequest"
             }
           }
         ],
@@ -228,7 +228,7 @@
         }
       }
     },
-    "v1CreatePipelineRequest": {
+    "sirosimesmikurav1CreatePipelineRequest": {
       "type": "object",
       "properties": {
         "name": {
@@ -249,7 +249,7 @@
       },
       "description": "CreatePipelineRequest is the request for creating a pipeline definition."
     },
-    "v1CreatePipelineResponse": {
+    "sirosimesmikurav1CreatePipelineResponse": {
       "type": "object",
       "properties": {
         "pipeline": {
@@ -257,6 +257,22 @@
         }
       },
       "description": "CreatePipelineResponse is the response after creating a pipeline."
+    },
+    "sirosimesmikurav1ListPipelinesResponse": {
+      "type": "object",
+      "properties": {
+        "pipelines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PipelineDefinition"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListPipelinesResponse is the response for listing pipeline definitions."
     },
     "v1GetPipelineStatusResponse": {
       "type": "object",
@@ -273,22 +289,6 @@
         }
       },
       "description": "GetPipelineStatusResponse is the response containing a pipeline run with steps."
-    },
-    "v1ListPipelinesResponse": {
-      "type": "object",
-      "properties": {
-        "pipelines": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1PipelineDefinition"
-          }
-        },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
-        }
-      },
-      "description": "ListPipelinesResponse is the response for listing pipeline definitions."
     },
     "v1PaginationRequest": {
       "type": "object",

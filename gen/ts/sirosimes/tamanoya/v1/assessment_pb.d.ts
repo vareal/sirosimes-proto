@@ -3,14 +3,72 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
-import type { ActorRef } from "../../common/v1/actor_pb.js";
 import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
- * AssessmentType classifies the type of assessment.
+ * PeriodStatus はアセスメント期間のステータス。
+ *
+ * @generated from enum sirosimes.tamanoya.v1.PeriodStatus
+ */
+export declare enum PeriodStatus {
+  /**
+   * @generated from enum value: PERIOD_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: PERIOD_STATUS_NOT_STARTED = 1;
+   */
+  NOT_STARTED = 1,
+
+  /**
+   * @generated from enum value: PERIOD_STATUS_IN_PROGRESS = 2;
+   */
+  IN_PROGRESS = 2,
+
+  /**
+   * @generated from enum value: PERIOD_STATUS_COMPLETED = 3;
+   */
+  COMPLETED = 3,
+}
+
+/**
+ * AssessmentCategory はアセスメントのカテゴリ。
+ *
+ * @generated from enum sirosimes.tamanoya.v1.AssessmentCategory
+ */
+export declare enum AssessmentCategory {
+  /**
+   * @generated from enum value: ASSESSMENT_CATEGORY_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ASSESSMENT_CATEGORY_TECHNICAL = 1;
+   */
+  TECHNICAL = 1,
+
+  /**
+   * @generated from enum value: ASSESSMENT_CATEGORY_LOGICAL = 2;
+   */
+  LOGICAL = 2,
+
+  /**
+   * @generated from enum value: ASSESSMENT_CATEGORY_BUSINESS = 3;
+   */
+  BUSINESS = 3,
+
+  /**
+   * @generated from enum value: ASSESSMENT_CATEGORY_PRESENTATION = 4;
+   */
+  PRESENTATION = 4,
+}
+
+/**
+ * AssessmentType はアセスメントの種別。
  *
  * @generated from enum sirosimes.tamanoya.v1.AssessmentType
  */
@@ -21,60 +79,43 @@ export declare enum AssessmentType {
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: ASSESSMENT_TYPE_QUIZ = 1;
+   * @generated from enum value: ASSESSMENT_TYPE_TECHNICAL_HARD = 1;
    */
-  QUIZ = 1,
+  TECHNICAL_HARD = 1,
 
   /**
-   * @generated from enum value: ASSESSMENT_TYPE_PRACTICAL = 2;
+   * @generated from enum value: ASSESSMENT_TYPE_TECHNICAL_SOFT = 2;
    */
-  PRACTICAL = 2,
+  TECHNICAL_SOFT = 2,
 
   /**
-   * @generated from enum value: ASSESSMENT_TYPE_PEER_REVIEW = 3;
+   * @generated from enum value: ASSESSMENT_TYPE_LOGICAL_THINKING = 3;
    */
-  PEER_REVIEW = 3,
+  LOGICAL_THINKING = 3,
 
   /**
-   * @generated from enum value: ASSESSMENT_TYPE_SELF_ASSESSMENT = 4;
+   * @generated from enum value: ASSESSMENT_TYPE_BUSINESS_SKILL = 4;
    */
-  SELF_ASSESSMENT = 4,
+  BUSINESS_SKILL = 4,
 
   /**
-   * @generated from enum value: ASSESSMENT_TYPE_CERTIFICATION = 5;
+   * @generated from enum value: ASSESSMENT_TYPE_MANAGEMENT_HARD = 5;
    */
-  CERTIFICATION = 5,
+  MANAGEMENT_HARD = 5,
+
+  /**
+   * @generated from enum value: ASSESSMENT_TYPE_SALES_HARD = 6;
+   */
+  SALES_HARD = 6,
+
+  /**
+   * @generated from enum value: ASSESSMENT_TYPE_PRESENTATION_SKILL = 7;
+   */
+  PRESENTATION_SKILL = 7,
 }
 
 /**
- * AssessmentStatus represents the lifecycle state of an assessment.
- *
- * @generated from enum sirosimes.tamanoya.v1.AssessmentStatus
- */
-export declare enum AssessmentStatus {
-  /**
-   * @generated from enum value: ASSESSMENT_STATUS_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: ASSESSMENT_STATUS_DRAFT = 1;
-   */
-  DRAFT = 1,
-
-  /**
-   * @generated from enum value: ASSESSMENT_STATUS_PUBLISHED = 2;
-   */
-  PUBLISHED = 2,
-
-  /**
-   * @generated from enum value: ASSESSMENT_STATUS_ARCHIVED = 3;
-   */
-  ARCHIVED = 3,
-}
-
-/**
- * SubmissionStatus represents the state of a submission.
+ * SubmissionStatus は提出物のステータス。
  *
  * @generated from enum sirosimes.tamanoya.v1.SubmissionStatus
  */
@@ -85,840 +126,752 @@ export declare enum SubmissionStatus {
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: SUBMISSION_STATUS_NOT_STARTED = 1;
+   * @generated from enum value: SUBMISSION_STATUS_IN_PROGRESS = 1;
    */
-  NOT_STARTED = 1,
+  IN_PROGRESS = 1,
 
   /**
-   * @generated from enum value: SUBMISSION_STATUS_IN_PROGRESS = 2;
+   * @generated from enum value: SUBMISSION_STATUS_SUBMITTED = 2;
    */
-  IN_PROGRESS = 2,
+  SUBMITTED = 2,
 
   /**
-   * @generated from enum value: SUBMISSION_STATUS_SUBMITTED = 3;
+   * @generated from enum value: SUBMISSION_STATUS_EVALUATING = 3;
    */
-  SUBMITTED = 3,
+  EVALUATING = 3,
 
   /**
-   * @generated from enum value: SUBMISSION_STATUS_GRADED = 4;
+   * @generated from enum value: SUBMISSION_STATUS_EVALUATED = 4;
    */
-  GRADED = 4,
+  EVALUATED = 4,
+
+  /**
+   * @generated from enum value: SUBMISSION_STATUS_REVIEWED = 5;
+   */
+  REVIEWED = 5,
 }
 
 /**
- * QuestionType classifies the type of question.
+ * AssessmentPeriod はアセスメント期間を表す。
  *
- * @generated from enum sirosimes.tamanoya.v1.QuestionType
+ * @generated from message sirosimes.tamanoya.v1.AssessmentPeriod
  */
-export declare enum QuestionType {
+export declare class AssessmentPeriod extends Message<AssessmentPeriod> {
   /**
-   * @generated from enum value: QUESTION_TYPE_UNSPECIFIED = 0;
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
    */
-  UNSPECIFIED = 0,
+  metadata?: ResourceMetadata;
 
   /**
-   * @generated from enum value: QUESTION_TYPE_MULTIPLE_CHOICE = 1;
+   * 期間コード（例: "2025-h1", "practice"）
+   *
+   * @generated from field: string code = 2;
    */
-  MULTIPLE_CHOICE = 1,
+  code: string;
 
   /**
-   * @generated from enum value: QUESTION_TYPE_FREE_TEXT = 2;
+   * 期間名（例: "2025年上期"）
+   *
+   * @generated from field: string name = 3;
    */
-  FREE_TEXT = 2,
+  name: string;
 
   /**
-   * @generated from enum value: QUESTION_TYPE_CODE = 3;
+   * 開始日
+   *
+   * @generated from field: string start_date = 4;
    */
-  CODE = 3,
+  startDate: string;
 
   /**
-   * @generated from enum value: QUESTION_TYPE_TRUE_FALSE = 4;
+   * 終了日
+   *
+   * @generated from field: string end_date = 5;
    */
-  TRUE_FALSE = 4,
+  endDate: string;
 
   /**
-   * @generated from enum value: QUESTION_TYPE_RATING = 5;
+   * 提出期限
+   *
+   * @generated from field: string deadline = 6;
    */
-  RATING = 5,
+  deadline: string;
+
+  /**
+   * ステータス
+   *
+   * @generated from field: sirosimes.tamanoya.v1.PeriodStatus status = 7;
+   */
+  status: PeriodStatus;
+
+  /**
+   * 練習モードを許可するか
+   *
+   * @generated from field: bool allow_practice = 8;
+   */
+  allowPractice: boolean;
+
+  constructor(data?: PartialMessage<AssessmentPeriod>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.AssessmentPeriod";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssessmentPeriod;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AssessmentPeriod;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AssessmentPeriod;
+
+  static equals(a: AssessmentPeriod | PlainMessage<AssessmentPeriod> | undefined, b: AssessmentPeriod | PlainMessage<AssessmentPeriod> | undefined): boolean;
 }
 
 /**
- * Question represents a single question in an assessment.
+ * AssessmentSubmission はアセスメント提出物。
  *
- * @generated from message sirosimes.tamanoya.v1.Question
+ * @generated from message sirosimes.tamanoya.v1.AssessmentSubmission
  */
-export declare class Question extends Message<Question> {
+export declare class AssessmentSubmission extends Message<AssessmentSubmission> {
+  /**
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   */
+  metadata?: ResourceMetadata;
+
+  /**
+   * セッションID
+   *
+   * @generated from field: string session_id = 2;
+   */
+  sessionId: string;
+
+  /**
+   * 受験者ID
+   *
+   * @generated from field: string user_id = 3;
+   */
+  userId: string;
+
+  /**
+   * アセスメント期間ID
+   *
+   * @generated from field: string period_id = 4;
+   */
+  periodId: string;
+
+  /**
+   * カテゴリ
+   *
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentCategory category = 5;
+   */
+  category: AssessmentCategory;
+
+  /**
+   * アセスメント種別
+   *
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentType assessment_type = 6;
+   */
+  assessmentType: AssessmentType;
+
+  /**
+   * 受験者の部門
+   *
+   * @generated from field: string department = 7;
+   */
+  department: string;
+
+  /**
+   * 受験者の等級
+   *
+   * @generated from field: string grade = 8;
+   */
+  grade: string;
+
+  /**
+   * --- 時間情報 ---
+   *
+   * @generated from field: google.protobuf.Timestamp started_at = 9;
+   */
+  startedAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp submitted_at = 10;
+   */
+  submittedAt?: Timestamp;
+
+  /**
+   * @generated from field: int32 time_spent_seconds = 11;
+   */
+  timeSpentSeconds: number;
+
+  /**
+   * 残り時間（自動保存用）
+   *
+   * @generated from field: int32 time_remaining_seconds = 12;
+   */
+  timeRemainingSeconds: number;
+
+  /**
+   * 現在の問題インデックス（0始まり）
+   *
+   * @generated from field: int32 current_question_index = 13;
+   */
+  currentQuestionIndex: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp auto_saved_at = 14;
+   */
+  autoSavedAt?: Timestamp;
+
+  /**
+   * --- 状態 ---
+   *
+   * @generated from field: sirosimes.tamanoya.v1.SubmissionStatus status = 15;
+   */
+  status: SubmissionStatus;
+
+  /**
+   * --- スコア ---
+   *
+   * @generated from field: double total_score = 16;
+   */
+  totalScore: number;
+
+  /**
+   * @generated from field: double max_score = 17;
+   */
+  maxScore: number;
+
+  /**
+   * @generated from field: double percentage_score = 18;
+   */
+  percentageScore: number;
+
+  /**
+   * 評価ティア（S/A/B/C/D）
+   *
+   * @generated from field: string evaluation_tier = 19;
+   */
+  evaluationTier: string;
+
+  /**
+   * --- 評価詳細 ---
+   *
+   * @generated from field: google.protobuf.Struct evaluation_result = 20;
+   */
+  evaluationResult?: Struct;
+
+  /**
+   * @generated from field: string feedback = 21;
+   */
+  feedback: string;
+
+  /**
+   * @generated from field: bool is_demo = 22;
+   */
+  isDemo: boolean;
+
+  /**
+   * --- 回答一覧 ---
+   *
+   * @generated from field: repeated sirosimes.tamanoya.v1.AssessmentAnswer answers = 23;
+   */
+  answers: AssessmentAnswer[];
+
+  constructor(data?: PartialMessage<AssessmentSubmission>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.AssessmentSubmission";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssessmentSubmission;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AssessmentSubmission;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AssessmentSubmission;
+
+  static equals(a: AssessmentSubmission | PlainMessage<AssessmentSubmission> | undefined, b: AssessmentSubmission | PlainMessage<AssessmentSubmission> | undefined): boolean;
+}
+
+/**
+ * AssessmentAnswer はアセスメントの個別回答。
+ *
+ * @generated from message sirosimes.tamanoya.v1.AssessmentAnswer
+ */
+export declare class AssessmentAnswer extends Message<AssessmentAnswer> {
+  /**
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   */
+  metadata?: ResourceMetadata;
+
+  /**
+   * @generated from field: string submission_id = 2;
+   */
+  submissionId: string;
+
+  /**
+   * 問題バンクID（DBの問題から出題時）
+   *
+   * @generated from field: string question_id = 3;
+   */
+  questionId: string;
+
+  /**
+   * レガシー問題参照
+   *
+   * @generated from field: string question_ref = 4;
+   */
+  questionRef: string;
+
+  /**
+   * 問題タイプ
+   *
+   * @generated from field: string question_type = 5;
+   */
+  questionType: string;
+
+  /**
+   * @generated from field: string question_title = 6;
+   */
+  questionTitle: string;
+
+  /**
+   * --- 回答内容 ---
+   *
+   * @generated from field: string answer_text = 7;
+   */
+  answerText: string;
+
+  /**
+   * @generated from field: string answer_code = 8;
+   */
+  answerCode: string;
+
+  /**
+   * @generated from field: repeated string selected_options = 9;
+   */
+  selectedOptions: string[];
+
+  /**
+   * @generated from field: int32 time_spent_seconds = 10;
+   */
+  timeSpentSeconds: number;
+
+  /**
+   * --- 評価 ---
+   *
+   * @generated from field: double score = 11;
+   */
+  score: number;
+
+  /**
+   * @generated from field: double max_score = 12;
+   */
+  maxScore: number;
+
+  /**
+   * @generated from field: bool is_correct = 13;
+   */
+  isCorrect: boolean;
+
+  /**
+   * @generated from field: google.protobuf.Struct rubric_scores = 14;
+   */
+  rubricScores?: Struct;
+
+  /**
+   * @generated from field: string feedback = 15;
+   */
+  feedback: string;
+
+  constructor(data?: PartialMessage<AssessmentAnswer>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.AssessmentAnswer";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AssessmentAnswer;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AssessmentAnswer;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AssessmentAnswer;
+
+  static equals(a: AssessmentAnswer | PlainMessage<AssessmentAnswer> | undefined, b: AssessmentAnswer | PlainMessage<AssessmentAnswer> | undefined): boolean;
+}
+
+/**
+ * QuestionSettings はアセスメント種別ごとの出題設定。
+ *
+ * @generated from message sirosimes.tamanoya.v1.QuestionSettings
+ */
+export declare class QuestionSettings extends Message<QuestionSettings> {
+  /**
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   */
+  metadata?: ResourceMetadata;
+
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentType assessment_type = 2;
+   */
+  assessmentType: AssessmentType;
+
+  /**
+   * 対象グレード（空の場合は全グレード共通）
+   *
+   * @generated from field: string target_grade = 3;
+   */
+  targetGrade: string;
+
+  /**
+   * @generated from field: int32 required_count = 4;
+   */
+  requiredCount: number;
+
+  /**
+   * @generated from field: bool is_enabled = 5;
+   */
+  isEnabled: boolean;
+
+  /**
+   * @generated from field: string min_difficulty = 6;
+   */
+  minDifficulty: string;
+
+  /**
+   * @generated from field: string max_difficulty = 7;
+   */
+  maxDifficulty: string;
+
+  /**
+   * @generated from field: int32 time_limit_minutes = 8;
+   */
+  timeLimitMinutes: number;
+
+  constructor(data?: PartialMessage<QuestionSettings>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.QuestionSettings";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): QuestionSettings;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): QuestionSettings;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): QuestionSettings;
+
+  static equals(a: QuestionSettings | PlainMessage<QuestionSettings> | undefined, b: QuestionSettings | PlainMessage<QuestionSettings> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetAssessmentPeriodRequest
+ */
+export declare class GetAssessmentPeriodRequest extends Message<GetAssessmentPeriodRequest> {
   /**
    * @generated from field: string id = 1;
    */
   id: string;
 
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.QuestionType type = 2;
-   */
-  type: QuestionType;
-
-  /**
-   * @generated from field: string content = 3;
-   */
-  content: string;
-
-  /**
-   * @generated from field: repeated string options = 4;
-   */
-  options: string[];
-
-  /**
-   * @generated from field: string correct_answer = 5;
-   */
-  correctAnswer: string;
-
-  /**
-   * @generated from field: int32 points = 6;
-   */
-  points: number;
-
-  /**
-   * @generated from field: int32 order = 7;
-   */
-  order: number;
-
-  /**
-   * @generated from field: string explanation = 8;
-   */
-  explanation: string;
-
-  constructor(data?: PartialMessage<Question>);
+  constructor(data?: PartialMessage<GetAssessmentPeriodRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.Question";
+  static readonly typeName = "sirosimes.tamanoya.v1.GetAssessmentPeriodRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Question;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAssessmentPeriodRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Question;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAssessmentPeriodRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Question;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAssessmentPeriodRequest;
 
-  static equals(a: Question | PlainMessage<Question> | undefined, b: Question | PlainMessage<Question> | undefined): boolean;
+  static equals(a: GetAssessmentPeriodRequest | PlainMessage<GetAssessmentPeriodRequest> | undefined, b: GetAssessmentPeriodRequest | PlainMessage<GetAssessmentPeriodRequest> | undefined): boolean;
 }
 
 /**
- * Assessment represents a skill evaluation.
- *
- * @generated from message sirosimes.tamanoya.v1.Assessment
+ * @generated from message sirosimes.tamanoya.v1.GetAssessmentPeriodResponse
  */
-export declare class Assessment extends Message<Assessment> {
+export declare class GetAssessmentPeriodResponse extends Message<GetAssessmentPeriodResponse> {
   /**
-   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentPeriod period = 1;
    */
-  metadata?: ResourceMetadata;
+  period?: AssessmentPeriod;
 
-  /**
-   * @generated from field: string title = 2;
-   */
-  title: string;
-
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
-
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.AssessmentType type = 4;
-   */
-  type: AssessmentType;
-
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.AssessmentStatus status = 5;
-   */
-  status: AssessmentStatus;
-
-  /**
-   * @generated from field: string skill_id = 6;
-   */
-  skillId: string;
-
-  /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Question questions = 7;
-   */
-  questions: Question[];
-
-  /**
-   * @generated from field: int32 passing_score = 8;
-   */
-  passingScore: number;
-
-  /**
-   * @generated from field: int32 time_limit_minutes = 9;
-   */
-  timeLimitMinutes: number;
-
-  /**
-   * @generated from field: int32 max_attempts = 10;
-   */
-  maxAttempts: number;
-
-  /**
-   * @generated from field: string created_by_id = 11;
-   */
-  createdById: string;
-
-  constructor(data?: PartialMessage<Assessment>);
+  constructor(data?: PartialMessage<GetAssessmentPeriodResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.Assessment";
+  static readonly typeName = "sirosimes.tamanoya.v1.GetAssessmentPeriodResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Assessment;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAssessmentPeriodResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Assessment;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAssessmentPeriodResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Assessment;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAssessmentPeriodResponse;
 
-  static equals(a: Assessment | PlainMessage<Assessment> | undefined, b: Assessment | PlainMessage<Assessment> | undefined): boolean;
+  static equals(a: GetAssessmentPeriodResponse | PlainMessage<GetAssessmentPeriodResponse> | undefined, b: GetAssessmentPeriodResponse | PlainMessage<GetAssessmentPeriodResponse> | undefined): boolean;
 }
 
 /**
- * Answer represents a learner's answer to a question.
- *
- * @generated from message sirosimes.tamanoya.v1.Answer
+ * @generated from message sirosimes.tamanoya.v1.ListAssessmentPeriodsRequest
  */
-export declare class Answer extends Message<Answer> {
-  /**
-   * @generated from field: string question_id = 1;
-   */
-  questionId: string;
-
-  /**
-   * @generated from field: string answer = 2;
-   */
-  answer: string;
-
-  /**
-   * @generated from field: int32 score = 3;
-   */
-  score: number;
-
-  /**
-   * @generated from field: string feedback = 4;
-   */
-  feedback: string;
-
-  constructor(data?: PartialMessage<Answer>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.Answer";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Answer;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Answer;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Answer;
-
-  static equals(a: Answer | PlainMessage<Answer> | undefined, b: Answer | PlainMessage<Answer> | undefined): boolean;
-}
-
-/**
- * Submission represents a learner's assessment attempt.
- *
- * @generated from message sirosimes.tamanoya.v1.Submission
- */
-export declare class Submission extends Message<Submission> {
-  /**
-   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
-   */
-  metadata?: ResourceMetadata;
-
-  /**
-   * @generated from field: string assessment_id = 2;
-   */
-  assessmentId: string;
-
-  /**
-   * @generated from field: string learner_id = 3;
-   */
-  learnerId: string;
-
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.SubmissionStatus status = 4;
-   */
-  status: SubmissionStatus;
-
-  /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Answer answers = 5;
-   */
-  answers: Answer[];
-
-  /**
-   * @generated from field: int32 total_score = 6;
-   */
-  totalScore: number;
-
-  /**
-   * @generated from field: int32 max_score = 7;
-   */
-  maxScore: number;
-
-  /**
-   * @generated from field: bool passed = 8;
-   */
-  passed: boolean;
-
-  /**
-   * @generated from field: int32 attempt_number = 9;
-   */
-  attemptNumber: number;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp started_at = 10;
-   */
-  startedAt?: Timestamp;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp submitted_at = 11;
-   */
-  submittedAt?: Timestamp;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp graded_at = 12;
-   */
-  gradedAt?: Timestamp;
-
-  /**
-   * @generated from field: string graded_by_id = 13;
-   */
-  gradedById: string;
-
-  constructor(data?: PartialMessage<Submission>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.Submission";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Submission;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Submission;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Submission;
-
-  static equals(a: Submission | PlainMessage<Submission> | undefined, b: Submission | PlainMessage<Submission> | undefined): boolean;
-}
-
-/**
- * SubmissionDetail bundles a submission with resolved actor references.
- *
- * @generated from message sirosimes.tamanoya.v1.SubmissionDetail
- */
-export declare class SubmissionDetail extends Message<SubmissionDetail> {
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.Submission submission = 1;
-   */
-  submission?: Submission;
-
-  /**
-   * @generated from field: sirosimes.common.v1.ActorRef learner = 2;
-   */
-  learner?: ActorRef;
-
-  /**
-   * @generated from field: sirosimes.common.v1.ActorRef graded_by = 3;
-   */
-  gradedBy?: ActorRef;
-
-  constructor(data?: PartialMessage<SubmissionDetail>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.SubmissionDetail";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmissionDetail;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmissionDetail;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmissionDetail;
-
-  static equals(a: SubmissionDetail | PlainMessage<SubmissionDetail> | undefined, b: SubmissionDetail | PlainMessage<SubmissionDetail> | undefined): boolean;
-}
-
-/**
- * ListAssessmentsRequest is the request for listing assessments.
- *
- * @generated from message sirosimes.tamanoya.v1.ListAssessmentsRequest
- */
-export declare class ListAssessmentsRequest extends Message<ListAssessmentsRequest> {
+export declare class ListAssessmentPeriodsRequest extends Message<ListAssessmentPeriodsRequest> {
   /**
    * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
    */
   pagination?: PaginationRequest;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.AssessmentType type = 2;
+   * @generated from field: sirosimes.tamanoya.v1.PeriodStatus status = 2;
    */
-  type: AssessmentType;
+  status: PeriodStatus;
 
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.AssessmentStatus status = 3;
-   */
-  status: AssessmentStatus;
-
-  /**
-   * @generated from field: string skill_id = 4;
-   */
-  skillId: string;
-
-  /**
-   * @generated from field: string search = 5;
-   */
-  search: string;
-
-  constructor(data?: PartialMessage<ListAssessmentsRequest>);
+  constructor(data?: PartialMessage<ListAssessmentPeriodsRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.ListAssessmentsRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.ListAssessmentPeriodsRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAssessmentsRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAssessmentPeriodsRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAssessmentsRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAssessmentPeriodsRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAssessmentsRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAssessmentPeriodsRequest;
 
-  static equals(a: ListAssessmentsRequest | PlainMessage<ListAssessmentsRequest> | undefined, b: ListAssessmentsRequest | PlainMessage<ListAssessmentsRequest> | undefined): boolean;
+  static equals(a: ListAssessmentPeriodsRequest | PlainMessage<ListAssessmentPeriodsRequest> | undefined, b: ListAssessmentPeriodsRequest | PlainMessage<ListAssessmentPeriodsRequest> | undefined): boolean;
 }
 
 /**
- * ListAssessmentsResponse is the response for listing assessments.
- *
- * @generated from message sirosimes.tamanoya.v1.ListAssessmentsResponse
+ * @generated from message sirosimes.tamanoya.v1.ListAssessmentPeriodsResponse
  */
-export declare class ListAssessmentsResponse extends Message<ListAssessmentsResponse> {
+export declare class ListAssessmentPeriodsResponse extends Message<ListAssessmentPeriodsResponse> {
   /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Assessment assessments = 1;
+   * @generated from field: repeated sirosimes.tamanoya.v1.AssessmentPeriod periods = 1;
    */
-  assessments: Assessment[];
+  periods: AssessmentPeriod[];
 
   /**
    * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
    */
   pagination?: PaginationResponse;
 
-  constructor(data?: PartialMessage<ListAssessmentsResponse>);
+  constructor(data?: PartialMessage<ListAssessmentPeriodsResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.ListAssessmentsResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.ListAssessmentPeriodsResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAssessmentsResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAssessmentPeriodsResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAssessmentsResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAssessmentPeriodsResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAssessmentsResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAssessmentPeriodsResponse;
 
-  static equals(a: ListAssessmentsResponse | PlainMessage<ListAssessmentsResponse> | undefined, b: ListAssessmentsResponse | PlainMessage<ListAssessmentsResponse> | undefined): boolean;
+  static equals(a: ListAssessmentPeriodsResponse | PlainMessage<ListAssessmentPeriodsResponse> | undefined, b: ListAssessmentPeriodsResponse | PlainMessage<ListAssessmentPeriodsResponse> | undefined): boolean;
 }
 
 /**
- * GetAssessmentRequest is the request for retrieving a single assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.GetAssessmentRequest
+ * @generated from message sirosimes.tamanoya.v1.CreateAssessmentPeriodRequest
  */
-export declare class GetAssessmentRequest extends Message<GetAssessmentRequest> {
+export declare class CreateAssessmentPeriodRequest extends Message<CreateAssessmentPeriodRequest> {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string code = 1;
    */
-  id: string;
+  code: string;
 
-  constructor(data?: PartialMessage<GetAssessmentRequest>);
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string start_date = 3;
+   */
+  startDate: string;
+
+  /**
+   * @generated from field: string end_date = 4;
+   */
+  endDate: string;
+
+  /**
+   * @generated from field: string deadline = 5;
+   */
+  deadline: string;
+
+  /**
+   * @generated from field: bool allow_practice = 6;
+   */
+  allowPractice: boolean;
+
+  constructor(data?: PartialMessage<CreateAssessmentPeriodRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GetAssessmentRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.CreateAssessmentPeriodRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAssessmentRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAssessmentPeriodRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAssessmentRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAssessmentPeriodRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAssessmentRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAssessmentPeriodRequest;
 
-  static equals(a: GetAssessmentRequest | PlainMessage<GetAssessmentRequest> | undefined, b: GetAssessmentRequest | PlainMessage<GetAssessmentRequest> | undefined): boolean;
+  static equals(a: CreateAssessmentPeriodRequest | PlainMessage<CreateAssessmentPeriodRequest> | undefined, b: CreateAssessmentPeriodRequest | PlainMessage<CreateAssessmentPeriodRequest> | undefined): boolean;
 }
 
 /**
- * GetAssessmentResponse is the response containing a single assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.GetAssessmentResponse
+ * @generated from message sirosimes.tamanoya.v1.CreateAssessmentPeriodResponse
  */
-export declare class GetAssessmentResponse extends Message<GetAssessmentResponse> {
+export declare class CreateAssessmentPeriodResponse extends Message<CreateAssessmentPeriodResponse> {
   /**
-   * @generated from field: sirosimes.tamanoya.v1.Assessment assessment = 1;
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentPeriod period = 1;
    */
-  assessment?: Assessment;
+  period?: AssessmentPeriod;
 
-  constructor(data?: PartialMessage<GetAssessmentResponse>);
+  constructor(data?: PartialMessage<CreateAssessmentPeriodResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GetAssessmentResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.CreateAssessmentPeriodResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAssessmentResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAssessmentPeriodResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAssessmentResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAssessmentPeriodResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAssessmentResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAssessmentPeriodResponse;
 
-  static equals(a: GetAssessmentResponse | PlainMessage<GetAssessmentResponse> | undefined, b: GetAssessmentResponse | PlainMessage<GetAssessmentResponse> | undefined): boolean;
+  static equals(a: CreateAssessmentPeriodResponse | PlainMessage<CreateAssessmentPeriodResponse> | undefined, b: CreateAssessmentPeriodResponse | PlainMessage<CreateAssessmentPeriodResponse> | undefined): boolean;
 }
 
 /**
- * CreateAssessmentRequest is the request for creating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateAssessmentRequest
+ * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentPeriodRequest
  */
-export declare class CreateAssessmentRequest extends Message<CreateAssessmentRequest> {
-  /**
-   * @generated from field: string title = 1;
-   */
-  title: string;
-
-  /**
-   * @generated from field: string description = 2;
-   */
-  description: string;
-
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.AssessmentType type = 3;
-   */
-  type: AssessmentType;
-
-  /**
-   * @generated from field: string skill_id = 4;
-   */
-  skillId: string;
-
-  /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Question questions = 5;
-   */
-  questions: Question[];
-
-  /**
-   * @generated from field: int32 passing_score = 6;
-   */
-  passingScore: number;
-
-  /**
-   * @generated from field: int32 time_limit_minutes = 7;
-   */
-  timeLimitMinutes: number;
-
-  /**
-   * @generated from field: int32 max_attempts = 8;
-   */
-  maxAttempts: number;
-
-  /**
-   * @generated from field: string created_by_id = 9;
-   */
-  createdById: string;
-
-  constructor(data?: PartialMessage<CreateAssessmentRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.CreateAssessmentRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAssessmentRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAssessmentRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAssessmentRequest;
-
-  static equals(a: CreateAssessmentRequest | PlainMessage<CreateAssessmentRequest> | undefined, b: CreateAssessmentRequest | PlainMessage<CreateAssessmentRequest> | undefined): boolean;
-}
-
-/**
- * CreateAssessmentResponse is the response after creating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateAssessmentResponse
- */
-export declare class CreateAssessmentResponse extends Message<CreateAssessmentResponse> {
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.Assessment assessment = 1;
-   */
-  assessment?: Assessment;
-
-  constructor(data?: PartialMessage<CreateAssessmentResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.CreateAssessmentResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAssessmentResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAssessmentResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAssessmentResponse;
-
-  static equals(a: CreateAssessmentResponse | PlainMessage<CreateAssessmentResponse> | undefined, b: CreateAssessmentResponse | PlainMessage<CreateAssessmentResponse> | undefined): boolean;
-}
-
-/**
- * UpdateAssessmentRequest is the request for updating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentRequest
- */
-export declare class UpdateAssessmentRequest extends Message<UpdateAssessmentRequest> {
+export declare class UpdateAssessmentPeriodRequest extends Message<UpdateAssessmentPeriodRequest> {
   /**
    * @generated from field: string id = 1;
    */
   id: string;
 
   /**
-   * @generated from field: string title = 2;
+   * @generated from field: google.protobuf.FieldMask update_mask = 2;
    */
-  title: string;
+  updateMask?: FieldMask;
 
   /**
-   * @generated from field: string description = 3;
+   * @generated from field: string name = 3;
    */
-  description: string;
+  name: string;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.AssessmentStatus status = 4;
+   * @generated from field: string start_date = 4;
    */
-  status: AssessmentStatus;
+  startDate: string;
 
   /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Question questions = 5;
+   * @generated from field: string end_date = 5;
    */
-  questions: Question[];
+  endDate: string;
 
   /**
-   * @generated from field: int32 passing_score = 6;
+   * @generated from field: string deadline = 6;
    */
-  passingScore: number;
+  deadline: string;
 
   /**
-   * @generated from field: int32 time_limit_minutes = 7;
+   * @generated from field: sirosimes.tamanoya.v1.PeriodStatus status = 7;
    */
-  timeLimitMinutes: number;
+  status: PeriodStatus;
 
-  constructor(data?: PartialMessage<UpdateAssessmentRequest>);
+  /**
+   * @generated from field: bool allow_practice = 8;
+   */
+  allowPractice: boolean;
+
+  constructor(data?: PartialMessage<UpdateAssessmentPeriodRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.UpdateAssessmentRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateAssessmentPeriodRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAssessmentRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAssessmentPeriodRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAssessmentRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAssessmentPeriodRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAssessmentRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAssessmentPeriodRequest;
 
-  static equals(a: UpdateAssessmentRequest | PlainMessage<UpdateAssessmentRequest> | undefined, b: UpdateAssessmentRequest | PlainMessage<UpdateAssessmentRequest> | undefined): boolean;
+  static equals(a: UpdateAssessmentPeriodRequest | PlainMessage<UpdateAssessmentPeriodRequest> | undefined, b: UpdateAssessmentPeriodRequest | PlainMessage<UpdateAssessmentPeriodRequest> | undefined): boolean;
 }
 
 /**
- * UpdateAssessmentResponse is the response after updating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentResponse
+ * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentPeriodResponse
  */
-export declare class UpdateAssessmentResponse extends Message<UpdateAssessmentResponse> {
+export declare class UpdateAssessmentPeriodResponse extends Message<UpdateAssessmentPeriodResponse> {
   /**
-   * @generated from field: sirosimes.tamanoya.v1.Assessment assessment = 1;
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentPeriod period = 1;
    */
-  assessment?: Assessment;
+  period?: AssessmentPeriod;
 
-  constructor(data?: PartialMessage<UpdateAssessmentResponse>);
+  constructor(data?: PartialMessage<UpdateAssessmentPeriodResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.UpdateAssessmentResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateAssessmentPeriodResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAssessmentResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAssessmentPeriodResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAssessmentResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAssessmentPeriodResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAssessmentResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAssessmentPeriodResponse;
 
-  static equals(a: UpdateAssessmentResponse | PlainMessage<UpdateAssessmentResponse> | undefined, b: UpdateAssessmentResponse | PlainMessage<UpdateAssessmentResponse> | undefined): boolean;
+  static equals(a: UpdateAssessmentPeriodResponse | PlainMessage<UpdateAssessmentPeriodResponse> | undefined, b: UpdateAssessmentPeriodResponse | PlainMessage<UpdateAssessmentPeriodResponse> | undefined): boolean;
 }
 
 /**
- * DeleteAssessmentRequest is the request for deleting an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteAssessmentRequest
+ * @generated from message sirosimes.tamanoya.v1.GetSubmissionRequest
  */
-export declare class DeleteAssessmentRequest extends Message<DeleteAssessmentRequest> {
+export declare class GetSubmissionRequest extends Message<GetSubmissionRequest> {
   /**
    * @generated from field: string id = 1;
    */
   id: string;
 
-  constructor(data?: PartialMessage<DeleteAssessmentRequest>);
+  constructor(data?: PartialMessage<GetSubmissionRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.DeleteAssessmentRequest";
+  static readonly typeName = "sirosimes.tamanoya.v1.GetSubmissionRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAssessmentRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSubmissionRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAssessmentRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSubmissionRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAssessmentRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSubmissionRequest;
 
-  static equals(a: DeleteAssessmentRequest | PlainMessage<DeleteAssessmentRequest> | undefined, b: DeleteAssessmentRequest | PlainMessage<DeleteAssessmentRequest> | undefined): boolean;
+  static equals(a: GetSubmissionRequest | PlainMessage<GetSubmissionRequest> | undefined, b: GetSubmissionRequest | PlainMessage<GetSubmissionRequest> | undefined): boolean;
 }
 
 /**
- * DeleteAssessmentResponse is the response after deleting an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteAssessmentResponse
+ * @generated from message sirosimes.tamanoya.v1.GetSubmissionResponse
  */
-export declare class DeleteAssessmentResponse extends Message<DeleteAssessmentResponse> {
-  constructor(data?: PartialMessage<DeleteAssessmentResponse>);
+export declare class GetSubmissionResponse extends Message<GetSubmissionResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentSubmission submission = 1;
+   */
+  submission?: AssessmentSubmission;
+
+  constructor(data?: PartialMessage<GetSubmissionResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.DeleteAssessmentResponse";
+  static readonly typeName = "sirosimes.tamanoya.v1.GetSubmissionResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAssessmentResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSubmissionResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAssessmentResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSubmissionResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAssessmentResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSubmissionResponse;
 
-  static equals(a: DeleteAssessmentResponse | PlainMessage<DeleteAssessmentResponse> | undefined, b: DeleteAssessmentResponse | PlainMessage<DeleteAssessmentResponse> | undefined): boolean;
+  static equals(a: GetSubmissionResponse | PlainMessage<GetSubmissionResponse> | undefined, b: GetSubmissionResponse | PlainMessage<GetSubmissionResponse> | undefined): boolean;
 }
 
 /**
- * SubmitAssessmentRequest is the request for submitting answers.
- *
- * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentRequest
- */
-export declare class SubmitAssessmentRequest extends Message<SubmitAssessmentRequest> {
-  /**
-   * @generated from field: string assessment_id = 1;
-   */
-  assessmentId: string;
-
-  /**
-   * @generated from field: string learner_id = 2;
-   */
-  learnerId: string;
-
-  /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Answer answers = 3;
-   */
-  answers: Answer[];
-
-  constructor(data?: PartialMessage<SubmitAssessmentRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.SubmitAssessmentRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmitAssessmentRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmitAssessmentRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmitAssessmentRequest;
-
-  static equals(a: SubmitAssessmentRequest | PlainMessage<SubmitAssessmentRequest> | undefined, b: SubmitAssessmentRequest | PlainMessage<SubmitAssessmentRequest> | undefined): boolean;
-}
-
-/**
- * SubmitAssessmentResponse is the response after submitting answers.
- *
- * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentResponse
- */
-export declare class SubmitAssessmentResponse extends Message<SubmitAssessmentResponse> {
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.SubmissionDetail submission = 1;
-   */
-  submission?: SubmissionDetail;
-
-  constructor(data?: PartialMessage<SubmitAssessmentResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.SubmitAssessmentResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmitAssessmentResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmitAssessmentResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmitAssessmentResponse;
-
-  static equals(a: SubmitAssessmentResponse | PlainMessage<SubmitAssessmentResponse> | undefined, b: SubmitAssessmentResponse | PlainMessage<SubmitAssessmentResponse> | undefined): boolean;
-}
-
-/**
- * GradeSubmissionRequest is the request for grading a submission.
- *
- * @generated from message sirosimes.tamanoya.v1.GradeSubmissionRequest
- */
-export declare class GradeSubmissionRequest extends Message<GradeSubmissionRequest> {
-  /**
-   * @generated from field: string submission_id = 1;
-   */
-  submissionId: string;
-
-  /**
-   * @generated from field: string graded_by_id = 2;
-   */
-  gradedById: string;
-
-  /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.Answer graded_answers = 3;
-   */
-  gradedAnswers: Answer[];
-
-  constructor(data?: PartialMessage<GradeSubmissionRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GradeSubmissionRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GradeSubmissionRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GradeSubmissionRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GradeSubmissionRequest;
-
-  static equals(a: GradeSubmissionRequest | PlainMessage<GradeSubmissionRequest> | undefined, b: GradeSubmissionRequest | PlainMessage<GradeSubmissionRequest> | undefined): boolean;
-}
-
-/**
- * GradeSubmissionResponse is the response after grading a submission.
- *
- * @generated from message sirosimes.tamanoya.v1.GradeSubmissionResponse
- */
-export declare class GradeSubmissionResponse extends Message<GradeSubmissionResponse> {
-  /**
-   * @generated from field: sirosimes.tamanoya.v1.SubmissionDetail submission = 1;
-   */
-  submission?: SubmissionDetail;
-
-  constructor(data?: PartialMessage<GradeSubmissionResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.tamanoya.v1.GradeSubmissionResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GradeSubmissionResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GradeSubmissionResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GradeSubmissionResponse;
-
-  static equals(a: GradeSubmissionResponse | PlainMessage<GradeSubmissionResponse> | undefined, b: GradeSubmissionResponse | PlainMessage<GradeSubmissionResponse> | undefined): boolean;
-}
-
-/**
- * ListSubmissionsRequest is the request for listing submissions.
- *
  * @generated from message sirosimes.tamanoya.v1.ListSubmissionsRequest
  */
 export declare class ListSubmissionsRequest extends Message<ListSubmissionsRequest> {
@@ -928,19 +881,34 @@ export declare class ListSubmissionsRequest extends Message<ListSubmissionsReque
   pagination?: PaginationRequest;
 
   /**
-   * @generated from field: string assessment_id = 2;
+   * @generated from field: string user_id = 2;
    */
-  assessmentId: string;
+  userId: string;
 
   /**
-   * @generated from field: string learner_id = 3;
+   * @generated from field: string period_id = 3;
    */
-  learnerId: string;
+  periodId: string;
 
   /**
-   * @generated from field: sirosimes.tamanoya.v1.SubmissionStatus status = 4;
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentType assessment_type = 4;
+   */
+  assessmentType: AssessmentType;
+
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.SubmissionStatus status = 5;
    */
   status: SubmissionStatus;
+
+  /**
+   * @generated from field: string department = 6;
+   */
+  department: string;
+
+  /**
+   * @generated from field: string grade = 7;
+   */
+  grade: string;
 
   constructor(data?: PartialMessage<ListSubmissionsRequest>);
 
@@ -958,15 +926,13 @@ export declare class ListSubmissionsRequest extends Message<ListSubmissionsReque
 }
 
 /**
- * ListSubmissionsResponse is the response for listing submissions.
- *
  * @generated from message sirosimes.tamanoya.v1.ListSubmissionsResponse
  */
 export declare class ListSubmissionsResponse extends Message<ListSubmissionsResponse> {
   /**
-   * @generated from field: repeated sirosimes.tamanoya.v1.SubmissionDetail submissions = 1;
+   * @generated from field: repeated sirosimes.tamanoya.v1.AssessmentSubmission submissions = 1;
    */
-  submissions: SubmissionDetail[];
+  submissions: AssessmentSubmission[];
 
   /**
    * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
@@ -986,5 +952,402 @@ export declare class ListSubmissionsResponse extends Message<ListSubmissionsResp
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListSubmissionsResponse;
 
   static equals(a: ListSubmissionsResponse | PlainMessage<ListSubmissionsResponse> | undefined, b: ListSubmissionsResponse | PlainMessage<ListSubmissionsResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.StartAssessmentRequest
+ */
+export declare class StartAssessmentRequest extends Message<StartAssessmentRequest> {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string period_id = 2;
+   */
+  periodId: string;
+
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentType assessment_type = 3;
+   */
+  assessmentType: AssessmentType;
+
+  constructor(data?: PartialMessage<StartAssessmentRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.StartAssessmentRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartAssessmentRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartAssessmentRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartAssessmentRequest;
+
+  static equals(a: StartAssessmentRequest | PlainMessage<StartAssessmentRequest> | undefined, b: StartAssessmentRequest | PlainMessage<StartAssessmentRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.StartAssessmentResponse
+ */
+export declare class StartAssessmentResponse extends Message<StartAssessmentResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentSubmission submission = 1;
+   */
+  submission?: AssessmentSubmission;
+
+  constructor(data?: PartialMessage<StartAssessmentResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.StartAssessmentResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartAssessmentResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartAssessmentResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartAssessmentResponse;
+
+  static equals(a: StartAssessmentResponse | PlainMessage<StartAssessmentResponse> | undefined, b: StartAssessmentResponse | PlainMessage<StartAssessmentResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentRequest
+ */
+export declare class SubmitAssessmentRequest extends Message<SubmitAssessmentRequest> {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: repeated sirosimes.tamanoya.v1.AnswerInput answers = 2;
+   */
+  answers: AnswerInput[];
+
+  constructor(data?: PartialMessage<SubmitAssessmentRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.SubmitAssessmentRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmitAssessmentRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmitAssessmentRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmitAssessmentRequest;
+
+  static equals(a: SubmitAssessmentRequest | PlainMessage<SubmitAssessmentRequest> | undefined, b: SubmitAssessmentRequest | PlainMessage<SubmitAssessmentRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.AnswerInput
+ */
+export declare class AnswerInput extends Message<AnswerInput> {
+  /**
+   * @generated from field: string question_id = 1;
+   */
+  questionId: string;
+
+  /**
+   * @generated from field: string answer_text = 2;
+   */
+  answerText: string;
+
+  /**
+   * @generated from field: string answer_code = 3;
+   */
+  answerCode: string;
+
+  /**
+   * @generated from field: repeated string selected_options = 4;
+   */
+  selectedOptions: string[];
+
+  /**
+   * @generated from field: int32 time_spent_seconds = 5;
+   */
+  timeSpentSeconds: number;
+
+  constructor(data?: PartialMessage<AnswerInput>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.AnswerInput";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AnswerInput;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AnswerInput;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AnswerInput;
+
+  static equals(a: AnswerInput | PlainMessage<AnswerInput> | undefined, b: AnswerInput | PlainMessage<AnswerInput> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentResponse
+ */
+export declare class SubmitAssessmentResponse extends Message<SubmitAssessmentResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentSubmission submission = 1;
+   */
+  submission?: AssessmentSubmission;
+
+  constructor(data?: PartialMessage<SubmitAssessmentResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.SubmitAssessmentResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubmitAssessmentResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubmitAssessmentResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubmitAssessmentResponse;
+
+  static equals(a: SubmitAssessmentResponse | PlainMessage<SubmitAssessmentResponse> | undefined, b: SubmitAssessmentResponse | PlainMessage<SubmitAssessmentResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.AutoSaveRequest
+ */
+export declare class AutoSaveRequest extends Message<AutoSaveRequest> {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: int32 current_question_index = 2;
+   */
+  currentQuestionIndex: number;
+
+  /**
+   * @generated from field: int32 time_remaining_seconds = 3;
+   */
+  timeRemainingSeconds: number;
+
+  /**
+   * @generated from field: repeated sirosimes.tamanoya.v1.AnswerInput answers = 4;
+   */
+  answers: AnswerInput[];
+
+  constructor(data?: PartialMessage<AutoSaveRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.AutoSaveRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AutoSaveRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AutoSaveRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AutoSaveRequest;
+
+  static equals(a: AutoSaveRequest | PlainMessage<AutoSaveRequest> | undefined, b: AutoSaveRequest | PlainMessage<AutoSaveRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.AutoSaveResponse
+ */
+export declare class AutoSaveResponse extends Message<AutoSaveResponse> {
+  /**
+   * @generated from field: google.protobuf.Timestamp saved_at = 1;
+   */
+  savedAt?: Timestamp;
+
+  constructor(data?: PartialMessage<AutoSaveResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.AutoSaveResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AutoSaveResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AutoSaveResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AutoSaveResponse;
+
+  static equals(a: AutoSaveResponse | PlainMessage<AutoSaveResponse> | undefined, b: AutoSaveResponse | PlainMessage<AutoSaveResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetQuestionSettingsRequest
+ */
+export declare class GetQuestionSettingsRequest extends Message<GetQuestionSettingsRequest> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentType assessment_type = 1;
+   */
+  assessmentType: AssessmentType;
+
+  /**
+   * @generated from field: string target_grade = 2;
+   */
+  targetGrade: string;
+
+  constructor(data?: PartialMessage<GetQuestionSettingsRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.GetQuestionSettingsRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetQuestionSettingsRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetQuestionSettingsRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetQuestionSettingsRequest;
+
+  static equals(a: GetQuestionSettingsRequest | PlainMessage<GetQuestionSettingsRequest> | undefined, b: GetQuestionSettingsRequest | PlainMessage<GetQuestionSettingsRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetQuestionSettingsResponse
+ */
+export declare class GetQuestionSettingsResponse extends Message<GetQuestionSettingsResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.QuestionSettings settings = 1;
+   */
+  settings?: QuestionSettings;
+
+  constructor(data?: PartialMessage<GetQuestionSettingsResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.GetQuestionSettingsResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetQuestionSettingsResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetQuestionSettingsResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetQuestionSettingsResponse;
+
+  static equals(a: GetQuestionSettingsResponse | PlainMessage<GetQuestionSettingsResponse> | undefined, b: GetQuestionSettingsResponse | PlainMessage<GetQuestionSettingsResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListQuestionSettingsRequest
+ */
+export declare class ListQuestionSettingsRequest extends Message<ListQuestionSettingsRequest> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.AssessmentType assessment_type = 1;
+   */
+  assessmentType: AssessmentType;
+
+  constructor(data?: PartialMessage<ListQuestionSettingsRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.ListQuestionSettingsRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListQuestionSettingsRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListQuestionSettingsRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListQuestionSettingsRequest;
+
+  static equals(a: ListQuestionSettingsRequest | PlainMessage<ListQuestionSettingsRequest> | undefined, b: ListQuestionSettingsRequest | PlainMessage<ListQuestionSettingsRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListQuestionSettingsResponse
+ */
+export declare class ListQuestionSettingsResponse extends Message<ListQuestionSettingsResponse> {
+  /**
+   * @generated from field: repeated sirosimes.tamanoya.v1.QuestionSettings settings = 1;
+   */
+  settings: QuestionSettings[];
+
+  constructor(data?: PartialMessage<ListQuestionSettingsResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.ListQuestionSettingsResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListQuestionSettingsResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListQuestionSettingsResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListQuestionSettingsResponse;
+
+  static equals(a: ListQuestionSettingsResponse | PlainMessage<ListQuestionSettingsResponse> | undefined, b: ListQuestionSettingsResponse | PlainMessage<ListQuestionSettingsResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.UpdateQuestionSettingsRequest
+ */
+export declare class UpdateQuestionSettingsRequest extends Message<UpdateQuestionSettingsRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: google.protobuf.FieldMask update_mask = 2;
+   */
+  updateMask?: FieldMask;
+
+  /**
+   * @generated from field: int32 required_count = 3;
+   */
+  requiredCount: number;
+
+  /**
+   * @generated from field: bool is_enabled = 4;
+   */
+  isEnabled: boolean;
+
+  /**
+   * @generated from field: string min_difficulty = 5;
+   */
+  minDifficulty: string;
+
+  /**
+   * @generated from field: string max_difficulty = 6;
+   */
+  maxDifficulty: string;
+
+  /**
+   * @generated from field: int32 time_limit_minutes = 7;
+   */
+  timeLimitMinutes: number;
+
+  constructor(data?: PartialMessage<UpdateQuestionSettingsRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateQuestionSettingsRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateQuestionSettingsRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateQuestionSettingsRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateQuestionSettingsRequest;
+
+  static equals(a: UpdateQuestionSettingsRequest | PlainMessage<UpdateQuestionSettingsRequest> | undefined, b: UpdateQuestionSettingsRequest | PlainMessage<UpdateQuestionSettingsRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.UpdateQuestionSettingsResponse
+ */
+export declare class UpdateQuestionSettingsResponse extends Message<UpdateQuestionSettingsResponse> {
+  /**
+   * @generated from field: sirosimes.tamanoya.v1.QuestionSettings settings = 1;
+   */
+  settings?: QuestionSettings;
+
+  constructor(data?: PartialMessage<UpdateQuestionSettingsResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.tamanoya.v1.UpdateQuestionSettingsResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateQuestionSettingsResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateQuestionSettingsResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateQuestionSettingsResponse;
+
+  static equals(a: UpdateQuestionSettingsResponse | PlainMessage<UpdateQuestionSettingsResponse> | undefined, b: UpdateQuestionSettingsResponse | PlainMessage<UpdateQuestionSettingsResponse> | undefined): boolean;
 }
 

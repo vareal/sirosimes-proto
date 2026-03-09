@@ -3,13 +3,43 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Timestamp } from "@bufbuild/protobuf";
+import { FieldMask, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
 import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
-import { ActorRef } from "../../common/v1/actor_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
- * AssessmentType classifies the type of assessment.
+ * PeriodStatus はアセスメント期間のステータス。
+ *
+ * @generated from enum sirosimes.tamanoya.v1.PeriodStatus
+ */
+export const PeriodStatus = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.tamanoya.v1.PeriodStatus",
+  [
+    {no: 0, name: "PERIOD_STATUS_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "PERIOD_STATUS_NOT_STARTED", localName: "NOT_STARTED"},
+    {no: 2, name: "PERIOD_STATUS_IN_PROGRESS", localName: "IN_PROGRESS"},
+    {no: 3, name: "PERIOD_STATUS_COMPLETED", localName: "COMPLETED"},
+  ],
+);
+
+/**
+ * AssessmentCategory はアセスメントのカテゴリ。
+ *
+ * @generated from enum sirosimes.tamanoya.v1.AssessmentCategory
+ */
+export const AssessmentCategory = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.tamanoya.v1.AssessmentCategory",
+  [
+    {no: 0, name: "ASSESSMENT_CATEGORY_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "ASSESSMENT_CATEGORY_TECHNICAL", localName: "TECHNICAL"},
+    {no: 2, name: "ASSESSMENT_CATEGORY_LOGICAL", localName: "LOGICAL"},
+    {no: 3, name: "ASSESSMENT_CATEGORY_BUSINESS", localName: "BUSINESS"},
+    {no: 4, name: "ASSESSMENT_CATEGORY_PRESENTATION", localName: "PRESENTATION"},
+  ],
+);
+
+/**
+ * AssessmentType はアセスメントの種別。
  *
  * @generated from enum sirosimes.tamanoya.v1.AssessmentType
  */
@@ -17,31 +47,18 @@ export const AssessmentType = /*@__PURE__*/ proto3.makeEnum(
   "sirosimes.tamanoya.v1.AssessmentType",
   [
     {no: 0, name: "ASSESSMENT_TYPE_UNSPECIFIED", localName: "UNSPECIFIED"},
-    {no: 1, name: "ASSESSMENT_TYPE_QUIZ", localName: "QUIZ"},
-    {no: 2, name: "ASSESSMENT_TYPE_PRACTICAL", localName: "PRACTICAL"},
-    {no: 3, name: "ASSESSMENT_TYPE_PEER_REVIEW", localName: "PEER_REVIEW"},
-    {no: 4, name: "ASSESSMENT_TYPE_SELF_ASSESSMENT", localName: "SELF_ASSESSMENT"},
-    {no: 5, name: "ASSESSMENT_TYPE_CERTIFICATION", localName: "CERTIFICATION"},
+    {no: 1, name: "ASSESSMENT_TYPE_TECHNICAL_HARD", localName: "TECHNICAL_HARD"},
+    {no: 2, name: "ASSESSMENT_TYPE_TECHNICAL_SOFT", localName: "TECHNICAL_SOFT"},
+    {no: 3, name: "ASSESSMENT_TYPE_LOGICAL_THINKING", localName: "LOGICAL_THINKING"},
+    {no: 4, name: "ASSESSMENT_TYPE_BUSINESS_SKILL", localName: "BUSINESS_SKILL"},
+    {no: 5, name: "ASSESSMENT_TYPE_MANAGEMENT_HARD", localName: "MANAGEMENT_HARD"},
+    {no: 6, name: "ASSESSMENT_TYPE_SALES_HARD", localName: "SALES_HARD"},
+    {no: 7, name: "ASSESSMENT_TYPE_PRESENTATION_SKILL", localName: "PRESENTATION_SKILL"},
   ],
 );
 
 /**
- * AssessmentStatus represents the lifecycle state of an assessment.
- *
- * @generated from enum sirosimes.tamanoya.v1.AssessmentStatus
- */
-export const AssessmentStatus = /*@__PURE__*/ proto3.makeEnum(
-  "sirosimes.tamanoya.v1.AssessmentStatus",
-  [
-    {no: 0, name: "ASSESSMENT_STATUS_UNSPECIFIED", localName: "UNSPECIFIED"},
-    {no: 1, name: "ASSESSMENT_STATUS_DRAFT", localName: "DRAFT"},
-    {no: 2, name: "ASSESSMENT_STATUS_PUBLISHED", localName: "PUBLISHED"},
-    {no: 3, name: "ASSESSMENT_STATUS_ARCHIVED", localName: "ARCHIVED"},
-  ],
-);
-
-/**
- * SubmissionStatus represents the state of a submission.
+ * SubmissionStatus は提出物のステータス。
  *
  * @generated from enum sirosimes.tamanoya.v1.SubmissionStatus
  */
@@ -49,338 +66,397 @@ export const SubmissionStatus = /*@__PURE__*/ proto3.makeEnum(
   "sirosimes.tamanoya.v1.SubmissionStatus",
   [
     {no: 0, name: "SUBMISSION_STATUS_UNSPECIFIED", localName: "UNSPECIFIED"},
-    {no: 1, name: "SUBMISSION_STATUS_NOT_STARTED", localName: "NOT_STARTED"},
-    {no: 2, name: "SUBMISSION_STATUS_IN_PROGRESS", localName: "IN_PROGRESS"},
-    {no: 3, name: "SUBMISSION_STATUS_SUBMITTED", localName: "SUBMITTED"},
-    {no: 4, name: "SUBMISSION_STATUS_GRADED", localName: "GRADED"},
+    {no: 1, name: "SUBMISSION_STATUS_IN_PROGRESS", localName: "IN_PROGRESS"},
+    {no: 2, name: "SUBMISSION_STATUS_SUBMITTED", localName: "SUBMITTED"},
+    {no: 3, name: "SUBMISSION_STATUS_EVALUATING", localName: "EVALUATING"},
+    {no: 4, name: "SUBMISSION_STATUS_EVALUATED", localName: "EVALUATED"},
+    {no: 5, name: "SUBMISSION_STATUS_REVIEWED", localName: "REVIEWED"},
   ],
 );
 
 /**
- * QuestionType classifies the type of question.
+ * AssessmentPeriod はアセスメント期間を表す。
  *
- * @generated from enum sirosimes.tamanoya.v1.QuestionType
+ * @generated from message sirosimes.tamanoya.v1.AssessmentPeriod
  */
-export const QuestionType = /*@__PURE__*/ proto3.makeEnum(
-  "sirosimes.tamanoya.v1.QuestionType",
-  [
-    {no: 0, name: "QUESTION_TYPE_UNSPECIFIED", localName: "UNSPECIFIED"},
-    {no: 1, name: "QUESTION_TYPE_MULTIPLE_CHOICE", localName: "MULTIPLE_CHOICE"},
-    {no: 2, name: "QUESTION_TYPE_FREE_TEXT", localName: "FREE_TEXT"},
-    {no: 3, name: "QUESTION_TYPE_CODE", localName: "CODE"},
-    {no: 4, name: "QUESTION_TYPE_TRUE_FALSE", localName: "TRUE_FALSE"},
-    {no: 5, name: "QUESTION_TYPE_RATING", localName: "RATING"},
+export const AssessmentPeriod = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.AssessmentPeriod",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "start_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "end_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "deadline", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "status", kind: "enum", T: proto3.getEnumType(PeriodStatus) },
+    { no: 8, name: "allow_practice", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
 /**
- * Question represents a single question in an assessment.
+ * AssessmentSubmission はアセスメント提出物。
  *
- * @generated from message sirosimes.tamanoya.v1.Question
+ * @generated from message sirosimes.tamanoya.v1.AssessmentSubmission
  */
-export const Question = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.Question",
+export const AssessmentSubmission = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.AssessmentSubmission",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "session_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "period_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category", kind: "enum", T: proto3.getEnumType(AssessmentCategory) },
+    { no: 6, name: "assessment_type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
+    { no: 7, name: "department", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "grade", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "started_at", kind: "message", T: Timestamp },
+    { no: 10, name: "submitted_at", kind: "message", T: Timestamp },
+    { no: 11, name: "time_spent_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 12, name: "time_remaining_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 13, name: "current_question_index", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 14, name: "auto_saved_at", kind: "message", T: Timestamp },
+    { no: 15, name: "status", kind: "enum", T: proto3.getEnumType(SubmissionStatus) },
+    { no: 16, name: "total_score", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 17, name: "max_score", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 18, name: "percentage_score", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 19, name: "evaluation_tier", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 20, name: "evaluation_result", kind: "message", T: Struct },
+    { no: 21, name: "feedback", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 22, name: "is_demo", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 23, name: "answers", kind: "message", T: AssessmentAnswer, repeated: true },
+  ],
+);
+
+/**
+ * AssessmentAnswer はアセスメントの個別回答。
+ *
+ * @generated from message sirosimes.tamanoya.v1.AssessmentAnswer
+ */
+export const AssessmentAnswer = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.AssessmentAnswer",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "submission_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "question_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "question_ref", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "question_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "question_title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "answer_text", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "answer_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "selected_options", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 10, name: "time_spent_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 11, name: "score", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 12, name: "max_score", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 13, name: "is_correct", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 14, name: "rubric_scores", kind: "message", T: Struct },
+    { no: 15, name: "feedback", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * QuestionSettings はアセスメント種別ごとの出題設定。
+ *
+ * @generated from message sirosimes.tamanoya.v1.QuestionSettings
+ */
+export const QuestionSettings = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.QuestionSettings",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "assessment_type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
+    { no: 3, name: "target_grade", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "required_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "is_enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "min_difficulty", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "max_difficulty", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "time_limit_minutes", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetAssessmentPeriodRequest
+ */
+export const GetAssessmentPeriodRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetAssessmentPeriodRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "type", kind: "enum", T: proto3.getEnumType(QuestionType) },
-    { no: 3, name: "content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "options", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "correct_answer", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "points", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 8, name: "explanation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
- * Assessment represents a skill evaluation.
- *
- * @generated from message sirosimes.tamanoya.v1.Assessment
+ * @generated from message sirosimes.tamanoya.v1.GetAssessmentPeriodResponse
  */
-export const Assessment = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.Assessment",
+export const GetAssessmentPeriodResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetAssessmentPeriodResponse",
   () => [
-    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
-    { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
-    { no: 5, name: "status", kind: "enum", T: proto3.getEnumType(AssessmentStatus) },
-    { no: 6, name: "skill_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "questions", kind: "message", T: Question, repeated: true },
-    { no: 8, name: "passing_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 9, name: "time_limit_minutes", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 10, name: "max_attempts", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 11, name: "created_by_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "period", kind: "message", T: AssessmentPeriod },
   ],
 );
 
 /**
- * Answer represents a learner's answer to a question.
- *
- * @generated from message sirosimes.tamanoya.v1.Answer
+ * @generated from message sirosimes.tamanoya.v1.ListAssessmentPeriodsRequest
  */
-export const Answer = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.Answer",
-  () => [
-    { no: 1, name: "question_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "answer", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: "feedback", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * Submission represents a learner's assessment attempt.
- *
- * @generated from message sirosimes.tamanoya.v1.Submission
- */
-export const Submission = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.Submission",
-  () => [
-    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
-    { no: 2, name: "assessment_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "learner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "status", kind: "enum", T: proto3.getEnumType(SubmissionStatus) },
-    { no: 5, name: "answers", kind: "message", T: Answer, repeated: true },
-    { no: 6, name: "total_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "max_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 8, name: "passed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 9, name: "attempt_number", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 10, name: "started_at", kind: "message", T: Timestamp },
-    { no: 11, name: "submitted_at", kind: "message", T: Timestamp },
-    { no: 12, name: "graded_at", kind: "message", T: Timestamp },
-    { no: 13, name: "graded_by_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * SubmissionDetail bundles a submission with resolved actor references.
- *
- * @generated from message sirosimes.tamanoya.v1.SubmissionDetail
- */
-export const SubmissionDetail = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.SubmissionDetail",
-  () => [
-    { no: 1, name: "submission", kind: "message", T: Submission },
-    { no: 2, name: "learner", kind: "message", T: ActorRef },
-    { no: 3, name: "graded_by", kind: "message", T: ActorRef },
-  ],
-);
-
-/**
- * ListAssessmentsRequest is the request for listing assessments.
- *
- * @generated from message sirosimes.tamanoya.v1.ListAssessmentsRequest
- */
-export const ListAssessmentsRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.ListAssessmentsRequest",
+export const ListAssessmentPeriodsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListAssessmentPeriodsRequest",
   () => [
     { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
-    { no: 2, name: "type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
-    { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(AssessmentStatus) },
-    { no: 4, name: "skill_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "search", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(PeriodStatus) },
   ],
 );
 
 /**
- * ListAssessmentsResponse is the response for listing assessments.
- *
- * @generated from message sirosimes.tamanoya.v1.ListAssessmentsResponse
+ * @generated from message sirosimes.tamanoya.v1.ListAssessmentPeriodsResponse
  */
-export const ListAssessmentsResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.ListAssessmentsResponse",
+export const ListAssessmentPeriodsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListAssessmentPeriodsResponse",
   () => [
-    { no: 1, name: "assessments", kind: "message", T: Assessment, repeated: true },
+    { no: 1, name: "periods", kind: "message", T: AssessmentPeriod, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
   ],
 );
 
 /**
- * GetAssessmentRequest is the request for retrieving a single assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.GetAssessmentRequest
+ * @generated from message sirosimes.tamanoya.v1.CreateAssessmentPeriodRequest
  */
-export const GetAssessmentRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GetAssessmentRequest",
+export const CreateAssessmentPeriodRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.CreateAssessmentPeriodRequest",
+  () => [
+    { no: 1, name: "code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "start_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "end_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "deadline", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "allow_practice", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.CreateAssessmentPeriodResponse
+ */
+export const CreateAssessmentPeriodResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.CreateAssessmentPeriodResponse",
+  () => [
+    { no: 1, name: "period", kind: "message", T: AssessmentPeriod },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentPeriodRequest
+ */
+export const UpdateAssessmentPeriodRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateAssessmentPeriodRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "update_mask", kind: "message", T: FieldMask },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "start_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "end_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "deadline", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "status", kind: "enum", T: proto3.getEnumType(PeriodStatus) },
+    { no: 8, name: "allow_practice", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentPeriodResponse
+ */
+export const UpdateAssessmentPeriodResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateAssessmentPeriodResponse",
+  () => [
+    { no: 1, name: "period", kind: "message", T: AssessmentPeriod },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetSubmissionRequest
+ */
+export const GetSubmissionRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetSubmissionRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
- * GetAssessmentResponse is the response containing a single assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.GetAssessmentResponse
+ * @generated from message sirosimes.tamanoya.v1.GetSubmissionResponse
  */
-export const GetAssessmentResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GetAssessmentResponse",
+export const GetSubmissionResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetSubmissionResponse",
   () => [
-    { no: 1, name: "assessment", kind: "message", T: Assessment },
+    { no: 1, name: "submission", kind: "message", T: AssessmentSubmission },
   ],
 );
 
 /**
- * CreateAssessmentRequest is the request for creating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateAssessmentRequest
- */
-export const CreateAssessmentRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.CreateAssessmentRequest",
-  () => [
-    { no: 1, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
-    { no: 4, name: "skill_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "questions", kind: "message", T: Question, repeated: true },
-    { no: 6, name: "passing_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "time_limit_minutes", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 8, name: "max_attempts", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 9, name: "created_by_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * CreateAssessmentResponse is the response after creating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateAssessmentResponse
- */
-export const CreateAssessmentResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.CreateAssessmentResponse",
-  () => [
-    { no: 1, name: "assessment", kind: "message", T: Assessment },
-  ],
-);
-
-/**
- * UpdateAssessmentRequest is the request for updating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentRequest
- */
-export const UpdateAssessmentRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.UpdateAssessmentRequest",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "status", kind: "enum", T: proto3.getEnumType(AssessmentStatus) },
-    { no: 5, name: "questions", kind: "message", T: Question, repeated: true },
-    { no: 6, name: "passing_score", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 7, name: "time_limit_minutes", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-  ],
-);
-
-/**
- * UpdateAssessmentResponse is the response after updating an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateAssessmentResponse
- */
-export const UpdateAssessmentResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.UpdateAssessmentResponse",
-  () => [
-    { no: 1, name: "assessment", kind: "message", T: Assessment },
-  ],
-);
-
-/**
- * DeleteAssessmentRequest is the request for deleting an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteAssessmentRequest
- */
-export const DeleteAssessmentRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.DeleteAssessmentRequest",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * DeleteAssessmentResponse is the response after deleting an assessment.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteAssessmentResponse
- */
-export const DeleteAssessmentResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.DeleteAssessmentResponse",
-  [],
-);
-
-/**
- * SubmitAssessmentRequest is the request for submitting answers.
- *
- * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentRequest
- */
-export const SubmitAssessmentRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.SubmitAssessmentRequest",
-  () => [
-    { no: 1, name: "assessment_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "learner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "answers", kind: "message", T: Answer, repeated: true },
-  ],
-);
-
-/**
- * SubmitAssessmentResponse is the response after submitting answers.
- *
- * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentResponse
- */
-export const SubmitAssessmentResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.SubmitAssessmentResponse",
-  () => [
-    { no: 1, name: "submission", kind: "message", T: SubmissionDetail },
-  ],
-);
-
-/**
- * GradeSubmissionRequest is the request for grading a submission.
- *
- * @generated from message sirosimes.tamanoya.v1.GradeSubmissionRequest
- */
-export const GradeSubmissionRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GradeSubmissionRequest",
-  () => [
-    { no: 1, name: "submission_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "graded_by_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "graded_answers", kind: "message", T: Answer, repeated: true },
-  ],
-);
-
-/**
- * GradeSubmissionResponse is the response after grading a submission.
- *
- * @generated from message sirosimes.tamanoya.v1.GradeSubmissionResponse
- */
-export const GradeSubmissionResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GradeSubmissionResponse",
-  () => [
-    { no: 1, name: "submission", kind: "message", T: SubmissionDetail },
-  ],
-);
-
-/**
- * ListSubmissionsRequest is the request for listing submissions.
- *
  * @generated from message sirosimes.tamanoya.v1.ListSubmissionsRequest
  */
 export const ListSubmissionsRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tamanoya.v1.ListSubmissionsRequest",
   () => [
     { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
-    { no: 2, name: "assessment_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "learner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "status", kind: "enum", T: proto3.getEnumType(SubmissionStatus) },
+    { no: 2, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "period_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "assessment_type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
+    { no: 5, name: "status", kind: "enum", T: proto3.getEnumType(SubmissionStatus) },
+    { no: 6, name: "department", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "grade", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
- * ListSubmissionsResponse is the response for listing submissions.
- *
  * @generated from message sirosimes.tamanoya.v1.ListSubmissionsResponse
  */
 export const ListSubmissionsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tamanoya.v1.ListSubmissionsResponse",
   () => [
-    { no: 1, name: "submissions", kind: "message", T: SubmissionDetail, repeated: true },
+    { no: 1, name: "submissions", kind: "message", T: AssessmentSubmission, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.StartAssessmentRequest
+ */
+export const StartAssessmentRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.StartAssessmentRequest",
+  () => [
+    { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "period_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "assessment_type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.StartAssessmentResponse
+ */
+export const StartAssessmentResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.StartAssessmentResponse",
+  () => [
+    { no: 1, name: "submission", kind: "message", T: AssessmentSubmission },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentRequest
+ */
+export const SubmitAssessmentRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.SubmitAssessmentRequest",
+  () => [
+    { no: 1, name: "session_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "answers", kind: "message", T: AnswerInput, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.AnswerInput
+ */
+export const AnswerInput = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.AnswerInput",
+  () => [
+    { no: 1, name: "question_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "answer_text", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "answer_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "selected_options", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "time_spent_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.SubmitAssessmentResponse
+ */
+export const SubmitAssessmentResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.SubmitAssessmentResponse",
+  () => [
+    { no: 1, name: "submission", kind: "message", T: AssessmentSubmission },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.AutoSaveRequest
+ */
+export const AutoSaveRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.AutoSaveRequest",
+  () => [
+    { no: 1, name: "session_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "current_question_index", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "time_remaining_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "answers", kind: "message", T: AnswerInput, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.AutoSaveResponse
+ */
+export const AutoSaveResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.AutoSaveResponse",
+  () => [
+    { no: 1, name: "saved_at", kind: "message", T: Timestamp },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetQuestionSettingsRequest
+ */
+export const GetQuestionSettingsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetQuestionSettingsRequest",
+  () => [
+    { no: 1, name: "assessment_type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
+    { no: 2, name: "target_grade", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetQuestionSettingsResponse
+ */
+export const GetQuestionSettingsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetQuestionSettingsResponse",
+  () => [
+    { no: 1, name: "settings", kind: "message", T: QuestionSettings },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListQuestionSettingsRequest
+ */
+export const ListQuestionSettingsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListQuestionSettingsRequest",
+  () => [
+    { no: 1, name: "assessment_type", kind: "enum", T: proto3.getEnumType(AssessmentType) },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListQuestionSettingsResponse
+ */
+export const ListQuestionSettingsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListQuestionSettingsResponse",
+  () => [
+    { no: 1, name: "settings", kind: "message", T: QuestionSettings, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.UpdateQuestionSettingsRequest
+ */
+export const UpdateQuestionSettingsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateQuestionSettingsRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "update_mask", kind: "message", T: FieldMask },
+    { no: 3, name: "required_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "is_enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "min_difficulty", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "max_difficulty", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "time_limit_minutes", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.UpdateQuestionSettingsResponse
+ */
+export const UpdateQuestionSettingsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateQuestionSettingsResponse",
+  () => [
+    { no: 1, name: "settings", kind: "message", T: QuestionSettings },
   ],
 );
 

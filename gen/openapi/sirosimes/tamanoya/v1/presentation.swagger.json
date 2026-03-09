@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "sirosimes/tamanoya/v1/assessment.proto",
+    "title": "sirosimes/tamanoya/v1/presentation.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "AssessmentService"
+      "name": "PresentationService"
     }
   ],
   "consumes": [
@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/assessment-periods": {
+    "/api/v1/presentations/audio": {
       "get": {
-        "operationId": "AssessmentService_ListAssessmentPeriods",
+        "operationId": "PresentationService_ListAudioResponses",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListAssessmentPeriodsResponse"
+              "$ref": "#/definitions/v1ListAudioResponsesResponse"
             }
           },
           "default": {
@@ -71,400 +71,10 @@
             "default": "SORT_ORDER_UNSPECIFIED"
           },
           {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "PERIOD_STATUS_UNSPECIFIED",
-              "PERIOD_STATUS_NOT_STARTED",
-              "PERIOD_STATUS_IN_PROGRESS",
-              "PERIOD_STATUS_COMPLETED"
-            ],
-            "default": "PERIOD_STATUS_UNSPECIFIED"
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      },
-      "post": {
-        "operationId": "AssessmentService_CreateAssessmentPeriod",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1CreateAssessmentPeriodResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1CreateAssessmentPeriodRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/assessment-periods/{id}": {
-      "get": {
-        "summary": "--- 期間管理 ---",
-        "operationId": "AssessmentService_GetAssessmentPeriod",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetAssessmentPeriodResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      },
-      "patch": {
-        "operationId": "AssessmentService_UpdateAssessmentPeriod",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UpdateAssessmentPeriodResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AssessmentServiceUpdateAssessmentPeriodBody"
-            }
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/assessments/auto-save": {
-      "post": {
-        "summary": "自動保存",
-        "operationId": "AssessmentService_AutoSave",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1AutoSaveResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1AutoSaveRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/assessments/start": {
-      "post": {
-        "summary": "アセスメント開始（セッション生成 + 問題出題）",
-        "operationId": "AssessmentService_StartAssessment",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1StartAssessmentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1StartAssessmentRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/assessments/submit": {
-      "post": {
-        "summary": "アセスメント提出",
-        "operationId": "AssessmentService_SubmitAssessment",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1SubmitAssessmentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1SubmitAssessmentRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/question-settings": {
-      "get": {
-        "summary": "--- 出題設定 ---",
-        "operationId": "AssessmentService_GetQuestionSettings",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetQuestionSettingsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "assessmentType",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "ASSESSMENT_TYPE_UNSPECIFIED",
-              "ASSESSMENT_TYPE_TECHNICAL_HARD",
-              "ASSESSMENT_TYPE_TECHNICAL_SOFT",
-              "ASSESSMENT_TYPE_LOGICAL_THINKING",
-              "ASSESSMENT_TYPE_BUSINESS_SKILL",
-              "ASSESSMENT_TYPE_MANAGEMENT_HARD",
-              "ASSESSMENT_TYPE_SALES_HARD",
-              "ASSESSMENT_TYPE_PRESENTATION_SKILL"
-            ],
-            "default": "ASSESSMENT_TYPE_UNSPECIFIED"
-          },
-          {
-            "name": "targetGrade",
+            "name": "sessionId",
             "in": "query",
             "required": false,
             "type": "string"
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/question-settings/list": {
-      "get": {
-        "operationId": "AssessmentService_ListQuestionSettings",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListQuestionSettingsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "assessmentType",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "ASSESSMENT_TYPE_UNSPECIFIED",
-              "ASSESSMENT_TYPE_TECHNICAL_HARD",
-              "ASSESSMENT_TYPE_TECHNICAL_SOFT",
-              "ASSESSMENT_TYPE_LOGICAL_THINKING",
-              "ASSESSMENT_TYPE_BUSINESS_SKILL",
-              "ASSESSMENT_TYPE_MANAGEMENT_HARD",
-              "ASSESSMENT_TYPE_SALES_HARD",
-              "ASSESSMENT_TYPE_PRESENTATION_SKILL"
-            ],
-            "default": "ASSESSMENT_TYPE_UNSPECIFIED"
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/question-settings/{id}": {
-      "patch": {
-        "operationId": "AssessmentService_UpdateQuestionSettings",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UpdateQuestionSettingsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AssessmentServiceUpdateQuestionSettingsBody"
-            }
-          }
-        ],
-        "tags": [
-          "AssessmentService"
-        ]
-      }
-    },
-    "/api/v1/submissions": {
-      "get": {
-        "operationId": "AssessmentService_ListSubmissions",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListSubmissionsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "pagination.page",
-            "description": "Page number (1-indexed).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "pagination.pageSize",
-            "description": "Number of items per page (max enforced per-service).",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "pagination.sortBy",
-            "description": "Field name to sort by.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "pagination.sortOrder",
-            "description": "Sort direction.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "SORT_ORDER_UNSPECIFIED",
-              "SORT_ORDER_ASC",
-              "SORT_ORDER_DESC"
-            ],
-            "default": "SORT_ORDER_UNSPECIFIED"
           },
           {
             "name": "userId",
@@ -473,70 +83,104 @@
             "type": "string"
           },
           {
-            "name": "periodId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "assessmentType",
+            "name": "transcriptionStatus",
             "in": "query",
             "required": false,
             "type": "string",
             "enum": [
-              "ASSESSMENT_TYPE_UNSPECIFIED",
-              "ASSESSMENT_TYPE_TECHNICAL_HARD",
-              "ASSESSMENT_TYPE_TECHNICAL_SOFT",
-              "ASSESSMENT_TYPE_LOGICAL_THINKING",
-              "ASSESSMENT_TYPE_BUSINESS_SKILL",
-              "ASSESSMENT_TYPE_MANAGEMENT_HARD",
-              "ASSESSMENT_TYPE_SALES_HARD",
-              "ASSESSMENT_TYPE_PRESENTATION_SKILL"
+              "TRANSCRIPTION_STATUS_UNSPECIFIED",
+              "TRANSCRIPTION_STATUS_PENDING",
+              "TRANSCRIPTION_STATUS_PROCESSING",
+              "TRANSCRIPTION_STATUS_COMPLETED",
+              "TRANSCRIPTION_STATUS_FAILED"
             ],
-            "default": "ASSESSMENT_TYPE_UNSPECIFIED"
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "SUBMISSION_STATUS_UNSPECIFIED",
-              "SUBMISSION_STATUS_IN_PROGRESS",
-              "SUBMISSION_STATUS_SUBMITTED",
-              "SUBMISSION_STATUS_EVALUATING",
-              "SUBMISSION_STATUS_EVALUATED",
-              "SUBMISSION_STATUS_REVIEWED"
-            ],
-            "default": "SUBMISSION_STATUS_UNSPECIFIED"
-          },
-          {
-            "name": "department",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "grade",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "default": "TRANSCRIPTION_STATUS_UNSPECIFIED"
           }
         ],
         "tags": [
-          "AssessmentService"
+          "PresentationService"
         ]
       }
     },
-    "/api/v1/submissions/{id}": {
-      "get": {
-        "summary": "--- 提出管理 ---",
-        "operationId": "AssessmentService_GetSubmission",
+    "/api/v1/presentations/audio/upload": {
+      "post": {
+        "summary": "--- 音声アップロード・管理 ---",
+        "operationId": "PresentationService_UploadAudio",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetSubmissionResponse"
+              "$ref": "#/definitions/v1UploadAudioResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UploadAudioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      }
+    },
+    "/api/v1/presentations/audio/{audioResponseId}/retry-transcription": {
+      "post": {
+        "operationId": "PresentationService_RetryTranscription",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RetryTranscriptionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "audioResponseId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PresentationServiceRetryTranscriptionBody"
+            }
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      }
+    },
+    "/api/v1/presentations/audio/{id}": {
+      "get": {
+        "operationId": "PresentationService_GetAudioResponse",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAudioResponseResponse"
             }
           },
           "default": {
@@ -555,60 +199,422 @@
           }
         ],
         "tags": [
-          "AssessmentService"
+          "PresentationService"
+        ]
+      }
+    },
+    "/api/v1/presentations/topics": {
+      "get": {
+        "operationId": "PresentationService_ListPresentationTopics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPresentationTopicsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "targetDepartments",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "targetGrades",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      },
+      "post": {
+        "operationId": "PresentationService_CreatePresentationTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreatePresentationTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreatePresentationTopicRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      }
+    },
+    "/api/v1/presentations/topics/{id}": {
+      "get": {
+        "summary": "--- お題管理 ---",
+        "operationId": "PresentationService_GetPresentationTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPresentationTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      },
+      "delete": {
+        "operationId": "PresentationService_DeletePresentationTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeletePresentationTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      },
+      "patch": {
+        "operationId": "PresentationService_UpdatePresentationTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdatePresentationTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PresentationServiceUpdatePresentationTopicBody"
+            }
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      }
+    },
+    "/api/v1/presentations/videos": {
+      "get": {
+        "operationId": "PresentationService_ListVideoSubmissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListVideoSubmissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pagination.page",
+            "description": "Page number (1-indexed).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.pageSize",
+            "description": "Number of items per page (max enforced per-service).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.sortBy",
+            "description": "Field name to sort by.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pagination.sortOrder",
+            "description": "Sort direction.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "SORT_ORDER_UNSPECIFIED",
+              "SORT_ORDER_ASC",
+              "SORT_ORDER_DESC"
+            ],
+            "default": "SORT_ORDER_UNSPECIFIED"
+          },
+          {
+            "name": "evaluationSessionId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "processingStatus",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "VIDEO_PROCESSING_STATUS_UNSPECIFIED",
+              "VIDEO_PROCESSING_STATUS_PENDING",
+              "VIDEO_PROCESSING_STATUS_PROCESSING",
+              "VIDEO_PROCESSING_STATUS_COMPLETED",
+              "VIDEO_PROCESSING_STATUS_FAILED"
+            ],
+            "default": "VIDEO_PROCESSING_STATUS_UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      }
+    },
+    "/api/v1/presentations/videos/{id}": {
+      "get": {
+        "summary": "--- 動画管理 ---",
+        "operationId": "PresentationService_GetVideoSubmission",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetVideoSubmissionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PresentationService"
+        ]
+      }
+    },
+    "/api/v1/presentations/videos/{videoId}/retry": {
+      "post": {
+        "operationId": "PresentationService_RetryVideoProcessing",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RetryVideoProcessingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PresentationServiceRetryVideoProcessingBody"
+            }
+          }
+        ],
+        "tags": [
+          "PresentationService"
         ]
       }
     }
   },
   "definitions": {
-    "AssessmentServiceUpdateAssessmentPeriodBody": {
+    "PresentationServiceRetryTranscriptionBody": {
       "type": "object",
-      "properties": {
-        "updateMask": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "startDate": {
-          "type": "string"
-        },
-        "endDate": {
-          "type": "string"
-        },
-        "deadline": {
-          "type": "string"
-        },
-        "status": {
-          "$ref": "#/definitions/v1PeriodStatus"
-        },
-        "allowPractice": {
-          "type": "boolean"
-        }
-      }
+      "title": "文字起こしの再実行リクエスト"
     },
-    "AssessmentServiceUpdateQuestionSettingsBody": {
+    "PresentationServiceRetryVideoProcessingBody": {
+      "type": "object",
+      "title": "動画処理の再実行リクエスト"
+    },
+    "PresentationServiceUpdatePresentationTopicBody": {
       "type": "object",
       "properties": {
         "updateMask": {
           "type": "string"
         },
-        "requiredCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "isEnabled": {
-          "type": "boolean"
-        },
-        "minDifficulty": {
+        "title": {
           "type": "string"
         },
-        "maxDifficulty": {
+        "description": {
+          "type": "string"
+        },
+        "examples": {
+          "type": "string"
+        },
+        "targetDepartments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "targetGrades": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "difficulty": {
           "type": "string"
         },
         "timeLimitMinutes": {
           "type": "integer",
           "format": "int32"
+        },
+        "isActive": {
+          "type": "boolean"
         }
       }
     },
@@ -648,142 +654,7 @@
         }
       }
     },
-    "v1AnswerInput": {
-      "type": "object",
-      "properties": {
-        "questionId": {
-          "type": "string"
-        },
-        "answerText": {
-          "type": "string"
-        },
-        "answerCode": {
-          "type": "string"
-        },
-        "selectedOptions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "timeSpentSeconds": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1AssessmentAnswer": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "submissionId": {
-          "type": "string"
-        },
-        "questionId": {
-          "type": "string",
-          "title": "問題バンクID（DBの問題から出題時）"
-        },
-        "questionRef": {
-          "type": "string",
-          "title": "レガシー問題参照"
-        },
-        "questionType": {
-          "type": "string",
-          "title": "問題タイプ"
-        },
-        "questionTitle": {
-          "type": "string"
-        },
-        "answerText": {
-          "type": "string",
-          "title": "--- 回答内容 ---"
-        },
-        "answerCode": {
-          "type": "string"
-        },
-        "selectedOptions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "timeSpentSeconds": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "score": {
-          "type": "number",
-          "format": "double",
-          "title": "--- 評価 ---"
-        },
-        "maxScore": {
-          "type": "number",
-          "format": "double"
-        },
-        "isCorrect": {
-          "type": "boolean"
-        },
-        "rubricScores": {
-          "type": "object"
-        },
-        "feedback": {
-          "type": "string"
-        }
-      },
-      "title": "AssessmentAnswer はアセスメントの個別回答。"
-    },
-    "v1AssessmentCategory": {
-      "type": "string",
-      "enum": [
-        "ASSESSMENT_CATEGORY_UNSPECIFIED",
-        "ASSESSMENT_CATEGORY_TECHNICAL",
-        "ASSESSMENT_CATEGORY_LOGICAL",
-        "ASSESSMENT_CATEGORY_BUSINESS",
-        "ASSESSMENT_CATEGORY_PRESENTATION"
-      ],
-      "default": "ASSESSMENT_CATEGORY_UNSPECIFIED",
-      "title": "AssessmentCategory はアセスメントのカテゴリ。"
-    },
-    "v1AssessmentPeriod": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "code": {
-          "type": "string",
-          "title": "期間コード（例: \"2025-h1\", \"practice\"）"
-        },
-        "name": {
-          "type": "string",
-          "title": "期間名（例: \"2025年上期\"）"
-        },
-        "startDate": {
-          "type": "string",
-          "title": "開始日"
-        },
-        "endDate": {
-          "type": "string",
-          "title": "終了日"
-        },
-        "deadline": {
-          "type": "string",
-          "title": "提出期限"
-        },
-        "status": {
-          "$ref": "#/definitions/v1PeriodStatus",
-          "title": "ステータス"
-        },
-        "allowPractice": {
-          "type": "boolean",
-          "title": "練習モードを許可するか"
-        }
-      },
-      "title": "AssessmentPeriod はアセスメント期間を表す。"
-    },
-    "v1AssessmentSubmission": {
+    "v1AudioResponse": {
       "type": "object",
       "properties": {
         "metadata": {
@@ -795,207 +666,183 @@
         },
         "userId": {
           "type": "string",
-          "title": "受験者ID"
+          "title": "ユーザーID"
         },
-        "periodId": {
+        "questionId": {
           "type": "string",
-          "title": "アセスメント期間ID"
+          "title": "関連する問題ID"
         },
-        "category": {
-          "$ref": "#/definitions/v1AssessmentCategory",
-          "title": "カテゴリ"
-        },
-        "assessmentType": {
-          "$ref": "#/definitions/v1AssessmentType",
-          "title": "アセスメント種別"
-        },
-        "department": {
+        "topicId": {
           "type": "string",
-          "title": "受験者の部門"
+          "title": "関連するお題ID"
         },
-        "grade": {
+        "audioFilePath": {
           "type": "string",
-          "title": "受験者の等級"
+          "title": "音声ファイルパス"
         },
-        "startedAt": {
+        "audioFormat": {
           "type": "string",
-          "format": "date-time",
-          "title": "--- 時間情報 ---"
+          "title": "音声フォーマット（mp3, wav等）"
         },
-        "submittedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "timeSpentSeconds": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "timeRemainingSeconds": {
-          "type": "integer",
-          "format": "int32",
-          "title": "残り時間（自動保存用）"
-        },
-        "currentQuestionIndex": {
-          "type": "integer",
-          "format": "int32",
-          "title": "現在の問題インデックス（0始まり）"
-        },
-        "autoSavedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "status": {
-          "$ref": "#/definitions/v1SubmissionStatus",
-          "title": "--- 状態 ---"
-        },
-        "totalScore": {
+        "durationSeconds": {
           "type": "number",
           "format": "double",
-          "title": "--- スコア ---"
+          "title": "音声の長さ（秒）"
         },
-        "maxScore": {
-          "type": "number",
-          "format": "double"
-        },
-        "percentageScore": {
-          "type": "number",
-          "format": "double"
-        },
-        "evaluationTier": {
+        "fileSizeBytes": {
           "type": "string",
-          "title": "評価ティア（S/A/B/C/D）"
+          "format": "int64",
+          "title": "ファイルサイズ（バイト）"
         },
-        "evaluationResult": {
-          "type": "object",
-          "title": "--- 評価詳細 ---"
+        "transcriptionStatus": {
+          "$ref": "#/definitions/v1TranscriptionStatus",
+          "title": "文字起こしステータス"
         },
-        "feedback": {
-          "type": "string"
-        },
-        "isDemo": {
-          "type": "boolean"
-        },
-        "answers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1AssessmentAnswer"
-          },
-          "title": "--- 回答一覧 ---"
+        "transcription": {
+          "$ref": "#/definitions/v1AudioTranscription",
+          "title": "文字起こし結果（完了時）"
         }
       },
-      "title": "AssessmentSubmission はアセスメント提出物。"
+      "title": "AudioResponse は音声回答データ。"
     },
-    "v1AssessmentType": {
-      "type": "string",
-      "enum": [
-        "ASSESSMENT_TYPE_UNSPECIFIED",
-        "ASSESSMENT_TYPE_TECHNICAL_HARD",
-        "ASSESSMENT_TYPE_TECHNICAL_SOFT",
-        "ASSESSMENT_TYPE_LOGICAL_THINKING",
-        "ASSESSMENT_TYPE_BUSINESS_SKILL",
-        "ASSESSMENT_TYPE_MANAGEMENT_HARD",
-        "ASSESSMENT_TYPE_SALES_HARD",
-        "ASSESSMENT_TYPE_PRESENTATION_SKILL"
-      ],
-      "default": "ASSESSMENT_TYPE_UNSPECIFIED",
-      "title": "AssessmentType はアセスメントの種別。"
-    },
-    "v1AutoSaveRequest": {
+    "v1AudioTranscription": {
       "type": "object",
       "properties": {
-        "sessionId": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "audioResponseId": {
           "type": "string"
         },
-        "currentQuestionIndex": {
-          "type": "integer",
-          "format": "int32"
+        "transcribedText": {
+          "type": "string",
+          "title": "文字起こしテキスト"
         },
-        "timeRemainingSeconds": {
-          "type": "integer",
-          "format": "int32"
+        "confidenceScore": {
+          "type": "number",
+          "format": "double",
+          "title": "信頼度スコア（0.0-1.0）"
         },
-        "answers": {
+        "language": {
+          "type": "string",
+          "title": "言語コード"
+        },
+        "apiProvider": {
+          "type": "string",
+          "title": "APIプロバイダー"
+        },
+        "apiModel": {
+          "type": "string",
+          "title": "使用モデル"
+        },
+        "processingTimeMs": {
+          "type": "integer",
+          "format": "int32",
+          "title": "処理時間（ミリ秒）"
+        },
+        "segments": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1AnswerInput"
-          }
+            "$ref": "#/definitions/v1TranscriptionSegment"
+          },
+          "title": "セグメント情報（タイムスタンプ付き）"
+        },
+        "errorMessage": {
+          "type": "string",
+          "title": "エラーメッセージ（失敗時）"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
         }
-      }
+      },
+      "title": "AudioTranscription は音声→テキスト変換結果。"
     },
-    "v1AutoSaveResponse": {
+    "v1CreatePresentationTopicRequest": {
       "type": "object",
       "properties": {
-        "savedAt": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "examples": {
+          "type": "string"
+        },
+        "targetDepartments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "targetGrades": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "difficulty": {
+          "type": "string"
+        },
+        "timeLimitMinutes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "validFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validUntil": {
           "type": "string",
           "format": "date-time"
         }
       }
     },
-    "v1CreateAssessmentPeriodRequest": {
+    "v1CreatePresentationTopicResponse": {
       "type": "object",
       "properties": {
-        "code": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "startDate": {
-          "type": "string"
-        },
-        "endDate": {
-          "type": "string"
-        },
-        "deadline": {
-          "type": "string"
-        },
-        "allowPractice": {
-          "type": "boolean"
+        "topic": {
+          "$ref": "#/definitions/v1PresentationTopic"
         }
       }
     },
-    "v1CreateAssessmentPeriodResponse": {
+    "v1DeletePresentationTopicResponse": {
+      "type": "object"
+    },
+    "v1GetAudioResponseResponse": {
       "type": "object",
       "properties": {
-        "period": {
-          "$ref": "#/definitions/v1AssessmentPeriod"
+        "audioResponse": {
+          "$ref": "#/definitions/v1AudioResponse"
         }
       }
     },
-    "v1GetAssessmentPeriodResponse": {
+    "v1GetPresentationTopicResponse": {
       "type": "object",
       "properties": {
-        "period": {
-          "$ref": "#/definitions/v1AssessmentPeriod"
+        "topic": {
+          "$ref": "#/definitions/v1PresentationTopic"
         }
       }
     },
-    "v1GetQuestionSettingsResponse": {
+    "v1GetVideoSubmissionResponse": {
       "type": "object",
       "properties": {
-        "settings": {
-          "$ref": "#/definitions/v1QuestionSettings"
+        "video": {
+          "$ref": "#/definitions/v1VideoSubmission"
         }
       }
     },
-    "v1GetSubmissionResponse": {
+    "v1ListAudioResponsesResponse": {
       "type": "object",
       "properties": {
-        "submission": {
-          "$ref": "#/definitions/v1AssessmentSubmission"
-        }
-      }
-    },
-    "v1ListAssessmentPeriodsResponse": {
-      "type": "object",
-      "properties": {
-        "periods": {
+        "audioResponses": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1AssessmentPeriod"
+            "$ref": "#/definitions/v1AudioResponse"
           }
         },
         "pagination": {
@@ -1003,26 +850,29 @@
         }
       }
     },
-    "v1ListQuestionSettingsResponse": {
+    "v1ListPresentationTopicsResponse": {
       "type": "object",
       "properties": {
-        "settings": {
+        "topics": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1QuestionSettings"
+            "$ref": "#/definitions/v1PresentationTopic"
           }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
         }
       }
     },
-    "v1ListSubmissionsResponse": {
+    "v1ListVideoSubmissionsResponse": {
       "type": "object",
       "properties": {
-        "submissions": {
+        "videos": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1AssessmentSubmission"
+            "$ref": "#/definitions/v1VideoSubmission"
           }
         },
         "pagination": {
@@ -1083,49 +933,62 @@
       },
       "description": "PaginationResponse is the standard offset-based pagination output."
     },
-    "v1PeriodStatus": {
-      "type": "string",
-      "enum": [
-        "PERIOD_STATUS_UNSPECIFIED",
-        "PERIOD_STATUS_NOT_STARTED",
-        "PERIOD_STATUS_IN_PROGRESS",
-        "PERIOD_STATUS_COMPLETED"
-      ],
-      "default": "PERIOD_STATUS_UNSPECIFIED",
-      "title": "PeriodStatus はアセスメント期間のステータス。"
-    },
-    "v1QuestionSettings": {
+    "v1PresentationTopic": {
       "type": "object",
       "properties": {
         "metadata": {
           "$ref": "#/definitions/v1ResourceMetadata"
         },
-        "assessmentType": {
-          "$ref": "#/definitions/v1AssessmentType"
-        },
-        "targetGrade": {
+        "title": {
           "type": "string",
-          "title": "対象グレード（空の場合は全グレード共通）"
+          "title": "お題タイトル"
         },
-        "requiredCount": {
-          "type": "integer",
-          "format": "int32"
+        "description": {
+          "type": "string",
+          "title": "お題の詳細説明"
         },
-        "isEnabled": {
-          "type": "boolean"
+        "examples": {
+          "type": "string",
+          "title": "回答例やヒント"
         },
-        "minDifficulty": {
-          "type": "string"
+        "targetDepartments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "対象部門"
         },
-        "maxDifficulty": {
-          "type": "string"
+        "targetGrades": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "対象グレード"
+        },
+        "difficulty": {
+          "type": "string",
+          "title": "難易度（easy/medium/hard）"
         },
         "timeLimitMinutes": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "制限時間（分）"
+        },
+        "isActive": {
+          "type": "boolean",
+          "title": "有効フラグ"
+        },
+        "validFrom": {
+          "type": "string",
+          "format": "date-time",
+          "title": "有効期間"
+        },
+        "validUntil": {
+          "type": "string",
+          "format": "date-time"
         }
       },
-      "title": "QuestionSettings はアセスメント種別ごとの出題設定。"
+      "title": "PresentationTopic はプレゼンテーションのお題。"
     },
     "v1ResourceMetadata": {
       "type": "object",
@@ -1183,6 +1046,22 @@
       },
       "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
     },
+    "v1RetryTranscriptionResponse": {
+      "type": "object",
+      "properties": {
+        "audioResponse": {
+          "$ref": "#/definitions/v1AudioResponse"
+        }
+      }
+    },
+    "v1RetryVideoProcessingResponse": {
+      "type": "object",
+      "properties": {
+        "video": {
+          "$ref": "#/definitions/v1VideoSubmission"
+        }
+      }
+    },
     "v1SecurityLevel": {
       "type": "string",
       "enum": [
@@ -1205,79 +1084,165 @@
       "default": "SORT_ORDER_UNSPECIFIED",
       "description": "SortOrder specifies the sort direction."
     },
-    "v1StartAssessmentRequest": {
+    "v1TranscriptionSegment": {
       "type": "object",
       "properties": {
-        "userId": {
+        "startSeconds": {
+          "type": "number",
+          "format": "double"
+        },
+        "endSeconds": {
+          "type": "number",
+          "format": "double"
+        },
+        "text": {
           "type": "string"
         },
-        "periodId": {
-          "type": "string"
-        },
-        "assessmentType": {
-          "$ref": "#/definitions/v1AssessmentType"
+        "confidence": {
+          "type": "number",
+          "format": "double"
         }
-      }
+      },
+      "title": "TranscriptionSegment はタイムスタンプ付きセグメント。"
     },
-    "v1StartAssessmentResponse": {
-      "type": "object",
-      "properties": {
-        "submission": {
-          "$ref": "#/definitions/v1AssessmentSubmission"
-        }
-      }
-    },
-    "v1SubmissionStatus": {
+    "v1TranscriptionStatus": {
       "type": "string",
       "enum": [
-        "SUBMISSION_STATUS_UNSPECIFIED",
-        "SUBMISSION_STATUS_IN_PROGRESS",
-        "SUBMISSION_STATUS_SUBMITTED",
-        "SUBMISSION_STATUS_EVALUATING",
-        "SUBMISSION_STATUS_EVALUATED",
-        "SUBMISSION_STATUS_REVIEWED"
+        "TRANSCRIPTION_STATUS_UNSPECIFIED",
+        "TRANSCRIPTION_STATUS_PENDING",
+        "TRANSCRIPTION_STATUS_PROCESSING",
+        "TRANSCRIPTION_STATUS_COMPLETED",
+        "TRANSCRIPTION_STATUS_FAILED"
       ],
-      "default": "SUBMISSION_STATUS_UNSPECIFIED",
-      "title": "SubmissionStatus は提出物のステータス。"
+      "default": "TRANSCRIPTION_STATUS_UNSPECIFIED",
+      "title": "TranscriptionStatus は音声→テキスト変換の処理状態。"
     },
-    "v1SubmitAssessmentRequest": {
+    "v1UpdatePresentationTopicResponse": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/v1PresentationTopic"
+        }
+      }
+    },
+    "v1UploadAudioRequest": {
       "type": "object",
       "properties": {
         "sessionId": {
           "type": "string"
         },
-        "answers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1AnswerInput"
-          }
+        "userId": {
+          "type": "string"
+        },
+        "questionId": {
+          "type": "string"
+        },
+        "topicId": {
+          "type": "string"
+        },
+        "audioData": {
+          "type": "string",
+          "format": "byte",
+          "title": "音声データ（バイナリ）"
+        },
+        "audioFormat": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
         }
       }
     },
-    "v1SubmitAssessmentResponse": {
+    "v1UploadAudioResponse": {
       "type": "object",
       "properties": {
-        "submission": {
-          "$ref": "#/definitions/v1AssessmentSubmission"
+        "audioResponse": {
+          "$ref": "#/definitions/v1AudioResponse"
         }
       }
     },
-    "v1UpdateAssessmentPeriodResponse": {
-      "type": "object",
-      "properties": {
-        "period": {
-          "$ref": "#/definitions/v1AssessmentPeriod"
-        }
-      }
+    "v1VideoProcessingStatus": {
+      "type": "string",
+      "enum": [
+        "VIDEO_PROCESSING_STATUS_UNSPECIFIED",
+        "VIDEO_PROCESSING_STATUS_PENDING",
+        "VIDEO_PROCESSING_STATUS_PROCESSING",
+        "VIDEO_PROCESSING_STATUS_COMPLETED",
+        "VIDEO_PROCESSING_STATUS_FAILED"
+      ],
+      "default": "VIDEO_PROCESSING_STATUS_UNSPECIFIED",
+      "title": "VideoProcessingStatus は動画の処理状態。"
     },
-    "v1UpdateQuestionSettingsResponse": {
+    "v1VideoSubmission": {
       "type": "object",
       "properties": {
-        "settings": {
-          "$ref": "#/definitions/v1QuestionSettings"
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "evaluationSessionId": {
+          "type": "string"
+        },
+        "originalFilename": {
+          "type": "string",
+          "title": "ファイル情報"
+        },
+        "storagePath": {
+          "type": "string"
+        },
+        "fileSizeBytes": {
+          "type": "string",
+          "format": "int64"
+        },
+        "durationSeconds": {
+          "type": "number",
+          "format": "double"
+        },
+        "format": {
+          "type": "string"
+        },
+        "resolution": {
+          "type": "string"
+        },
+        "processingStatus": {
+          "$ref": "#/definitions/v1VideoProcessingStatus",
+          "title": "処理ステータス"
+        },
+        "processingStartedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "processingCompletedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "processingError": {
+          "type": "string"
+        },
+        "ocrText": {
+          "type": "string",
+          "title": "OCR結果"
+        },
+        "ocrConfidence": {
+          "type": "number",
+          "format": "double"
+        },
+        "ocrExtractedCode": {
+          "type": "object"
+        },
+        "transcript": {
+          "type": "string",
+          "title": "音声→テキスト結果"
+        },
+        "transcriptConfidence": {
+          "type": "number",
+          "format": "double"
+        },
+        "actionLog": {
+          "type": "object",
+          "title": "アクションログ"
         }
-      }
+      },
+      "title": "VideoSubmission は動画提出データ。"
     }
   }
 }

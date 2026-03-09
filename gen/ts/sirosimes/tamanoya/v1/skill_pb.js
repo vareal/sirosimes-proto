@@ -3,12 +3,13 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3 } from "@bufbuild/protobuf";
+import { FieldMask, proto3 } from "@bufbuild/protobuf";
 import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
 /**
- * SkillLevel classifies the proficiency level of a skill.
+ * SkillDifficulty はスキルの難易度を表す。
+ * SkillLevel は習熟度レベルを表す。
  *
  * @generated from enum sirosimes.tamanoya.v1.SkillLevel
  */
@@ -24,317 +25,389 @@ export const SkillLevel = /*@__PURE__*/ proto3.makeEnum(
 );
 
 /**
- * SkillStatus represents the lifecycle state of a skill.
- *
- * @generated from enum sirosimes.tamanoya.v1.SkillStatus
+ * @generated from enum sirosimes.tamanoya.v1.SkillDifficulty
  */
-export const SkillStatus = /*@__PURE__*/ proto3.makeEnum(
-  "sirosimes.tamanoya.v1.SkillStatus",
+export const SkillDifficulty = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.tamanoya.v1.SkillDifficulty",
   [
-    {no: 0, name: "SKILL_STATUS_UNSPECIFIED", localName: "UNSPECIFIED"},
-    {no: 1, name: "SKILL_STATUS_ACTIVE", localName: "ACTIVE"},
-    {no: 2, name: "SKILL_STATUS_DRAFT", localName: "DRAFT"},
-    {no: 3, name: "SKILL_STATUS_ARCHIVED", localName: "ARCHIVED"},
+    {no: 0, name: "SKILL_DIFFICULTY_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "SKILL_DIFFICULTY_BEGINNER", localName: "BEGINNER"},
+    {no: 2, name: "SKILL_DIFFICULTY_ELEMENTARY", localName: "ELEMENTARY"},
+    {no: 3, name: "SKILL_DIFFICULTY_INTERMEDIATE", localName: "INTERMEDIATE"},
+    {no: 4, name: "SKILL_DIFFICULTY_ADVANCED", localName: "ADVANCED"},
+    {no: 5, name: "SKILL_DIFFICULTY_EXPERT", localName: "EXPERT"},
   ],
 );
 
 /**
- * SkillCategory represents a grouping of related skills.
+ * MeasurementMethodType はスキルの測定方法を表す。
  *
- * @generated from message sirosimes.tamanoya.v1.SkillCategory
+ * @generated from enum sirosimes.tamanoya.v1.MeasurementMethodType
  */
-export const SkillCategory = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.SkillCategory",
+export const MeasurementMethodType = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.tamanoya.v1.MeasurementMethodType",
+  [
+    {no: 0, name: "MEASUREMENT_METHOD_TYPE_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "MEASUREMENT_METHOD_TYPE_CODING", localName: "CODING"},
+    {no: 2, name: "MEASUREMENT_METHOD_TYPE_MULTIPLE_CHOICE", localName: "MULTIPLE_CHOICE"},
+    {no: 3, name: "MEASUREMENT_METHOD_TYPE_FREE_TEXT", localName: "FREE_TEXT"},
+    {no: 4, name: "MEASUREMENT_METHOD_TYPE_VIDEO", localName: "VIDEO"},
+    {no: 5, name: "MEASUREMENT_METHOD_TYPE_PRESENTATION", localName: "PRESENTATION"},
+    {no: 6, name: "MEASUREMENT_METHOD_TYPE_ROLE_PLAY", localName: "ROLE_PLAY"},
+    {no: 7, name: "MEASUREMENT_METHOD_TYPE_DOCUMENT", localName: "DOCUMENT"},
+    {no: 8, name: "MEASUREMENT_METHOD_TYPE_INTERVIEW", localName: "INTERVIEW"},
+  ],
+);
+
+/**
+ * SkillTagCategory はスキルタグのカテゴリを表す。
+ *
+ * @generated from enum sirosimes.tamanoya.v1.SkillTagCategory
+ */
+export const SkillTagCategory = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.tamanoya.v1.SkillTagCategory",
+  [
+    {no: 0, name: "SKILL_TAG_CATEGORY_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "SKILL_TAG_CATEGORY_SKILL_TYPE", localName: "SKILL_TYPE"},
+    {no: 2, name: "SKILL_TAG_CATEGORY_DOMAIN", localName: "DOMAIN"},
+    {no: 3, name: "SKILL_TAG_CATEGORY_ROLE", localName: "ROLE"},
+    {no: 4, name: "SKILL_TAG_CATEGORY_CUSTOM", localName: "CUSTOM"},
+  ],
+);
+
+/**
+ * SkillTag はスキルタグマスタ。
+ *
+ * @generated from message sirosimes.tamanoya.v1.SkillTag
+ */
+export const SkillTag = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.SkillTag",
   () => [
     { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "parent_category_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "sort_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "name_en", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category", kind: "enum", T: proto3.getEnumType(SkillTagCategory) },
+    { no: 6, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 8, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
 /**
- * Skill represents a defined competency or capability.
+ * SkillDefinition はスキル定義。
  *
- * @generated from message sirosimes.tamanoya.v1.Skill
+ * @generated from message sirosimes.tamanoya.v1.SkillDefinition
  */
-export const Skill = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.Skill",
+export const SkillDefinition = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.SkillDefinition",
   () => [
     { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "category_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "default_level", kind: "enum", T: proto3.getEnumType(SkillLevel) },
-    { no: 7, name: "status", kind: "enum", T: proto3.getEnumType(SkillStatus) },
-    { no: 8, name: "prerequisite_skill_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 9, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "skill_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "large_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "medium_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "small_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "skill_detail", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "difficulty", kind: "enum", T: proto3.getEnumType(SkillDifficulty) },
+    { no: 8, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 10, name: "source_file", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "tags", kind: "message", T: SkillTag, repeated: true },
+    { no: 12, name: "measurement_methods", kind: "message", T: SkillMeasurementMethod, repeated: true },
   ],
 );
 
 /**
- * ListSkillCategoriesRequest is the request for listing skill categories.
+ * SkillMeasurementMethod はスキル測定方法。
  *
- * @generated from message sirosimes.tamanoya.v1.ListSkillCategoriesRequest
+ * @generated from message sirosimes.tamanoya.v1.SkillMeasurementMethod
  */
-export const ListSkillCategoriesRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.ListSkillCategoriesRequest",
+export const SkillMeasurementMethod = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.SkillMeasurementMethod",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "skill_definition_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "method_type", kind: "enum", T: proto3.getEnumType(MeasurementMethodType) },
+    { no: 4, name: "display_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "priority", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 7, name: "is_recommended", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "is_excluded", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "exclusion_reason", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetSkillTagRequest
+ */
+export const GetSkillTagRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetSkillTagRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.GetSkillTagResponse
+ */
+export const GetSkillTagResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetSkillTagResponse",
+  () => [
+    { no: 1, name: "tag", kind: "message", T: SkillTag },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListSkillTagsRequest
+ */
+export const ListSkillTagsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListSkillTagsRequest",
   () => [
     { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
-    { no: 2, name: "parent_category_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "category", kind: "enum", T: proto3.getEnumType(SkillTagCategory) },
+    { no: 3, name: "active_only", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
 /**
- * ListSkillCategoriesResponse is the response for listing skill categories.
- *
- * @generated from message sirosimes.tamanoya.v1.ListSkillCategoriesResponse
+ * @generated from message sirosimes.tamanoya.v1.ListSkillTagsResponse
  */
-export const ListSkillCategoriesResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.ListSkillCategoriesResponse",
+export const ListSkillTagsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListSkillTagsResponse",
   () => [
-    { no: 1, name: "categories", kind: "message", T: SkillCategory, repeated: true },
+    { no: 1, name: "tags", kind: "message", T: SkillTag, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
   ],
 );
 
 /**
- * GetSkillCategoryRequest is the request for retrieving a single skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.GetSkillCategoryRequest
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillTagRequest
  */
-export const GetSkillCategoryRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GetSkillCategoryRequest",
+export const CreateSkillTagRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.CreateSkillTagRequest",
   () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * GetSkillCategoryResponse is the response containing a single skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.GetSkillCategoryResponse
- */
-export const GetSkillCategoryResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GetSkillCategoryResponse",
-  () => [
-    { no: 1, name: "category", kind: "message", T: SkillCategory },
-  ],
-);
-
-/**
- * CreateSkillCategoryRequest is the request for creating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillCategoryRequest
- */
-export const CreateSkillCategoryRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.CreateSkillCategoryRequest",
-  () => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "parent_category_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "sort_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-  ],
-);
-
-/**
- * CreateSkillCategoryResponse is the response after creating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillCategoryResponse
- */
-export const CreateSkillCategoryResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.CreateSkillCategoryResponse",
-  () => [
-    { no: 1, name: "category", kind: "message", T: SkillCategory },
-  ],
-);
-
-/**
- * UpdateSkillCategoryRequest is the request for updating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillCategoryRequest
- */
-export const UpdateSkillCategoryRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.UpdateSkillCategoryRequest",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "sort_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "name_en", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "category", kind: "enum", T: proto3.getEnumType(SkillTagCategory) },
+    { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ],
 );
 
 /**
- * UpdateSkillCategoryResponse is the response after updating a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillCategoryResponse
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillTagResponse
  */
-export const UpdateSkillCategoryResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.UpdateSkillCategoryResponse",
+export const CreateSkillTagResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.CreateSkillTagResponse",
   () => [
-    { no: 1, name: "category", kind: "message", T: SkillCategory },
+    { no: 1, name: "tag", kind: "message", T: SkillTag },
   ],
 );
 
 /**
- * DeleteSkillCategoryRequest is the request for deleting a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillCategoryRequest
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillTagRequest
  */
-export const DeleteSkillCategoryRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.DeleteSkillCategoryRequest",
+export const UpdateSkillTagRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateSkillTagRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "update_mask", kind: "message", T: FieldMask },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "name_en", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category", kind: "enum", T: proto3.getEnumType(SkillTagCategory) },
+    { no: 6, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 8, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillTagResponse
+ */
+export const UpdateSkillTagResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateSkillTagResponse",
+  () => [
+    { no: 1, name: "tag", kind: "message", T: SkillTag },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillTagRequest
+ */
+export const DeleteSkillTagRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.DeleteSkillTagRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
- * DeleteSkillCategoryResponse is the response after deleting a skill category.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillCategoryResponse
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillTagResponse
  */
-export const DeleteSkillCategoryResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.DeleteSkillCategoryResponse",
+export const DeleteSkillTagResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.DeleteSkillTagResponse",
   [],
 );
 
 /**
- * ListSkillsRequest is the request for listing skills.
- *
- * @generated from message sirosimes.tamanoya.v1.ListSkillsRequest
+ * @generated from message sirosimes.tamanoya.v1.GetSkillDefinitionRequest
  */
-export const ListSkillsRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.ListSkillsRequest",
+export const GetSkillDefinitionRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetSkillDefinitionRequest",
   () => [
-    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
-    { no: 2, name: "category_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(SkillStatus) },
-    { no: 4, name: "level", kind: "enum", T: proto3.getEnumType(SkillLevel) },
-    { no: 5, name: "search", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
- * ListSkillsResponse is the response for listing skills.
- *
- * @generated from message sirosimes.tamanoya.v1.ListSkillsResponse
+ * @generated from message sirosimes.tamanoya.v1.GetSkillDefinitionResponse
  */
-export const ListSkillsResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.ListSkillsResponse",
+export const GetSkillDefinitionResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.GetSkillDefinitionResponse",
   () => [
-    { no: 1, name: "skills", kind: "message", T: Skill, repeated: true },
+    { no: 1, name: "skill", kind: "message", T: SkillDefinition },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListSkillDefinitionsRequest
+ */
+export const ListSkillDefinitionsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListSkillDefinitionsRequest",
+  () => [
+    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 2, name: "large_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "medium_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "difficulty", kind: "enum", T: proto3.getEnumType(SkillDifficulty) },
+    { no: 5, name: "tag_codes", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "active_only", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 7, name: "query", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ListSkillDefinitionsResponse
+ */
+export const ListSkillDefinitionsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ListSkillDefinitionsResponse",
+  () => [
+    { no: 1, name: "skills", kind: "message", T: SkillDefinition, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
   ],
 );
 
 /**
- * GetSkillRequest is the request for retrieving a single skill.
- *
- * @generated from message sirosimes.tamanoya.v1.GetSkillRequest
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillDefinitionRequest
  */
-export const GetSkillRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GetSkillRequest",
+export const CreateSkillDefinitionRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.CreateSkillDefinitionRequest",
   () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "skill_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "large_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "medium_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "small_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "skill_detail", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "difficulty", kind: "enum", T: proto3.getEnumType(SkillDifficulty) },
+    { no: 7, name: "tag_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 8, name: "measurement_methods", kind: "message", T: MeasurementMethodInput, repeated: true },
   ],
 );
 
 /**
- * GetSkillResponse is the response containing a single skill.
+ * MeasurementMethodInput は測定方法の入力用メッセージ。
  *
- * @generated from message sirosimes.tamanoya.v1.GetSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.MeasurementMethodInput
  */
-export const GetSkillResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.GetSkillResponse",
+export const MeasurementMethodInput = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.MeasurementMethodInput",
   () => [
-    { no: 1, name: "skill", kind: "message", T: Skill },
-  ],
-);
-
-/**
- * CreateSkillRequest is the request for creating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillRequest
- */
-export const CreateSkillRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.CreateSkillRequest",
-  () => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "slug", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "method_type", kind: "enum", T: proto3.getEnumType(MeasurementMethodType) },
+    { no: 2, name: "display_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "category_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "default_level", kind: "enum", T: proto3.getEnumType(SkillLevel) },
-    { no: 6, name: "prerequisite_skill_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 7, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "priority", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "is_recommended", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
 /**
- * CreateSkillResponse is the response after creating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.CreateSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.CreateSkillDefinitionResponse
  */
-export const CreateSkillResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.CreateSkillResponse",
+export const CreateSkillDefinitionResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.CreateSkillDefinitionResponse",
   () => [
-    { no: 1, name: "skill", kind: "message", T: Skill },
+    { no: 1, name: "skill", kind: "message", T: SkillDefinition },
   ],
 );
 
 /**
- * UpdateSkillRequest is the request for updating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillRequest
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillDefinitionRequest
  */
-export const UpdateSkillRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.UpdateSkillRequest",
+export const UpdateSkillDefinitionRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateSkillDefinitionRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "category_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "default_level", kind: "enum", T: proto3.getEnumType(SkillLevel) },
-    { no: 6, name: "status", kind: "enum", T: proto3.getEnumType(SkillStatus) },
-    { no: 7, name: "prerequisite_skill_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 8, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "update_mask", kind: "message", T: FieldMask },
+    { no: 3, name: "large_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "medium_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "small_category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "skill_detail", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "difficulty", kind: "enum", T: proto3.getEnumType(SkillDifficulty) },
+    { no: 8, name: "tag_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 9, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
 /**
- * UpdateSkillResponse is the response after updating a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.UpdateSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.UpdateSkillDefinitionResponse
  */
-export const UpdateSkillResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.UpdateSkillResponse",
+export const UpdateSkillDefinitionResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.UpdateSkillDefinitionResponse",
   () => [
-    { no: 1, name: "skill", kind: "message", T: Skill },
+    { no: 1, name: "skill", kind: "message", T: SkillDefinition },
   ],
 );
 
 /**
- * DeleteSkillRequest is the request for deleting a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillRequest
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillDefinitionRequest
  */
-export const DeleteSkillRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.DeleteSkillRequest",
+export const DeleteSkillDefinitionRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.DeleteSkillDefinitionRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
- * DeleteSkillResponse is the response after deleting a skill.
- *
- * @generated from message sirosimes.tamanoya.v1.DeleteSkillResponse
+ * @generated from message sirosimes.tamanoya.v1.DeleteSkillDefinitionResponse
  */
-export const DeleteSkillResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.tamanoya.v1.DeleteSkillResponse",
+export const DeleteSkillDefinitionResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.DeleteSkillDefinitionResponse",
   [],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ImportSkillsFromCsvRequest
+ */
+export const ImportSkillsFromCsvRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ImportSkillsFromCsvRequest",
+  () => [
+    { no: 1, name: "csv_data", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+    { no: 2, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "imported_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.tamanoya.v1.ImportSkillsFromCsvResponse
+ */
+export const ImportSkillsFromCsvResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.tamanoya.v1.ImportSkillsFromCsvResponse",
+  () => [
+    { no: 1, name: "imported_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "skipped_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "errors", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
 );
 
