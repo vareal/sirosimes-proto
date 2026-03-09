@@ -1,20 +1,12 @@
 {
   "name": "@vareal/sirosimes-proto",
   "version": "0.1.0",
-  "description": "Sirosimes Protocol Buffers generated TypeScript types",
-  "main": "sirosimes/common/v1/index.js",
-  "types": "sirosimes/common/v1/index.d.ts",
-  "files": [
-    "sirosimes/**/*.js",
-    "sirosimes/**/*.d.ts"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vareal/sirosimes-proto.git"
-  },
+  "description": "Generated TypeScript types from Sirosimes Proto SSoT",
+  "main": "index.js",
+  "types": "index.d.ts",
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "@bufbuild/protobuf": "^2.0.0"
+    "@bufbuild/protobuf": "^2.2.3"
   }
 }

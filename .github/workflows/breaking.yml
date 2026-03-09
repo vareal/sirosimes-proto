@@ -13,5 +13,5 @@ jobs:
           fetch-depth: 0
       - uses: bufbuild/buf-setup-action@v1
         with:
-          version: 1.28.1
-      - run: buf breaking --against "https://git.vareal.group/VarealGroup/sirosimes-proto.git#branch=main"
+          version: 1.50.0
+      - run: buf breaking --against 'https://git.vareal.group/VarealGroup/sirosimes-proto.git#branch=main'
