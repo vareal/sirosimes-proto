@@ -5,6 +5,7 @@ package sirosimes.mizugaki.v1;
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/actor.proto";
 import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/mizugaki/v1/api_key.proto";
 
 // auth.proto — 瑞垣（Mizugaki）認証サービス定義。
 //
@@ -75,7 +76,9 @@ message AuthSession {
 
 // ApiKeyConfig は API キーの設定とライフサイクルを管理する。
 // API キーは長期有効トークンであるため、有効期限・スコープ制限・レート制限を必須とする。
+// [Phase 3 deprecated] Superseded by ApiKey in api_key.proto.
 message ApiKeyConfig {
+  option deprecated = true;
   // API キーの一意識別子。
   string id = 1;
   // API キーの表示名（用途の説明）。
@@ -173,38 +176,13 @@ message RevokeSessionRequest {
 // RevokeSessionResponse はセッション取り消しレスポンスを表す。
 message RevokeSessionResponse {}
 
-// CreateApiKeyRequest は API キー作成リクエストを表す。
-// Exposure: INTERNAL（管理者操作）。
-message CreateApiKeyRequest {
-  // API キーの表示名。
-  string name = 1;
-  // 有効期限（必須）。
-  google.protobuf.Timestamp expires_at = 2;
-  // 許可するスコープ。
-  repeated string allowed_scopes = 3;
-  // レート制限（1分あたり）。
-  int32 rate_limit_per_minute = 4;
-  // キーの所有者ID。
-  string owner_id = 5;
-}
+// [Phase 3] CreateApiKeyRequest moved to api_key.proto.
 
-// CreateApiKeyResponse は API キー作成レスポンスを表す。
-message CreateApiKeyResponse {
-  // 作成された API キー設定。
-  ApiKeyConfig api_key = 1;
-  // 平文の API キー（RESTRICTED — この応答でのみ返却、以降は取得不可）。
-  string raw_key = 2;
-}
+// [Phase 3] CreateApiKeyResponse moved to api_key.proto.
 
-// RevokeApiKeyRequest は API キー失効リクエストを表す。
-// Exposure: INTERNAL（管理者操作）。
-message RevokeApiKeyRequest {
-  string id = 1;
-  string reason = 2;
-}
+// [Phase 3] RevokeApiKeyRequest moved to api_key.proto.
 
-// RevokeApiKeyResponse は API キー失効レスポンスを表す。
-message RevokeApiKeyResponse {}
+// [Phase 3] RevokeApiKeyResponse moved to api_key.proto.
 
 // AuthService は瑞垣の認証操作を提供する。
 service AuthService {

@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// api_key.proto — APIキー管理サービス。
+//
+// サービス間通信およびサードパーティ連携用のAPIキー管理を提供する。
+// APIキーは作成時のみ平文で返却し、以降はプレフィックス表示のみ。
+//
+// Exposure: INTERNAL（全RPC）
+
+// ApiKeyStatus はAPIキーの状態を表す。
+enum ApiKeyStatus {
+  API_KEY_STATUS_UNSPECIFIED = 0;
+  API_KEY_STATUS_ACTIVE = 1;
+  API_KEY_STATUS_EXPIRED = 2;
+  API_KEY_STATUS_REVOKED = 3;
+}
+
+// ApiKey はAPIキーを表す。key_valueは作成時レスポンスのみに含まれる。
+message ApiKey {
+  // APIキーのプレフィックス表示（例: "sk_live_abc1...xyz9"）。
+  string key_prefix = 1;
+  // キー名（人間可読な識別子）。
+  string name = 2;
+  // 発行先アクターID。
+  string actor_id = 3;
+  // キー状態。
+  ApiKeyStatus status = 4;
+  // 許可スコープ。
+  repeated string scopes = 5;
+  // 有効期限。
+  google.protobuf.Timestamp expires_at = 6;
+  // 最終使用時刻。
+  google.protobuf.Timestamp last_used_at = 7;
+  // 使用回数。
+  int64 usage_count = 8;
+  // IP制限（CIDR形式、空なら制限なし）。
+  repeated string allowed_cidrs = 9;
+  // レートリミット（requests per minute, 0=無制限）。
+  int32 rate_limit_rpm = 10;
+  // メタデータ。Default security_level: RESTRICTED.
+  sirosimes.common.v1.ResourceMetadata metadata = 11;
+}
+
+// CreateApiKeyRequest はAPIキー作成リクエストを表す。
+message CreateApiKeyRequest {
+  // キー名。
+  string name = 1;
+  // 発行先アクターID。
+  string actor_id = 2;
+  // 許可スコープ。
+  repeated string scopes = 3;
+  // 有効期間（秒）。0の場合はデフォルト（90日）。
+  int64 ttl_seconds = 4;
+  // IP制限（CIDR形式）。
+  repeated string allowed_cidrs = 5;
+  // レートリミット（requests per minute）。
+  int32 rate_limit_rpm = 6;
+}
+
+// CreateApiKeyResponse はAPIキー作成レスポンスを表す。
+// key_valueは本レスポンスでのみ返却される。保存しなければ再取得不可。
+message CreateApiKeyResponse {
+  // 作成されたAPIキー。
+  ApiKey api_key = 1;
+  // 平文APIキー値。このレスポンスのみで返却。
+  string key_value = 2;
+}
+
+// ListApiKeysRequest はAPIキー一覧リクエストを表す。
+message ListApiKeysRequest {
+  // ページネーション。
+  sirosimes.common.v1.PageToken page_token = 1;
+  // アクターIDでフィルタ。
+  string actor_id = 2;
+  // 状態でフィルタ。
+  ApiKeyStatus status = 3;
+}
+
+// ListApiKeysResponse はAPIキー一覧レスポンスを表す。
+message ListApiKeysResponse {
+  // APIキー一覧。
+  repeated ApiKey api_keys = 1;
+  // ページネーション情報。
+  sirosimes.common.v1.PageTokenResponse page_info = 2;
+}
+
+// GetApiKeyRequest はAPIキー取得リクエストを表す。
+message GetApiKeyRequest {
+  // 取得対象のキープレフィックス。
+  string key_prefix = 1;
+}
+
+// GetApiKeyResponse はAPIキー取得レスポンスを表す。
+message GetApiKeyResponse {
+  // APIキー。
+  ApiKey api_key = 1;
+}
+
+// RevokeApiKeyRequest はAPIキー失効リクエストを表す。
+message RevokeApiKeyRequest {
+  // 失効対象のキープレフィックス。
+  string key_prefix = 1;
+  // 失効理由。
+  string reason = 2;
+}
+
+// RevokeApiKeyResponse はAPIキー失効レスポンスを表す。
+message RevokeApiKeyResponse {
+  // 失効後のAPIキー。
+  ApiKey api_key = 1;
+}
+
+// RotateApiKeyRequest はAPIキーローテーションリクエストを表す。
+// 旧キーを失効し、同一スコープ・設定で新キーを発行する。
+message RotateApiKeyRequest {
+  // ローテーション対象のキープレフィックス。
+  string key_prefix = 1;
+  // 旧キーの猶予期間（秒）。この間は旧キーも有効。
+  int64 grace_period_seconds = 2;
+}
+
+// RotateApiKeyResponse はAPIキーローテーションレスポンスを表す。
+message RotateApiKeyResponse {
+  // 新しいAPIキー。
+  ApiKey new_api_key = 1;
+  // 新しい平文キー値。
+  string new_key_value = 2;
+  // 旧キーの失効予定時刻（grace period後）。
+  google.protobuf.Timestamp old_key_expires_at = 3;
+}
+
+// ValidateApiKeyRequest はAPIキー検証リクエストを表す。
+message ValidateApiKeyRequest {
+  // 検証する平文キー値。
+  string key_value = 1;
+  // 必要なスコープ。
+  repeated string required_scopes = 2;
+  // クライアントIP（CIDR制限チェック用）。
+  string client_ip = 3;
+}
+
+// ValidateApiKeyResponse はAPIキー検証レスポンスを表す。
+message ValidateApiKeyResponse {
+  // 検証結果。
+  bool valid = 1;
+  // 有効な場合のAPIキー情報。
+  ApiKey api_key = 2;
+  // 無効な場合の理由。
+  string rejection_reason = 3;
+}
+
+// ApiKeyService はAPIキー管理操作を提供する。
+// Exposure: INTERNAL
+service ApiKeyService {
+  // APIキーを作成する。
+  rpc CreateApiKey(CreateApiKeyRequest) returns (CreateApiKeyResponse);
+  // APIキー一覧を取得する。
+  rpc ListApiKeys(ListApiKeysRequest) returns (ListApiKeysResponse);
+  // APIキーを取得する。
+  rpc GetApiKey(GetApiKeyRequest) returns (GetApiKeyResponse);
+  // APIキーを失効する。
+  rpc RevokeApiKey(RevokeApiKeyRequest) returns (RevokeApiKeyResponse);
+  // APIキーをローテーションする。
+  rpc RotateApiKey(RotateApiKeyRequest) returns (RotateApiKeyResponse);
+  // APIキーを検証する。
+  rpc ValidateApiKey(ValidateApiKeyRequest) returns (ValidateApiKeyResponse);
+}

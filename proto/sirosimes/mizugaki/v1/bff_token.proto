@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/mizugaki/v1/token.proto";
+
+// bff_token.proto — BFF（Backend For Frontend）オペークトークン管理。
+//
+// クライアントに公開するトークンはオペーク形式（意味のない参照値）とし、
+// 内部でのみJWTクレームにマッピングする。外部APIにJWTを直接露出しない。
+// ADR-002に基づくBFFトークン設計。
+//
+// Exposure: INTERNAL（BFFサーバー↔瑞垣間の内部通信）
+
+// OpaqueTokenType はオペークトークンの種別を分類する。
+enum OpaqueTokenType {
+  OPAQUE_TOKEN_TYPE_UNSPECIFIED = 0;
+  // セッション用アクセストークン。
+  OPAQUE_TOKEN_TYPE_SESSION = 1;
+  // APIアクセス用トークン。
+  OPAQUE_TOKEN_TYPE_API = 2;
+  // サービス間通信用トークン。
+  OPAQUE_TOKEN_TYPE_SERVICE = 3;
+}
+
+// OpaqueToken はBFFが発行するオペークトークンを表す。
+// クライアントにはtoken_referenceのみ返却し、内部クレームは返却しない。
+message OpaqueToken {
+  // オペークトークン参照値（暗号論的ランダム、Base64URL、48バイト）。
+  // クライアントに公開される唯一の値。
+  string token_reference = 1;
+  // 内部JWT ID（jti）へのマッピング。クライアントには非公開。
+  string internal_jti = 2;
+  // トークン種別。
+  OpaqueTokenType token_type = 3;
+  // 発行先アクターID。
+  string subject_actor_id = 4;
+  // 許可されたスコープ。
+  repeated string scopes = 5;
+  // 発行時刻。
+  google.protobuf.Timestamp issued_at = 6;
+  // 有効期限。
+  google.protobuf.Timestamp expires_at = 7;
+  // 最終使用時刻。
+  google.protobuf.Timestamp last_used_at = 8;
+  // トークンが失効されたかどうか。
+  bool revoked = 9;
+  // メタデータ。Default security_level: RESTRICTED.
+  sirosimes.common.v1.ResourceMetadata metadata = 10;
+}
+
+// IssueOpaqueTokenRequest はオペークトークン発行リクエストを表す。
+message IssueOpaqueTokenRequest {
+  // 発行先アクターID。
+  string subject_actor_id = 1;
+  // トークン種別。
+  OpaqueTokenType token_type = 2;
+  // 要求スコープ。
+  repeated string scopes = 3;
+  // 有効期間（秒）。0の場合はデフォルト値を使用。
+  int64 ttl_seconds = 4;
+  // クライアントIP（監査ログ用）。
+  string client_ip = 5;
+  // ユーザーエージェント（監査ログ用）。
+  string user_agent = 6;
+}
+
+// IssueOpaqueTokenResponse はオペークトークン発行レスポンスを表す。
+message IssueOpaqueTokenResponse {
+  // クライアントに返却するオペーク参照値。
+  string token_reference = 1;
+  // 有効期限。
+  google.protobuf.Timestamp expires_at = 2;
+  // 付与されたスコープ。
+  repeated string granted_scopes = 3;
+}
+
+// ValidateOpaqueTokenRequest はオペークトークン検証リクエストを表す。
+message ValidateOpaqueTokenRequest {
+  // 検証するオペーク参照値。
+  string token_reference = 1;
+  // 必要なスコープ（全て満たす必要あり）。
+  repeated string required_scopes = 2;
+}
+
+// ValidateOpaqueTokenResponse はオペークトークン検証レスポンスを表す。
+message ValidateOpaqueTokenResponse {
+  // トークンが有効かどうか。
+  bool valid = 1;
+  // 有効な場合のアクターID。
+  string subject_actor_id = 2;
+  // 付与されたスコープ。
+  repeated string scopes = 3;
+  // 内部トークンクレーム（BFFサーバー内部用）。
+  TokenClaims internal_claims = 4;
+  // 無効な場合の理由。
+  string rejection_reason = 5;
+}
+
+// RevokeOpaqueTokenRequest はオペークトークン失効リクエストを表す。
+message RevokeOpaqueTokenRequest {
+  // 失効するオペーク参照値。
+  string token_reference = 1;
+  // 失効理由。
+  string reason = 2;
+}
+
+// RevokeOpaqueTokenResponse はオペークトークン失効レスポンスを表す。
+message RevokeOpaqueTokenResponse {}
+
+// BFFTokenService はBFFオペークトークン管理操作を提供する。
+// Exposure: INTERNAL — BFFサーバーと瑞垣バックエンド間の内部通信のみ。
+service BFFTokenService {
+  // オペークトークンを発行する。
+  rpc IssueOpaqueToken(IssueOpaqueTokenRequest) returns (IssueOpaqueTokenResponse);
+  // オペークトークンを検証し、内部クレームを返却する。
+  rpc ValidateOpaqueToken(ValidateOpaqueTokenRequest) returns (ValidateOpaqueTokenResponse);
+  // オペークトークンを失効する。
+  rpc RevokeOpaqueToken(RevokeOpaqueTokenRequest) returns (RevokeOpaqueTokenResponse);
+}

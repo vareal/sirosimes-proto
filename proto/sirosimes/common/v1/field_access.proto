@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "sirosimes/common/v1/metadata.proto";
+
+// field_access.proto — フィールドレベルアクセス制御プリミティブ。
+//
+// ロール・SecurityLevelに基づくフィールドフィルタリングを定義する。
+// Employee等のPIIを含むエンティティで使用。
+
+// FieldAccessLevel はフィールドへのアクセスレベルを定義する。
+enum FieldAccessLevel {
+  FIELD_ACCESS_LEVEL_UNSPECIFIED = 0;
+  // フィールド値をそのまま返却。
+  FIELD_ACCESS_LEVEL_FULL = 1;
+  // フィールド値をマスクして返却（例: メール → t***@vareal.co.jp）。
+  FIELD_ACCESS_LEVEL_MASKED = 2;
+  // フィールドを応答から除外。
+  FIELD_ACCESS_LEVEL_HIDDEN = 3;
+}
+
+// FieldAccessRule は特定フィールドに対するアクセスルールを定義する。
+message FieldAccessRule {
+  // 対象フィールドパス（proto field name, ドット記法対応: e.g., "employee.email"）。
+  string field_path = 1;
+  // このフィールドの最低必要SecurityLevel。
+  SecurityLevel required_security_level = 2;
+  // 最低必要trust_level（Role.trust_level）。
+  int32 required_trust_level = 3;
+  // SecurityLevel不足時の動作。
+  FieldAccessLevel fallback_access = 4;
+}
+
+// FieldAccessPolicy は複数フィールドのアクセスポリシーを束ねる。
+message FieldAccessPolicy {
+  // ポリシーID。
+  string id = 1;
+  // ポリシー名（e.g., "employee_pii_policy"）。
+  string name = 2;
+  // 対象リソースタイプ（e.g., "sirosimes.tsukasa.v1.Employee"）。
+  string resource_type = 3;
+  // フィールドルールの一覧。
+  repeated FieldAccessRule rules = 4;
+  // ポリシーが有効かどうか。
+  bool enabled = 5;
+}

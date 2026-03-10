@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package sirosimes.mizugaki.external.v1;
+
+import "sirosimes/mizugaki/v1/api_key.proto";
+
+// api_key_service.proto — 外部向けAPIキー管理サービス。
+//
+// クライアント（テナント管理者）が自身のAPIキーを管理するための外部エンドポイント。
+// 内部ApiKeyServiceのサブセットを公開する。
+//
+// Exposure: EXTERNAL
+
+// ExternalApiKeyService は外部向けAPIキー管理操作を提供する。
+// 認証済みユーザーは自身のAPIキーのみ管理可能。
+service ExternalApiKeyService {
+  // 新しいAPIキーを作成する。
+  rpc CreateApiKey(sirosimes.mizugaki.v1.CreateApiKeyRequest) returns (sirosimes.mizugaki.v1.CreateApiKeyResponse);
+  // 自身のAPIキー一覧を取得する。
+  rpc ListApiKeys(sirosimes.mizugaki.v1.ListApiKeysRequest) returns (sirosimes.mizugaki.v1.ListApiKeysResponse);
+  // APIキーを失効する。
+  rpc RevokeApiKey(sirosimes.mizugaki.v1.RevokeApiKeyRequest) returns (sirosimes.mizugaki.v1.RevokeApiKeyResponse);
+}

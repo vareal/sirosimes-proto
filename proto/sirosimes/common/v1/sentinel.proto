@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// sentinel.proto — セキュリティ監視・アラート定義。
+//
+// 異常検知、脅威アラート、セキュリティイベントの構造化を提供する。
+// MASフレームワーク（監視・監査・監督）の技術基盤。
+
+// ThreatSeverity は脅威の深刻度を分類する。
+enum ThreatSeverity {
+  THREAT_SEVERITY_UNSPECIFIED = 0;
+  // 情報のみ（異常ではないが記録対象）。
+  THREAT_SEVERITY_INFO = 1;
+  // 低リスク（通常の異常パターン）。
+  THREAT_SEVERITY_LOW = 2;
+  // 中リスク（要調査）。
+  THREAT_SEVERITY_MEDIUM = 3;
+  // 高リスク（即時対応必要）。
+  THREAT_SEVERITY_HIGH = 4;
+  // クリティカル（セキュリティインシデント）。
+  THREAT_SEVERITY_CRITICAL = 5;
+}
+
+// SecurityEventType はセキュリティイベントの種別を分類する。
+enum SecurityEventType {
+  SECURITY_EVENT_TYPE_UNSPECIFIED = 0;
+  // 認証失敗（ブルートフォース検知等）。
+  SECURITY_EVENT_TYPE_AUTH_FAILURE = 1;
+  // 権限昇格試行。
+  SECURITY_EVENT_TYPE_PRIVILEGE_ESCALATION = 2;
+  // データ漏洩の疑い。
+  SECURITY_EVENT_TYPE_DATA_EXFILTRATION = 3;
+  // 異常なAPIアクセスパターン。
+  SECURITY_EVENT_TYPE_ANOMALOUS_ACCESS = 4;
+  // 整合性検証失敗（改ざん検知）。
+  SECURITY_EVENT_TYPE_INTEGRITY_VIOLATION = 5;
+  // レートリミット超過（持続的）。
+  SECURITY_EVENT_TYPE_RATE_LIMIT_ABUSE = 6;
+  // 不正なトークン使用。
+  SECURITY_EVENT_TYPE_INVALID_TOKEN = 7;
+  // 越境データアクセス試行。
+  SECURITY_EVENT_TYPE_CROSS_BOUNDARY_ACCESS = 8;
+  // 設定変更（セキュリティ関連）。
+  SECURITY_EVENT_TYPE_CONFIG_CHANGE = 9;
+  // Proto定義の不正変更検知。
+  SECURITY_EVENT_TYPE_SCHEMA_TAMPERING = 10;
+}
+
+// SecurityEvent はセキュリティイベントを表す。
+message SecurityEvent {
+  // イベントID（UUID）。
+  string id = 1;
+  // イベント種別。
+  SecurityEventType event_type = 2;
+  // 深刻度。
+  ThreatSeverity severity = 3;
+  // 発生時刻。
+  google.protobuf.Timestamp occurred_at = 4;
+  // 検知時刻。
+  google.protobuf.Timestamp detected_at = 5;
+  // 発生元サービス。
+  string source_service = 6;
+  // 関連アクターID。
+  string actor_id = 7;
+  // 対象リソースタイプ。
+  string resource_type = 8;
+  // 対象リソースID。
+  string resource_id = 9;
+  // イベント詳細（構造化データ）。
+  google.protobuf.Struct details = 10;
+  // クライアントIP。
+  string client_ip = 11;
+  // ユーザーエージェント。
+  string user_agent = 12;
+  // 対応ステータス。
+  string resolution_status = 13;
+  // 対応者。
+  string resolved_by = 14;
+  // 対応時刻。
+  google.protobuf.Timestamp resolved_at = 15;
+}
+
+// SecurityAlert はセキュリティアラートを表す。
+message SecurityAlert {
+  // アラートID。
+  string id = 1;
+  // アラートタイトル。
+  string title = 2;
+  // アラート詳細。
+  string description = 3;
+  // 深刻度。
+  ThreatSeverity severity = 4;
+  // 関連イベントID一覧。
+  repeated string event_ids = 5;
+  // 通知先チャンネル（例: "#sirosimes-alert"）。
+  repeated string notify_channels = 6;
+  // 通知先アクターID。
+  repeated string notify_actors = 7;
+  // 発報時刻。
+  google.protobuf.Timestamp fired_at = 8;
+  // 確認者。
+  string acknowledged_by = 9;
+  // 確認時刻。
+  google.protobuf.Timestamp acknowledged_at = 10;
+}

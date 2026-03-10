@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// integrity.proto — HMAC-SHA256ベースの整合性検証プリミティブ。
+// 承認チェーンの改ざん検知に使用する。
+
+// HashAlgorithm は整合性ハッシュに使用するアルゴリズム。
+enum HashAlgorithm {
+  HASH_ALGORITHM_UNSPECIFIED = 0;
+  HASH_ALGORITHM_HMAC_SHA256 = 1;
+  HASH_ALGORITHM_HMAC_SHA512 = 2;
+}
+
+// IntegrityHash は単一リソースの整合性ハッシュを表す。
+message IntegrityHash {
+  // HMAC-SHA256ハッシュ値（hex encoded）。
+  string hash = 1;
+  // ハッシュアルゴリズム。
+  HashAlgorithm algorithm = 2;
+  // ハッシュ対象フィールド（"*" は全フィールド）。
+  repeated string covered_fields = 3;
+  // 前のハッシュ値（チェーン連結用）。空の場合はチェーンの先頭。
+  string previous_hash = 4;
+  // ハッシュ計算時刻。
+  google.protobuf.Timestamp computed_at = 5;
+  // ハッシュ計算を実行したアクターID。
+  string computed_by = 6;
+}
+
+// IntegrityVerification は整合性検証の結果を表す。
+message IntegrityVerification {
+  // 検証が成功したかどうか。
+  bool valid = 1;
+  // 検証失敗時の理由。
+  string failure_reason = 2;
+  // 検証されたチェーンの長さ。
+  int32 chain_length = 3;
+  // 最初に不整合が検出されたチェーン位置（0-indexed, -1は不整合なし）。
+  int32 first_mismatch_index = 4;
+  // 検証実行時刻。
+  google.protobuf.Timestamp verified_at = 5;
+}

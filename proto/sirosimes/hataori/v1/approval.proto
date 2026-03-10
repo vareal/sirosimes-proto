@@ -3,6 +3,7 @@ syntax = "proto3";
 package sirosimes.hataori.v1;
 
 import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/integrity.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/pagination.proto";
@@ -53,6 +54,10 @@ message ApprovalRequest {
   string escalate_to = 9;
   // When the approval decision was made.
   google.protobuf.Timestamp responded_at = 10;
+  // HMAC-SHA256 integrity hash for tamper detection of approval chain.
+  // Covers: execution_id, step_name, assignee, status, comment, timeout_at.
+  // previous_hash links to the preceding approval in the chain.
+  sirosimes.common.v1.IntegrityHash integrity_hash = 13;
   // [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.
   google.protobuf.Timestamp created_at = 11 [deprecated = true];
   // Standard resource metadata. Default security_level: CONFIDENTIAL (approval audit trail).

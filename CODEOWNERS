@@ -32,3 +32,12 @@ buf.gen.yaml @fujiwara.ai
 
 # デフォルト（全ファイル）
 * @fujiwara.ai
+
+# Phase 3: セキュリティ基盤
+proto/sirosimes/common/v1/integrity.proto @katsuragi.makoto
+proto/sirosimes/common/v1/field_access.proto @katsuragi.makoto
+proto/sirosimes/common/v1/rate_limit.proto @katsuragi.makoto
+proto/sirosimes/common/v1/sentinel.proto @katsuragi.makoto
+proto/sirosimes/mizugaki/v1/bff_token.proto @katsuragi.makoto
+proto/sirosimes/mizugaki/v1/api_key.proto @katsuragi.makoto
+proto/sirosimes/mizugaki/external/v1/api_key_service.proto @katsuragi.makoto

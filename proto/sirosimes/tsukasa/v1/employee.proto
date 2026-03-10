@@ -3,6 +3,7 @@ syntax = "proto3";
 package sirosimes.tsukasa.v1;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
 import "sirosimes/common/v1/actor.proto";
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
@@ -108,6 +109,8 @@ message ListEmployeesRequest {
   EmployeeStatus status = 3;
   string department_id = 4;
   string search = 5;
+  // Optional field mask for field-level access control.
+  google.protobuf.FieldMask read_mask = 6;
 }
 
 // ListEmployeesResponse is the response for listing employees.
@@ -119,6 +122,10 @@ message ListEmployeesResponse {
 // GetEmployeeRequest is the request for retrieving a single employee.
 message GetEmployeeRequest {
   string id = 1;
+  // Optional field mask for field-level access control.
+  // When set, only specified fields are returned (subject to FieldAccessPolicy).
+  // When empty, all fields accessible to the caller are returned.
+  google.protobuf.FieldMask read_mask = 3;
 }
 
 // GetEmployeeResponse is the response containing a single employee.

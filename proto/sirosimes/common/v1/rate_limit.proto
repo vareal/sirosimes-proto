@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package sirosimes.common.v1;
+
+import "google/protobuf/duration.proto";
+
+// rate_limit.proto — レートリミット・スロットリング定義。
+//
+// APIエンドポイントの保護に使用するレートリミットポリシーを定義する。
+// 瑞垣ゲートウェイおよび道標ルーターで適用される。
+
+// RateLimitAlgorithm はレートリミットアルゴリズムを分類する。
+enum RateLimitAlgorithm {
+  RATE_LIMIT_ALGORITHM_UNSPECIFIED = 0;
+  // 固定ウィンドウ（期間あたりの固定上限）。
+  RATE_LIMIT_ALGORITHM_FIXED_WINDOW = 1;
+  // スライディングウィンドウ（より均一な分布）。
+  RATE_LIMIT_ALGORITHM_SLIDING_WINDOW = 2;
+  // トークンバケット（バースト許容）。
+  RATE_LIMIT_ALGORITHM_TOKEN_BUCKET = 3;
+}
+
+// RateLimitScope はレートリミットの適用スコープを分類する。
+enum RateLimitScope {
+  RATE_LIMIT_SCOPE_UNSPECIFIED = 0;
+  // グローバル（全リクエスト合計）。
+  RATE_LIMIT_SCOPE_GLOBAL = 1;
+  // アクター単位。
+  RATE_LIMIT_SCOPE_PER_ACTOR = 2;
+  // IP単位。
+  RATE_LIMIT_SCOPE_PER_IP = 3;
+  // APIキー単位。
+  RATE_LIMIT_SCOPE_PER_API_KEY = 4;
+  // テナント単位。
+  RATE_LIMIT_SCOPE_PER_TENANT = 5;
+}
+
+// RateLimitPolicy はエンドポイントに適用するレートリミットポリシーを定義する。
+message RateLimitPolicy {
+  // ポリシーID。
+  string id = 1;
+  // ポリシー名。
+  string name = 2;
+  // 適用アルゴリズム。
+  RateLimitAlgorithm algorithm = 3;
+  // 適用スコープ。
+  RateLimitScope scope = 4;
+  // ウィンドウ期間。
+  google.protobuf.Duration window = 5;
+  // ウィンドウ内の最大リクエスト数。
+  int64 max_requests = 6;
+  // トークンバケットのバーストサイズ（TOKEN_BUCKETの場合のみ）。
+  int64 burst_size = 7;
+  // 制限超過時のリトライ可能までの待機時間。
+  google.protobuf.Duration retry_after = 8;
+  // ポリシーが有効かどうか。
+  bool enabled = 9;
+}
+
+// RateLimitStatus はレートリミットの現在の消費状態を表す。
+message RateLimitStatus {
+  // 残りリクエスト数。
+  int64 remaining = 1;
+  // ウィンドウ内の上限。
+  int64 limit = 2;
+  // ウィンドウのリセット時刻（Unix epoch秒）。
+  int64 reset_at_epoch = 3;
+  // リトライ可能までの秒数（制限超過時のみ）。
+  int64 retry_after_seconds = 4;
+}
