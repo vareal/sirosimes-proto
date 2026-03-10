@@ -82,6 +82,9 @@ message SecurityEvent {
   string resolved_by = 14;
   // 対応時刻。
   google.protobuf.Timestamp resolved_at = 15;
+  // 相関ID — 同一攻撃・同一インシデントに属する複数イベントをグルーピングする。
+  // インシデント対応時に関連イベントの追跡に使用。
+  string correlation_id = 16;
 }
 
 // SecurityAlert はセキュリティアラートを表す。

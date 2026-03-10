@@ -10,8 +10,9 @@ SECURITY.md @katsuragi.makoto
 # 瑞垣（認証基盤）— 全Proto CISO必須レビュー
 proto/sirosimes/mizugaki/v1/*.proto @katsuragi.makoto
 
-# External/Internal API分離（将来Phase 2）
+# External/Internal API分離
 proto/sirosimes/external/ @katsuragi.makoto
+proto/sirosimes/mizugaki/external/ @katsuragi.makoto
 proto/sirosimes/internal/ @katsuragi.makoto
 
 # 共通型定義
