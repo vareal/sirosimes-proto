@@ -1,15 +1,15 @@
 syntax = "proto3";
 
-package sirosimes.tenshu.v1;
+package sirosimes.amatsukagami.v1;
 
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
-import "sirosimes/tenshu/v1/alert.proto";
+import "sirosimes/amatsukagami/v1/alert.proto";
 
 // notification.proto — 通知チャネル・配信管理定義。
 //
-// 天守アラートからの通知配信を管理する。
+// 天津鏡アラートからの通知配信を管理する。
 // Mattermostからの全面移行に対応し、以下の通知チャネルをサポート:
 // 🟢 Info: 司チャット  🟡 Warning: 司チャット+プッシュ通知
 // 🟠 High: SMS+司チャット  🔴 Critical: 電話+SMS+司チャット

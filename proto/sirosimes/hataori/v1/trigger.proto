@@ -33,7 +33,7 @@ enum TriggerType {
   TRIGGER_TYPE_VM_EVENT = 13;
   // SecurityEvent連携（sentinel.proto → 機織WFトリガー）。Phase 4追加。
   TRIGGER_TYPE_SECURITY_EVENT = 14;
-  // 天守アラート連携（tenshu alert → 機織WFトリガー）。Phase 4追加。
+  // 天津鏡アラート連携（amatsukagami alert → 機織WFトリガー）。Phase 4追加。
   TRIGGER_TYPE_TENSHU_ALERT = 15;
 }
 

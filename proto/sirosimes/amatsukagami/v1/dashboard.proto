@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package sirosimes.tenshu.v1;
+package sirosimes.amatsukagami.v1;
 
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
-import "sirosimes/tenshu/v1/metric.proto";
+import "sirosimes/amatsukagami/v1/metric.proto";
 
 // dashboard.proto — 統合ダッシュボード構成定義。
 //

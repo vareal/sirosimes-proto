@@ -11,7 +11,7 @@ import "sirosimes/common/v1/pagination.proto";
 // カメラ管理、映像ストリーム、物体検出、顔認識、
 // 映像アーカイブを提供する。
 // 依代（Yorishiro）のカメラデバイスと連携し、
-// 天守（Tenshu）の物理世界監視領域にデータを提供する。
+// 天津鏡（Amatsukagami）の物理世界監視領域にデータを提供する。
 
 // StreamStatus はストリームの状態。
 enum StreamStatus {

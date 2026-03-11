@@ -9,7 +9,7 @@ import "sirosimes/common/v1/pagination.proto";
 // business.proto — Nexia ERP 業務管理（顧客・請求・在庫）。
 //
 // 顧客管理（CRM）、請求書管理、在庫管理、営業パイプラインを提供する。
-// 天守（Tenshu）のビジネス・財務メトリクスとして監視データを提供する。
+// 天津鏡（Amatsukagami）のビジネス・財務メトリクスとして監視データを提供する。
 
 // CustomerStatus は顧客のステータス。
 enum CustomerStatus {

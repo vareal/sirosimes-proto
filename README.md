@@ -24,7 +24,7 @@ git clone <repo-url> && cd sirosimes-proto && make all
 | Kaji (鍛冶) | CI/CD pipeline management |
 | Tamanoya (玉の舎) | Learning & training platform |
 | Tamayura (玉響) | Real-time messaging & communication |
-| Tenshu (天守) | Integrated monitoring & observability |
+| Amatsukagami (天津鏡) | Integrated monitoring & observability |
 | Kotonoha (言の葉) | NLP & document processing |
 | Omokage (面影) | Memory & RAG retrieval |
 | Chakai (茶会) | Meeting & collaboration |

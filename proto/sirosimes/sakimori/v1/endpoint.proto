@@ -9,7 +9,7 @@ import "sirosimes/common/v1/pagination.proto";
 // endpoint.proto — 防人（Sakimori）エンドポイント保護・脆弱性管理。
 //
 // エンドポイントデバイスの保護、脆弱性スキャン、パッチ管理、
-// 隔離対応を提供する。天守（Tenshu）と連携し、
+// 隔離対応を提供する。天津鏡（Amatsukagami）と連携し、
 // エンドポイントのセキュリティ状態を統合監視する。
 
 // EndpointStatus はエンドポイントのセキュリティ状態。

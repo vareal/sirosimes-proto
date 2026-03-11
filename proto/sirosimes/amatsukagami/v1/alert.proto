@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package sirosimes.tenshu.v1;
+package sirosimes.amatsukagami.v1;
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/metadata.proto";
 import "sirosimes/common/v1/pagination.proto";
-import "sirosimes/tenshu/v1/metric.proto";
+import "sirosimes/amatsukagami/v1/metric.proto";
 
 // alert.proto — アラートルール・条件・評価エンジン定義。
 //

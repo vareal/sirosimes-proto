@@ -25,8 +25,8 @@ proto/sirosimes/imonori/ @katsuragi.makoto
 # 防人（エンドポイント保護）— CISO必須レビュー
 proto/sirosimes/sakimori/ @katsuragi.makoto
 
-# 天守（監視基盤）— 人間社員監視はCISO/CHROレビュー
-proto/sirosimes/tenshu/v1/human_monitor.proto @katsuragi.makoto
+# 天津鏡（監視基盤）— 人間社員監視はCISO/CHROレビュー
+proto/sirosimes/amatsukagami/v1/human_monitor.proto @katsuragi.makoto
 
 # 共通型定義
 proto/sirosimes/common/ @fujiwara.ai

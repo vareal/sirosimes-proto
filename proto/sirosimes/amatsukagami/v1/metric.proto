@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package sirosimes.tenshu.v1;
+package sirosimes.amatsukagami.v1;
 
 import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/metadata.proto";
@@ -8,7 +8,7 @@ import "sirosimes/common/v1/pagination.proto";
 
 // metric.proto — メトリクス収集・格納定義。
 //
-// 天守（Tenshu）監視基盤のコアデータモデル。
+// 天津鏡（Amatsukagami）監視基盤のコアデータモデル。
 // OTLP Receiver, Redis Consumer, SecurityEvent統合による
 // 統合メトリクス収集エンジンを定義する。
 // 8監視領域（ビジネス/財務/AI社員/プロダクト/セキュリティ/インフラ/物理世界/人間社員）
