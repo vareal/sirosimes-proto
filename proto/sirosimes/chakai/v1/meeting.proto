@@ -1,0 +1,218 @@
+syntax = "proto3";
+
+package sirosimes.chakai.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// meeting.proto — 茶会（Chakai）会議・コラボレーション管理。
+//
+// 会議スケジューリング、参加者管理、議事録、アクションアイテム追跡を提供。
+// 司（Tsukasa）のビデオ通話基盤と連携し、リアルタイム会議を実現する。
+
+// MeetingStatus は会議の状態。
+enum MeetingStatus {
+  MEETING_STATUS_UNSPECIFIED = 0;
+  MEETING_STATUS_SCHEDULED = 1;
+  MEETING_STATUS_IN_PROGRESS = 2;
+  MEETING_STATUS_COMPLETED = 3;
+  MEETING_STATUS_CANCELLED = 4;
+}
+
+// MeetingType は会議の種別。
+enum MeetingType {
+  MEETING_TYPE_UNSPECIFIED = 0;
+  MEETING_TYPE_STANDUP = 1;
+  MEETING_TYPE_ONE_ON_ONE = 2;
+  MEETING_TYPE_TEAM = 3;
+  MEETING_TYPE_ALL_HANDS = 4;
+  MEETING_TYPE_REVIEW = 5;
+  MEETING_TYPE_PLANNING = 6;
+  MEETING_TYPE_RETROSPECTIVE = 7;
+  MEETING_TYPE_EXTERNAL = 8;
+}
+
+// ParticipantRole は参加者の役割。
+enum ParticipantRole {
+  PARTICIPANT_ROLE_UNSPECIFIED = 0;
+  PARTICIPANT_ROLE_ORGANIZER = 1;
+  PARTICIPANT_ROLE_PRESENTER = 2;
+  PARTICIPANT_ROLE_ATTENDEE = 3;
+  PARTICIPANT_ROLE_SCRIBE = 4;
+  PARTICIPANT_ROLE_OBSERVER = 5;
+}
+
+// Participant は会議参加者。
+message Participant {
+  string employee_id = 1;
+  string display_name = 2;
+  ParticipantRole role = 3;
+  bool is_ai = 4;
+  google.protobuf.Timestamp joined_at = 5;
+  google.protobuf.Timestamp left_at = 6;
+  google.protobuf.Duration speaking_duration = 7;
+}
+
+// ActionItem はアクションアイテム。
+message ActionItem {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string assignee_id = 4;
+  google.protobuf.Timestamp due_date = 5;
+  bool completed = 6;
+  google.protobuf.Timestamp completed_at = 7;
+  string task_id = 8;
+}
+
+// Meeting は会議。
+message Meeting {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string title = 2;
+  MeetingType type = 3;
+  MeetingStatus status = 4;
+  google.protobuf.Timestamp scheduled_start = 5;
+  google.protobuf.Timestamp scheduled_end = 6;
+  google.protobuf.Timestamp actual_start = 7;
+  google.protobuf.Timestamp actual_end = 8;
+  repeated Participant participants = 9;
+  string agenda = 10;
+  string minutes = 11;
+  string summary = 12;
+  repeated ActionItem action_items = 13;
+  string recording_url = 14;
+  string transcript = 15;
+  repeated string tags = 16;
+  string recurrence_rule = 17;
+}
+
+// MeetingService は会議管理サービス。
+service MeetingService {
+  rpc CreateMeeting(CreateMeetingRequest) returns (CreateMeetingResponse);
+  rpc GetMeeting(GetMeetingRequest) returns (GetMeetingResponse);
+  rpc UpdateMeeting(UpdateMeetingRequest) returns (UpdateMeetingResponse);
+  rpc DeleteMeeting(DeleteMeetingRequest) returns (DeleteMeetingResponse);
+  rpc ListMeetings(ListMeetingsRequest) returns (ListMeetingsResponse);
+  rpc StartMeeting(StartMeetingRequest) returns (StartMeetingResponse);
+  rpc EndMeeting(EndMeetingRequest) returns (EndMeetingResponse);
+  rpc AddParticipant(AddParticipantRequest) returns (AddParticipantResponse);
+  rpc GenerateMinutes(GenerateMinutesRequest) returns (GenerateMinutesResponse);
+  rpc CreateActionItem(CreateActionItemRequest) returns (CreateActionItemResponse);
+  rpc CompleteActionItem(CompleteActionItemRequest) returns (CompleteActionItemResponse);
+}
+
+message CreateMeetingRequest {
+  string title = 1;
+  MeetingType type = 2;
+  google.protobuf.Timestamp scheduled_start = 3;
+  google.protobuf.Timestamp scheduled_end = 4;
+  repeated string participant_ids = 5;
+  string agenda = 6;
+  string recurrence_rule = 7;
+  repeated string tags = 8;
+}
+
+message CreateMeetingResponse {
+  Meeting meeting = 1;
+}
+
+message GetMeetingRequest {
+  string id = 1;
+}
+
+message GetMeetingResponse {
+  Meeting meeting = 1;
+}
+
+message UpdateMeetingRequest {
+  string id = 1;
+  string title = 2;
+  google.protobuf.Timestamp scheduled_start = 3;
+  google.protobuf.Timestamp scheduled_end = 4;
+  string agenda = 5;
+  repeated string tags = 6;
+}
+
+message UpdateMeetingResponse {
+  Meeting meeting = 1;
+}
+
+message DeleteMeetingRequest {
+  string id = 1;
+}
+
+message DeleteMeetingResponse {}
+
+message ListMeetingsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  MeetingStatus status_filter = 2;
+  MeetingType type_filter = 3;
+  string participant_id = 4;
+  google.protobuf.Timestamp start_after = 5;
+  google.protobuf.Timestamp start_before = 6;
+  string search = 7;
+}
+
+message ListMeetingsResponse {
+  repeated Meeting meetings = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message StartMeetingRequest {
+  string id = 1;
+}
+
+message StartMeetingResponse {
+  Meeting meeting = 1;
+}
+
+message EndMeetingRequest {
+  string id = 1;
+}
+
+message EndMeetingResponse {
+  Meeting meeting = 1;
+}
+
+message AddParticipantRequest {
+  string meeting_id = 1;
+  string employee_id = 2;
+  ParticipantRole role = 3;
+}
+
+message AddParticipantResponse {
+  Participant participant = 1;
+}
+
+message GenerateMinutesRequest {
+  string meeting_id = 1;
+}
+
+message GenerateMinutesResponse {
+  string minutes = 1;
+  string summary = 2;
+  repeated ActionItem suggested_actions = 3;
+}
+
+message CreateActionItemRequest {
+  string meeting_id = 1;
+  string title = 2;
+  string description = 3;
+  string assignee_id = 4;
+  google.protobuf.Timestamp due_date = 5;
+}
+
+message CreateActionItemResponse {
+  ActionItem action_item = 1;
+}
+
+message CompleteActionItemRequest {
+  string meeting_id = 1;
+  string action_item_id = 2;
+}
+
+message CompleteActionItemResponse {
+  ActionItem action_item = 1;
+}

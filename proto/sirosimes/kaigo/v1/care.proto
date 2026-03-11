@@ -1,0 +1,244 @@
+syntax = "proto3";
+
+package sirosimes.kaigo.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// care.proto — 介護のこころ（Kaigo）ケアプラン・記録管理。
+//
+// 介護施設向けの利用者管理、ケアプラン作成、
+// ケア記録、バイタルサイン記録、家族連絡を提供する。
+
+// CareLevel は介護度。
+enum CareLevel {
+  CARE_LEVEL_UNSPECIFIED = 0;
+  CARE_LEVEL_SUPPORT_1 = 1;
+  CARE_LEVEL_SUPPORT_2 = 2;
+  CARE_LEVEL_CARE_1 = 3;
+  CARE_LEVEL_CARE_2 = 4;
+  CARE_LEVEL_CARE_3 = 5;
+  CARE_LEVEL_CARE_4 = 6;
+  CARE_LEVEL_CARE_5 = 7;
+}
+
+// RecordType はケア記録の種別。
+enum RecordType {
+  RECORD_TYPE_UNSPECIFIED = 0;
+  RECORD_TYPE_MEAL = 1;
+  RECORD_TYPE_BATH = 2;
+  RECORD_TYPE_TOILET = 3;
+  RECORD_TYPE_VITAL = 4;
+  RECORD_TYPE_MEDICATION = 5;
+  RECORD_TYPE_ACTIVITY = 6;
+  RECORD_TYPE_SLEEP = 7;
+  RECORD_TYPE_INCIDENT = 8;
+  RECORD_TYPE_NOTE = 9;
+}
+
+// Resident は利用者。
+message Resident {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  google.protobuf.Timestamp date_of_birth = 3;
+  string gender = 4;
+  CareLevel care_level = 5;
+  string room_number = 6;
+  string primary_doctor = 7;
+  string emergency_contact_name = 8;
+  string emergency_contact_phone = 9;
+  repeated string allergies = 10;
+  repeated string medications = 11;
+  string notes = 12;
+  bool active = 13;
+}
+
+// CarePlan はケアプラン。
+message CarePlan {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string resident_id = 2;
+  string title = 3;
+  string goals = 4;
+  string services = 5;
+  google.protobuf.Timestamp start_date = 6;
+  google.protobuf.Timestamp end_date = 7;
+  string created_by = 8;
+  string approved_by = 9;
+  bool active = 10;
+}
+
+// CareRecord はケア記録。
+message CareRecord {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string resident_id = 2;
+  RecordType type = 3;
+  string description = 4;
+  string recorded_by = 5;
+  google.protobuf.Timestamp recorded_at = 6;
+  VitalSigns vital_signs = 7;
+  map<string, string> details = 8;
+}
+
+// VitalSigns はバイタルサイン。
+message VitalSigns {
+  float body_temperature = 1;
+  int32 blood_pressure_systolic = 2;
+  int32 blood_pressure_diastolic = 3;
+  int32 heart_rate = 4;
+  float spo2 = 5;
+  int32 respiratory_rate = 6;
+  float weight = 7;
+}
+
+// CareService はケア管理サービス。
+service CareService {
+  rpc ListResidents(ListResidentsRequest) returns (ListResidentsResponse);
+  rpc GetResident(GetResidentRequest) returns (GetResidentResponse);
+  rpc CreateResident(CreateResidentRequest) returns (CreateResidentResponse);
+  rpc UpdateResident(UpdateResidentRequest) returns (UpdateResidentResponse);
+  rpc ListCarePlans(ListCarePlansRequest) returns (ListCarePlansResponse);
+  rpc GetCarePlan(GetCarePlanRequest) returns (GetCarePlanResponse);
+  rpc CreateCarePlan(CreateCarePlanRequest) returns (CreateCarePlanResponse);
+  rpc UpdateCarePlan(UpdateCarePlanRequest) returns (UpdateCarePlanResponse);
+  rpc ListCareRecords(ListCareRecordsRequest) returns (ListCareRecordsResponse);
+  rpc CreateCareRecord(CreateCareRecordRequest) returns (CreateCareRecordResponse);
+  rpc GetResidentSummary(GetResidentSummaryRequest) returns (GetResidentSummaryResponse);
+}
+
+message ListResidentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  CareLevel care_level_filter = 2;
+  bool active_only = 3;
+  string search = 4;
+}
+
+message ListResidentsResponse {
+  repeated Resident residents = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetResidentRequest {
+  string id = 1;
+}
+
+message GetResidentResponse {
+  Resident resident = 1;
+}
+
+message CreateResidentRequest {
+  string name = 1;
+  google.protobuf.Timestamp date_of_birth = 2;
+  string gender = 3;
+  CareLevel care_level = 4;
+  string room_number = 5;
+  string primary_doctor = 6;
+  string emergency_contact_name = 7;
+  string emergency_contact_phone = 8;
+  repeated string allergies = 9;
+  repeated string medications = 10;
+}
+
+message CreateResidentResponse {
+  Resident resident = 1;
+}
+
+message UpdateResidentRequest {
+  string id = 1;
+  CareLevel care_level = 2;
+  string room_number = 3;
+  string primary_doctor = 4;
+  string emergency_contact_name = 5;
+  string emergency_contact_phone = 6;
+  repeated string allergies = 7;
+  repeated string medications = 8;
+  string notes = 9;
+  bool active = 10;
+}
+
+message UpdateResidentResponse {
+  Resident resident = 1;
+}
+
+message ListCarePlansRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string resident_id = 2;
+  bool active_only = 3;
+}
+
+message ListCarePlansResponse {
+  repeated CarePlan plans = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetCarePlanRequest {
+  string id = 1;
+}
+
+message GetCarePlanResponse {
+  CarePlan plan = 1;
+}
+
+message CreateCarePlanRequest {
+  string resident_id = 1;
+  string title = 2;
+  string goals = 3;
+  string services = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+}
+
+message CreateCarePlanResponse {
+  CarePlan plan = 1;
+}
+
+message UpdateCarePlanRequest {
+  string id = 1;
+  string goals = 2;
+  string services = 3;
+  google.protobuf.Timestamp end_date = 4;
+  bool active = 5;
+}
+
+message UpdateCarePlanResponse {
+  CarePlan plan = 1;
+}
+
+message ListCareRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string resident_id = 2;
+  RecordType type_filter = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+}
+
+message ListCareRecordsResponse {
+  repeated CareRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateCareRecordRequest {
+  string resident_id = 1;
+  RecordType type = 2;
+  string description = 3;
+  VitalSigns vital_signs = 4;
+  map<string, string> details = 5;
+}
+
+message CreateCareRecordResponse {
+  CareRecord record = 1;
+}
+
+message GetResidentSummaryRequest {
+  string resident_id = 1;
+  int32 days = 2;
+}
+
+message GetResidentSummaryResponse {
+  string resident_name = 1;
+  CareLevel care_level = 2;
+  int32 total_records = 3;
+  map<string, int32> records_by_type = 4;
+  VitalSigns latest_vitals = 5;
+  string ai_summary = 6;
+}

@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+package sirosimes.tokowana.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// update.proto — 常若（Tokowana）更新・バージョン・ロールバック管理。
+//
+// Sirosimes全プロダクトのバージョン管理、更新デプロイ、
+// ロールバック、ヘルスチェック、カナリアリリースを提供する。
+// 鍛冶（Kaji）のCI/CDパイプラインと連携する。
+
+// ReleaseStatus はリリースの状態。
+enum ReleaseStatus {
+  RELEASE_STATUS_UNSPECIFIED = 0;
+  RELEASE_STATUS_DRAFT = 1;
+  RELEASE_STATUS_TESTING = 2;
+  RELEASE_STATUS_CANARY = 3;
+  RELEASE_STATUS_ROLLING_OUT = 4;
+  RELEASE_STATUS_DEPLOYED = 5;
+  RELEASE_STATUS_ROLLING_BACK = 6;
+  RELEASE_STATUS_ROLLED_BACK = 7;
+  RELEASE_STATUS_FAILED = 8;
+}
+
+// ReleaseStrategy はデプロイ戦略。
+enum ReleaseStrategy {
+  RELEASE_STRATEGY_UNSPECIFIED = 0;
+  RELEASE_STRATEGY_IMMEDIATE = 1;
+  RELEASE_STRATEGY_CANARY = 2;
+  RELEASE_STRATEGY_ROLLING = 3;
+  RELEASE_STRATEGY_BLUE_GREEN = 4;
+}
+
+// Release はリリース。
+message Release {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string product_name = 2;
+  string version = 3;
+  string previous_version = 4;
+  ReleaseStatus status = 5;
+  ReleaseStrategy strategy = 6;
+  string changelog = 7;
+  string commit_hash = 8;
+  string image_tag = 9;
+  string deployed_by = 10;
+  google.protobuf.Timestamp deployed_at = 11;
+  google.protobuf.Timestamp rolled_back_at = 12;
+  string rollback_reason = 13;
+  int32 canary_percentage = 14;
+  bool health_check_passed = 15;
+  repeated string affected_services = 16;
+}
+
+// HealthCheckResult はヘルスチェック結果。
+message HealthCheckResult {
+  string service_name = 1;
+  bool healthy = 2;
+  int32 response_time_ms = 3;
+  string error_message = 4;
+  google.protobuf.Timestamp checked_at = 5;
+}
+
+// UpdateService は更新・バージョン管理サービス。
+service UpdateService {
+  rpc CreateRelease(CreateReleaseRequest) returns (CreateReleaseResponse);
+  rpc GetRelease(GetReleaseRequest) returns (GetReleaseResponse);
+  rpc ListReleases(ListReleasesRequest) returns (ListReleasesResponse);
+  rpc DeployRelease(DeployReleaseRequest) returns (DeployReleaseResponse);
+  rpc RollbackRelease(RollbackReleaseRequest) returns (RollbackReleaseResponse);
+  rpc PromoteCanary(PromoteCanaryRequest) returns (PromoteCanaryResponse);
+  rpc RunHealthCheck(RunHealthCheckRequest) returns (RunHealthCheckResponse);
+  rpc GetCurrentVersion(GetCurrentVersionRequest) returns (GetCurrentVersionResponse);
+  rpc ListVersionHistory(ListVersionHistoryRequest) returns (ListVersionHistoryResponse);
+}
+
+message CreateReleaseRequest {
+  string product_name = 1;
+  string version = 2;
+  string changelog = 3;
+  string commit_hash = 4;
+  string image_tag = 5;
+  ReleaseStrategy strategy = 6;
+  repeated string affected_services = 7;
+}
+
+message CreateReleaseResponse {
+  Release release = 1;
+}
+
+message GetReleaseRequest {
+  string id = 1;
+}
+
+message GetReleaseResponse {
+  Release release = 1;
+}
+
+message ListReleasesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string product_name = 2;
+  ReleaseStatus status_filter = 3;
+}
+
+message ListReleasesResponse {
+  repeated Release releases = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message DeployReleaseRequest {
+  string release_id = 1;
+  int32 canary_percentage = 2;
+}
+
+message DeployReleaseResponse {
+  Release release = 1;
+}
+
+message RollbackReleaseRequest {
+  string release_id = 1;
+  string reason = 2;
+}
+
+message RollbackReleaseResponse {
+  Release release = 1;
+}
+
+message PromoteCanaryRequest {
+  string release_id = 1;
+  int32 new_percentage = 2;
+}
+
+message PromoteCanaryResponse {
+  Release release = 1;
+}
+
+message RunHealthCheckRequest {
+  string product_name = 1;
+}
+
+message RunHealthCheckResponse {
+  repeated HealthCheckResult results = 1;
+  bool all_healthy = 2;
+}
+
+message GetCurrentVersionRequest {
+  string product_name = 1;
+}
+
+message GetCurrentVersionResponse {
+  Release current_release = 1;
+}
+
+message ListVersionHistoryRequest {
+  string product_name = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+message ListVersionHistoryResponse {
+  repeated Release releases = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}

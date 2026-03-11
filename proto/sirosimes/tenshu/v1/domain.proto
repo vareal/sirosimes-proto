@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package sirosimes.tenshu.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "sirosimes/tenshu/v1/metric.proto";
+import "sirosimes/tenshu/v1/alert.proto";
+
+// domain.proto — 監視領域定義・ヘルスステータス管理。
+//
+// 8監視領域のドメイン構成・ヘルス集約・ステータスサマリーを定義する。
+// Single Pane of Glass の基盤として、全領域の一括ヘルスチェックと
+// 領域別の詳細ステータスを提供する。
+
+// DomainHealthStatus は監視領域のヘルス状態。
+enum DomainHealthStatus {
+  DOMAIN_HEALTH_STATUS_UNSPECIFIED = 0;
+  // 正常。
+  DOMAIN_HEALTH_STATUS_HEALTHY = 1;
+  // 注意（軽微な問題あり）。
+  DOMAIN_HEALTH_STATUS_DEGRADED = 2;
+  // 警告（要対応）。
+  DOMAIN_HEALTH_STATUS_WARNING = 3;
+  // 障害（サービス影響あり）。
+  DOMAIN_HEALTH_STATUS_CRITICAL = 4;
+  // 不明（データ取得不可）。
+  DOMAIN_HEALTH_STATUS_UNKNOWN = 5;
+}
+
+// DomainConfig は監視領域の設定を表す。
+message DomainConfig {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 監視領域。
+  MonitoringDomain domain = 2;
+  // 領域名（表示名）。
+  string display_name = 3;
+  // 説明。
+  string description = 4;
+  // 有効/無効。
+  bool enabled = 5;
+  // ヘルスチェック対象メトリクス名一覧。
+  repeated string health_metric_names = 6;
+  // ヘルス判定ルール。
+  repeated HealthRule health_rules = 7;
+  // 担当CXOロール。
+  repeated string responsible_cxo_roles = 8;
+  // 関連プロダクト名一覧。
+  repeated string related_products = 9;
+  // データソース。
+  repeated DataSourceConfig data_sources = 10;
+}
+
+// HealthRule はヘルス判定条件。
+message HealthRule {
+  // 対象メトリクス名。
+  string metric_name = 1;
+  // DEGRADEDとなる閾値。
+  double degraded_threshold = 2;
+  // WARNINGとなる閾値。
+  double warning_threshold = 3;
+  // CRITICALとなる閾値。
+  double critical_threshold = 4;
+  // 比較方向（true: 値が閾値以上で異常, false: 値が閾値以下で異常）。
+  bool above_is_bad = 5;
+  // 重み（ヘルススコア計算時の重要度: 0.0-1.0）。
+  float weight = 6;
+}
+
+// DataSourceConfig は監視データソースの設定。
+message DataSourceConfig {
+  // ソース名。
+  string name = 1;
+  // ソース種別。
+  CollectorSource source_type = 2;
+  // 接続先URL（API/Prometheus等）。
+  string endpoint = 3;
+  // 収集間隔（秒）。
+  int32 scrape_interval_seconds = 4;
+  // 認証方式（none/token/mtls）。
+  string auth_type = 5;
+  // 認証シークレット参照（暗号化された参照名）。
+  string auth_secret_ref = 6;
+  // 有効/無効。
+  bool enabled = 7;
+}
+
+// DomainHealth は監視領域のヘルスサマリー。
+message DomainHealth {
+  // 監視領域。
+  MonitoringDomain domain = 1;
+  // 表示名。
+  string display_name = 2;
+  // 総合ヘルス状態。
+  DomainHealthStatus status = 3;
+  // ヘルススコア（0.0-1.0, 1.0が最良）。
+  float health_score = 4;
+  // アクティブアラート数。
+  int32 active_alert_count = 5;
+  // 最高深刻度のアクティブアラート。
+  AlertSeverity max_alert_severity = 6;
+  // 最終更新時刻。
+  google.protobuf.Timestamp last_updated = 7;
+  // 主要メトリクスサマリー（key: metric_name, value: 現在値）。
+  map<string, double> key_metrics = 8;
+  // ステータスメッセージ。
+  string status_message = 9;
+}
+
+// SystemOverview は全領域の統合ヘルスサマリー。
+message SystemOverview {
+  // 全領域のヘルス。
+  repeated DomainHealth domains = 1;
+  // システム全体のヘルス状態。
+  DomainHealthStatus overall_status = 2;
+  // システム全体のヘルススコア。
+  float overall_health_score = 3;
+  // 全領域のアクティブアラート合計。
+  int32 total_active_alerts = 4;
+  // 最終更新時刻。
+  google.protobuf.Timestamp last_updated = 5;
+  // 概況メッセージ。
+  string summary = 6;
+}
+
+// DomainService は監視領域管理・ヘルス照会サービス。
+service DomainService {
+  // システム全体のヘルスサマリーを取得する。
+  rpc GetSystemOverview(GetSystemOverviewRequest) returns (GetSystemOverviewResponse);
+  // 個別領域のヘルスを取得する。
+  rpc GetDomainHealth(GetDomainHealthRequest) returns (GetDomainHealthResponse);
+  // 領域設定を一覧する。
+  rpc ListDomainConfigs(ListDomainConfigsRequest) returns (ListDomainConfigsResponse);
+  // 領域設定を取得する。
+  rpc GetDomainConfig(GetDomainConfigRequest) returns (GetDomainConfigResponse);
+  // 領域設定を更新する。
+  rpc UpdateDomainConfig(UpdateDomainConfigRequest) returns (UpdateDomainConfigResponse);
+  // ヘルスチェックを手動実行する。
+  rpc RunHealthCheck(RunHealthCheckRequest) returns (RunHealthCheckResponse);
+}
+
+message GetSystemOverviewRequest {}
+
+message GetSystemOverviewResponse {
+  SystemOverview overview = 1;
+}
+
+message GetDomainHealthRequest {
+  MonitoringDomain domain = 1;
+}
+
+message GetDomainHealthResponse {
+  DomainHealth health = 1;
+}
+
+message ListDomainConfigsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  bool enabled_only = 2;
+}
+
+message ListDomainConfigsResponse {
+  repeated DomainConfig configs = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetDomainConfigRequest {
+  MonitoringDomain domain = 1;
+}
+
+message GetDomainConfigResponse {
+  DomainConfig config = 1;
+}
+
+message UpdateDomainConfigRequest {
+  MonitoringDomain domain = 1;
+  string display_name = 2;
+  string description = 3;
+  bool enabled = 4;
+  repeated string health_metric_names = 5;
+  repeated HealthRule health_rules = 6;
+  repeated string responsible_cxo_roles = 7;
+  repeated string related_products = 8;
+  repeated DataSourceConfig data_sources = 9;
+}
+
+message UpdateDomainConfigResponse {
+  DomainConfig config = 1;
+}
+
+message RunHealthCheckRequest {
+  // 対象領域（UNSPECIFIED = 全領域）。
+  MonitoringDomain domain = 1;
+}
+
+message RunHealthCheckResponse {
+  SystemOverview overview = 1;
+}

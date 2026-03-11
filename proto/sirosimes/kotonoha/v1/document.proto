@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package sirosimes.kotonoha.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// document.proto — 言の葉（Kotonoha）自然言語処理・文書管理。
+//
+// 自然言語テキストの構造化・解析・分類を提供する。
+// 文書のインジェスト・前処理パイプラインの入口として機能し、
+// 言霊（Kotodama）の推論エンジンや面影（Omokage）のRAGと連携する。
+
+// DocumentStatus は文書の処理状態。
+enum DocumentStatus {
+  DOCUMENT_STATUS_UNSPECIFIED = 0;
+  DOCUMENT_STATUS_PENDING = 1;
+  DOCUMENT_STATUS_PROCESSING = 2;
+  DOCUMENT_STATUS_INDEXED = 3;
+  DOCUMENT_STATUS_FAILED = 4;
+  DOCUMENT_STATUS_ARCHIVED = 5;
+}
+
+// DocumentType は文書の種別。
+enum DocumentType {
+  DOCUMENT_TYPE_UNSPECIFIED = 0;
+  DOCUMENT_TYPE_TEXT = 1;
+  DOCUMENT_TYPE_MARKDOWN = 2;
+  DOCUMENT_TYPE_HTML = 3;
+  DOCUMENT_TYPE_PDF = 4;
+  DOCUMENT_TYPE_CODE = 5;
+  DOCUMENT_TYPE_EMAIL = 6;
+  DOCUMENT_TYPE_CHAT_LOG = 7;
+  DOCUMENT_TYPE_MEETING_MINUTES = 8;
+  DOCUMENT_TYPE_WIKI = 9;
+  DOCUMENT_TYPE_REPORT = 10;
+}
+
+// Document は処理対象文書。
+message Document {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string title = 2;
+  DocumentType type = 3;
+  DocumentStatus status = 4;
+  string content = 5;
+  string source_url = 6;
+  string source_service = 7;
+  string language = 8;
+  int64 content_length = 9;
+  string content_hash = 10;
+  repeated string tags = 11;
+  map<string, string> custom_metadata = 12;
+  google.protobuf.Timestamp indexed_at = 13;
+}
+
+// TextChunk は文書の分割チャンク。
+message TextChunk {
+  string id = 1;
+  string document_id = 2;
+  int32 chunk_index = 3;
+  string content = 4;
+  int32 start_offset = 5;
+  int32 end_offset = 6;
+  int32 token_count = 7;
+  repeated float embedding = 8;
+  string embedding_model = 9;
+}
+
+// DocumentService は文書管理サービス。
+service DocumentService {
+  rpc IngestDocument(IngestDocumentRequest) returns (IngestDocumentResponse);
+  rpc BatchIngestDocuments(BatchIngestDocumentsRequest) returns (BatchIngestDocumentsResponse);
+  rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse);
+  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse);
+  rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse);
+  rpc GetDocumentChunks(GetDocumentChunksRequest) returns (GetDocumentChunksResponse);
+  rpc ReprocessDocument(ReprocessDocumentRequest) returns (ReprocessDocumentResponse);
+}
+
+message IngestDocumentRequest {
+  string title = 1;
+  DocumentType type = 2;
+  string content = 3;
+  string source_url = 4;
+  string source_service = 5;
+  string language = 6;
+  repeated string tags = 7;
+  map<string, string> custom_metadata = 8;
+}
+
+message IngestDocumentResponse {
+  Document document = 1;
+}
+
+message BatchIngestDocumentsRequest {
+  repeated IngestDocumentRequest documents = 1;
+}
+
+message BatchIngestDocumentsResponse {
+  repeated Document documents = 1;
+  int32 success_count = 2;
+  int32 failure_count = 3;
+}
+
+message GetDocumentRequest {
+  string id = 1;
+}
+
+message GetDocumentResponse {
+  Document document = 1;
+}
+
+message ListDocumentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  DocumentType type_filter = 2;
+  DocumentStatus status_filter = 3;
+  string source_service = 4;
+  string search = 5;
+  repeated string tags = 6;
+}
+
+message ListDocumentsResponse {
+  repeated Document documents = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message DeleteDocumentRequest {
+  string id = 1;
+}
+
+message DeleteDocumentResponse {}
+
+message GetDocumentChunksRequest {
+  string document_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+message GetDocumentChunksResponse {
+  repeated TextChunk chunks = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message ReprocessDocumentRequest {
+  string id = 1;
+}
+
+message ReprocessDocumentResponse {
+  Document document = 1;
+}

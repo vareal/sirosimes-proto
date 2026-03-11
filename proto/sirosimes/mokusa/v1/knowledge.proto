@@ -1,0 +1,206 @@
+syntax = "proto3";
+
+package sirosimes.mokusa.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// knowledge.proto — 御草（Mokusa）ナレッジベース・文書化管理。
+//
+// 社内ナレッジの体系化、バージョン管理、レビューワークフロー、
+// 全文検索を提供する。司（Tsukasa）のWikiと連携し、
+// 言の葉（Kotonoha）のNLP解析を活用した知識グラフを構築する。
+
+// ArticleStatus は記事の状態。
+enum ArticleStatus {
+  ARTICLE_STATUS_UNSPECIFIED = 0;
+  ARTICLE_STATUS_DRAFT = 1;
+  ARTICLE_STATUS_IN_REVIEW = 2;
+  ARTICLE_STATUS_PUBLISHED = 3;
+  ARTICLE_STATUS_ARCHIVED = 4;
+  ARTICLE_STATUS_DEPRECATED = 5;
+}
+
+// Article はナレッジ記事。
+message Article {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string title = 2;
+  string content = 3;
+  string summary = 4;
+  ArticleStatus status = 5;
+  string author_id = 6;
+  string category = 7;
+  repeated string tags = 8;
+  int32 version = 9;
+  string parent_id = 10;
+  int32 view_count = 11;
+  float helpfulness_score = 12;
+  google.protobuf.Timestamp published_at = 13;
+  google.protobuf.Timestamp last_reviewed_at = 14;
+  string reviewer_id = 15;
+}
+
+// ArticleVersion は記事のバージョン。
+message ArticleVersion {
+  string id = 1;
+  string article_id = 2;
+  int32 version = 3;
+  string content = 4;
+  string change_summary = 5;
+  string edited_by = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// KnowledgeService はナレッジ管理サービス。
+service KnowledgeService {
+  rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse);
+  rpc GetArticle(GetArticleRequest) returns (GetArticleResponse);
+  rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleResponse);
+  rpc DeleteArticle(DeleteArticleRequest) returns (DeleteArticleResponse);
+  rpc ListArticles(ListArticlesRequest) returns (ListArticlesResponse);
+  rpc SearchArticles(SearchArticlesRequest) returns (SearchArticlesResponse);
+  rpc PublishArticle(PublishArticleRequest) returns (PublishArticleResponse);
+  rpc ArchiveArticle(ArchiveArticleRequest) returns (ArchiveArticleResponse);
+  rpc ListArticleVersions(ListArticleVersionsRequest) returns (ListArticleVersionsResponse);
+  rpc GetArticleVersion(GetArticleVersionRequest) returns (GetArticleVersionResponse);
+  rpc SubmitForReview(SubmitForReviewRequest) returns (SubmitForReviewResponse);
+  rpc ApproveReview(ApproveReviewRequest) returns (ApproveReviewResponse);
+  rpc RateArticle(RateArticleRequest) returns (RateArticleResponse);
+}
+
+message CreateArticleRequest {
+  string title = 1;
+  string content = 2;
+  string summary = 3;
+  string category = 4;
+  repeated string tags = 5;
+  string parent_id = 6;
+}
+
+message CreateArticleResponse {
+  Article article = 1;
+}
+
+message GetArticleRequest {
+  string id = 1;
+}
+
+message GetArticleResponse {
+  Article article = 1;
+}
+
+message UpdateArticleRequest {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+  string summary = 4;
+  string category = 5;
+  repeated string tags = 6;
+  string change_summary = 7;
+}
+
+message UpdateArticleResponse {
+  Article article = 1;
+}
+
+message DeleteArticleRequest {
+  string id = 1;
+}
+
+message DeleteArticleResponse {}
+
+message ListArticlesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ArticleStatus status_filter = 2;
+  string category = 3;
+  repeated string tags = 4;
+  string author_id = 5;
+  string search = 6;
+}
+
+message ListArticlesResponse {
+  repeated Article articles = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message SearchArticlesRequest {
+  string query = 1;
+  int32 top_k = 2;
+  string category = 3;
+  repeated string tags = 4;
+  bool semantic_search = 5;
+}
+
+message SearchArticlesResponse {
+  repeated ArticleSearchResult results = 1;
+}
+
+message ArticleSearchResult {
+  Article article = 1;
+  float relevance_score = 2;
+  string highlight = 3;
+}
+
+message PublishArticleRequest {
+  string id = 1;
+}
+
+message PublishArticleResponse {
+  Article article = 1;
+}
+
+message ArchiveArticleRequest {
+  string id = 1;
+}
+
+message ArchiveArticleResponse {
+  Article article = 1;
+}
+
+message ListArticleVersionsRequest {
+  string article_id = 1;
+  sirosimes.common.v1.PaginationRequest pagination = 2;
+}
+
+message ListArticleVersionsResponse {
+  repeated ArticleVersion versions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetArticleVersionRequest {
+  string article_id = 1;
+  int32 version = 2;
+}
+
+message GetArticleVersionResponse {
+  ArticleVersion version = 1;
+}
+
+message SubmitForReviewRequest {
+  string article_id = 1;
+  repeated string reviewer_ids = 2;
+}
+
+message SubmitForReviewResponse {
+  Article article = 1;
+}
+
+message ApproveReviewRequest {
+  string article_id = 1;
+  string comment = 2;
+}
+
+message ApproveReviewResponse {
+  Article article = 1;
+}
+
+message RateArticleRequest {
+  string article_id = 1;
+  float score = 2;
+  string comment = 3;
+}
+
+message RateArticleResponse {
+  Article article = 1;
+}

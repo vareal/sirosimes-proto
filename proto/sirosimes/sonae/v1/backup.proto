@@ -1,0 +1,254 @@
+syntax = "proto3";
+
+package sirosimes.sonae.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// backup.proto — 備（Sonae）バックアップ・災害復旧管理。
+//
+// 全Sirosimesプロダクトのデータバックアップ、スナップショット、
+// 災害復旧（DR）の統合管理を提供する。
+// RPO/RTOの定義と監視、復旧テストの自動化を含む。
+
+// BackupStatus はバックアップの状態。
+enum BackupStatus {
+  BACKUP_STATUS_UNSPECIFIED = 0;
+  BACKUP_STATUS_PENDING = 1;
+  BACKUP_STATUS_IN_PROGRESS = 2;
+  BACKUP_STATUS_COMPLETED = 3;
+  BACKUP_STATUS_FAILED = 4;
+  BACKUP_STATUS_EXPIRED = 5;
+  BACKUP_STATUS_DELETING = 6;
+}
+
+// BackupType はバックアップの種別。
+enum BackupType {
+  BACKUP_TYPE_UNSPECIFIED = 0;
+  BACKUP_TYPE_FULL = 1;
+  BACKUP_TYPE_INCREMENTAL = 2;
+  BACKUP_TYPE_DIFFERENTIAL = 3;
+  BACKUP_TYPE_SNAPSHOT = 4;
+  BACKUP_TYPE_WAL_ARCHIVE = 5;
+}
+
+// BackupTarget はバックアップ対象の種別。
+enum BackupTarget {
+  BACKUP_TARGET_UNSPECIFIED = 0;
+  BACKUP_TARGET_DATABASE = 1;
+  BACKUP_TARGET_FILE_SYSTEM = 2;
+  BACKUP_TARGET_CONTAINER_VOLUME = 3;
+  BACKUP_TARGET_CONFIGURATION = 4;
+  BACKUP_TARGET_SECRET = 5;
+  BACKUP_TARGET_FULL_SYSTEM = 6;
+}
+
+// RestoreStatus はリストアの状態。
+enum RestoreStatus {
+  RESTORE_STATUS_UNSPECIFIED = 0;
+  RESTORE_STATUS_PENDING = 1;
+  RESTORE_STATUS_IN_PROGRESS = 2;
+  RESTORE_STATUS_COMPLETED = 3;
+  RESTORE_STATUS_FAILED = 4;
+  RESTORE_STATUS_ROLLED_BACK = 5;
+}
+
+// BackupPolicy はバックアップポリシー。
+message BackupPolicy {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  BackupType type = 4;
+  BackupTarget target = 5;
+  string target_identifier = 6;
+  string cron_schedule = 7;
+  int32 retention_days = 8;
+  int32 max_backups = 9;
+  bool enabled = 10;
+  string storage_location = 11;
+  bool encryption_enabled = 12;
+  google.protobuf.Duration rpo = 13;
+  google.protobuf.Duration rto = 14;
+}
+
+// BackupRecord はバックアップ実行記録。
+message BackupRecord {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string policy_id = 2;
+  string policy_name = 3;
+  BackupType type = 4;
+  BackupTarget target = 5;
+  BackupStatus status = 6;
+  google.protobuf.Timestamp started_at = 7;
+  google.protobuf.Timestamp completed_at = 8;
+  int64 size_bytes = 9;
+  string storage_path = 10;
+  string checksum = 11;
+  string error_message = 12;
+  bool integrity_verified = 13;
+  google.protobuf.Timestamp expires_at = 14;
+}
+
+// RestoreRecord はリストア実行記録。
+message RestoreRecord {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string backup_record_id = 2;
+  RestoreStatus status = 3;
+  string target_identifier = 4;
+  google.protobuf.Timestamp started_at = 5;
+  google.protobuf.Timestamp completed_at = 6;
+  string initiated_by = 7;
+  string error_message = 8;
+  bool dry_run = 9;
+}
+
+// BackupService はバックアップ・リストア管理サービス。
+service BackupService {
+  rpc ListBackupPolicies(ListBackupPoliciesRequest) returns (ListBackupPoliciesResponse);
+  rpc GetBackupPolicy(GetBackupPolicyRequest) returns (GetBackupPolicyResponse);
+  rpc CreateBackupPolicy(CreateBackupPolicyRequest) returns (CreateBackupPolicyResponse);
+  rpc UpdateBackupPolicy(UpdateBackupPolicyRequest) returns (UpdateBackupPolicyResponse);
+  rpc DeleteBackupPolicy(DeleteBackupPolicyRequest) returns (DeleteBackupPolicyResponse);
+  rpc TriggerBackup(TriggerBackupRequest) returns (TriggerBackupResponse);
+  rpc ListBackupRecords(ListBackupRecordsRequest) returns (ListBackupRecordsResponse);
+  rpc GetBackupRecord(GetBackupRecordRequest) returns (GetBackupRecordResponse);
+  rpc DeleteBackupRecord(DeleteBackupRecordRequest) returns (DeleteBackupRecordResponse);
+  rpc VerifyBackupIntegrity(VerifyBackupIntegrityRequest) returns (VerifyBackupIntegrityResponse);
+  rpc RestoreFromBackup(RestoreFromBackupRequest) returns (RestoreFromBackupResponse);
+  rpc ListRestoreRecords(ListRestoreRecordsRequest) returns (ListRestoreRecordsResponse);
+  rpc GetRestoreRecord(GetRestoreRecordRequest) returns (GetRestoreRecordResponse);
+}
+
+message ListBackupPoliciesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  BackupTarget target_filter = 2;
+  bool enabled_only = 3;
+}
+
+message ListBackupPoliciesResponse {
+  repeated BackupPolicy policies = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetBackupPolicyRequest {
+  string id = 1;
+}
+
+message GetBackupPolicyResponse {
+  BackupPolicy policy = 1;
+}
+
+message CreateBackupPolicyRequest {
+  string name = 1;
+  string description = 2;
+  BackupType type = 3;
+  BackupTarget target = 4;
+  string target_identifier = 5;
+  string cron_schedule = 6;
+  int32 retention_days = 7;
+  int32 max_backups = 8;
+  string storage_location = 9;
+  bool encryption_enabled = 10;
+  google.protobuf.Duration rpo = 11;
+  google.protobuf.Duration rto = 12;
+}
+
+message CreateBackupPolicyResponse {
+  BackupPolicy policy = 1;
+}
+
+message UpdateBackupPolicyRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string cron_schedule = 4;
+  int32 retention_days = 5;
+  int32 max_backups = 6;
+  bool enabled = 7;
+  bool encryption_enabled = 8;
+}
+
+message UpdateBackupPolicyResponse {
+  BackupPolicy policy = 1;
+}
+
+message DeleteBackupPolicyRequest {
+  string id = 1;
+}
+
+message DeleteBackupPolicyResponse {}
+
+message TriggerBackupRequest {
+  string policy_id = 1;
+}
+
+message TriggerBackupResponse {
+  BackupRecord record = 1;
+}
+
+message ListBackupRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string policy_id = 2;
+  BackupStatus status_filter = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+}
+
+message ListBackupRecordsResponse {
+  repeated BackupRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetBackupRecordRequest {
+  string id = 1;
+}
+
+message GetBackupRecordResponse {
+  BackupRecord record = 1;
+}
+
+message DeleteBackupRecordRequest {
+  string id = 1;
+}
+
+message DeleteBackupRecordResponse {}
+
+message VerifyBackupIntegrityRequest {
+  string backup_record_id = 1;
+}
+
+message VerifyBackupIntegrityResponse {
+  bool integrity_valid = 1;
+  string checksum_computed = 2;
+  string checksum_stored = 3;
+}
+
+message RestoreFromBackupRequest {
+  string backup_record_id = 1;
+  string target_identifier = 2;
+  bool dry_run = 3;
+}
+
+message RestoreFromBackupResponse {
+  RestoreRecord record = 1;
+}
+
+message ListRestoreRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  RestoreStatus status_filter = 2;
+}
+
+message ListRestoreRecordsResponse {
+  repeated RestoreRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetRestoreRecordRequest {
+  string id = 1;
+}
+
+message GetRestoreRecordResponse {
+  RestoreRecord record = 1;
+}

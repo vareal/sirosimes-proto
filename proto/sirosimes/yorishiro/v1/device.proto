@@ -1,0 +1,223 @@
+syntax = "proto3";
+
+package sirosimes.yorishiro.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// device.proto — 依代（Yorishiro）IoTデバイス・物理インターフェース管理。
+//
+// IoTデバイスの登録・管理・制御、センサーデータ収集、
+// デバイスコマンド発行を提供する。
+// PAWS（ロボット）、Jetson、Vision Proなどの物理デバイスを管理する。
+
+// DeviceStatus はデバイスの状態。
+enum DeviceStatus {
+  DEVICE_STATUS_UNSPECIFIED = 0;
+  DEVICE_STATUS_ONLINE = 1;
+  DEVICE_STATUS_OFFLINE = 2;
+  DEVICE_STATUS_MAINTENANCE = 3;
+  DEVICE_STATUS_ERROR = 4;
+  DEVICE_STATUS_PROVISIONING = 5;
+}
+
+// DeviceType はデバイスの種別。
+enum DeviceType {
+  DEVICE_TYPE_UNSPECIFIED = 0;
+  DEVICE_TYPE_ROBOT = 1;
+  DEVICE_TYPE_SENSOR = 2;
+  DEVICE_TYPE_CAMERA = 3;
+  DEVICE_TYPE_GATEWAY = 4;
+  DEVICE_TYPE_ACTUATOR = 5;
+  DEVICE_TYPE_DISPLAY = 6;
+  DEVICE_TYPE_SPEAKER = 7;
+  DEVICE_TYPE_WEARABLE = 8;
+  DEVICE_TYPE_EDGE_COMPUTE = 9;
+}
+
+// CommandStatus はコマンドの実行状態。
+enum CommandStatus {
+  COMMAND_STATUS_UNSPECIFIED = 0;
+  COMMAND_STATUS_QUEUED = 1;
+  COMMAND_STATUS_SENT = 2;
+  COMMAND_STATUS_ACKNOWLEDGED = 3;
+  COMMAND_STATUS_EXECUTING = 4;
+  COMMAND_STATUS_COMPLETED = 5;
+  COMMAND_STATUS_FAILED = 6;
+  COMMAND_STATUS_TIMEOUT = 7;
+}
+
+// Device はIoTデバイス。
+message Device {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  DeviceType type = 3;
+  DeviceStatus status = 4;
+  string model = 5;
+  string firmware_version = 6;
+  string serial_number = 7;
+  string ip_address = 8;
+  string location = 9;
+  google.protobuf.Timestamp last_heartbeat_at = 10;
+  map<string, string> properties = 11;
+  repeated string capabilities = 12;
+  repeated string tags = 13;
+}
+
+// SensorReading はセンサー読み取り値。
+message SensorReading {
+  string device_id = 1;
+  string sensor_name = 2;
+  double value = 3;
+  string unit = 4;
+  google.protobuf.Timestamp timestamp = 5;
+  map<string, string> labels = 6;
+}
+
+// DeviceCommand はデバイスへのコマンド。
+message DeviceCommand {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string device_id = 2;
+  string command_type = 3;
+  map<string, string> parameters = 4;
+  CommandStatus status = 5;
+  google.protobuf.Timestamp sent_at = 6;
+  google.protobuf.Timestamp completed_at = 7;
+  string result = 8;
+  string error_message = 9;
+  int32 timeout_seconds = 10;
+}
+
+// DeviceService はデバイス管理サービス。
+service DeviceService {
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
+  rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+  rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse);
+  rpc DeregisterDevice(DeregisterDeviceRequest) returns (DeregisterDeviceResponse);
+  rpc SendCommand(SendCommandRequest) returns (SendCommandResponse);
+  rpc GetCommand(GetCommandRequest) returns (GetCommandResponse);
+  rpc ListCommands(ListCommandsRequest) returns (ListCommandsResponse);
+  rpc IngestSensorData(IngestSensorDataRequest) returns (IngestSensorDataResponse);
+  rpc QuerySensorData(QuerySensorDataRequest) returns (QuerySensorDataResponse);
+  rpc UpdateFirmware(UpdateFirmwareRequest) returns (UpdateFirmwareResponse);
+}
+
+message ListDevicesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  DeviceType type_filter = 2;
+  DeviceStatus status_filter = 3;
+  string location = 4;
+  string search = 5;
+}
+
+message ListDevicesResponse {
+  repeated Device devices = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetDeviceRequest {
+  string id = 1;
+}
+
+message GetDeviceResponse {
+  Device device = 1;
+}
+
+message RegisterDeviceRequest {
+  string name = 1;
+  DeviceType type = 2;
+  string model = 3;
+  string firmware_version = 4;
+  string serial_number = 5;
+  string ip_address = 6;
+  string location = 7;
+  map<string, string> properties = 8;
+  repeated string capabilities = 9;
+  repeated string tags = 10;
+}
+
+message RegisterDeviceResponse {
+  Device device = 1;
+}
+
+message UpdateDeviceRequest {
+  string id = 1;
+  string name = 2;
+  string firmware_version = 3;
+  string ip_address = 4;
+  string location = 5;
+  map<string, string> properties = 6;
+  repeated string tags = 7;
+}
+
+message UpdateDeviceResponse {
+  Device device = 1;
+}
+
+message DeregisterDeviceRequest {
+  string id = 1;
+}
+
+message DeregisterDeviceResponse {}
+
+message SendCommandRequest {
+  string device_id = 1;
+  string command_type = 2;
+  map<string, string> parameters = 3;
+  int32 timeout_seconds = 4;
+}
+
+message SendCommandResponse {
+  DeviceCommand command = 1;
+}
+
+message GetCommandRequest {
+  string id = 1;
+}
+
+message GetCommandResponse {
+  DeviceCommand command = 1;
+}
+
+message ListCommandsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string device_id = 2;
+  CommandStatus status_filter = 3;
+}
+
+message ListCommandsResponse {
+  repeated DeviceCommand commands = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message IngestSensorDataRequest {
+  repeated SensorReading readings = 1;
+}
+
+message IngestSensorDataResponse {
+  int32 accepted_count = 1;
+}
+
+message QuerySensorDataRequest {
+  string device_id = 1;
+  string sensor_name = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  int32 limit = 5;
+}
+
+message QuerySensorDataResponse {
+  repeated SensorReading readings = 1;
+}
+
+message UpdateFirmwareRequest {
+  string device_id = 1;
+  string target_version = 2;
+  string firmware_url = 3;
+}
+
+message UpdateFirmwareResponse {
+  DeviceCommand command = 1;
+}

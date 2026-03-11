@@ -1,0 +1,328 @@
+syntax = "proto3";
+
+package sirosimes.tenshu.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "sirosimes/tenshu/v1/metric.proto";
+
+// alert.proto — アラートルール・条件・評価エンジン定義。
+//
+// メトリクスの閾値超過・異常検知に基づくアラートルールを定義する。
+// 評価エンジンは定期的にルールを評価し、条件一致時にアラートを発火する。
+// 発火したアラートは notification.proto で定義される通知チャネルに配信される。
+// 機織（Hataori）WFトリガーとの連携も定義する。
+
+// AlertSeverity はアラートの深刻度を分類する。
+enum AlertSeverity {
+  ALERT_SEVERITY_UNSPECIFIED = 0;
+  // 情報（ログ記録のみ）。
+  ALERT_SEVERITY_INFO = 1;
+  // 警告（司チャットで通知）。
+  ALERT_SEVERITY_WARNING = 2;
+  // 高（SMS + 司チャットで通知）。
+  ALERT_SEVERITY_HIGH = 3;
+  // クリティカル（電話 + SMS + 司チャットで通知）。
+  ALERT_SEVERITY_CRITICAL = 4;
+  // 緊急（Video Call + 電話 + SMS + 司チャットで通知）。
+  ALERT_SEVERITY_EMERGENCY = 5;
+}
+
+// AlertState はアラートの現在の状態を表す。
+enum AlertState {
+  ALERT_STATE_UNSPECIFIED = 0;
+  // 正常（条件非該当）。
+  ALERT_STATE_OK = 1;
+  // 保留中（条件該当、確認待ち期間）。
+  ALERT_STATE_PENDING = 2;
+  // 発火中（アクティブアラート）。
+  ALERT_STATE_FIRING = 3;
+  // 確認済み（担当者が認識）。
+  ALERT_STATE_ACKNOWLEDGED = 4;
+  // 解決済み。
+  ALERT_STATE_RESOLVED = 5;
+  // 抑制中（メンテナンス等で一時無効）。
+  ALERT_STATE_SUPPRESSED = 6;
+}
+
+// ComparisonOperator は閾値比較演算子。
+enum ComparisonOperator {
+  COMPARISON_OPERATOR_UNSPECIFIED = 0;
+  COMPARISON_OPERATOR_GREATER_THAN = 1;
+  COMPARISON_OPERATOR_GREATER_THAN_OR_EQUAL = 2;
+  COMPARISON_OPERATOR_LESS_THAN = 3;
+  COMPARISON_OPERATOR_LESS_THAN_OR_EQUAL = 4;
+  COMPARISON_OPERATOR_EQUAL = 5;
+  COMPARISON_OPERATOR_NOT_EQUAL = 6;
+}
+
+// AlertCondition はアラート発火条件を定義する。
+message AlertCondition {
+  // 対象メトリクス名。
+  string metric_name = 1;
+  // 対象監視領域。
+  MonitoringDomain domain = 2;
+  // 比較演算子。
+  ComparisonOperator operator = 3;
+  // 閾値。
+  double threshold = 4;
+  // 評価期間（この期間中に条件を満たす必要がある）。
+  google.protobuf.Duration evaluation_window = 5;
+  // 集約方法。
+  AggregationMethod aggregation = 6;
+  // ラベルフィルタ。
+  map<string, string> label_filters = 7;
+}
+
+// AlertAction はアラート発火時のアクションを定義する。
+message AlertAction {
+  // 通知チャネルID（notification.proto参照）。
+  repeated string notification_channel_ids = 1;
+  // 機織WF ID（自動実行するワークフロー）。
+  string hataori_workflow_id = 2;
+  // 機織WFトリガーパラメータ。
+  map<string, string> workflow_params = 3;
+  // エスカレーション遅延（この時間後にエスカレーション）。
+  google.protobuf.Duration escalation_delay = 4;
+  // エスカレーション先通知チャネルID。
+  repeated string escalation_channel_ids = 5;
+}
+
+// AlertRule はアラートルールを定義する。
+message AlertRule {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // ルール名。
+  string name = 2;
+  // 説明。
+  string description = 3;
+  // 深刻度。
+  AlertSeverity severity = 4;
+  // 発火条件（すべてANDで評価）。
+  repeated AlertCondition conditions = 5;
+  // 発火時アクション。
+  AlertAction action = 6;
+  // 評価間隔。
+  google.protobuf.Duration evaluation_interval = 7;
+  // 発火前の猶予期間（連続して条件を満たす必要がある期間）。
+  google.protobuf.Duration pending_duration = 8;
+  // 有効/無効。
+  bool enabled = 9;
+  // CXOルーティング先（対象CXOロール: "CEO", "COO", "CTO" 等）。
+  repeated string cxo_routing = 10;
+  // ラベル（グルーピング・フィルタ用）。
+  map<string, string> labels = 11;
+}
+
+// AlertInstance はアラートルールの評価結果（発火インスタンス）を表す。
+message AlertInstance {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 対応するアラートルールID。
+  string rule_id = 2;
+  // ルール名（スナップショット）。
+  string rule_name = 3;
+  // 深刻度。
+  AlertSeverity severity = 4;
+  // 状態。
+  AlertState state = 5;
+  // 発火時刻。
+  google.protobuf.Timestamp fired_at = 6;
+  // 確認者。
+  string acknowledged_by = 7;
+  // 確認時刻。
+  google.protobuf.Timestamp acknowledged_at = 8;
+  // 解決者。
+  string resolved_by = 9;
+  // 解決時刻。
+  google.protobuf.Timestamp resolved_at = 10;
+  // トリガーされた通知ID一覧。
+  repeated string notification_ids = 11;
+  // トリガーされた機織WF実行ID。
+  string workflow_execution_id = 12;
+  // 発火時のメトリクス値。
+  double trigger_value = 13;
+  // 閾値。
+  double threshold_value = 14;
+  // 発火時のラベル。
+  map<string, string> labels = 15;
+}
+
+// SuppressionWindow はアラート抑制ウィンドウ（メンテナンス等）。
+message SuppressionWindow {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 名前。
+  string name = 2;
+  // 理由。
+  string reason = 3;
+  // 開始時刻。
+  google.protobuf.Timestamp start_time = 4;
+  // 終了時刻。
+  google.protobuf.Timestamp end_time = 5;
+  // 対象ルールID（空の場合は全ルール）。
+  repeated string rule_ids = 6;
+  // 対象監視領域（空の場合は全領域）。
+  repeated MonitoringDomain domains = 7;
+  // 作成者。
+  string created_by = 8;
+}
+
+// AlertService はアラート管理サービス。
+service AlertService {
+  // アラートルールを一覧する。
+  rpc ListAlertRules(ListAlertRulesRequest) returns (ListAlertRulesResponse);
+  // アラートルールを取得する。
+  rpc GetAlertRule(GetAlertRuleRequest) returns (GetAlertRuleResponse);
+  // アラートルールを作成する。
+  rpc CreateAlertRule(CreateAlertRuleRequest) returns (CreateAlertRuleResponse);
+  // アラートルールを更新する。
+  rpc UpdateAlertRule(UpdateAlertRuleRequest) returns (UpdateAlertRuleResponse);
+  // アラートルールを削除する。
+  rpc DeleteAlertRule(DeleteAlertRuleRequest) returns (DeleteAlertRuleResponse);
+  // アラートインスタンスを一覧する。
+  rpc ListAlertInstances(ListAlertInstancesRequest) returns (ListAlertInstancesResponse);
+  // アラートインスタンスを取得する。
+  rpc GetAlertInstance(GetAlertInstanceRequest) returns (GetAlertInstanceResponse);
+  // アラートを確認（acknowledge）する。
+  rpc AcknowledgeAlert(AcknowledgeAlertRequest) returns (AcknowledgeAlertResponse);
+  // アラートを解決する。
+  rpc ResolveAlert(ResolveAlertRequest) returns (ResolveAlertResponse);
+  // 抑制ウィンドウを作成する。
+  rpc CreateSuppressionWindow(CreateSuppressionWindowRequest) returns (CreateSuppressionWindowResponse);
+  // 抑制ウィンドウを一覧する。
+  rpc ListSuppressionWindows(ListSuppressionWindowsRequest) returns (ListSuppressionWindowsResponse);
+  // 抑制ウィンドウを削除する。
+  rpc DeleteSuppressionWindow(DeleteSuppressionWindowRequest) returns (DeleteSuppressionWindowResponse);
+}
+
+message ListAlertRulesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  AlertSeverity severity_filter = 2;
+  MonitoringDomain domain_filter = 3;
+  bool enabled_only = 4;
+  string search = 5;
+}
+
+message ListAlertRulesResponse {
+  repeated AlertRule rules = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetAlertRuleRequest {
+  string id = 1;
+}
+
+message GetAlertRuleResponse {
+  AlertRule rule = 1;
+}
+
+message CreateAlertRuleRequest {
+  string name = 1;
+  string description = 2;
+  AlertSeverity severity = 3;
+  repeated AlertCondition conditions = 4;
+  AlertAction action = 5;
+  google.protobuf.Duration evaluation_interval = 6;
+  google.protobuf.Duration pending_duration = 7;
+  repeated string cxo_routing = 8;
+  map<string, string> labels = 9;
+}
+
+message CreateAlertRuleResponse {
+  AlertRule rule = 1;
+}
+
+message UpdateAlertRuleRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  AlertSeverity severity = 4;
+  repeated AlertCondition conditions = 5;
+  AlertAction action = 6;
+  google.protobuf.Duration evaluation_interval = 7;
+  google.protobuf.Duration pending_duration = 8;
+  bool enabled = 9;
+  repeated string cxo_routing = 10;
+  map<string, string> labels = 11;
+}
+
+message UpdateAlertRuleResponse {
+  AlertRule rule = 1;
+}
+
+message DeleteAlertRuleRequest {
+  string id = 1;
+}
+
+message DeleteAlertRuleResponse {}
+
+message ListAlertInstancesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string rule_id = 2;
+  AlertState state_filter = 3;
+  AlertSeverity severity_filter = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp end_time = 6;
+}
+
+message ListAlertInstancesResponse {
+  repeated AlertInstance instances = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetAlertInstanceRequest {
+  string id = 1;
+}
+
+message GetAlertInstanceResponse {
+  AlertInstance instance = 1;
+}
+
+message AcknowledgeAlertRequest {
+  string id = 1;
+  string acknowledged_by = 2;
+  string comment = 3;
+}
+
+message AcknowledgeAlertResponse {
+  AlertInstance instance = 1;
+}
+
+message ResolveAlertRequest {
+  string id = 1;
+  string resolved_by = 2;
+  string resolution_note = 3;
+}
+
+message ResolveAlertResponse {
+  AlertInstance instance = 1;
+}
+
+message CreateSuppressionWindowRequest {
+  string name = 1;
+  string reason = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  repeated string rule_ids = 5;
+  repeated MonitoringDomain domains = 6;
+}
+
+message CreateSuppressionWindowResponse {
+  SuppressionWindow window = 1;
+}
+
+message ListSuppressionWindowsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  bool active_only = 2;
+}
+
+message ListSuppressionWindowsResponse {
+  repeated SuppressionWindow windows = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message DeleteSuppressionWindowRequest {
+  string id = 1;
+}
+
+message DeleteSuppressionWindowResponse {}

@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package sirosimes.kotonoha.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// analysis.proto — テキスト解析パイプライン定義。
+//
+// 感情分析、要約、エンティティ抽出、分類、翻訳などのNLP機能を提供。
+
+// AnalysisType は解析種別。
+enum AnalysisType {
+  ANALYSIS_TYPE_UNSPECIFIED = 0;
+  ANALYSIS_TYPE_SENTIMENT = 1;
+  ANALYSIS_TYPE_SUMMARY = 2;
+  ANALYSIS_TYPE_ENTITY_EXTRACTION = 3;
+  ANALYSIS_TYPE_CLASSIFICATION = 4;
+  ANALYSIS_TYPE_TRANSLATION = 5;
+  ANALYSIS_TYPE_KEYWORD_EXTRACTION = 6;
+  ANALYSIS_TYPE_TOPIC_MODELING = 7;
+  ANALYSIS_TYPE_INTENT_DETECTION = 8;
+}
+
+// SentimentLabel は感情ラベル。
+enum SentimentLabel {
+  SENTIMENT_LABEL_UNSPECIFIED = 0;
+  SENTIMENT_LABEL_POSITIVE = 1;
+  SENTIMENT_LABEL_NEGATIVE = 2;
+  SENTIMENT_LABEL_NEUTRAL = 3;
+  SENTIMENT_LABEL_MIXED = 4;
+}
+
+// Entity は抽出されたエンティティ。
+message Entity {
+  string text = 1;
+  string type = 2;
+  float confidence = 3;
+  int32 start_offset = 4;
+  int32 end_offset = 5;
+  map<string, string> attributes = 6;
+}
+
+// SentimentResult は感情分析結果。
+message SentimentResult {
+  SentimentLabel label = 1;
+  float score = 2;
+  float positive_score = 3;
+  float negative_score = 4;
+  float neutral_score = 5;
+}
+
+// ClassificationResult は分類結果。
+message ClassificationResult {
+  string category = 1;
+  float confidence = 2;
+  repeated ClassificationResult subcategories = 3;
+}
+
+// AnalysisResult は解析結果の統合型。
+message AnalysisResult {
+  string id = 1;
+  string document_id = 2;
+  AnalysisType type = 3;
+  SentimentResult sentiment = 4;
+  string summary = 5;
+  repeated Entity entities = 6;
+  repeated ClassificationResult classifications = 7;
+  repeated string keywords = 8;
+  string translated_text = 9;
+  string target_language = 10;
+  string model_used = 11;
+  google.protobuf.Timestamp analyzed_at = 12;
+}
+
+// AnalysisService はテキスト解析サービス。
+service AnalysisService {
+  rpc AnalyzeText(AnalyzeTextRequest) returns (AnalyzeTextResponse);
+  rpc AnalyzeDocument(AnalyzeDocumentRequest) returns (AnalyzeDocumentResponse);
+  rpc BatchAnalyze(BatchAnalyzeRequest) returns (BatchAnalyzeResponse);
+  rpc GetAnalysisResult(GetAnalysisResultRequest) returns (GetAnalysisResultResponse);
+  rpc ListAnalysisResults(ListAnalysisResultsRequest) returns (ListAnalysisResultsResponse);
+}
+
+message AnalyzeTextRequest {
+  string text = 1;
+  repeated AnalysisType types = 2;
+  string source_language = 3;
+  string target_language = 4;
+  string model_preference = 5;
+}
+
+message AnalyzeTextResponse {
+  repeated AnalysisResult results = 1;
+}
+
+message AnalyzeDocumentRequest {
+  string document_id = 1;
+  repeated AnalysisType types = 2;
+  string target_language = 3;
+}
+
+message AnalyzeDocumentResponse {
+  repeated AnalysisResult results = 1;
+}
+
+message BatchAnalyzeRequest {
+  repeated string document_ids = 1;
+  repeated AnalysisType types = 2;
+}
+
+message BatchAnalyzeResponse {
+  map<string, AnalyzeDocumentResponse> results = 1;
+  int32 success_count = 2;
+  int32 failure_count = 3;
+}
+
+message GetAnalysisResultRequest {
+  string id = 1;
+}
+
+message GetAnalysisResultResponse {
+  AnalysisResult result = 1;
+}
+
+message ListAnalysisResultsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string document_id = 2;
+  AnalysisType type_filter = 3;
+}
+
+message ListAnalysisResultsResponse {
+  repeated AnalysisResult results = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}

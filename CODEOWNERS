@@ -5,25 +5,31 @@
 proto/sirosimes/common/v1/permission.proto @katsuragi.makoto
 proto/sirosimes/common/v1/audit.proto @katsuragi.makoto
 proto/sirosimes/common/v1/metadata.proto @katsuragi.makoto
+proto/sirosimes/common/v1/integrity.proto @katsuragi.makoto
+proto/sirosimes/common/v1/field_access.proto @katsuragi.makoto
+proto/sirosimes/common/v1/rate_limit.proto @katsuragi.makoto
+proto/sirosimes/common/v1/sentinel.proto @katsuragi.makoto
 SECURITY.md @katsuragi.makoto
 
 # 瑞垣（認証基盤）— 全Proto CISO必須レビュー
-proto/sirosimes/mizugaki/v1/*.proto @katsuragi.makoto
+proto/sirosimes/mizugaki/ @katsuragi.makoto
 
 # External/Internal API分離
 proto/sirosimes/external/ @katsuragi.makoto
 proto/sirosimes/mizugaki/external/ @katsuragi.makoto
 proto/sirosimes/internal/ @katsuragi.makoto
 
+# 斎垣（セキュリティ境界）— CISO必須レビュー
+proto/sirosimes/imonori/ @katsuragi.makoto
+
+# 防人（エンドポイント保護）— CISO必須レビュー
+proto/sirosimes/sakimori/ @katsuragi.makoto
+
+# 天守（監視基盤）— 人間社員監視はCISO/CHROレビュー
+proto/sirosimes/tenshu/v1/human_monitor.proto @katsuragi.makoto
+
 # 共通型定義
 proto/sirosimes/common/ @fujiwara.ai
-
-# 司（Tsukasa）— セキュリティ関連フィールド変更のみCISOレビュー
-# （通常のCRUD RPC追加・変更はCQO/CEXOの判断に委ねる）
-# proto/sirosimes/tsukasa/v1/ — default reviewers
-
-# 機織（Hataori）— 同上
-# proto/sirosimes/hataori/v1/ — default reviewers
 
 # CI/CD
 .github/ @fujiwara.ai
@@ -33,12 +39,3 @@ buf.gen.yaml @fujiwara.ai
 
 # デフォルト（全ファイル）
 * @fujiwara.ai
-
-# Phase 3: セキュリティ基盤
-proto/sirosimes/common/v1/integrity.proto @katsuragi.makoto
-proto/sirosimes/common/v1/field_access.proto @katsuragi.makoto
-proto/sirosimes/common/v1/rate_limit.proto @katsuragi.makoto
-proto/sirosimes/common/v1/sentinel.proto @katsuragi.makoto
-proto/sirosimes/mizugaki/v1/bff_token.proto @katsuragi.makoto
-proto/sirosimes/mizugaki/v1/api_key.proto @katsuragi.makoto
-proto/sirosimes/mizugaki/external/v1/api_key_service.proto @katsuragi.makoto

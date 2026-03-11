@@ -1,0 +1,213 @@
+syntax = "proto3";
+
+package sirosimes.tokoyo.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// archive.proto — 常世（Tokoyo）永続ストレージ・アーカイブ管理。
+//
+// 長期保存データのアーカイブ、保持ポリシー、検索、
+// データライフサイクル管理を提供する。
+// 監査ログ、履歴データ、コンプライアンス対応の長期保存を実現する。
+
+// ArchiveStatus はアーカイブの状態。
+enum ArchiveStatus {
+  ARCHIVE_STATUS_UNSPECIFIED = 0;
+  ARCHIVE_STATUS_ACTIVE = 1;
+  ARCHIVE_STATUS_ARCHIVED = 2;
+  ARCHIVE_STATUS_RESTORING = 3;
+  ARCHIVE_STATUS_EXPIRED = 4;
+  ARCHIVE_STATUS_DELETED = 5;
+}
+
+// StorageTier はストレージ階層。
+enum StorageTier {
+  STORAGE_TIER_UNSPECIFIED = 0;
+  STORAGE_TIER_HOT = 1;
+  STORAGE_TIER_WARM = 2;
+  STORAGE_TIER_COLD = 3;
+  STORAGE_TIER_GLACIER = 4;
+}
+
+// ArchiveObject はアーカイブオブジェクト。
+message ArchiveObject {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string source_service = 2;
+  string source_type = 3;
+  string source_id = 4;
+  int64 size_bytes = 5;
+  string content_hash = 6;
+  StorageTier tier = 7;
+  ArchiveStatus status = 8;
+  google.protobuf.Timestamp archived_at = 9;
+  google.protobuf.Timestamp expires_at = 10;
+  string retention_policy_id = 11;
+  map<string, string> labels = 12;
+  bool encrypted = 13;
+  string compression_algorithm = 14;
+}
+
+// RetentionPolicy は保持ポリシー。
+message RetentionPolicy {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Duration retention_period = 4;
+  StorageTier initial_tier = 5;
+  repeated TierTransition tier_transitions = 6;
+  bool legal_hold = 7;
+  bool immutable = 8;
+  string compliance_standard = 9;
+}
+
+// TierTransition はストレージ階層の自動遷移ルール。
+message TierTransition {
+  google.protobuf.Duration after_duration = 1;
+  StorageTier target_tier = 2;
+}
+
+// ArchiveService はアーカイブ管理サービス。
+service ArchiveService {
+  rpc ArchiveData(ArchiveDataRequest) returns (ArchiveDataResponse);
+  rpc GetArchiveObject(GetArchiveObjectRequest) returns (GetArchiveObjectResponse);
+  rpc ListArchiveObjects(ListArchiveObjectsRequest) returns (ListArchiveObjectsResponse);
+  rpc RestoreArchive(RestoreArchiveRequest) returns (RestoreArchiveResponse);
+  rpc DeleteArchiveObject(DeleteArchiveObjectRequest) returns (DeleteArchiveObjectResponse);
+  rpc SearchArchives(SearchArchivesRequest) returns (SearchArchivesResponse);
+  rpc ListRetentionPolicies(ListRetentionPoliciesRequest) returns (ListRetentionPoliciesResponse);
+  rpc GetRetentionPolicy(GetRetentionPolicyRequest) returns (GetRetentionPolicyResponse);
+  rpc CreateRetentionPolicy(CreateRetentionPolicyRequest) returns (CreateRetentionPolicyResponse);
+  rpc UpdateRetentionPolicy(UpdateRetentionPolicyRequest) returns (UpdateRetentionPolicyResponse);
+  rpc DeleteRetentionPolicy(DeleteRetentionPolicyRequest) returns (DeleteRetentionPolicyResponse);
+  rpc GetStorageStats(GetStorageStatsRequest) returns (GetStorageStatsResponse);
+}
+
+message ArchiveDataRequest {
+  string source_service = 1;
+  string source_type = 2;
+  string source_id = 3;
+  bytes data = 4;
+  string retention_policy_id = 5;
+  map<string, string> labels = 6;
+  bool encrypt = 7;
+}
+
+message ArchiveDataResponse {
+  ArchiveObject object = 1;
+}
+
+message GetArchiveObjectRequest {
+  string id = 1;
+}
+
+message GetArchiveObjectResponse {
+  ArchiveObject object = 1;
+  bytes data = 2;
+}
+
+message ListArchiveObjectsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string source_service = 2;
+  string source_type = 3;
+  StorageTier tier_filter = 4;
+  ArchiveStatus status_filter = 5;
+  string retention_policy_id = 6;
+}
+
+message ListArchiveObjectsResponse {
+  repeated ArchiveObject objects = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message RestoreArchiveRequest {
+  string id = 1;
+  StorageTier restore_to_tier = 2;
+}
+
+message RestoreArchiveResponse {
+  ArchiveObject object = 1;
+}
+
+message DeleteArchiveObjectRequest {
+  string id = 1;
+}
+
+message DeleteArchiveObjectResponse {}
+
+message SearchArchivesRequest {
+  string query = 1;
+  string source_service = 2;
+  map<string, string> label_filters = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+  sirosimes.common.v1.PaginationRequest pagination = 6;
+}
+
+message SearchArchivesResponse {
+  repeated ArchiveObject objects = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message ListRetentionPoliciesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+}
+
+message ListRetentionPoliciesResponse {
+  repeated RetentionPolicy policies = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetRetentionPolicyRequest {
+  string id = 1;
+}
+
+message GetRetentionPolicyResponse {
+  RetentionPolicy policy = 1;
+}
+
+message CreateRetentionPolicyRequest {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Duration retention_period = 3;
+  StorageTier initial_tier = 4;
+  repeated TierTransition tier_transitions = 5;
+  bool legal_hold = 6;
+  bool immutable = 7;
+  string compliance_standard = 8;
+}
+
+message CreateRetentionPolicyResponse {
+  RetentionPolicy policy = 1;
+}
+
+message UpdateRetentionPolicyRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  bool legal_hold = 4;
+}
+
+message UpdateRetentionPolicyResponse {
+  RetentionPolicy policy = 1;
+}
+
+message DeleteRetentionPolicyRequest {
+  string id = 1;
+}
+
+message DeleteRetentionPolicyResponse {}
+
+message GetStorageStatsRequest {
+  StorageTier tier_filter = 1;
+}
+
+message GetStorageStatsResponse {
+  int64 total_objects = 1;
+  int64 total_size_bytes = 2;
+  map<string, int64> size_by_tier = 3;
+  map<string, int64> size_by_service = 4;
+  map<string, int64> objects_by_status = 5;
+}

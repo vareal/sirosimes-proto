@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package sirosimes.omokage.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// memory.proto — 面影（Omokage）記憶・コンテキスト管理。
+//
+// AI社員の長期記憶・セッションコンテキスト・知識ベースの管理を提供する。
+// RAG（Retrieval-Augmented Generation）パイプラインの基盤として、
+// 言の葉（Kotonoha）の文書チャンクと言霊（Kotodama）の推論エンジンを接続する。
+
+// MemoryType は記憶の種別。
+enum MemoryType {
+  MEMORY_TYPE_UNSPECIFIED = 0;
+  // 短期記憶（セッション内コンテキスト）。
+  MEMORY_TYPE_SHORT_TERM = 1;
+  // 長期記憶（永続的な知識・経験）。
+  MEMORY_TYPE_LONG_TERM = 2;
+  // エピソード記憶（具体的な出来事の記憶）。
+  MEMORY_TYPE_EPISODIC = 3;
+  // セマンティック記憶（概念・知識の記憶）。
+  MEMORY_TYPE_SEMANTIC = 4;
+  // 手続き記憶（手順・スキルの記憶）。
+  MEMORY_TYPE_PROCEDURAL = 5;
+}
+
+// MemoryEntry は記憶エントリ。
+message MemoryEntry {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 所有者（AI社員ID）。
+  string owner_id = 2;
+  // 記憶種別。
+  MemoryType type = 3;
+  // 内容。
+  string content = 4;
+  // 要約（短縮版）。
+  string summary = 5;
+  // 重要度スコア（0.0-1.0）。
+  float importance = 6;
+  // アクセス回数。
+  int32 access_count = 7;
+  // 最終アクセス時刻。
+  google.protobuf.Timestamp last_accessed_at = 8;
+  // 関連記憶ID。
+  repeated string related_memory_ids = 9;
+  // タグ。
+  repeated string tags = 10;
+  // ソースコンテキスト（何がきっかけで記録されたか）。
+  string source_context = 11;
+  // 埋め込みベクトル。
+  repeated float embedding = 12;
+  // 埋め込みモデル。
+  string embedding_model = 13;
+  // 有効期限（短期記憶の自動削除等）。
+  google.protobuf.Timestamp expires_at = 14;
+}
+
+// RetrievalResult はRAG検索結果。
+message RetrievalResult {
+  // 記憶エントリ。
+  MemoryEntry entry = 1;
+  // 類似度スコア（0.0-1.0）。
+  float similarity_score = 2;
+  // 再ランキングスコア（Cross-Encoder等）。
+  float rerank_score = 3;
+  // ソース文書チャンクID（言の葉連携）。
+  string source_chunk_id = 4;
+}
+
+// MemoryService は記憶管理サービス。
+service MemoryService {
+  rpc StoreMemory(StoreMemoryRequest) returns (StoreMemoryResponse);
+  rpc GetMemory(GetMemoryRequest) returns (GetMemoryResponse);
+  rpc UpdateMemory(UpdateMemoryRequest) returns (UpdateMemoryResponse);
+  rpc DeleteMemory(DeleteMemoryRequest) returns (DeleteMemoryResponse);
+  rpc ListMemories(ListMemoriesRequest) returns (ListMemoriesResponse);
+  rpc SearchMemories(SearchMemoriesRequest) returns (SearchMemoriesResponse);
+  rpc ConsolidateMemories(ConsolidateMemoriesRequest) returns (ConsolidateMemoriesResponse);
+  rpc ForgetMemories(ForgetMemoriesRequest) returns (ForgetMemoriesResponse);
+}
+
+message StoreMemoryRequest {
+  string owner_id = 1;
+  MemoryType type = 2;
+  string content = 3;
+  string summary = 4;
+  float importance = 5;
+  repeated string tags = 6;
+  string source_context = 7;
+  google.protobuf.Timestamp expires_at = 8;
+}
+
+message StoreMemoryResponse {
+  MemoryEntry entry = 1;
+}
+
+message GetMemoryRequest {
+  string id = 1;
+}
+
+message GetMemoryResponse {
+  MemoryEntry entry = 1;
+}
+
+message UpdateMemoryRequest {
+  string id = 1;
+  string content = 2;
+  string summary = 3;
+  float importance = 4;
+  repeated string tags = 5;
+}
+
+message UpdateMemoryResponse {
+  MemoryEntry entry = 1;
+}
+
+message DeleteMemoryRequest {
+  string id = 1;
+}
+
+message DeleteMemoryResponse {}
+
+message ListMemoriesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string owner_id = 2;
+  MemoryType type_filter = 3;
+  repeated string tags = 4;
+  float min_importance = 5;
+}
+
+message ListMemoriesResponse {
+  repeated MemoryEntry entries = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message SearchMemoriesRequest {
+  string owner_id = 1;
+  string query = 2;
+  int32 top_k = 3;
+  float min_similarity = 4;
+  MemoryType type_filter = 5;
+  repeated string tags = 6;
+  bool enable_rerank = 7;
+}
+
+message SearchMemoriesResponse {
+  repeated RetrievalResult results = 1;
+}
+
+// ConsolidateMemoriesRequest は記憶の統合（短期→長期昇格、重複排除）。
+message ConsolidateMemoriesRequest {
+  string owner_id = 1;
+}
+
+message ConsolidateMemoriesResponse {
+  int32 consolidated_count = 1;
+  int32 promoted_count = 2;
+  int32 deduplicated_count = 3;
+}
+
+// ForgetMemoriesRequest は古い/低重要度の記憶を忘却する。
+message ForgetMemoriesRequest {
+  string owner_id = 1;
+  float importance_threshold = 2;
+  int32 max_age_days = 3;
+  MemoryType type_filter = 4;
+}
+
+message ForgetMemoriesResponse {
+  int32 forgotten_count = 1;
+}

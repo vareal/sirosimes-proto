@@ -1,0 +1,217 @@
+syntax = "proto3";
+
+package sirosimes.nexia.paws.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// robot.proto — Nexia PAWS ロボット制御・テレメトリ管理。
+//
+// 四脚ロボット（Go2W等）のモーション制御、テレメトリ収集、
+// 音声対話、映像ストリーム、安全制御を提供する。
+// 依代（Yorishiro）のデバイス管理、碧（Aoi）の映像解析と連携する。
+
+// RobotState はロボットの状態。
+enum RobotState {
+  ROBOT_STATE_UNSPECIFIED = 0;
+  ROBOT_STATE_IDLE = 1;
+  ROBOT_STATE_WALKING = 2;
+  ROBOT_STATE_RUNNING = 3;
+  ROBOT_STATE_STANDING = 4;
+  ROBOT_STATE_SITTING = 5;
+  ROBOT_STATE_CHARGING = 6;
+  ROBOT_STATE_ERROR = 7;
+  ROBOT_STATE_EMERGENCY_STOP = 8;
+}
+
+// MotionMode はモーションモード。
+enum MotionMode {
+  MOTION_MODE_UNSPECIFIED = 0;
+  MOTION_MODE_NORMAL = 1;
+  MOTION_MODE_SPORT = 2;
+  MOTION_MODE_STAIRS = 3;
+  MOTION_MODE_OBSTACLE = 4;
+  MOTION_MODE_BALANCE = 5;
+}
+
+// SafetyLevel は安全レベル。
+enum SafetyLevel {
+  SAFETY_LEVEL_UNSPECIFIED = 0;
+  SAFETY_LEVEL_FULL = 1;
+  SAFETY_LEVEL_RESTRICTED = 2;
+  SAFETY_LEVEL_EMERGENCY_ONLY = 3;
+}
+
+// RobotInfo はロボット情報。
+message RobotInfo {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string model = 3;
+  string serial_number = 4;
+  RobotState state = 5;
+  MotionMode motion_mode = 6;
+  SafetyLevel safety_level = 7;
+  float battery_percent = 8;
+  Position position = 9;
+  string firmware_version = 10;
+  google.protobuf.Timestamp last_heartbeat_at = 11;
+  string device_id = 12;
+}
+
+// Position は3D位置情報。
+message Position {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+  double roll = 4;
+  double pitch = 5;
+  double yaw = 6;
+}
+
+// Velocity は速度情報。
+message Velocity {
+  double linear_x = 1;
+  double linear_y = 2;
+  double angular_z = 3;
+}
+
+// TelemetryData はテレメトリデータ。
+message TelemetryData {
+  string robot_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  RobotState state = 3;
+  float battery_percent = 4;
+  Position position = 5;
+  Velocity velocity = 6;
+  float cpu_temperature = 7;
+  float motor_temperature = 8;
+  map<string, double> joint_angles = 9;
+  map<string, double> joint_torques = 10;
+  repeated float imu_data = 11;
+  int32 wifi_rssi = 12;
+}
+
+// MotionCommand はモーションコマンド。
+message MotionCommand {
+  string robot_id = 1;
+  Velocity velocity = 2;
+  google.protobuf.Duration duration = 3;
+  MotionMode mode = 4;
+  float max_speed = 5;
+}
+
+// RobotService はロボット制御サービス。
+service RobotService {
+  rpc GetRobotInfo(GetRobotInfoRequest) returns (GetRobotInfoResponse);
+  rpc ListRobots(ListRobotsRequest) returns (ListRobotsResponse);
+  rpc SendMotionCommand(SendMotionCommandRequest) returns (SendMotionCommandResponse);
+  rpc EmergencyStop(EmergencyStopRequest) returns (EmergencyStopResponse);
+  rpc SetMotionMode(SetMotionModeRequest) returns (SetMotionModeResponse);
+  rpc SetSafetyLevel(SetSafetyLevelRequest) returns (SetSafetyLevelResponse);
+  rpc IngestTelemetry(IngestTelemetryRequest) returns (IngestTelemetryResponse);
+  rpc QueryTelemetry(QueryTelemetryRequest) returns (QueryTelemetryResponse);
+  rpc GetLatestTelemetry(GetLatestTelemetryRequest) returns (GetLatestTelemetryResponse);
+  rpc StartVoiceSession(StartVoiceSessionRequest) returns (StartVoiceSessionResponse);
+  rpc StopVoiceSession(StopVoiceSessionRequest) returns (StopVoiceSessionResponse);
+}
+
+message GetRobotInfoRequest {
+  string id = 1;
+}
+
+message GetRobotInfoResponse {
+  RobotInfo robot = 1;
+}
+
+message ListRobotsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  RobotState state_filter = 2;
+}
+
+message ListRobotsResponse {
+  repeated RobotInfo robots = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message SendMotionCommandRequest {
+  MotionCommand command = 1;
+}
+
+message SendMotionCommandResponse {
+  bool accepted = 1;
+  string error_message = 2;
+}
+
+message EmergencyStopRequest {
+  string robot_id = 1;
+  string reason = 2;
+}
+
+message EmergencyStopResponse {
+  RobotInfo robot = 1;
+}
+
+message SetMotionModeRequest {
+  string robot_id = 1;
+  MotionMode mode = 2;
+}
+
+message SetMotionModeResponse {
+  RobotInfo robot = 1;
+}
+
+message SetSafetyLevelRequest {
+  string robot_id = 1;
+  SafetyLevel level = 2;
+}
+
+message SetSafetyLevelResponse {
+  RobotInfo robot = 1;
+}
+
+message IngestTelemetryRequest {
+  repeated TelemetryData data = 1;
+}
+
+message IngestTelemetryResponse {
+  int32 accepted_count = 1;
+}
+
+message QueryTelemetryRequest {
+  string robot_id = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+  int32 limit = 4;
+}
+
+message QueryTelemetryResponse {
+  repeated TelemetryData data = 1;
+}
+
+message GetLatestTelemetryRequest {
+  string robot_id = 1;
+}
+
+message GetLatestTelemetryResponse {
+  TelemetryData data = 1;
+}
+
+message StartVoiceSessionRequest {
+  string robot_id = 1;
+  string language = 2;
+  string voice_model = 3;
+}
+
+message StartVoiceSessionResponse {
+  string session_id = 1;
+  string webrtc_offer = 2;
+}
+
+message StopVoiceSessionRequest {
+  string robot_id = 1;
+  string session_id = 2;
+}
+
+message StopVoiceSessionResponse {}

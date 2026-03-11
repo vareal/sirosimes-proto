@@ -1,0 +1,473 @@
+syntax = "proto3";
+
+package sirosimes.imonori.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// network.proto — 斎垣（Imonori）閉域網・VPN・mTLS・サービスメッシュ管理。
+//
+// Phase 6: Cloudflare廃止に伴う自前閉域網構築の基盤Proto定義。
+// WireGuard VPNトンネル、mTLS証明書管理、サービスメッシュルーティング、
+// DNS管理を統合的に提供する。
+// 瑞垣（Mizugaki）のゼロトラスト認証と組み合わせて利用する。
+
+// TunnelStatus はVPNトンネルの状態。
+enum TunnelStatus {
+  TUNNEL_STATUS_UNSPECIFIED = 0;
+  TUNNEL_STATUS_ACTIVE = 1;
+  TUNNEL_STATUS_INACTIVE = 2;
+  TUNNEL_STATUS_CONNECTING = 3;
+  TUNNEL_STATUS_ERROR = 4;
+  TUNNEL_STATUS_MAINTENANCE = 5;
+}
+
+// TunnelType はトンネルの種別。
+enum TunnelType {
+  TUNNEL_TYPE_UNSPECIFIED = 0;
+  // WireGuardトンネル。
+  TUNNEL_TYPE_WIREGUARD = 1;
+  // IPsec IKEv2トンネル。
+  TUNNEL_TYPE_IPSEC = 2;
+  // SSHトンネル。
+  TUNNEL_TYPE_SSH = 3;
+}
+
+// CertificateStatus は証明書の状態。
+enum CertificateStatus {
+  CERTIFICATE_STATUS_UNSPECIFIED = 0;
+  CERTIFICATE_STATUS_ACTIVE = 1;
+  CERTIFICATE_STATUS_EXPIRING_SOON = 2;
+  CERTIFICATE_STATUS_EXPIRED = 3;
+  CERTIFICATE_STATUS_REVOKED = 4;
+  CERTIFICATE_STATUS_PENDING = 5;
+}
+
+// CertificateType は証明書の種別。
+enum CertificateType {
+  CERTIFICATE_TYPE_UNSPECIFIED = 0;
+  // CA（認証局）証明書。
+  CERTIFICATE_TYPE_CA = 1;
+  // サーバー証明書。
+  CERTIFICATE_TYPE_SERVER = 2;
+  // クライアント証明書（mTLS用）。
+  CERTIFICATE_TYPE_CLIENT = 3;
+  // 中間CA証明書。
+  CERTIFICATE_TYPE_INTERMEDIATE = 4;
+}
+
+// MeshNodeStatus はサービスメッシュノードの状態。
+enum MeshNodeStatus {
+  MESH_NODE_STATUS_UNSPECIFIED = 0;
+  MESH_NODE_STATUS_HEALTHY = 1;
+  MESH_NODE_STATUS_DEGRADED = 2;
+  MESH_NODE_STATUS_DOWN = 3;
+  MESH_NODE_STATUS_DRAINING = 4;
+}
+
+// VPNTunnel はVPNトンネル。
+message VPNTunnel {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  TunnelType type = 3;
+  TunnelStatus status = 4;
+  // ローカル側のエンドポイント。
+  string local_endpoint = 5;
+  // リモート側のエンドポイント。
+  string remote_endpoint = 6;
+  // トンネル内部IPレンジ（CIDR）。
+  string internal_cidr = 7;
+  // WireGuard公開鍵（WIREGUARD_TYPEのみ）。
+  string public_key = 8;
+  // Pre-Shared Key参照（暗号化参照名）。
+  string psk_secret_ref = 9;
+  // キープアライブ間隔。
+  int32 keepalive_seconds = 10;
+  // MTU設定。
+  int32 mtu = 11;
+  // 許可されるIPレンジ。
+  repeated string allowed_ips = 12;
+  google.protobuf.Timestamp last_handshake_at = 13;
+  int64 rx_bytes = 14;
+  int64 tx_bytes = 15;
+}
+
+// Certificate はTLS証明書。
+message Certificate {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  CertificateType type = 3;
+  CertificateStatus status = 4;
+  // サブジェクト（CN等）。
+  string subject = 5;
+  // 発行者。
+  string issuer = 6;
+  // SANs（Subject Alternative Names）。
+  repeated string sans = 7;
+  // シリアル番号。
+  string serial_number = 8;
+  // 有効期間開始。
+  google.protobuf.Timestamp not_before = 9;
+  // 有効期間終了。
+  google.protobuf.Timestamp not_after = 10;
+  // フィンガープリント（SHA-256）。
+  string fingerprint = 11;
+  // 鍵アルゴリズム（ed25519/ecdsa-p256/rsa-2048）。
+  string key_algorithm = 12;
+  // 親CA証明書ID。
+  string issuer_certificate_id = 13;
+  // 自動更新有効。
+  bool auto_renew = 14;
+  // 更新何日前に通知。
+  int32 renew_before_days = 15;
+}
+
+// MeshNode はサービスメッシュノード。
+message MeshNode {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  MeshNodeStatus status = 3;
+  // ノードのアドレス。
+  string address = 4;
+  // ポート。
+  int32 port = 5;
+  // サービス名。
+  string service_name = 6;
+  // mTLS証明書ID。
+  string certificate_id = 7;
+  // ヘルスチェックURL。
+  string health_check_url = 8;
+  // ヘルスチェック間隔。
+  int32 health_check_interval_seconds = 9;
+  // 最終ヘルスチェック時刻。
+  google.protobuf.Timestamp last_health_check_at = 10;
+  // レイテンシ（ms）。
+  int32 latency_ms = 11;
+  // アクティブ接続数。
+  int32 active_connections = 12;
+  // ルーティング重み（ロードバランシング）。
+  int32 weight = 13;
+}
+
+// MeshRoute はサービスメッシュルーティングルール。
+message MeshRoute {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  // ソースサービス。
+  string source_service = 3;
+  // 宛先サービス。
+  string destination_service = 4;
+  // パスプレフィックス。
+  string path_prefix = 5;
+  // ロードバランシング方式（round_robin/least_conn/ip_hash）。
+  string load_balancing = 6;
+  // タイムアウト。
+  google.protobuf.Duration timeout = 7;
+  // リトライ回数。
+  int32 retries = 8;
+  // mTLS必須。
+  bool mtls_required = 9;
+  // 有効。
+  bool enabled = 10;
+}
+
+// DNSRecord は内部DNS レコード。
+message DNSRecord {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  // レコード種別（A/AAAA/CNAME/SRV/TXT）。
+  string record_type = 3;
+  string value = 4;
+  int32 ttl = 5;
+  int32 priority = 6;
+  bool internal_only = 7;
+}
+
+// NetworkService は閉域網管理サービス。
+service NetworkService {
+  // VPNトンネル管理。
+  rpc ListTunnels(ListTunnelsRequest) returns (ListTunnelsResponse);
+  rpc GetTunnel(GetTunnelRequest) returns (GetTunnelResponse);
+  rpc CreateTunnel(CreateTunnelRequest) returns (CreateTunnelResponse);
+  rpc UpdateTunnel(UpdateTunnelRequest) returns (UpdateTunnelResponse);
+  rpc DeleteTunnel(DeleteTunnelRequest) returns (DeleteTunnelResponse);
+  // 証明書管理。
+  rpc ListCertificates(ListCertificatesRequest) returns (ListCertificatesResponse);
+  rpc GetCertificate(GetCertificateRequest) returns (GetCertificateResponse);
+  rpc IssueCertificate(IssueCertificateRequest) returns (IssueCertificateResponse);
+  rpc RenewCertificate(RenewCertificateRequest) returns (RenewCertificateResponse);
+  rpc RevokeCertificate(RevokeCertificateRequest) returns (RevokeCertificateResponse);
+  // サービスメッシュ管理。
+  rpc ListMeshNodes(ListMeshNodesRequest) returns (ListMeshNodesResponse);
+  rpc GetMeshNode(GetMeshNodeRequest) returns (GetMeshNodeResponse);
+  rpc RegisterMeshNode(RegisterMeshNodeRequest) returns (RegisterMeshNodeResponse);
+  rpc DeregisterMeshNode(DeregisterMeshNodeRequest) returns (DeregisterMeshNodeResponse);
+  rpc ListMeshRoutes(ListMeshRoutesRequest) returns (ListMeshRoutesResponse);
+  rpc CreateMeshRoute(CreateMeshRouteRequest) returns (CreateMeshRouteResponse);
+  rpc UpdateMeshRoute(UpdateMeshRouteRequest) returns (UpdateMeshRouteResponse);
+  rpc DeleteMeshRoute(DeleteMeshRouteRequest) returns (DeleteMeshRouteResponse);
+  // DNS管理。
+  rpc ListDNSRecords(ListDNSRecordsRequest) returns (ListDNSRecordsResponse);
+  rpc CreateDNSRecord(CreateDNSRecordRequest) returns (CreateDNSRecordResponse);
+  rpc UpdateDNSRecord(UpdateDNSRecordRequest) returns (UpdateDNSRecordResponse);
+  rpc DeleteDNSRecord(DeleteDNSRecordRequest) returns (DeleteDNSRecordResponse);
+  // ネットワーク全体状況。
+  rpc GetNetworkOverview(GetNetworkOverviewRequest) returns (GetNetworkOverviewResponse);
+}
+
+message ListTunnelsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  TunnelStatus status_filter = 2;
+  TunnelType type_filter = 3;
+}
+
+message ListTunnelsResponse {
+  repeated VPNTunnel tunnels = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetTunnelRequest {
+  string id = 1;
+}
+
+message GetTunnelResponse {
+  VPNTunnel tunnel = 1;
+}
+
+message CreateTunnelRequest {
+  string name = 1;
+  TunnelType type = 2;
+  string local_endpoint = 3;
+  string remote_endpoint = 4;
+  string internal_cidr = 5;
+  string psk_secret_ref = 6;
+  int32 keepalive_seconds = 7;
+  int32 mtu = 8;
+  repeated string allowed_ips = 9;
+}
+
+message CreateTunnelResponse {
+  VPNTunnel tunnel = 1;
+  // 生成されたWireGuard公開鍵（WIREGUARD_TYPEのみ）。
+  string public_key = 2;
+}
+
+message UpdateTunnelRequest {
+  string id = 1;
+  string name = 2;
+  string remote_endpoint = 3;
+  int32 keepalive_seconds = 4;
+  repeated string allowed_ips = 5;
+  TunnelStatus status = 6;
+}
+
+message UpdateTunnelResponse {
+  VPNTunnel tunnel = 1;
+}
+
+message DeleteTunnelRequest {
+  string id = 1;
+}
+
+message DeleteTunnelResponse {}
+
+message ListCertificatesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  CertificateType type_filter = 2;
+  CertificateStatus status_filter = 3;
+  bool expiring_within_days = 4;
+  int32 days = 5;
+}
+
+message ListCertificatesResponse {
+  repeated Certificate certificates = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetCertificateRequest {
+  string id = 1;
+}
+
+message GetCertificateResponse {
+  Certificate certificate = 1;
+}
+
+message IssueCertificateRequest {
+  string name = 1;
+  CertificateType type = 2;
+  string subject = 3;
+  repeated string sans = 4;
+  string key_algorithm = 5;
+  int32 validity_days = 6;
+  string issuer_certificate_id = 7;
+  bool auto_renew = 8;
+  int32 renew_before_days = 9;
+}
+
+message IssueCertificateResponse {
+  Certificate certificate = 1;
+  // PEM形式の証明書。
+  string certificate_pem = 2;
+  // PEM形式の秘密鍵（クライアントに一度だけ返す）。
+  string private_key_pem = 3;
+}
+
+message RenewCertificateRequest {
+  string id = 1;
+}
+
+message RenewCertificateResponse {
+  Certificate certificate = 1;
+  string certificate_pem = 2;
+}
+
+message RevokeCertificateRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+message RevokeCertificateResponse {
+  Certificate certificate = 1;
+}
+
+message ListMeshNodesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string service_name = 2;
+  MeshNodeStatus status_filter = 3;
+}
+
+message ListMeshNodesResponse {
+  repeated MeshNode nodes = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetMeshNodeRequest {
+  string id = 1;
+}
+
+message GetMeshNodeResponse {
+  MeshNode node = 1;
+}
+
+message RegisterMeshNodeRequest {
+  string name = 1;
+  string address = 2;
+  int32 port = 3;
+  string service_name = 4;
+  string certificate_id = 5;
+  string health_check_url = 6;
+  int32 health_check_interval_seconds = 7;
+  int32 weight = 8;
+}
+
+message RegisterMeshNodeResponse {
+  MeshNode node = 1;
+}
+
+message DeregisterMeshNodeRequest {
+  string id = 1;
+}
+
+message DeregisterMeshNodeResponse {}
+
+message ListMeshRoutesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string source_service = 2;
+  string destination_service = 3;
+}
+
+message ListMeshRoutesResponse {
+  repeated MeshRoute routes = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateMeshRouteRequest {
+  string name = 1;
+  string source_service = 2;
+  string destination_service = 3;
+  string path_prefix = 4;
+  string load_balancing = 5;
+  google.protobuf.Duration timeout = 6;
+  int32 retries = 7;
+  bool mtls_required = 8;
+}
+
+message CreateMeshRouteResponse {
+  MeshRoute route = 1;
+}
+
+message UpdateMeshRouteRequest {
+  string id = 1;
+  string load_balancing = 2;
+  google.protobuf.Duration timeout = 3;
+  int32 retries = 4;
+  bool mtls_required = 5;
+  bool enabled = 6;
+}
+
+message UpdateMeshRouteResponse {
+  MeshRoute route = 1;
+}
+
+message DeleteMeshRouteRequest {
+  string id = 1;
+}
+
+message DeleteMeshRouteResponse {}
+
+message ListDNSRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string record_type = 2;
+  bool internal_only = 3;
+}
+
+message ListDNSRecordsResponse {
+  repeated DNSRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateDNSRecordRequest {
+  string name = 1;
+  string record_type = 2;
+  string value = 3;
+  int32 ttl = 4;
+  int32 priority = 5;
+  bool internal_only = 6;
+}
+
+message CreateDNSRecordResponse {
+  DNSRecord record = 1;
+}
+
+message UpdateDNSRecordRequest {
+  string id = 1;
+  string value = 2;
+  int32 ttl = 3;
+  int32 priority = 4;
+}
+
+message UpdateDNSRecordResponse {
+  DNSRecord record = 1;
+}
+
+message DeleteDNSRecordRequest {
+  string id = 1;
+}
+
+message DeleteDNSRecordResponse {}
+
+message GetNetworkOverviewRequest {}
+
+message GetNetworkOverviewResponse {
+  int32 active_tunnels = 1;
+  int32 total_tunnels = 2;
+  int32 healthy_mesh_nodes = 3;
+  int32 total_mesh_nodes = 4;
+  int32 active_certificates = 5;
+  int32 expiring_certificates = 6;
+  int32 dns_records = 7;
+  int64 total_rx_bytes = 8;
+  int64 total_tx_bytes = 9;
+}

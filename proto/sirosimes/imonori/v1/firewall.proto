@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+package sirosimes.imonori.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// firewall.proto — 斎垣（Imonori）セキュリティ境界・WAF管理。
+//
+// ネットワーク境界防御、WAF（Web Application Firewall）ルール、
+// IPフィルタリング、ジオブロッキング、DDoS防御の設定と管理を提供する。
+
+// FirewallRuleAction はファイアウォールルールのアクション。
+enum FirewallRuleAction {
+  FIREWALL_RULE_ACTION_UNSPECIFIED = 0;
+  FIREWALL_RULE_ACTION_ALLOW = 1;
+  FIREWALL_RULE_ACTION_DENY = 2;
+  FIREWALL_RULE_ACTION_LOG = 3;
+  FIREWALL_RULE_ACTION_CHALLENGE = 4;
+  FIREWALL_RULE_ACTION_RATE_LIMIT = 5;
+}
+
+// FirewallRuleType はルールの種別。
+enum FirewallRuleType {
+  FIREWALL_RULE_TYPE_UNSPECIFIED = 0;
+  FIREWALL_RULE_TYPE_IP = 1;
+  FIREWALL_RULE_TYPE_CIDR = 2;
+  FIREWALL_RULE_TYPE_GEO = 3;
+  FIREWALL_RULE_TYPE_WAF = 4;
+  FIREWALL_RULE_TYPE_HEADER = 5;
+  FIREWALL_RULE_TYPE_PATH = 6;
+  FIREWALL_RULE_TYPE_USER_AGENT = 7;
+  FIREWALL_RULE_TYPE_COMPOSITE = 8;
+}
+
+// ThreatCategory はWAF脅威カテゴリ。
+enum ThreatCategory {
+  THREAT_CATEGORY_UNSPECIFIED = 0;
+  THREAT_CATEGORY_SQL_INJECTION = 1;
+  THREAT_CATEGORY_XSS = 2;
+  THREAT_CATEGORY_CSRF = 3;
+  THREAT_CATEGORY_PATH_TRAVERSAL = 4;
+  THREAT_CATEGORY_COMMAND_INJECTION = 5;
+  THREAT_CATEGORY_FILE_INCLUSION = 6;
+  THREAT_CATEGORY_SSRF = 7;
+  THREAT_CATEGORY_BOT = 8;
+  THREAT_CATEGORY_SCANNER = 9;
+  THREAT_CATEGORY_DDOS = 10;
+}
+
+// FirewallRule はファイアウォールルール。
+message FirewallRule {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  FirewallRuleType type = 4;
+  FirewallRuleAction action = 5;
+  int32 priority = 6;
+  string expression = 7;
+  repeated ThreatCategory threat_categories = 8;
+  bool enabled = 9;
+  int64 hit_count = 10;
+  google.protobuf.Timestamp last_hit_at = 11;
+  repeated string target_services = 12;
+}
+
+// IPBlockList はIPブロックリスト。
+message IPBlockList {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  repeated string entries = 4;
+  bool auto_updated = 5;
+  string source_url = 6;
+  google.protobuf.Timestamp last_synced_at = 7;
+}
+
+// FirewallEvent はファイアウォールイベント（ブロック/許可ログ）。
+message FirewallEvent {
+  string id = 1;
+  string rule_id = 2;
+  string rule_name = 3;
+  FirewallRuleAction action_taken = 4;
+  string source_ip = 5;
+  string destination_service = 6;
+  string request_path = 7;
+  string request_method = 8;
+  string user_agent = 9;
+  string country_code = 10;
+  ThreatCategory threat_category = 11;
+  float threat_score = 12;
+  google.protobuf.Timestamp occurred_at = 13;
+}
+
+// FirewallService はファイアウォール管理サービス。
+service FirewallService {
+  rpc ListFirewallRules(ListFirewallRulesRequest) returns (ListFirewallRulesResponse);
+  rpc GetFirewallRule(GetFirewallRuleRequest) returns (GetFirewallRuleResponse);
+  rpc CreateFirewallRule(CreateFirewallRuleRequest) returns (CreateFirewallRuleResponse);
+  rpc UpdateFirewallRule(UpdateFirewallRuleRequest) returns (UpdateFirewallRuleResponse);
+  rpc DeleteFirewallRule(DeleteFirewallRuleRequest) returns (DeleteFirewallRuleResponse);
+  rpc ListIPBlockLists(ListIPBlockListsRequest) returns (ListIPBlockListsResponse);
+  rpc CreateIPBlockList(CreateIPBlockListRequest) returns (CreateIPBlockListResponse);
+  rpc UpdateIPBlockList(UpdateIPBlockListRequest) returns (UpdateIPBlockListResponse);
+  rpc DeleteIPBlockList(DeleteIPBlockListRequest) returns (DeleteIPBlockListResponse);
+  rpc QueryFirewallEvents(QueryFirewallEventsRequest) returns (QueryFirewallEventsResponse);
+  rpc GetFirewallStats(GetFirewallStatsRequest) returns (GetFirewallStatsResponse);
+}
+
+message ListFirewallRulesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  FirewallRuleType type_filter = 2;
+  FirewallRuleAction action_filter = 3;
+  bool enabled_only = 4;
+  string target_service = 5;
+}
+
+message ListFirewallRulesResponse {
+  repeated FirewallRule rules = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetFirewallRuleRequest {
+  string id = 1;
+}
+
+message GetFirewallRuleResponse {
+  FirewallRule rule = 1;
+}
+
+message CreateFirewallRuleRequest {
+  string name = 1;
+  string description = 2;
+  FirewallRuleType type = 3;
+  FirewallRuleAction action = 4;
+  int32 priority = 5;
+  string expression = 6;
+  repeated ThreatCategory threat_categories = 7;
+  repeated string target_services = 8;
+}
+
+message CreateFirewallRuleResponse {
+  FirewallRule rule = 1;
+}
+
+message UpdateFirewallRuleRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  FirewallRuleAction action = 4;
+  int32 priority = 5;
+  string expression = 6;
+  bool enabled = 7;
+  repeated string target_services = 8;
+}
+
+message UpdateFirewallRuleResponse {
+  FirewallRule rule = 1;
+}
+
+message DeleteFirewallRuleRequest {
+  string id = 1;
+}
+
+message DeleteFirewallRuleResponse {}
+
+message ListIPBlockListsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+}
+
+message ListIPBlockListsResponse {
+  repeated IPBlockList lists = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CreateIPBlockListRequest {
+  string name = 1;
+  string description = 2;
+  repeated string entries = 3;
+  string source_url = 4;
+}
+
+message CreateIPBlockListResponse {
+  IPBlockList list = 1;
+}
+
+message UpdateIPBlockListRequest {
+  string id = 1;
+  string name = 2;
+  repeated string entries = 3;
+  string source_url = 4;
+}
+
+message UpdateIPBlockListResponse {
+  IPBlockList list = 1;
+}
+
+message DeleteIPBlockListRequest {
+  string id = 1;
+}
+
+message DeleteIPBlockListResponse {}
+
+message QueryFirewallEventsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string rule_id = 2;
+  FirewallRuleAction action_filter = 3;
+  string source_ip = 4;
+  ThreatCategory threat_filter = 5;
+  google.protobuf.Timestamp start_time = 6;
+  google.protobuf.Timestamp end_time = 7;
+}
+
+message QueryFirewallEventsResponse {
+  repeated FirewallEvent events = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetFirewallStatsRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message GetFirewallStatsResponse {
+  int64 total_requests = 1;
+  int64 blocked_requests = 2;
+  int64 challenged_requests = 3;
+  map<string, int64> blocks_by_category = 4;
+  map<string, int64> blocks_by_country = 5;
+  repeated string top_blocked_ips = 6;
+}

@@ -68,3 +68,19 @@ message RateLimitStatus {
   // リトライ可能までの秒数（制限超過時のみ）。
   int64 retry_after_seconds = 4;
 }
+
+// RateLimitAction はレートリミット超過時のアクションを分類する。
+// Phase 3 CISOレビューで延期 → Phase 4で追加。
+enum RateLimitAction {
+  RATE_LIMIT_ACTION_UNSPECIFIED = 0;
+  // リクエストを拒否（429 Too Many Requests）。
+  RATE_LIMIT_ACTION_REJECT = 1;
+  // リクエストをキューに入れて遅延実行。
+  RATE_LIMIT_ACTION_QUEUE = 2;
+  // リクエストを許可するがログに記録（モニタリングモード）。
+  RATE_LIMIT_ACTION_LOG_ONLY = 3;
+  // レスポンスの品質を低下させる（例: キャッシュから返す）。
+  RATE_LIMIT_ACTION_DEGRADE = 4;
+  // SecurityEventを生成してsentinelに通知。
+  RATE_LIMIT_ACTION_ALERT = 5;
+}

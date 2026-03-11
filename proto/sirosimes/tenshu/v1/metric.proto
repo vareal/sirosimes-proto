@@ -1,0 +1,311 @@
+syntax = "proto3";
+
+package sirosimes.tenshu.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// metric.proto — メトリクス収集・格納定義。
+//
+// 天守（Tenshu）監視基盤のコアデータモデル。
+// OTLP Receiver, Redis Consumer, SecurityEvent統合による
+// 統合メトリクス収集エンジンを定義する。
+// 8監視領域（ビジネス/財務/AI社員/プロダクト/セキュリティ/インフラ/物理世界/人間社員）
+// のメトリクスを単一パイプラインで収集・格納する。
+
+// MetricType はメトリクスの種別を分類する。
+enum MetricType {
+  METRIC_TYPE_UNSPECIFIED = 0;
+  // カウンター（単調増加値）。
+  METRIC_TYPE_COUNTER = 1;
+  // ゲージ（瞬時値）。
+  METRIC_TYPE_GAUGE = 2;
+  // ヒストグラム（分布）。
+  METRIC_TYPE_HISTOGRAM = 3;
+  // サマリー（パーセンタイル）。
+  METRIC_TYPE_SUMMARY = 4;
+  // ブーリアン（正常/異常）。
+  METRIC_TYPE_BOOLEAN = 5;
+}
+
+// MonitoringDomain は監視領域を分類する。
+enum MonitoringDomain {
+  MONITORING_DOMAIN_UNSPECIFIED = 0;
+  // 領域1: ビジネスメトリクス（売上・案件・KPI）。
+  MONITORING_DOMAIN_BUSINESS = 1;
+  // 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。
+  MONITORING_DOMAIN_FINANCE = 2;
+  // 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。
+  MONITORING_DOMAIN_AI_EMPLOYEE = 3;
+  // 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。
+  MONITORING_DOMAIN_PRODUCT = 4;
+  // 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。
+  MONITORING_DOMAIN_SECURITY = 5;
+  // 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。
+  MONITORING_DOMAIN_INFRASTRUCTURE = 6;
+  // 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。
+  MONITORING_DOMAIN_PHYSICAL = 7;
+  // 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。
+  MONITORING_DOMAIN_HUMAN_EMPLOYEE = 8;
+}
+
+// AggregationMethod はメトリクス集約方法を定義する。
+enum AggregationMethod {
+  AGGREGATION_METHOD_UNSPECIFIED = 0;
+  AGGREGATION_METHOD_SUM = 1;
+  AGGREGATION_METHOD_AVG = 2;
+  AGGREGATION_METHOD_MIN = 3;
+  AGGREGATION_METHOD_MAX = 4;
+  AGGREGATION_METHOD_COUNT = 5;
+  AGGREGATION_METHOD_P50 = 6;
+  AGGREGATION_METHOD_P95 = 7;
+  AGGREGATION_METHOD_P99 = 8;
+  AGGREGATION_METHOD_LAST = 9;
+}
+
+// CollectorSource はメトリクス収集ソースを分類する。
+enum CollectorSource {
+  COLLECTOR_SOURCE_UNSPECIFIED = 0;
+  // OpenTelemetry Protocol（gRPC/HTTP）。
+  COLLECTOR_SOURCE_OTLP = 1;
+  // Redis Streams Consumer。
+  COLLECTOR_SOURCE_REDIS_STREAM = 2;
+  // SecurityEvent（sentinel.proto連携）。
+  COLLECTOR_SOURCE_SECURITY_EVENT = 3;
+  // Prometheus scrape endpoint。
+  COLLECTOR_SOURCE_PROMETHEUS = 4;
+  // 司API（社員・タスク・プロジェクトデータ）。
+  COLLECTOR_SOURCE_TSUKASA_API = 5;
+  // 機織WF実行データ。
+  COLLECTOR_SOURCE_HATAORI_EVENT = 6;
+  // 外部Webhook。
+  COLLECTOR_SOURCE_WEBHOOK = 7;
+  // 手動入力。
+  COLLECTOR_SOURCE_MANUAL = 8;
+}
+
+// MetricDataPoint は単一のメトリクスデータポイントを表す。
+message MetricDataPoint {
+  // メトリクス名（例: "infra.cpu.usage", "business.revenue.monthly"）。
+  string name = 1;
+  // メトリクス種別。
+  MetricType type = 2;
+  // 監視領域。
+  MonitoringDomain domain = 3;
+  // 収集タイムスタンプ。
+  google.protobuf.Timestamp timestamp = 4;
+  // 数値（counter/gauge/histogram/summary）。
+  double value = 5;
+  // ブーリアン値（METRIC_TYPE_BOOLEAN時）。
+  bool bool_value = 6;
+  // ラベル（key-value形式のメタデータ）。
+  map<string, string> labels = 7;
+  // 収集ソース。
+  CollectorSource source = 8;
+  // ソースサービス名。
+  string source_service = 9;
+  // 単位（例: "percent", "bytes", "requests/s", "yen"）。
+  string unit = 10;
+}
+
+// MetricDefinition はメトリクスの定義（スキーマ）を表す。
+message MetricDefinition {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // メトリクス名（一意キー）。
+  string name = 2;
+  // 説明。
+  string description = 3;
+  // メトリクス種別。
+  MetricType type = 4;
+  // 監視領域。
+  MonitoringDomain domain = 5;
+  // 単位。
+  string unit = 6;
+  // 集約方法。
+  AggregationMethod default_aggregation = 7;
+  // 集約間隔（秒）。
+  int32 aggregation_interval_seconds = 8;
+  // 保持期間（日）。
+  int32 retention_days = 9;
+  // ラベルキー定義。
+  repeated string label_keys = 10;
+  // 正常範囲下限。
+  double normal_range_min = 11;
+  // 正常範囲上限。
+  double normal_range_max = 12;
+  // 有効/無効。
+  bool enabled = 13;
+}
+
+// AggregatedMetric は集約済みメトリクスを表す。
+message AggregatedMetric {
+  // メトリクス名。
+  string name = 1;
+  // 監視領域。
+  MonitoringDomain domain = 2;
+  // 集約期間開始。
+  google.protobuf.Timestamp period_start = 3;
+  // 集約期間終了。
+  google.protobuf.Timestamp period_end = 4;
+  // 集約方法。
+  AggregationMethod aggregation = 5;
+  // 集約値。
+  double value = 6;
+  // データポイント数。
+  int64 sample_count = 7;
+  // ラベル（グルーピングキー）。
+  map<string, string> labels = 8;
+}
+
+// IntegrityRecord はメトリクス改ざん検知用ハッシュチェーンレコード。
+message IntegrityRecord {
+  // レコードID。
+  string id = 1;
+  // 対象メトリクス名。
+  string metric_name = 2;
+  // 期間。
+  google.protobuf.Timestamp period_start = 3;
+  google.protobuf.Timestamp period_end = 4;
+  // データハッシュ（SHA-256）。
+  string data_hash = 5;
+  // 前レコードのハッシュ（チェーン）。
+  string previous_hash = 6;
+  // 検証ステータス。
+  bool verified = 7;
+  // 検証時刻。
+  google.protobuf.Timestamp verified_at = 8;
+}
+
+// MetricService はメトリクス収集・照会サービス。
+service MetricService {
+  // メトリクスデータポイントを送信する。
+  rpc IngestMetrics(IngestMetricsRequest) returns (IngestMetricsResponse);
+  // メトリクスを範囲指定で照会する。
+  rpc QueryMetrics(QueryMetricsRequest) returns (QueryMetricsResponse);
+  // 集約済みメトリクスを照会する。
+  rpc QueryAggregatedMetrics(QueryAggregatedMetricsRequest) returns (QueryAggregatedMetricsResponse);
+  // メトリクス定義を一覧する。
+  rpc ListMetricDefinitions(ListMetricDefinitionsRequest) returns (ListMetricDefinitionsResponse);
+  // メトリクス定義を取得する。
+  rpc GetMetricDefinition(GetMetricDefinitionRequest) returns (GetMetricDefinitionResponse);
+  // メトリクス定義を作成する。
+  rpc CreateMetricDefinition(CreateMetricDefinitionRequest) returns (CreateMetricDefinitionResponse);
+  // メトリクス定義を更新する。
+  rpc UpdateMetricDefinition(UpdateMetricDefinitionRequest) returns (UpdateMetricDefinitionResponse);
+  // メトリクス定義を削除する。
+  rpc DeleteMetricDefinition(DeleteMetricDefinitionRequest) returns (DeleteMetricDefinitionResponse);
+  // 改ざん検知ハッシュチェーンを検証する。
+  rpc VerifyIntegrity(VerifyIntegrityRequest) returns (VerifyIntegrityResponse);
+}
+
+message IngestMetricsRequest {
+  repeated MetricDataPoint data_points = 1;
+}
+
+message IngestMetricsResponse {
+  int32 accepted_count = 1;
+  int32 rejected_count = 2;
+  repeated string errors = 3;
+}
+
+message QueryMetricsRequest {
+  string metric_name = 1;
+  MonitoringDomain domain = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  map<string, string> label_filters = 5;
+  AggregationMethod aggregation = 6;
+  int32 step_seconds = 7;
+  int32 limit = 8;
+}
+
+message QueryMetricsResponse {
+  repeated MetricDataPoint data_points = 1;
+}
+
+message QueryAggregatedMetricsRequest {
+  string metric_name = 1;
+  MonitoringDomain domain = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  AggregationMethod aggregation = 5;
+  repeated string group_by_labels = 6;
+  sirosimes.common.v1.PaginationRequest pagination = 7;
+}
+
+message QueryAggregatedMetricsResponse {
+  repeated AggregatedMetric metrics = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message ListMetricDefinitionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  MonitoringDomain domain_filter = 2;
+  MetricType type_filter = 3;
+  string search = 4;
+}
+
+message ListMetricDefinitionsResponse {
+  repeated MetricDefinition definitions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetMetricDefinitionRequest {
+  string id = 1;
+}
+
+message GetMetricDefinitionResponse {
+  MetricDefinition definition = 1;
+}
+
+message CreateMetricDefinitionRequest {
+  string name = 1;
+  string description = 2;
+  MetricType type = 3;
+  MonitoringDomain domain = 4;
+  string unit = 5;
+  AggregationMethod default_aggregation = 6;
+  int32 aggregation_interval_seconds = 7;
+  int32 retention_days = 8;
+  repeated string label_keys = 9;
+  double normal_range_min = 10;
+  double normal_range_max = 11;
+}
+
+message CreateMetricDefinitionResponse {
+  MetricDefinition definition = 1;
+}
+
+message UpdateMetricDefinitionRequest {
+  string id = 1;
+  string description = 2;
+  AggregationMethod default_aggregation = 3;
+  int32 aggregation_interval_seconds = 4;
+  int32 retention_days = 5;
+  double normal_range_min = 6;
+  double normal_range_max = 7;
+  bool enabled = 8;
+}
+
+message UpdateMetricDefinitionResponse {
+  MetricDefinition definition = 1;
+}
+
+message DeleteMetricDefinitionRequest {
+  string id = 1;
+}
+
+message DeleteMetricDefinitionResponse {}
+
+message VerifyIntegrityRequest {
+  string metric_name = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+}
+
+message VerifyIntegrityResponse {
+  bool integrity_valid = 1;
+  int32 records_checked = 2;
+  repeated IntegrityRecord violations = 3;
+}

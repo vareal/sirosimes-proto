@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+package sirosimes.aoi.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// vision.proto — 碧（Aoi）ビジョン・映像解析管理。
+//
+// カメラ管理、映像ストリーム、物体検出、顔認識、
+// 映像アーカイブを提供する。
+// 依代（Yorishiro）のカメラデバイスと連携し、
+// 天守（Tenshu）の物理世界監視領域にデータを提供する。
+
+// StreamStatus はストリームの状態。
+enum StreamStatus {
+  STREAM_STATUS_UNSPECIFIED = 0;
+  STREAM_STATUS_ACTIVE = 1;
+  STREAM_STATUS_PAUSED = 2;
+  STREAM_STATUS_ERROR = 3;
+  STREAM_STATUS_DISCONNECTED = 4;
+}
+
+// DetectionType は検出の種別。
+enum DetectionType {
+  DETECTION_TYPE_UNSPECIFIED = 0;
+  DETECTION_TYPE_OBJECT = 1;
+  DETECTION_TYPE_FACE = 2;
+  DETECTION_TYPE_MOTION = 3;
+  DETECTION_TYPE_TEXT = 4;
+  DETECTION_TYPE_POSE = 5;
+  DETECTION_TYPE_ANOMALY = 6;
+}
+
+// CameraStream はカメラストリーム。
+message CameraStream {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string device_id = 2;
+  string name = 3;
+  StreamStatus status = 4;
+  string rtsp_url = 5;
+  string webrtc_url = 6;
+  int32 width = 7;
+  int32 height = 8;
+  int32 fps = 9;
+  string codec = 10;
+  bool recording_enabled = 11;
+  bool detection_enabled = 12;
+  string location = 13;
+}
+
+// Detection は検出結果。
+message Detection {
+  string id = 1;
+  string stream_id = 2;
+  DetectionType type = 3;
+  string label = 4;
+  float confidence = 5;
+  BoundingBox bounding_box = 6;
+  google.protobuf.Timestamp detected_at = 7;
+  string frame_url = 8;
+  map<string, string> attributes = 9;
+}
+
+// BoundingBox はバウンディングボックス。
+message BoundingBox {
+  float x = 1;
+  float y = 2;
+  float width = 3;
+  float height = 4;
+}
+
+// RecordingSegment は録画セグメント。
+message RecordingSegment {
+  string id = 1;
+  string stream_id = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  int64 size_bytes = 5;
+  string storage_path = 6;
+  string format = 7;
+}
+
+// VisionService はビジョン・映像解析サービス。
+service VisionService {
+  rpc ListStreams(ListStreamsRequest) returns (ListStreamsResponse);
+  rpc GetStream(GetStreamRequest) returns (GetStreamResponse);
+  rpc CreateStream(CreateStreamRequest) returns (CreateStreamResponse);
+  rpc UpdateStream(UpdateStreamRequest) returns (UpdateStreamResponse);
+  rpc DeleteStream(DeleteStreamRequest) returns (DeleteStreamResponse);
+  rpc StartRecording(StartRecordingRequest) returns (StartRecordingResponse);
+  rpc StopRecording(StopRecordingRequest) returns (StopRecordingResponse);
+  rpc ListRecordings(ListRecordingsRequest) returns (ListRecordingsResponse);
+  rpc ListDetections(ListDetectionsRequest) returns (ListDetectionsResponse);
+  rpc AnalyzeFrame(AnalyzeFrameRequest) returns (AnalyzeFrameResponse);
+  rpc GetStreamSnapshot(GetStreamSnapshotRequest) returns (GetStreamSnapshotResponse);
+}
+
+message ListStreamsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  StreamStatus status_filter = 2;
+  string location = 3;
+}
+
+message ListStreamsResponse {
+  repeated CameraStream streams = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetStreamRequest {
+  string id = 1;
+}
+
+message GetStreamResponse {
+  CameraStream stream = 1;
+}
+
+message CreateStreamRequest {
+  string device_id = 1;
+  string name = 2;
+  string rtsp_url = 3;
+  bool recording_enabled = 4;
+  bool detection_enabled = 5;
+  string location = 6;
+}
+
+message CreateStreamResponse {
+  CameraStream stream = 1;
+}
+
+message UpdateStreamRequest {
+  string id = 1;
+  string name = 2;
+  string rtsp_url = 3;
+  bool recording_enabled = 4;
+  bool detection_enabled = 5;
+}
+
+message UpdateStreamResponse {
+  CameraStream stream = 1;
+}
+
+message DeleteStreamRequest {
+  string id = 1;
+}
+
+message DeleteStreamResponse {}
+
+message StartRecordingRequest {
+  string stream_id = 1;
+}
+
+message StartRecordingResponse {
+  CameraStream stream = 1;
+}
+
+message StopRecordingRequest {
+  string stream_id = 1;
+}
+
+message StopRecordingResponse {
+  CameraStream stream = 1;
+}
+
+message ListRecordingsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string stream_id = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+}
+
+message ListRecordingsResponse {
+  repeated RecordingSegment segments = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message ListDetectionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string stream_id = 2;
+  DetectionType type_filter = 3;
+  float min_confidence = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp end_time = 6;
+}
+
+message ListDetectionsResponse {
+  repeated Detection detections = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message AnalyzeFrameRequest {
+  string stream_id = 1;
+  bytes frame_data = 2;
+  repeated DetectionType detection_types = 3;
+}
+
+message AnalyzeFrameResponse {
+  repeated Detection detections = 1;
+}
+
+message GetStreamSnapshotRequest {
+  string stream_id = 1;
+}
+
+message GetStreamSnapshotResponse {
+  bytes frame_data = 1;
+  google.protobuf.Timestamp captured_at = 2;
+  string content_type = 3;
+}

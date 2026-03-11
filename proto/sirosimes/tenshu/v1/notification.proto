@@ -1,0 +1,310 @@
+syntax = "proto3";
+
+package sirosimes.tenshu.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "sirosimes/tenshu/v1/alert.proto";
+
+// notification.proto — 通知チャネル・配信管理定義。
+//
+// 天守アラートからの通知配信を管理する。
+// Mattermostからの全面移行に対応し、以下の通知チャネルをサポート:
+// 🟢 Info: 司チャット  🟡 Warning: 司チャット+プッシュ通知
+// 🟠 High: SMS+司チャット  🔴 Critical: 電話+SMS+司チャット
+// ⚫ Emergency: Video Call+電話+SMS+司チャット
+// CXO別ルーティングとエスカレーションフローを定義する。
+
+// NotificationChannelType は通知チャネルの種別。
+enum NotificationChannelType {
+  NOTIFICATION_CHANNEL_TYPE_UNSPECIFIED = 0;
+  // 司チャット（テキストメッセージ）。
+  NOTIFICATION_CHANNEL_TYPE_TSUKASA_CHAT = 1;
+  // プッシュ通知（モバイル/デスクトップ）。
+  NOTIFICATION_CHANNEL_TYPE_PUSH = 2;
+  // SMS（Twilio経由）。
+  NOTIFICATION_CHANNEL_TYPE_SMS = 3;
+  // 電話（自動音声、Twilio経由）。
+  NOTIFICATION_CHANNEL_TYPE_PHONE_CALL = 4;
+  // Video Call（自動起動、司ビデオ通話経由）。
+  NOTIFICATION_CHANNEL_TYPE_VIDEO_CALL = 5;
+  // Webhook（外部サービス連携）。
+  NOTIFICATION_CHANNEL_TYPE_WEBHOOK = 6;
+  // メール。
+  NOTIFICATION_CHANNEL_TYPE_EMAIL = 7;
+}
+
+// NotificationStatus は通知の配信状態。
+enum NotificationStatus {
+  NOTIFICATION_STATUS_UNSPECIFIED = 0;
+  // 送信待ち。
+  NOTIFICATION_STATUS_PENDING = 1;
+  // 送信中。
+  NOTIFICATION_STATUS_SENDING = 2;
+  // 配信完了。
+  NOTIFICATION_STATUS_DELIVERED = 3;
+  // 配信失敗。
+  NOTIFICATION_STATUS_FAILED = 4;
+  // 再試行中。
+  NOTIFICATION_STATUS_RETRYING = 5;
+  // スキップ（抑制/重複排除）。
+  NOTIFICATION_STATUS_SKIPPED = 6;
+}
+
+// NotificationChannel は通知チャネルの設定を表す。
+message NotificationChannel {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // チャネル名。
+  string name = 2;
+  // チャネル種別。
+  NotificationChannelType type = 3;
+  // 設定（種別により異なる）。
+  NotificationChannelConfig config = 4;
+  // 有効/無効。
+  bool enabled = 5;
+  // 対象深刻度（このレベル以上で使用）。
+  AlertSeverity min_severity = 6;
+  // CXO受信者ロール（空の場合は全員）。
+  repeated string cxo_roles = 7;
+  // 説明。
+  string description = 8;
+}
+
+// NotificationChannelConfig はチャネル種別固有の設定。
+message NotificationChannelConfig {
+  // 司チャット: チャンネルID。
+  string tsukasa_channel_id = 1;
+  // SMS/電話: 電話番号。
+  repeated string phone_numbers = 2;
+  // メール: アドレス。
+  repeated string email_addresses = 3;
+  // Webhook: URL。
+  string webhook_url = 4;
+  // Webhook: ヘッダー。
+  map<string, string> webhook_headers = 5;
+  // 電話: 自動音声テンプレート。
+  string voice_template = 6;
+  // Video Call: 自動起動設定。
+  bool video_auto_start = 7;
+  // Twilio Account SID（暗号化参照）。
+  string twilio_account_ref = 8;
+}
+
+// EscalationPolicy はエスカレーションポリシーを定義する。
+message EscalationPolicy {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // ポリシー名。
+  string name = 2;
+  // 説明。
+  string description = 3;
+  // エスカレーションステップ（順序実行）。
+  repeated EscalationStep steps = 4;
+  // 最終エスカレーション先（全ステップ未応答時）。
+  repeated string final_notification_channel_ids = 5;
+  // 有効/無効。
+  bool enabled = 6;
+}
+
+// EscalationStep はエスカレーションの1ステップ。
+message EscalationStep {
+  // ステップ番号（1から）。
+  int32 step_number = 1;
+  // 通知先チャネルID。
+  repeated string notification_channel_ids = 2;
+  // 待機時間（応答がなければ次のステップへ）。
+  int32 wait_seconds = 3;
+  // 対象CXOロール。
+  repeated string cxo_roles = 4;
+}
+
+// NotificationRecord は送信済み通知のレコード。
+message NotificationRecord {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 対応するアラートインスタンスID。
+  string alert_instance_id = 2;
+  // 通知チャネルID。
+  string channel_id = 3;
+  // チャネル種別。
+  NotificationChannelType channel_type = 4;
+  // 受信者。
+  string recipient = 5;
+  // 配信状態。
+  NotificationStatus status = 6;
+  // 送信時刻。
+  google.protobuf.Timestamp sent_at = 7;
+  // 配信時刻。
+  google.protobuf.Timestamp delivered_at = 8;
+  // 失敗理由。
+  string error_message = 9;
+  // リトライ回数。
+  int32 retry_count = 10;
+  // 通知本文（送信内容スナップショット）。
+  string body = 11;
+}
+
+// NotificationService は通知チャネル・配信管理サービス。
+service NotificationService {
+  // 通知チャネルを一覧する。
+  rpc ListNotificationChannels(ListNotificationChannelsRequest) returns (ListNotificationChannelsResponse);
+  // 通知チャネルを取得する。
+  rpc GetNotificationChannel(GetNotificationChannelRequest) returns (GetNotificationChannelResponse);
+  // 通知チャネルを作成する。
+  rpc CreateNotificationChannel(CreateNotificationChannelRequest) returns (CreateNotificationChannelResponse);
+  // 通知チャネルを更新する。
+  rpc UpdateNotificationChannel(UpdateNotificationChannelRequest) returns (UpdateNotificationChannelResponse);
+  // 通知チャネルを削除する。
+  rpc DeleteNotificationChannel(DeleteNotificationChannelRequest) returns (DeleteNotificationChannelResponse);
+  // 通知チャネルをテスト送信する。
+  rpc TestNotificationChannel(TestNotificationChannelRequest) returns (TestNotificationChannelResponse);
+  // エスカレーションポリシーを一覧する。
+  rpc ListEscalationPolicies(ListEscalationPoliciesRequest) returns (ListEscalationPoliciesResponse);
+  // エスカレーションポリシーを取得する。
+  rpc GetEscalationPolicy(GetEscalationPolicyRequest) returns (GetEscalationPolicyResponse);
+  // エスカレーションポリシーを作成する。
+  rpc CreateEscalationPolicy(CreateEscalationPolicyRequest) returns (CreateEscalationPolicyResponse);
+  // エスカレーションポリシーを更新する。
+  rpc UpdateEscalationPolicy(UpdateEscalationPolicyRequest) returns (UpdateEscalationPolicyResponse);
+  // エスカレーションポリシーを削除する。
+  rpc DeleteEscalationPolicy(DeleteEscalationPolicyRequest) returns (DeleteEscalationPolicyResponse);
+  // 通知履歴を照会する。
+  rpc ListNotificationRecords(ListNotificationRecordsRequest) returns (ListNotificationRecordsResponse);
+  // 通知を手動送信する。
+  rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse);
+}
+
+message ListNotificationChannelsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  NotificationChannelType type_filter = 2;
+  bool enabled_only = 3;
+}
+
+message ListNotificationChannelsResponse {
+  repeated NotificationChannel channels = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetNotificationChannelRequest {
+  string id = 1;
+}
+
+message GetNotificationChannelResponse {
+  NotificationChannel channel = 1;
+}
+
+message CreateNotificationChannelRequest {
+  string name = 1;
+  NotificationChannelType type = 2;
+  NotificationChannelConfig config = 3;
+  AlertSeverity min_severity = 4;
+  repeated string cxo_roles = 5;
+  string description = 6;
+}
+
+message CreateNotificationChannelResponse {
+  NotificationChannel channel = 1;
+}
+
+message UpdateNotificationChannelRequest {
+  string id = 1;
+  string name = 2;
+  NotificationChannelConfig config = 3;
+  bool enabled = 4;
+  AlertSeverity min_severity = 5;
+  repeated string cxo_roles = 6;
+  string description = 7;
+}
+
+message UpdateNotificationChannelResponse {
+  NotificationChannel channel = 1;
+}
+
+message DeleteNotificationChannelRequest {
+  string id = 1;
+}
+
+message DeleteNotificationChannelResponse {}
+
+message TestNotificationChannelRequest {
+  string id = 1;
+  string test_message = 2;
+}
+
+message TestNotificationChannelResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message ListEscalationPoliciesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  bool enabled_only = 2;
+}
+
+message ListEscalationPoliciesResponse {
+  repeated EscalationPolicy policies = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetEscalationPolicyRequest {
+  string id = 1;
+}
+
+message GetEscalationPolicyResponse {
+  EscalationPolicy policy = 1;
+}
+
+message CreateEscalationPolicyRequest {
+  string name = 1;
+  string description = 2;
+  repeated EscalationStep steps = 3;
+  repeated string final_notification_channel_ids = 4;
+}
+
+message CreateEscalationPolicyResponse {
+  EscalationPolicy policy = 1;
+}
+
+message UpdateEscalationPolicyRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated EscalationStep steps = 4;
+  repeated string final_notification_channel_ids = 5;
+  bool enabled = 6;
+}
+
+message UpdateEscalationPolicyResponse {
+  EscalationPolicy policy = 1;
+}
+
+message DeleteEscalationPolicyRequest {
+  string id = 1;
+}
+
+message DeleteEscalationPolicyResponse {}
+
+message ListNotificationRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string alert_instance_id = 2;
+  string channel_id = 3;
+  NotificationStatus status_filter = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp end_time = 6;
+}
+
+message ListNotificationRecordsResponse {
+  repeated NotificationRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message SendNotificationRequest {
+  repeated string channel_ids = 1;
+  string title = 2;
+  string body = 3;
+  AlertSeverity severity = 4;
+  map<string, string> metadata = 5;
+}
+
+message SendNotificationResponse {
+  repeated NotificationRecord records = 1;
+}

@@ -1,0 +1,200 @@
+syntax = "proto3";
+
+package sirosimes.musubi.v1;
+
+import "google/protobuf/struct.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// generation.proto — 産霊（Musubi）コンテンツ生成・テンプレートエンジン。
+//
+// AI駆動のコンテンツ生成（テキスト・コード・画像・レポート等）、
+// テンプレート管理、生成品質フィードバックループを提供する。
+// 言霊（Kotodama）の推論エンジンと面影（Omokage）のRAGを活用する。
+
+// GenerationStatus は生成タスクの状態。
+enum GenerationStatus {
+  GENERATION_STATUS_UNSPECIFIED = 0;
+  GENERATION_STATUS_QUEUED = 1;
+  GENERATION_STATUS_GENERATING = 2;
+  GENERATION_STATUS_COMPLETED = 3;
+  GENERATION_STATUS_FAILED = 4;
+  GENERATION_STATUS_CANCELLED = 5;
+}
+
+// ContentType は生成コンテンツの種別。
+enum ContentType {
+  CONTENT_TYPE_UNSPECIFIED = 0;
+  CONTENT_TYPE_TEXT = 1;
+  CONTENT_TYPE_CODE = 2;
+  CONTENT_TYPE_REPORT = 3;
+  CONTENT_TYPE_EMAIL = 4;
+  CONTENT_TYPE_PRESENTATION = 5;
+  CONTENT_TYPE_SUMMARY = 6;
+  CONTENT_TYPE_TRANSLATION = 7;
+  CONTENT_TYPE_IMAGE = 8;
+}
+
+// GenerationTask は生成タスク。
+message GenerationTask {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string prompt = 2;
+  ContentType content_type = 3;
+  GenerationStatus status = 4;
+  string template_id = 5;
+  google.protobuf.Struct parameters = 6;
+  string output = 7;
+  string model_used = 8;
+  int32 token_count = 9;
+  int32 generation_time_ms = 10;
+  string requested_by = 11;
+  float quality_score = 12;
+  string feedback = 13;
+}
+
+// Template は生成テンプレート。
+message Template {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  ContentType content_type = 4;
+  string prompt_template = 5;
+  repeated string required_parameters = 6;
+  string default_model = 7;
+  int32 max_tokens = 8;
+  float temperature = 9;
+  string system_prompt = 10;
+  repeated string example_outputs = 11;
+}
+
+// GenerationService は生成サービス。
+service GenerationService {
+  rpc Generate(GenerateRequest) returns (GenerateResponse);
+  rpc GetGenerationTask(GetGenerationTaskRequest) returns (GetGenerationTaskResponse);
+  rpc ListGenerationTasks(ListGenerationTasksRequest) returns (ListGenerationTasksResponse);
+  rpc CancelGeneration(CancelGenerationRequest) returns (CancelGenerationResponse);
+  rpc SubmitFeedback(SubmitFeedbackRequest) returns (SubmitFeedbackResponse);
+  rpc ListTemplates(ListTemplatesRequest) returns (ListTemplatesResponse);
+  rpc GetTemplate(GetTemplateRequest) returns (GetTemplateResponse);
+  rpc CreateTemplate(CreateTemplateRequest) returns (CreateTemplateResponse);
+  rpc UpdateTemplate(UpdateTemplateRequest) returns (UpdateTemplateResponse);
+  rpc DeleteTemplate(DeleteTemplateRequest) returns (DeleteTemplateResponse);
+  rpc RegenerateWithFeedback(RegenerateWithFeedbackRequest) returns (RegenerateWithFeedbackResponse);
+}
+
+message GenerateRequest {
+  string prompt = 1;
+  ContentType content_type = 2;
+  string template_id = 3;
+  google.protobuf.Struct parameters = 4;
+  string model_preference = 5;
+  int32 max_tokens = 6;
+  float temperature = 7;
+}
+
+message GenerateResponse {
+  GenerationTask task = 1;
+}
+
+message GetGenerationTaskRequest {
+  string id = 1;
+}
+
+message GetGenerationTaskResponse {
+  GenerationTask task = 1;
+}
+
+message ListGenerationTasksRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ContentType content_type_filter = 2;
+  GenerationStatus status_filter = 3;
+  string requested_by = 4;
+}
+
+message ListGenerationTasksResponse {
+  repeated GenerationTask tasks = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message CancelGenerationRequest {
+  string id = 1;
+}
+
+message CancelGenerationResponse {
+  GenerationTask task = 1;
+}
+
+message SubmitFeedbackRequest {
+  string task_id = 1;
+  float quality_score = 2;
+  string feedback = 3;
+}
+
+message SubmitFeedbackResponse {
+  GenerationTask task = 1;
+}
+
+message ListTemplatesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ContentType content_type_filter = 2;
+  string search = 3;
+}
+
+message ListTemplatesResponse {
+  repeated Template templates = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetTemplateRequest {
+  string id = 1;
+}
+
+message GetTemplateResponse {
+  Template template = 1;
+}
+
+message CreateTemplateRequest {
+  string name = 1;
+  string description = 2;
+  ContentType content_type = 3;
+  string prompt_template = 4;
+  repeated string required_parameters = 5;
+  string default_model = 6;
+  int32 max_tokens = 7;
+  float temperature = 8;
+  string system_prompt = 9;
+}
+
+message CreateTemplateResponse {
+  Template template = 1;
+}
+
+message UpdateTemplateRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string prompt_template = 4;
+  string default_model = 5;
+  int32 max_tokens = 6;
+  float temperature = 7;
+  string system_prompt = 8;
+}
+
+message UpdateTemplateResponse {
+  Template template = 1;
+}
+
+message DeleteTemplateRequest {
+  string id = 1;
+}
+
+message DeleteTemplateResponse {}
+
+message RegenerateWithFeedbackRequest {
+  string original_task_id = 1;
+  string additional_instructions = 2;
+}
+
+message RegenerateWithFeedbackResponse {
+  GenerationTask task = 1;
+}

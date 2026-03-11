@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+package sirosimes.matoi.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// connector.proto — 纏（Matoi）サービス統合・データコネクタ管理。
+//
+// 外部サービスとSirosimesプロダクト間のデータ連携を管理する。
+// ETLパイプライン、リアルタイム同期、データ変換を提供する。
+// Google Workspace、Mattermost、Redmine等の外部サービス連携を含む。
+
+// ConnectorStatus はコネクタの状態。
+enum ConnectorStatus {
+  CONNECTOR_STATUS_UNSPECIFIED = 0;
+  CONNECTOR_STATUS_ACTIVE = 1;
+  CONNECTOR_STATUS_PAUSED = 2;
+  CONNECTOR_STATUS_ERROR = 3;
+  CONNECTOR_STATUS_CONFIGURING = 4;
+  CONNECTOR_STATUS_DISABLED = 5;
+}
+
+// ConnectorType はコネクタの種別。
+enum ConnectorType {
+  CONNECTOR_TYPE_UNSPECIFIED = 0;
+  CONNECTOR_TYPE_GOOGLE_WORKSPACE = 1;
+  CONNECTOR_TYPE_MATTERMOST = 2;
+  CONNECTOR_TYPE_GITHUB = 3;
+  CONNECTOR_TYPE_GITEA = 4;
+  CONNECTOR_TYPE_REDMINE = 5;
+  CONNECTOR_TYPE_SMTP = 6;
+  CONNECTOR_TYPE_WEBHOOK = 7;
+  CONNECTOR_TYPE_DATABASE = 8;
+  CONNECTOR_TYPE_REST_API = 9;
+  CONNECTOR_TYPE_GRPC = 10;
+  CONNECTOR_TYPE_REDIS_STREAM = 11;
+}
+
+// SyncDirection はデータ同期の方向。
+enum SyncDirection {
+  SYNC_DIRECTION_UNSPECIFIED = 0;
+  SYNC_DIRECTION_INBOUND = 1;
+  SYNC_DIRECTION_OUTBOUND = 2;
+  SYNC_DIRECTION_BIDIRECTIONAL = 3;
+}
+
+// SyncStatus は同期の状態。
+enum SyncStatus {
+  SYNC_STATUS_UNSPECIFIED = 0;
+  SYNC_STATUS_IDLE = 1;
+  SYNC_STATUS_RUNNING = 2;
+  SYNC_STATUS_COMPLETED = 3;
+  SYNC_STATUS_FAILED = 4;
+}
+
+// Connector はサービスコネクタ。
+message Connector {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string name = 2;
+  string description = 3;
+  ConnectorType type = 4;
+  ConnectorStatus status = 5;
+  SyncDirection direction = 6;
+  google.protobuf.Struct config = 7;
+  string auth_secret_ref = 8;
+  string cron_schedule = 9;
+  google.protobuf.Timestamp last_sync_at = 10;
+  string last_sync_error = 11;
+  int64 total_records_synced = 12;
+}
+
+// SyncRecord は同期実行記録。
+message SyncRecord {
+  string id = 1;
+  string connector_id = 2;
+  SyncStatus status = 3;
+  google.protobuf.Timestamp started_at = 4;
+  google.protobuf.Timestamp completed_at = 5;
+  int64 records_processed = 6;
+  int64 records_created = 7;
+  int64 records_updated = 8;
+  int64 records_failed = 9;
+  string error_message = 10;
+}
+
+// TransformRule はデータ変換ルール。
+message TransformRule {
+  string id = 1;
+  string connector_id = 2;
+  string source_field = 3;
+  string target_field = 4;
+  string transform_expression = 5;
+  string default_value = 6;
+  bool required = 7;
+}
+
+// ConnectorService はコネクタ管理サービス。
+service ConnectorService {
+  rpc ListConnectors(ListConnectorsRequest) returns (ListConnectorsResponse);
+  rpc GetConnector(GetConnectorRequest) returns (GetConnectorResponse);
+  rpc CreateConnector(CreateConnectorRequest) returns (CreateConnectorResponse);
+  rpc UpdateConnector(UpdateConnectorRequest) returns (UpdateConnectorResponse);
+  rpc DeleteConnector(DeleteConnectorRequest) returns (DeleteConnectorResponse);
+  rpc TestConnector(TestConnectorRequest) returns (TestConnectorResponse);
+  rpc TriggerSync(TriggerSyncRequest) returns (TriggerSyncResponse);
+  rpc ListSyncRecords(ListSyncRecordsRequest) returns (ListSyncRecordsResponse);
+  rpc ListTransformRules(ListTransformRulesRequest) returns (ListTransformRulesResponse);
+  rpc CreateTransformRule(CreateTransformRuleRequest) returns (CreateTransformRuleResponse);
+  rpc UpdateTransformRule(UpdateTransformRuleRequest) returns (UpdateTransformRuleResponse);
+  rpc DeleteTransformRule(DeleteTransformRuleRequest) returns (DeleteTransformRuleResponse);
+}
+
+message ListConnectorsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  ConnectorType type_filter = 2;
+  ConnectorStatus status_filter = 3;
+}
+
+message ListConnectorsResponse {
+  repeated Connector connectors = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetConnectorRequest {
+  string id = 1;
+}
+
+message GetConnectorResponse {
+  Connector connector = 1;
+}
+
+message CreateConnectorRequest {
+  string name = 1;
+  string description = 2;
+  ConnectorType type = 3;
+  SyncDirection direction = 4;
+  google.protobuf.Struct config = 5;
+  string auth_secret_ref = 6;
+  string cron_schedule = 7;
+}
+
+message CreateConnectorResponse {
+  Connector connector = 1;
+}
+
+message UpdateConnectorRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Struct config = 4;
+  string cron_schedule = 5;
+  ConnectorStatus status = 6;
+}
+
+message UpdateConnectorResponse {
+  Connector connector = 1;
+}
+
+message DeleteConnectorRequest {
+  string id = 1;
+}
+
+message DeleteConnectorResponse {}
+
+message TestConnectorRequest {
+  string id = 1;
+}
+
+message TestConnectorResponse {
+  bool success = 1;
+  string error_message = 2;
+  int32 latency_ms = 3;
+}
+
+message TriggerSyncRequest {
+  string connector_id = 1;
+}
+
+message TriggerSyncResponse {
+  SyncRecord record = 1;
+}
+
+message ListSyncRecordsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string connector_id = 2;
+  SyncStatus status_filter = 3;
+}
+
+message ListSyncRecordsResponse {
+  repeated SyncRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message ListTransformRulesRequest {
+  string connector_id = 1;
+}
+
+message ListTransformRulesResponse {
+  repeated TransformRule rules = 1;
+}
+
+message CreateTransformRuleRequest {
+  string connector_id = 1;
+  string source_field = 2;
+  string target_field = 3;
+  string transform_expression = 4;
+  string default_value = 5;
+  bool required = 6;
+}
+
+message CreateTransformRuleResponse {
+  TransformRule rule = 1;
+}
+
+message UpdateTransformRuleRequest {
+  string id = 1;
+  string source_field = 2;
+  string target_field = 3;
+  string transform_expression = 4;
+  string default_value = 5;
+  bool required = 6;
+}
+
+message UpdateTransformRuleResponse {
+  TransformRule rule = 1;
+}
+
+message DeleteTransformRuleRequest {
+  string id = 1;
+}
+
+message DeleteTransformRuleResponse {}

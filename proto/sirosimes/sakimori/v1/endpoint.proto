@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package sirosimes.sakimori.v1;
+
+import "google/protobuf/timestamp.proto";
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// endpoint.proto — 防人（Sakimori）エンドポイント保護・脆弱性管理。
+//
+// エンドポイントデバイスの保護、脆弱性スキャン、パッチ管理、
+// 隔離対応を提供する。天守（Tenshu）と連携し、
+// エンドポイントのセキュリティ状態を統合監視する。
+
+// EndpointStatus はエンドポイントのセキュリティ状態。
+enum EndpointStatus {
+  ENDPOINT_STATUS_UNSPECIFIED = 0;
+  ENDPOINT_STATUS_HEALTHY = 1;
+  ENDPOINT_STATUS_AT_RISK = 2;
+  ENDPOINT_STATUS_COMPROMISED = 3;
+  ENDPOINT_STATUS_QUARANTINED = 4;
+  ENDPOINT_STATUS_OFFLINE = 5;
+}
+
+// EndpointType はエンドポイントの種別。
+enum EndpointType {
+  ENDPOINT_TYPE_UNSPECIFIED = 0;
+  ENDPOINT_TYPE_SERVER = 1;
+  ENDPOINT_TYPE_WORKSTATION = 2;
+  ENDPOINT_TYPE_CONTAINER = 3;
+  ENDPOINT_TYPE_VM = 4;
+  ENDPOINT_TYPE_IOT_DEVICE = 5;
+  ENDPOINT_TYPE_MOBILE = 6;
+  ENDPOINT_TYPE_NETWORK_DEVICE = 7;
+}
+
+// VulnerabilitySeverity は脆弱性の深刻度。
+enum VulnerabilitySeverity {
+  VULNERABILITY_SEVERITY_UNSPECIFIED = 0;
+  VULNERABILITY_SEVERITY_NONE = 1;
+  VULNERABILITY_SEVERITY_LOW = 2;
+  VULNERABILITY_SEVERITY_MEDIUM = 3;
+  VULNERABILITY_SEVERITY_HIGH = 4;
+  VULNERABILITY_SEVERITY_CRITICAL = 5;
+}
+
+// ScanStatus はスキャンの状態。
+enum ScanStatus {
+  SCAN_STATUS_UNSPECIFIED = 0;
+  SCAN_STATUS_PENDING = 1;
+  SCAN_STATUS_RUNNING = 2;
+  SCAN_STATUS_COMPLETED = 3;
+  SCAN_STATUS_FAILED = 4;
+}
+
+// Endpoint はエンドポイントデバイス。
+message Endpoint {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string hostname = 2;
+  EndpointType type = 3;
+  EndpointStatus status = 4;
+  string ip_address = 5;
+  string mac_address = 6;
+  string os_name = 7;
+  string os_version = 8;
+  string agent_version = 9;
+  google.protobuf.Timestamp last_seen_at = 10;
+  google.protobuf.Timestamp last_scan_at = 11;
+  int32 vulnerability_count = 12;
+  int32 critical_vulnerability_count = 13;
+  bool compliant = 14;
+  repeated string tags = 15;
+  string owner_id = 16;
+}
+
+// Vulnerability は検出された脆弱性。
+message Vulnerability {
+  string id = 1;
+  string endpoint_id = 2;
+  string cve_id = 3;
+  string title = 4;
+  string description = 5;
+  VulnerabilitySeverity severity = 6;
+  float cvss_score = 7;
+  string affected_package = 8;
+  string installed_version = 9;
+  string fixed_version = 10;
+  bool patch_available = 11;
+  bool exploited_in_wild = 12;
+  google.protobuf.Timestamp discovered_at = 13;
+  google.protobuf.Timestamp patched_at = 14;
+}
+
+// ScanResult はスキャン結果。
+message ScanResult {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  string endpoint_id = 2;
+  ScanStatus status = 3;
+  google.protobuf.Timestamp started_at = 4;
+  google.protobuf.Timestamp completed_at = 5;
+  int32 total_vulnerabilities = 6;
+  int32 critical_count = 7;
+  int32 high_count = 8;
+  int32 medium_count = 9;
+  int32 low_count = 10;
+  repeated Vulnerability vulnerabilities = 11;
+}
+
+// EndpointService はエンドポイント保護サービス。
+service EndpointService {
+  rpc ListEndpoints(ListEndpointsRequest) returns (ListEndpointsResponse);
+  rpc GetEndpoint(GetEndpointRequest) returns (GetEndpointResponse);
+  rpc RegisterEndpoint(RegisterEndpointRequest) returns (RegisterEndpointResponse);
+  rpc UpdateEndpoint(UpdateEndpointRequest) returns (UpdateEndpointResponse);
+  rpc DeregisterEndpoint(DeregisterEndpointRequest) returns (DeregisterEndpointResponse);
+  rpc QuarantineEndpoint(QuarantineEndpointRequest) returns (QuarantineEndpointResponse);
+  rpc ReleaseEndpoint(ReleaseEndpointRequest) returns (ReleaseEndpointResponse);
+  rpc TriggerScan(TriggerScanRequest) returns (TriggerScanResponse);
+  rpc GetScanResult(GetScanResultRequest) returns (GetScanResultResponse);
+  rpc ListScanResults(ListScanResultsRequest) returns (ListScanResultsResponse);
+  rpc ListVulnerabilities(ListVulnerabilitiesRequest) returns (ListVulnerabilitiesResponse);
+  rpc ApplyPatch(ApplyPatchRequest) returns (ApplyPatchResponse);
+}
+
+message ListEndpointsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  EndpointType type_filter = 2;
+  EndpointStatus status_filter = 3;
+  bool non_compliant_only = 4;
+  string search = 5;
+}
+
+message ListEndpointsResponse {
+  repeated Endpoint endpoints = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message GetEndpointRequest {
+  string id = 1;
+}
+
+message GetEndpointResponse {
+  Endpoint endpoint = 1;
+}
+
+message RegisterEndpointRequest {
+  string hostname = 1;
+  EndpointType type = 2;
+  string ip_address = 3;
+  string mac_address = 4;
+  string os_name = 5;
+  string os_version = 6;
+  string owner_id = 7;
+  repeated string tags = 8;
+}
+
+message RegisterEndpointResponse {
+  Endpoint endpoint = 1;
+}
+
+message UpdateEndpointRequest {
+  string id = 1;
+  string ip_address = 2;
+  string os_version = 3;
+  string agent_version = 4;
+  repeated string tags = 5;
+}
+
+message UpdateEndpointResponse {
+  Endpoint endpoint = 1;
+}
+
+message DeregisterEndpointRequest {
+  string id = 1;
+}
+
+message DeregisterEndpointResponse {}
+
+message QuarantineEndpointRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+message QuarantineEndpointResponse {
+  Endpoint endpoint = 1;
+}
+
+message ReleaseEndpointRequest {
+  string id = 1;
+}
+
+message ReleaseEndpointResponse {
+  Endpoint endpoint = 1;
+}
+
+message TriggerScanRequest {
+  string endpoint_id = 1;
+}
+
+message TriggerScanResponse {
+  ScanResult result = 1;
+}
+
+message GetScanResultRequest {
+  string id = 1;
+}
+
+message GetScanResultResponse {
+  ScanResult result = 1;
+}
+
+message ListScanResultsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string endpoint_id = 2;
+  ScanStatus status_filter = 3;
+}
+
+message ListScanResultsResponse {
+  repeated ScanResult results = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message ListVulnerabilitiesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string endpoint_id = 2;
+  VulnerabilitySeverity min_severity = 3;
+  bool unpatched_only = 4;
+  bool exploited_only = 5;
+}
+
+message ListVulnerabilitiesResponse {
+  repeated Vulnerability vulnerabilities = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message ApplyPatchRequest {
+  string endpoint_id = 1;
+  repeated string vulnerability_ids = 2;
+}
+
+message ApplyPatchResponse {
+  int32 patched_count = 1;
+  int32 failed_count = 2;
+  repeated string failed_vulnerability_ids = 3;
+}

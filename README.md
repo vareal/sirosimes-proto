@@ -17,8 +17,31 @@ git clone <repo-url> && cd sirosimes-proto && make all
 | Tsukasa (司) | Integrated employee management system |
 | Hataori (機織) | AI workflow orchestration engine |
 | Mizugaki (瑞垣) | Authentication & authorization gateway |
-| Michishirube (道標) | Knowledge graph & navigation |
+| Michishirube (道標) | LLM routing & service mesh proxy |
 | Mikura (御倉) | Secure document vault |
+| Mitama (御魂) | AI agent lifecycle engine |
+| Kotodama (言霊) | LLM inference & embedding service |
+| Kaji (鍛冶) | CI/CD pipeline management |
+| Tamanoya (玉の舎) | Learning & training platform |
+| Tamayura (玉響) | Real-time messaging & communication |
+| Tenshu (天守) | Integrated monitoring & observability |
+| Kotonoha (言の葉) | NLP & document processing |
+| Omokage (面影) | Memory & RAG retrieval |
+| Chakai (茶会) | Meeting & collaboration |
+| Sonae (備) | Backup & disaster recovery |
+| Imonori (斎垣) | Security perimeter, WAF & closed network |
+| Sakimori (防人) | Endpoint protection & vulnerability mgmt |
+| Yorishiro (依代) | IoT device management |
+| Aoi (碧) | Vision & video analytics |
+| Matoi (纏) | Service integration & data connectors |
+| Tokoyo (常世) | Archive & long-term storage |
+| Tokowana (常若) | Release & version management |
+| Musubi (産霊) | AI content generation |
+| Mokusa (御草) | Knowledge base & documentation |
+| Nexia PAWS | Quadruped robot control & telemetry |
+| Nexia Voice | Voice conversation & speech AI |
+| Nexia ERP | CRM, invoicing & business management |
+| Kaigo (介護のこころ) | Care planning & resident management |
 
 ## Directory Structure
 
