@@ -1,0 +1,499 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kaigo/v1/care.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "CareService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CareLevel": {
+      "type": "string",
+      "enum": [
+        "CARE_LEVEL_UNSPECIFIED",
+        "CARE_LEVEL_SUPPORT_1",
+        "CARE_LEVEL_SUPPORT_2",
+        "CARE_LEVEL_CARE_1",
+        "CARE_LEVEL_CARE_2",
+        "CARE_LEVEL_CARE_3",
+        "CARE_LEVEL_CARE_4",
+        "CARE_LEVEL_CARE_5"
+      ],
+      "default": "CARE_LEVEL_UNSPECIFIED",
+      "title": "CareLevel は介護度。"
+    },
+    "v1CarePlan": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "residentId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "goals": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "approvedBy": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      },
+      "title": "CarePlan はケアプラン。"
+    },
+    "v1CareRecord": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "residentId": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1RecordType"
+        },
+        "description": {
+          "type": "string"
+        },
+        "recordedBy": {
+          "type": "string"
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "vitalSigns": {
+          "$ref": "#/definitions/v1VitalSigns"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "CareRecord はケア記録。"
+    },
+    "v1CreateCarePlanResponse": {
+      "type": "object",
+      "properties": {
+        "plan": {
+          "$ref": "#/definitions/v1CarePlan"
+        }
+      }
+    },
+    "v1CreateCareRecordResponse": {
+      "type": "object",
+      "properties": {
+        "record": {
+          "$ref": "#/definitions/v1CareRecord"
+        }
+      }
+    },
+    "v1CreateResidentResponse": {
+      "type": "object",
+      "properties": {
+        "resident": {
+          "$ref": "#/definitions/v1Resident"
+        }
+      }
+    },
+    "v1GetCarePlanResponse": {
+      "type": "object",
+      "properties": {
+        "plan": {
+          "$ref": "#/definitions/v1CarePlan"
+        }
+      }
+    },
+    "v1GetResidentResponse": {
+      "type": "object",
+      "properties": {
+        "resident": {
+          "$ref": "#/definitions/v1Resident"
+        }
+      }
+    },
+    "v1GetResidentSummaryResponse": {
+      "type": "object",
+      "properties": {
+        "residentName": {
+          "type": "string"
+        },
+        "careLevel": {
+          "$ref": "#/definitions/v1CareLevel"
+        },
+        "totalRecords": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "recordsByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "latestVitals": {
+          "$ref": "#/definitions/v1VitalSigns"
+        },
+        "aiSummary": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListCarePlansResponse": {
+      "type": "object",
+      "properties": {
+        "plans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CarePlan"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListCareRecordsResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CareRecord"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListResidentsResponse": {
+      "type": "object",
+      "properties": {
+        "residents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Resident"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1RecordType": {
+      "type": "string",
+      "enum": [
+        "RECORD_TYPE_UNSPECIFIED",
+        "RECORD_TYPE_MEAL",
+        "RECORD_TYPE_BATH",
+        "RECORD_TYPE_TOILET",
+        "RECORD_TYPE_VITAL",
+        "RECORD_TYPE_MEDICATION",
+        "RECORD_TYPE_ACTIVITY",
+        "RECORD_TYPE_SLEEP",
+        "RECORD_TYPE_INCIDENT",
+        "RECORD_TYPE_NOTE"
+      ],
+      "default": "RECORD_TYPE_UNSPECIFIED",
+      "title": "RecordType はケア記録の種別。"
+    },
+    "v1Resident": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "careLevel": {
+          "$ref": "#/definitions/v1CareLevel"
+        },
+        "roomNumber": {
+          "type": "string"
+        },
+        "primaryDoctor": {
+          "type": "string"
+        },
+        "emergencyContactName": {
+          "type": "string"
+        },
+        "emergencyContactPhone": {
+          "type": "string"
+        },
+        "allergies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "medications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      },
+      "title": "Resident は利用者。"
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateCarePlanResponse": {
+      "type": "object",
+      "properties": {
+        "plan": {
+          "$ref": "#/definitions/v1CarePlan"
+        }
+      }
+    },
+    "v1UpdateResidentResponse": {
+      "type": "object",
+      "properties": {
+        "resident": {
+          "$ref": "#/definitions/v1Resident"
+        }
+      }
+    },
+    "v1VitalSigns": {
+      "type": "object",
+      "properties": {
+        "bodyTemperature": {
+          "type": "number",
+          "format": "float"
+        },
+        "bloodPressureSystolic": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "bloodPressureDiastolic": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "heartRate": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "spo2": {
+          "type": "number",
+          "format": "float"
+        },
+        "respiratoryRate": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "weight": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "title": "VitalSigns はバイタルサイン。"
+    }
+  }
+}

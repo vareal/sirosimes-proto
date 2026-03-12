@@ -1,0 +1,552 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/amatsukagami/v1/notification.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "NotificationService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "sirosimesamatsukagamiv1EscalationPolicy": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string",
+          "title": "ポリシー名。"
+        },
+        "description": {
+          "type": "string",
+          "title": "説明。"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EscalationStep"
+          },
+          "title": "エスカレーションステップ（順序実行）。"
+        },
+        "finalNotificationChannelIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "最終エスカレーション先（全ステップ未応答時）。"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "有効/無効。"
+        }
+      },
+      "title": "EscalationPolicy はエスカレーションポリシーを定義する。"
+    },
+    "v1AlertSeverity": {
+      "type": "string",
+      "enum": [
+        "ALERT_SEVERITY_UNSPECIFIED",
+        "ALERT_SEVERITY_INFO",
+        "ALERT_SEVERITY_WARNING",
+        "ALERT_SEVERITY_HIGH",
+        "ALERT_SEVERITY_CRITICAL",
+        "ALERT_SEVERITY_EMERGENCY"
+      ],
+      "default": "ALERT_SEVERITY_UNSPECIFIED",
+      "description": "- ALERT_SEVERITY_INFO: 情報（ログ記録のみ）。\n - ALERT_SEVERITY_WARNING: 警告（司チャットで通知）。\n - ALERT_SEVERITY_HIGH: 高（SMS + 司チャットで通知）。\n - ALERT_SEVERITY_CRITICAL: クリティカル（電話 + SMS + 司チャットで通知）。\n - ALERT_SEVERITY_EMERGENCY: 緊急（Video Call + 電話 + SMS + 司チャットで通知）。",
+      "title": "AlertSeverity はアラートの深刻度を分類する。"
+    },
+    "v1CreateEscalationPolicyResponse": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/sirosimesamatsukagamiv1EscalationPolicy"
+        }
+      }
+    },
+    "v1CreateNotificationChannelResponse": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/v1NotificationChannel"
+        }
+      }
+    },
+    "v1DeleteEscalationPolicyResponse": {
+      "type": "object"
+    },
+    "v1DeleteNotificationChannelResponse": {
+      "type": "object"
+    },
+    "v1EscalationStep": {
+      "type": "object",
+      "properties": {
+        "stepNumber": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ステップ番号（1から）。"
+        },
+        "notificationChannelIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "通知先チャネルID。"
+        },
+        "waitSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "待機時間（応答がなければ次のステップへ）。"
+        },
+        "cxoRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "対象CXOロール。"
+        }
+      },
+      "title": "EscalationStep はエスカレーションの1ステップ。"
+    },
+    "v1GetEscalationPolicyResponse": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/sirosimesamatsukagamiv1EscalationPolicy"
+        }
+      }
+    },
+    "v1GetNotificationChannelResponse": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/v1NotificationChannel"
+        }
+      }
+    },
+    "v1ListEscalationPoliciesResponse": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/sirosimesamatsukagamiv1EscalationPolicy"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListNotificationChannelsResponse": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationChannel"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListNotificationRecordsResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationRecord"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1NotificationChannel": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string",
+          "title": "チャネル名。"
+        },
+        "type": {
+          "$ref": "#/definitions/v1NotificationChannelType",
+          "title": "チャネル種別。"
+        },
+        "config": {
+          "$ref": "#/definitions/v1NotificationChannelConfig",
+          "title": "設定（種別により異なる）。"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "有効/無効。"
+        },
+        "minSeverity": {
+          "$ref": "#/definitions/v1AlertSeverity",
+          "title": "対象深刻度（このレベル以上で使用）。"
+        },
+        "cxoRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "CXO受信者ロール（空の場合は全員）。"
+        },
+        "description": {
+          "type": "string",
+          "title": "説明。"
+        }
+      },
+      "title": "NotificationChannel は通知チャネルの設定を表す。"
+    },
+    "v1NotificationChannelConfig": {
+      "type": "object",
+      "properties": {
+        "tsukasaChannelId": {
+          "type": "string",
+          "title": "司チャット: チャンネルID。"
+        },
+        "phoneNumbers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "SMS/電話: 電話番号。"
+        },
+        "emailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "メール: アドレス。"
+        },
+        "webhookUrl": {
+          "type": "string",
+          "title": "Webhook: URL。"
+        },
+        "webhookHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Webhook: ヘッダー。"
+        },
+        "voiceTemplate": {
+          "type": "string",
+          "title": "電話: 自動音声テンプレート。"
+        },
+        "videoAutoStart": {
+          "type": "boolean",
+          "title": "Video Call: 自動起動設定。"
+        },
+        "twilioAccountRef": {
+          "type": "string",
+          "title": "Twilio Account SID（暗号化参照）。"
+        }
+      },
+      "title": "NotificationChannelConfig はチャネル種別固有の設定。"
+    },
+    "v1NotificationChannelType": {
+      "type": "string",
+      "enum": [
+        "NOTIFICATION_CHANNEL_TYPE_UNSPECIFIED",
+        "NOTIFICATION_CHANNEL_TYPE_TSUKASA_CHAT",
+        "NOTIFICATION_CHANNEL_TYPE_PUSH",
+        "NOTIFICATION_CHANNEL_TYPE_SMS",
+        "NOTIFICATION_CHANNEL_TYPE_PHONE_CALL",
+        "NOTIFICATION_CHANNEL_TYPE_VIDEO_CALL",
+        "NOTIFICATION_CHANNEL_TYPE_WEBHOOK",
+        "NOTIFICATION_CHANNEL_TYPE_EMAIL"
+      ],
+      "default": "NOTIFICATION_CHANNEL_TYPE_UNSPECIFIED",
+      "description": "- NOTIFICATION_CHANNEL_TYPE_TSUKASA_CHAT: 司チャット（テキストメッセージ）。\n - NOTIFICATION_CHANNEL_TYPE_PUSH: プッシュ通知（モバイル/デスクトップ）。\n - NOTIFICATION_CHANNEL_TYPE_SMS: SMS（Twilio経由）。\n - NOTIFICATION_CHANNEL_TYPE_PHONE_CALL: 電話（自動音声、Twilio経由）。\n - NOTIFICATION_CHANNEL_TYPE_VIDEO_CALL: Video Call（自動起動、司ビデオ通話経由）。\n - NOTIFICATION_CHANNEL_TYPE_WEBHOOK: Webhook（外部サービス連携）。\n - NOTIFICATION_CHANNEL_TYPE_EMAIL: メール。",
+      "title": "NotificationChannelType は通知チャネルの種別。"
+    },
+    "v1NotificationRecord": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "alertInstanceId": {
+          "type": "string",
+          "title": "対応するアラートインスタンスID。"
+        },
+        "channelId": {
+          "type": "string",
+          "title": "通知チャネルID。"
+        },
+        "channelType": {
+          "$ref": "#/definitions/v1NotificationChannelType",
+          "title": "チャネル種別。"
+        },
+        "recipient": {
+          "type": "string",
+          "title": "受信者。"
+        },
+        "status": {
+          "$ref": "#/definitions/v1NotificationStatus",
+          "title": "配信状態。"
+        },
+        "sentAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "送信時刻。"
+        },
+        "deliveredAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "配信時刻。"
+        },
+        "errorMessage": {
+          "type": "string",
+          "title": "失敗理由。"
+        },
+        "retryCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "リトライ回数。"
+        },
+        "body": {
+          "type": "string",
+          "title": "通知本文（送信内容スナップショット）。"
+        }
+      },
+      "title": "NotificationRecord は送信済み通知のレコード。"
+    },
+    "v1NotificationStatus": {
+      "type": "string",
+      "enum": [
+        "NOTIFICATION_STATUS_UNSPECIFIED",
+        "NOTIFICATION_STATUS_PENDING",
+        "NOTIFICATION_STATUS_SENDING",
+        "NOTIFICATION_STATUS_DELIVERED",
+        "NOTIFICATION_STATUS_FAILED",
+        "NOTIFICATION_STATUS_RETRYING",
+        "NOTIFICATION_STATUS_SKIPPED"
+      ],
+      "default": "NOTIFICATION_STATUS_UNSPECIFIED",
+      "description": "- NOTIFICATION_STATUS_PENDING: 送信待ち。\n - NOTIFICATION_STATUS_SENDING: 送信中。\n - NOTIFICATION_STATUS_DELIVERED: 配信完了。\n - NOTIFICATION_STATUS_FAILED: 配信失敗。\n - NOTIFICATION_STATUS_RETRYING: 再試行中。\n - NOTIFICATION_STATUS_SKIPPED: スキップ（抑制/重複排除）。",
+      "title": "NotificationStatus は通知の配信状態。"
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SendNotificationResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationRecord"
+          }
+        }
+      }
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1TestNotificationChannelResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateEscalationPolicyResponse": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/sirosimesamatsukagamiv1EscalationPolicy"
+        }
+      }
+    },
+    "v1UpdateNotificationChannelResponse": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/v1NotificationChannel"
+        }
+      }
+    }
+  }
+}

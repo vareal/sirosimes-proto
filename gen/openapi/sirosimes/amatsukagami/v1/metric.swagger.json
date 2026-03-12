@@ -1,0 +1,552 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/amatsukagami/v1/metric.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MetricService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AggregatedMetric": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "メトリクス名。"
+        },
+        "domain": {
+          "$ref": "#/definitions/v1MonitoringDomain",
+          "title": "監視領域。"
+        },
+        "periodStart": {
+          "type": "string",
+          "format": "date-time",
+          "title": "集約期間開始。"
+        },
+        "periodEnd": {
+          "type": "string",
+          "format": "date-time",
+          "title": "集約期間終了。"
+        },
+        "aggregation": {
+          "$ref": "#/definitions/v1AggregationMethod",
+          "title": "集約方法。"
+        },
+        "value": {
+          "type": "number",
+          "format": "double",
+          "title": "集約値。"
+        },
+        "sampleCount": {
+          "type": "string",
+          "format": "int64",
+          "title": "データポイント数。"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "ラベル（グルーピングキー）。"
+        }
+      },
+      "title": "AggregatedMetric は集約済みメトリクスを表す。"
+    },
+    "v1AggregationMethod": {
+      "type": "string",
+      "enum": [
+        "AGGREGATION_METHOD_UNSPECIFIED",
+        "AGGREGATION_METHOD_SUM",
+        "AGGREGATION_METHOD_AVG",
+        "AGGREGATION_METHOD_MIN",
+        "AGGREGATION_METHOD_MAX",
+        "AGGREGATION_METHOD_COUNT",
+        "AGGREGATION_METHOD_P50",
+        "AGGREGATION_METHOD_P95",
+        "AGGREGATION_METHOD_P99",
+        "AGGREGATION_METHOD_LAST"
+      ],
+      "default": "AGGREGATION_METHOD_UNSPECIFIED",
+      "title": "AggregationMethod はメトリクス集約方法を定義する。"
+    },
+    "v1CollectorSource": {
+      "type": "string",
+      "enum": [
+        "COLLECTOR_SOURCE_UNSPECIFIED",
+        "COLLECTOR_SOURCE_OTLP",
+        "COLLECTOR_SOURCE_REDIS_STREAM",
+        "COLLECTOR_SOURCE_SECURITY_EVENT",
+        "COLLECTOR_SOURCE_PROMETHEUS",
+        "COLLECTOR_SOURCE_TSUKASA_API",
+        "COLLECTOR_SOURCE_HATAORI_EVENT",
+        "COLLECTOR_SOURCE_WEBHOOK",
+        "COLLECTOR_SOURCE_MANUAL"
+      ],
+      "default": "COLLECTOR_SOURCE_UNSPECIFIED",
+      "description": "- COLLECTOR_SOURCE_OTLP: OpenTelemetry Protocol（gRPC/HTTP）。\n - COLLECTOR_SOURCE_REDIS_STREAM: Redis Streams Consumer。\n - COLLECTOR_SOURCE_SECURITY_EVENT: SecurityEvent（sentinel.proto連携）。\n - COLLECTOR_SOURCE_PROMETHEUS: Prometheus scrape endpoint。\n - COLLECTOR_SOURCE_TSUKASA_API: 司API（社員・タスク・プロジェクトデータ）。\n - COLLECTOR_SOURCE_HATAORI_EVENT: 機織WF実行データ。\n - COLLECTOR_SOURCE_WEBHOOK: 外部Webhook。\n - COLLECTOR_SOURCE_MANUAL: 手動入力。",
+      "title": "CollectorSource はメトリクス収集ソースを分類する。"
+    },
+    "v1CreateMetricDefinitionResponse": {
+      "type": "object",
+      "properties": {
+        "definition": {
+          "$ref": "#/definitions/v1MetricDefinition"
+        }
+      }
+    },
+    "v1DeleteMetricDefinitionResponse": {
+      "type": "object"
+    },
+    "v1GetMetricDefinitionResponse": {
+      "type": "object",
+      "properties": {
+        "definition": {
+          "$ref": "#/definitions/v1MetricDefinition"
+        }
+      }
+    },
+    "v1IngestMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "acceptedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rejectedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1IntegrityRecord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "レコードID。"
+        },
+        "metricName": {
+          "type": "string",
+          "title": "対象メトリクス名。"
+        },
+        "periodStart": {
+          "type": "string",
+          "format": "date-time",
+          "title": "期間。"
+        },
+        "periodEnd": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dataHash": {
+          "type": "string",
+          "title": "データハッシュ（SHA-256）。"
+        },
+        "previousHash": {
+          "type": "string",
+          "title": "前レコードのハッシュ（チェーン）。"
+        },
+        "verified": {
+          "type": "boolean",
+          "title": "検証ステータス。"
+        },
+        "verifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "検証時刻。"
+        }
+      },
+      "title": "IntegrityRecord はメトリクス改ざん検知用ハッシュチェーンレコード。"
+    },
+    "v1ListMetricDefinitionsResponse": {
+      "type": "object",
+      "properties": {
+        "definitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MetricDefinition"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1MetricDataPoint": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "メトリクス名（例: \"infra.cpu.usage\", \"business.revenue.monthly\"）。"
+        },
+        "type": {
+          "$ref": "#/definitions/v1MetricType",
+          "title": "メトリクス種別。"
+        },
+        "domain": {
+          "$ref": "#/definitions/v1MonitoringDomain",
+          "title": "監視領域。"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "収集タイムスタンプ。"
+        },
+        "value": {
+          "type": "number",
+          "format": "double",
+          "title": "数値（counter/gauge/histogram/summary）。"
+        },
+        "boolValue": {
+          "type": "boolean",
+          "title": "ブーリアン値（METRIC_TYPE_BOOLEAN時）。"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "ラベル（key-value形式のメタデータ）。"
+        },
+        "source": {
+          "$ref": "#/definitions/v1CollectorSource",
+          "title": "収集ソース。"
+        },
+        "sourceService": {
+          "type": "string",
+          "title": "ソースサービス名。"
+        },
+        "unit": {
+          "type": "string",
+          "title": "単位（例: \"percent\", \"bytes\", \"requests/s\", \"yen\"）。"
+        }
+      },
+      "title": "MetricDataPoint は単一のメトリクスデータポイントを表す。"
+    },
+    "v1MetricDefinition": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string",
+          "title": "メトリクス名（一意キー）。"
+        },
+        "description": {
+          "type": "string",
+          "title": "説明。"
+        },
+        "type": {
+          "$ref": "#/definitions/v1MetricType",
+          "title": "メトリクス種別。"
+        },
+        "domain": {
+          "$ref": "#/definitions/v1MonitoringDomain",
+          "title": "監視領域。"
+        },
+        "unit": {
+          "type": "string",
+          "title": "単位。"
+        },
+        "defaultAggregation": {
+          "$ref": "#/definitions/v1AggregationMethod",
+          "title": "集約方法。"
+        },
+        "aggregationIntervalSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "集約間隔（秒）。"
+        },
+        "retentionDays": {
+          "type": "integer",
+          "format": "int32",
+          "title": "保持期間（日）。"
+        },
+        "labelKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "ラベルキー定義。"
+        },
+        "normalRangeMin": {
+          "type": "number",
+          "format": "double",
+          "title": "正常範囲下限。"
+        },
+        "normalRangeMax": {
+          "type": "number",
+          "format": "double",
+          "title": "正常範囲上限。"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "有効/無効。"
+        }
+      },
+      "title": "MetricDefinition はメトリクスの定義（スキーマ）を表す。"
+    },
+    "v1MetricType": {
+      "type": "string",
+      "enum": [
+        "METRIC_TYPE_UNSPECIFIED",
+        "METRIC_TYPE_COUNTER",
+        "METRIC_TYPE_GAUGE",
+        "METRIC_TYPE_HISTOGRAM",
+        "METRIC_TYPE_SUMMARY",
+        "METRIC_TYPE_BOOLEAN"
+      ],
+      "default": "METRIC_TYPE_UNSPECIFIED",
+      "description": "- METRIC_TYPE_COUNTER: カウンター（単調増加値）。\n - METRIC_TYPE_GAUGE: ゲージ（瞬時値）。\n - METRIC_TYPE_HISTOGRAM: ヒストグラム（分布）。\n - METRIC_TYPE_SUMMARY: サマリー（パーセンタイル）。\n - METRIC_TYPE_BOOLEAN: ブーリアン（正常/異常）。",
+      "title": "MetricType はメトリクスの種別を分類する。"
+    },
+    "v1MonitoringDomain": {
+      "type": "string",
+      "enum": [
+        "MONITORING_DOMAIN_UNSPECIFIED",
+        "MONITORING_DOMAIN_BUSINESS",
+        "MONITORING_DOMAIN_FINANCE",
+        "MONITORING_DOMAIN_AI_EMPLOYEE",
+        "MONITORING_DOMAIN_PRODUCT",
+        "MONITORING_DOMAIN_SECURITY",
+        "MONITORING_DOMAIN_INFRASTRUCTURE",
+        "MONITORING_DOMAIN_PHYSICAL",
+        "MONITORING_DOMAIN_HUMAN_EMPLOYEE"
+      ],
+      "default": "MONITORING_DOMAIN_UNSPECIFIED",
+      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。",
+      "title": "MonitoringDomain は監視領域を分類する。"
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1QueryAggregatedMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AggregatedMetric"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1QueryMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "dataPoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MetricDataPoint"
+          }
+        }
+      }
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1UpdateMetricDefinitionResponse": {
+      "type": "object",
+      "properties": {
+        "definition": {
+          "$ref": "#/definitions/v1MetricDefinition"
+        }
+      }
+    },
+    "v1VerifyIntegrityResponse": {
+      "type": "object",
+      "properties": {
+        "integrityValid": {
+          "type": "boolean"
+        },
+        "recordsChecked": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IntegrityRecord"
+          }
+        }
+      }
+    }
+  }
+}

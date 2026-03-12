@@ -76,7 +76,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListCertificatesResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1ListCertificatesResponse"
             }
           },
           "default": {
@@ -159,7 +159,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1IssueCertificateResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1IssueCertificateResponse"
             }
           },
           "default": {
@@ -176,7 +176,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1IssueCertificateRequest"
+              "$ref": "#/definitions/sirosimesmichishirubev1IssueCertificateRequest"
             }
           }
         ],
@@ -192,7 +192,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1RevokeCertificateResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1RevokeCertificateResponse"
             }
           },
           "default": {
@@ -214,7 +214,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/DNSServiceRevokeCertificateBody"
+              "$ref": "#/definitions/v1DNSServiceRevokeCertificateBody"
             }
           }
         ],
@@ -230,7 +230,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListDNSRecordsResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1ListDNSRecordsResponse"
             }
           },
           "default": {
@@ -316,7 +316,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateDNSRecordResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1CreateDNSRecordResponse"
             }
           },
           "default": {
@@ -333,7 +333,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateDNSRecordRequest"
+              "$ref": "#/definitions/sirosimesmichishirubev1CreateDNSRecordRequest"
             }
           }
         ],
@@ -349,7 +349,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1DeleteDNSRecordResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1DeleteDNSRecordResponse"
             }
           },
           "default": {
@@ -377,7 +377,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpdateDNSRecordResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1UpdateDNSRecordResponse"
             }
           },
           "default": {
@@ -399,7 +399,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/DNSServiceUpdateDNSRecordBody"
+              "$ref": "#/definitions/v1DNSServiceUpdateDNSRecordBody"
             }
           }
         ],
@@ -410,37 +410,6 @@
     }
   },
   "definitions": {
-    "DNSServiceRevokeCertificateBody": {
-      "type": "object",
-      "properties": {
-        "reason": {
-          "type": "string"
-        }
-      },
-      "description": "RevokeCertificateRequest is the request for revoking a certificate."
-    },
-    "DNSServiceUpdateDNSRecordBody": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "recordType": {
-          "$ref": "#/definitions/v1DNSRecordType"
-        },
-        "value": {
-          "type": "string"
-        },
-        "ttl": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "isInternal": {
-          "type": "boolean"
-        }
-      },
-      "description": "UpdateDNSRecordRequest is the request for updating a DNS record."
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -469,26 +438,7 @@
         }
       }
     },
-    "v1CAConfig": {
-      "type": "object",
-      "properties": {
-        "rootCaCert": {
-          "type": "string"
-        },
-        "intermediateCerts": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "autoRenewDays": {
-          "type": "integer",
-          "format": "int32"
-        }
-      },
-      "description": "CAConfig represents the internal Certificate Authority configuration."
-    },
-    "v1Certificate": {
+    "sirosimesmichishirubev1Certificate": {
       "type": "object",
       "properties": {
         "metadata": {
@@ -517,18 +467,7 @@
       },
       "description": "Certificate represents a TLS certificate."
     },
-    "v1CertificateIssuer": {
-      "type": "string",
-      "enum": [
-        "CERTIFICATE_ISSUER_UNSPECIFIED",
-        "CERTIFICATE_ISSUER_INTERNAL_CA",
-        "CERTIFICATE_ISSUER_LETS_ENCRYPT",
-        "CERTIFICATE_ISSUER_CLOUDFLARE"
-      ],
-      "default": "CERTIFICATE_ISSUER_UNSPECIFIED",
-      "description": "CertificateIssuer classifies the certificate issuing authority."
-    },
-    "v1CreateDNSRecordRequest": {
+    "sirosimesmichishirubev1CreateDNSRecordRequest": {
       "type": "object",
       "properties": {
         "name": {
@@ -550,16 +489,16 @@
       },
       "description": "CreateDNSRecordRequest is the request for creating a DNS record."
     },
-    "v1CreateDNSRecordResponse": {
+    "sirosimesmichishirubev1CreateDNSRecordResponse": {
       "type": "object",
       "properties": {
         "record": {
-          "$ref": "#/definitions/v1DNSRecord"
+          "$ref": "#/definitions/sirosimesmichishirubev1DNSRecord"
         }
       },
       "description": "CreateDNSRecordResponse is the response after creating a DNS record."
     },
-    "v1DNSRecord": {
+    "sirosimesmichishirubev1DNSRecord": {
       "type": "object",
       "properties": {
         "metadata": {
@@ -588,34 +527,11 @@
       },
       "description": "DNSRecord represents a DNS record entry."
     },
-    "v1DNSRecordType": {
-      "type": "string",
-      "enum": [
-        "DNS_RECORD_TYPE_UNSPECIFIED",
-        "DNS_RECORD_TYPE_A",
-        "DNS_RECORD_TYPE_AAAA",
-        "DNS_RECORD_TYPE_CNAME",
-        "DNS_RECORD_TYPE_TXT",
-        "DNS_RECORD_TYPE_MX",
-        "DNS_RECORD_TYPE_SRV"
-      ],
-      "default": "DNS_RECORD_TYPE_UNSPECIFIED",
-      "description": "DNSRecordType classifies the type of DNS record."
-    },
-    "v1DeleteDNSRecordResponse": {
+    "sirosimesmichishirubev1DeleteDNSRecordResponse": {
       "type": "object",
       "description": "DeleteDNSRecordResponse is the response after deleting a DNS record."
     },
-    "v1GetCAConfigResponse": {
-      "type": "object",
-      "properties": {
-        "config": {
-          "$ref": "#/definitions/v1CAConfig"
-        }
-      },
-      "description": "GetCAConfigResponse is the response containing CA configuration."
-    },
-    "v1IssueCertificateRequest": {
+    "sirosimesmichishirubev1IssueCertificateRequest": {
       "type": "object",
       "properties": {
         "domain": {
@@ -633,23 +549,23 @@
       },
       "description": "IssueCertificateRequest is the request for issuing a new certificate."
     },
-    "v1IssueCertificateResponse": {
+    "sirosimesmichishirubev1IssueCertificateResponse": {
       "type": "object",
       "properties": {
         "certificate": {
-          "$ref": "#/definitions/v1Certificate"
+          "$ref": "#/definitions/sirosimesmichishirubev1Certificate"
         }
       },
       "description": "IssueCertificateResponse is the response after issuing a certificate."
     },
-    "v1ListCertificatesResponse": {
+    "sirosimesmichishirubev1ListCertificatesResponse": {
       "type": "object",
       "properties": {
         "certificates": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Certificate"
+            "$ref": "#/definitions/sirosimesmichishirubev1Certificate"
           }
         },
         "pagination": {
@@ -658,14 +574,14 @@
       },
       "description": "ListCertificatesResponse is the response for listing certificates."
     },
-    "v1ListDNSRecordsResponse": {
+    "sirosimesmichishirubev1ListDNSRecordsResponse": {
       "type": "object",
       "properties": {
         "records": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1DNSRecord"
+            "$ref": "#/definitions/sirosimesmichishirubev1DNSRecord"
           }
         },
         "pagination": {
@@ -673,6 +589,108 @@
         }
       },
       "description": "ListDNSRecordsResponse is the response for listing DNS records."
+    },
+    "sirosimesmichishirubev1RevokeCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "$ref": "#/definitions/sirosimesmichishirubev1Certificate"
+        }
+      },
+      "description": "RevokeCertificateResponse is the response after revoking a certificate."
+    },
+    "sirosimesmichishirubev1UpdateDNSRecordResponse": {
+      "type": "object",
+      "properties": {
+        "record": {
+          "$ref": "#/definitions/sirosimesmichishirubev1DNSRecord"
+        }
+      },
+      "description": "UpdateDNSRecordResponse is the response after updating a DNS record."
+    },
+    "v1CAConfig": {
+      "type": "object",
+      "properties": {
+        "rootCaCert": {
+          "type": "string"
+        },
+        "intermediateCerts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "autoRenewDays": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "description": "CAConfig represents the internal Certificate Authority configuration."
+    },
+    "v1CertificateIssuer": {
+      "type": "string",
+      "enum": [
+        "CERTIFICATE_ISSUER_UNSPECIFIED",
+        "CERTIFICATE_ISSUER_INTERNAL_CA",
+        "CERTIFICATE_ISSUER_LETS_ENCRYPT",
+        "CERTIFICATE_ISSUER_CLOUDFLARE"
+      ],
+      "default": "CERTIFICATE_ISSUER_UNSPECIFIED",
+      "description": "CertificateIssuer classifies the certificate issuing authority."
+    },
+    "v1DNSRecordType": {
+      "type": "string",
+      "enum": [
+        "DNS_RECORD_TYPE_UNSPECIFIED",
+        "DNS_RECORD_TYPE_A",
+        "DNS_RECORD_TYPE_AAAA",
+        "DNS_RECORD_TYPE_CNAME",
+        "DNS_RECORD_TYPE_TXT",
+        "DNS_RECORD_TYPE_MX",
+        "DNS_RECORD_TYPE_SRV"
+      ],
+      "default": "DNS_RECORD_TYPE_UNSPECIFIED",
+      "description": "DNSRecordType classifies the type of DNS record."
+    },
+    "v1DNSServiceRevokeCertificateBody": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      },
+      "description": "RevokeCertificateRequest is the request for revoking a certificate."
+    },
+    "v1DNSServiceUpdateDNSRecordBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "recordType": {
+          "$ref": "#/definitions/v1DNSRecordType"
+        },
+        "value": {
+          "type": "string"
+        },
+        "ttl": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isInternal": {
+          "type": "boolean"
+        }
+      },
+      "description": "UpdateDNSRecordRequest is the request for updating a DNS record."
+    },
+    "v1GetCAConfigResponse": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/v1CAConfig"
+        }
+      },
+      "description": "GetCAConfigResponse is the response containing CA configuration."
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -783,15 +801,6 @@
       },
       "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
     },
-    "v1RevokeCertificateResponse": {
-      "type": "object",
-      "properties": {
-        "certificate": {
-          "$ref": "#/definitions/v1Certificate"
-        }
-      },
-      "description": "RevokeCertificateResponse is the response after revoking a certificate."
-    },
     "v1SecurityLevel": {
       "type": "string",
       "enum": [
@@ -841,15 +850,6 @@
         }
       },
       "description": "UpdateCAConfigResponse is the response after updating CA configuration."
-    },
-    "v1UpdateDNSRecordResponse": {
-      "type": "object",
-      "properties": {
-        "record": {
-          "$ref": "#/definitions/v1DNSRecord"
-        }
-      },
-      "description": "UpdateDNSRecordResponse is the response after updating a DNS record."
     }
   }
 }

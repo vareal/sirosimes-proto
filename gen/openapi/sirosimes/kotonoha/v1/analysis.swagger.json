@@ -1,0 +1,335 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kotonoha/v1/analysis.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AnalysisService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AnalysisResult": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "documentId": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1AnalysisType"
+        },
+        "sentiment": {
+          "$ref": "#/definitions/v1SentimentResult"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Entity"
+          }
+        },
+        "classifications": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ClassificationResult"
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "translatedText": {
+          "type": "string"
+        },
+        "targetLanguage": {
+          "type": "string"
+        },
+        "modelUsed": {
+          "type": "string"
+        },
+        "analyzedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "AnalysisResult は解析結果の統合型。"
+    },
+    "v1AnalysisType": {
+      "type": "string",
+      "enum": [
+        "ANALYSIS_TYPE_UNSPECIFIED",
+        "ANALYSIS_TYPE_SENTIMENT",
+        "ANALYSIS_TYPE_SUMMARY",
+        "ANALYSIS_TYPE_ENTITY_EXTRACTION",
+        "ANALYSIS_TYPE_CLASSIFICATION",
+        "ANALYSIS_TYPE_TRANSLATION",
+        "ANALYSIS_TYPE_KEYWORD_EXTRACTION",
+        "ANALYSIS_TYPE_TOPIC_MODELING",
+        "ANALYSIS_TYPE_INTENT_DETECTION"
+      ],
+      "default": "ANALYSIS_TYPE_UNSPECIFIED",
+      "title": "AnalysisType は解析種別。"
+    },
+    "v1AnalyzeDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AnalysisResult"
+          }
+        }
+      }
+    },
+    "v1AnalyzeTextResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AnalysisResult"
+          }
+        }
+      }
+    },
+    "v1BatchAnalyzeResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1AnalyzeDocumentResponse"
+          }
+        },
+        "successCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failureCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ClassificationResult": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "format": "float"
+        },
+        "subcategories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ClassificationResult"
+          }
+        }
+      },
+      "title": "ClassificationResult は分類結果。"
+    },
+    "v1Entity": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "format": "float"
+        },
+        "startOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "endOffset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Entity は抽出されたエンティティ。"
+    },
+    "v1GetAnalysisResultResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v1AnalysisResult"
+        }
+      }
+    },
+    "v1ListAnalysisResultsResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AnalysisResult"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1SentimentLabel": {
+      "type": "string",
+      "enum": [
+        "SENTIMENT_LABEL_UNSPECIFIED",
+        "SENTIMENT_LABEL_POSITIVE",
+        "SENTIMENT_LABEL_NEGATIVE",
+        "SENTIMENT_LABEL_NEUTRAL",
+        "SENTIMENT_LABEL_MIXED"
+      ],
+      "default": "SENTIMENT_LABEL_UNSPECIFIED",
+      "title": "SentimentLabel は感情ラベル。"
+    },
+    "v1SentimentResult": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "$ref": "#/definitions/v1SentimentLabel"
+        },
+        "score": {
+          "type": "number",
+          "format": "float"
+        },
+        "positiveScore": {
+          "type": "number",
+          "format": "float"
+        },
+        "negativeScore": {
+          "type": "number",
+          "format": "float"
+        },
+        "neutralScore": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "title": "SentimentResult は感情分析結果。"
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    }
+  }
+}

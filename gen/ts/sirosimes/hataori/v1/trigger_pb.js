@@ -29,6 +29,8 @@ export const TriggerType = /*@__PURE__*/ proto3.makeEnum(
     {no: 11, name: "TRIGGER_TYPE_CONTAINER", localName: "CONTAINER"},
     {no: 12, name: "TRIGGER_TYPE_PROCESS", localName: "PROCESS"},
     {no: 13, name: "TRIGGER_TYPE_VM_EVENT", localName: "VM_EVENT"},
+    {no: 14, name: "TRIGGER_TYPE_SECURITY_EVENT", localName: "SECURITY_EVENT"},
+    {no: 15, name: "TRIGGER_TYPE_TENSHU_ALERT", localName: "TENSHU_ALERT"},
   ],
 );
 

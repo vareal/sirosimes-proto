@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
+import { IntegrityHash } from "../../common/v1/integrity_pb.js";
 import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { PageToken, PageTokenResponse, PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
@@ -43,6 +44,7 @@ export const ApprovalRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 8, name: "timeout_at", kind: "message", T: Timestamp },
     { no: 9, name: "escalate_to", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 10, name: "responded_at", kind: "message", T: Timestamp },
+    { no: 13, name: "integrity_hash", kind: "message", T: IntegrityHash },
     { no: 11, name: "created_at", kind: "message", T: Timestamp },
     { no: 12, name: "metadata", kind: "message", T: ResourceMetadata },
   ],

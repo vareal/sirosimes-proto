@@ -67,8 +67,10 @@ export const AuthSession = /*@__PURE__*/ proto3.makeMessageType(
 /**
  * ApiKeyConfig は API キーの設定とライフサイクルを管理する。
  * API キーは長期有効トークンであるため、有効期限・スコープ制限・レート制限を必須とする。
+ * [Phase 3 deprecated] Superseded by ApiKey in api_key.proto.
  *
  * @generated from message sirosimes.mizugaki.v1.ApiKeyConfig
+ * @deprecated
  */
 export const ApiKeyConfig = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.mizugaki.v1.ApiKeyConfig",
@@ -242,60 +244,6 @@ export const RevokeSessionRequest = /*@__PURE__*/ proto3.makeMessageType(
  */
 export const RevokeSessionResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.mizugaki.v1.RevokeSessionResponse",
-  [],
-);
-
-/**
- * CreateApiKeyRequest は API キー作成リクエストを表す。
- * Exposure: INTERNAL（管理者操作）。
- *
- * @generated from message sirosimes.mizugaki.v1.CreateApiKeyRequest
- */
-export const CreateApiKeyRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.mizugaki.v1.CreateApiKeyRequest",
-  () => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "expires_at", kind: "message", T: Timestamp },
-    { no: 3, name: "allowed_scopes", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "rate_limit_per_minute", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: "owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * CreateApiKeyResponse は API キー作成レスポンスを表す。
- *
- * @generated from message sirosimes.mizugaki.v1.CreateApiKeyResponse
- */
-export const CreateApiKeyResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.mizugaki.v1.CreateApiKeyResponse",
-  () => [
-    { no: 1, name: "api_key", kind: "message", T: ApiKeyConfig },
-    { no: 2, name: "raw_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * RevokeApiKeyRequest は API キー失効リクエストを表す。
- * Exposure: INTERNAL（管理者操作）。
- *
- * @generated from message sirosimes.mizugaki.v1.RevokeApiKeyRequest
- */
-export const RevokeApiKeyRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.mizugaki.v1.RevokeApiKeyRequest",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "reason", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * RevokeApiKeyResponse は API キー失効レスポンスを表す。
- *
- * @generated from message sirosimes.mizugaki.v1.RevokeApiKeyResponse
- */
-export const RevokeApiKeyResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "sirosimes.mizugaki.v1.RevokeApiKeyResponse",
   [],
 );
 

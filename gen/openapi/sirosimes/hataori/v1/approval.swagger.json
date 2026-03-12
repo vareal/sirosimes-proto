@@ -67,6 +67,20 @@
       "default": "APPROVAL_STATUS_UNSPECIFIED",
       "description": "ApprovalStatus represents the lifecycle state of an approval request.\n\n - APPROVAL_STATUS_PENDING: Approval is awaiting a decision.\n - APPROVAL_STATUS_APPROVED: Approval was granted.\n - APPROVAL_STATUS_REJECTED: Approval was denied.\n - APPROVAL_STATUS_DELEGATED: Approval was delegated to another actor.\n - APPROVAL_STATUS_ESCALATED: Approval was escalated due to policy or timeout.\n - APPROVAL_STATUS_TIMED_OUT: Approval expired without a response."
     },
+    "sirosimeshataoriv1EscalationPolicy": {
+      "type": "object",
+      "properties": {
+        "escalateTo": {
+          "type": "string",
+          "description": "Actor ID to receive the final escalation."
+        },
+        "notifyVia": {
+          "type": "string",
+          "description": "Notification channel (e.g., \"mattermost\", \"email\")."
+        }
+      },
+      "description": "EscalationPolicy defines what happens when all delegation steps are exhausted."
+    },
     "v1ApprovalRequest": {
       "type": "object",
       "properties": {
@@ -111,6 +125,10 @@
           "type": "string",
           "format": "date-time",
           "description": "When the approval decision was made."
+        },
+        "integrityHash": {
+          "$ref": "#/definitions/v1IntegrityHash",
+          "description": "HMAC-SHA256 integrity hash for tamper detection of approval chain.\nCovers: execution_id, step_name, assignee, status, comment, timeout_at.\nprevious_hash links to the preceding approval in the chain."
         },
         "createdAt": {
           "type": "string",
@@ -171,7 +189,7 @@
           "description": "Ordered sequence of delegation steps."
         },
         "escalation": {
-          "$ref": "#/definitions/v1EscalationPolicy",
+          "$ref": "#/definitions/sirosimeshataoriv1EscalationPolicy",
           "description": "Escalation policy when all steps are exhausted."
         },
         "createdBy": {
@@ -199,20 +217,6 @@
       },
       "description": "DelegationStep represents a single step in a delegation chain."
     },
-    "v1EscalationPolicy": {
-      "type": "object",
-      "properties": {
-        "escalateTo": {
-          "type": "string",
-          "description": "Actor ID to receive the final escalation."
-        },
-        "notifyVia": {
-          "type": "string",
-          "description": "Notification channel (e.g., \"mattermost\", \"email\")."
-        }
-      },
-      "description": "EscalationPolicy defines what happens when all delegation steps are exhausted."
-    },
     "v1GetApprovalResponse": {
       "type": "object",
       "properties": {
@@ -230,6 +234,50 @@
         }
       },
       "description": "GetDelegationChainResponse is the response containing a single delegation chain."
+    },
+    "v1HashAlgorithm": {
+      "type": "string",
+      "enum": [
+        "HASH_ALGORITHM_UNSPECIFIED",
+        "HASH_ALGORITHM_HMAC_SHA256",
+        "HASH_ALGORITHM_HMAC_SHA512"
+      ],
+      "default": "HASH_ALGORITHM_UNSPECIFIED",
+      "title": "HashAlgorithm は整合性ハッシュに使用するアルゴリズム。"
+    },
+    "v1IntegrityHash": {
+      "type": "object",
+      "properties": {
+        "hash": {
+          "type": "string",
+          "title": "HMAC-SHA256ハッシュ値（hex encoded）。"
+        },
+        "algorithm": {
+          "$ref": "#/definitions/v1HashAlgorithm",
+          "title": "ハッシュアルゴリズム。"
+        },
+        "coveredFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "ハッシュ対象フィールド（\"*\" は全フィールド）。"
+        },
+        "previousHash": {
+          "type": "string",
+          "title": "前のハッシュ値（チェーン連結用）。空の場合はチェーンの先頭。"
+        },
+        "computedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "ハッシュ計算時刻。"
+        },
+        "computedBy": {
+          "type": "string",
+          "title": "ハッシュ計算を実行したアクターID。"
+        }
+      },
+      "title": "IntegrityHash は単一リソースの整合性ハッシュを表す。"
     },
     "v1ListApprovalsResponse": {
       "type": "object",

@@ -1,0 +1,484 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/imonori/v1/firewall.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "FirewallService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateFirewallRuleResponse": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v1FirewallRule"
+        }
+      }
+    },
+    "v1CreateIPBlockListResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "$ref": "#/definitions/v1IPBlockList"
+        }
+      }
+    },
+    "v1DeleteFirewallRuleResponse": {
+      "type": "object"
+    },
+    "v1DeleteIPBlockListResponse": {
+      "type": "object"
+    },
+    "v1FirewallEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "ruleId": {
+          "type": "string"
+        },
+        "ruleName": {
+          "type": "string"
+        },
+        "actionTaken": {
+          "$ref": "#/definitions/v1FirewallRuleAction"
+        },
+        "sourceIp": {
+          "type": "string"
+        },
+        "destinationService": {
+          "type": "string"
+        },
+        "requestPath": {
+          "type": "string"
+        },
+        "requestMethod": {
+          "type": "string"
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "threatCategory": {
+          "$ref": "#/definitions/v1ThreatCategory"
+        },
+        "threatScore": {
+          "type": "number",
+          "format": "float"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "FirewallEvent はファイアウォールイベント（ブロック/許可ログ）。"
+    },
+    "v1FirewallRule": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1FirewallRuleType"
+        },
+        "action": {
+          "$ref": "#/definitions/v1FirewallRuleAction"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "threatCategories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ThreatCategory"
+          }
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "hitCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "lastHitAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "targetServices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "FirewallRule はファイアウォールルール。"
+    },
+    "v1FirewallRuleAction": {
+      "type": "string",
+      "enum": [
+        "FIREWALL_RULE_ACTION_UNSPECIFIED",
+        "FIREWALL_RULE_ACTION_ALLOW",
+        "FIREWALL_RULE_ACTION_DENY",
+        "FIREWALL_RULE_ACTION_LOG",
+        "FIREWALL_RULE_ACTION_CHALLENGE",
+        "FIREWALL_RULE_ACTION_RATE_LIMIT"
+      ],
+      "default": "FIREWALL_RULE_ACTION_UNSPECIFIED",
+      "title": "FirewallRuleAction はファイアウォールルールのアクション。"
+    },
+    "v1FirewallRuleType": {
+      "type": "string",
+      "enum": [
+        "FIREWALL_RULE_TYPE_UNSPECIFIED",
+        "FIREWALL_RULE_TYPE_IP",
+        "FIREWALL_RULE_TYPE_CIDR",
+        "FIREWALL_RULE_TYPE_GEO",
+        "FIREWALL_RULE_TYPE_WAF",
+        "FIREWALL_RULE_TYPE_HEADER",
+        "FIREWALL_RULE_TYPE_PATH",
+        "FIREWALL_RULE_TYPE_USER_AGENT",
+        "FIREWALL_RULE_TYPE_COMPOSITE"
+      ],
+      "default": "FIREWALL_RULE_TYPE_UNSPECIFIED",
+      "title": "FirewallRuleType はルールの種別。"
+    },
+    "v1GetFirewallRuleResponse": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v1FirewallRule"
+        }
+      }
+    },
+    "v1GetFirewallStatsResponse": {
+      "type": "object",
+      "properties": {
+        "totalRequests": {
+          "type": "string",
+          "format": "int64"
+        },
+        "blockedRequests": {
+          "type": "string",
+          "format": "int64"
+        },
+        "challengedRequests": {
+          "type": "string",
+          "format": "int64"
+        },
+        "blocksByCategory": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "blocksByCountry": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "topBlockedIps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1IPBlockList": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "autoUpdated": {
+          "type": "boolean"
+        },
+        "sourceUrl": {
+          "type": "string"
+        },
+        "lastSyncedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "IPBlockList はIPブロックリスト。"
+    },
+    "v1ListFirewallRulesResponse": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FirewallRule"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListIPBlockListsResponse": {
+      "type": "object",
+      "properties": {
+        "lists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IPBlockList"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1QueryFirewallEventsResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FirewallEvent"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1ThreatCategory": {
+      "type": "string",
+      "enum": [
+        "THREAT_CATEGORY_UNSPECIFIED",
+        "THREAT_CATEGORY_SQL_INJECTION",
+        "THREAT_CATEGORY_XSS",
+        "THREAT_CATEGORY_CSRF",
+        "THREAT_CATEGORY_PATH_TRAVERSAL",
+        "THREAT_CATEGORY_COMMAND_INJECTION",
+        "THREAT_CATEGORY_FILE_INCLUSION",
+        "THREAT_CATEGORY_SSRF",
+        "THREAT_CATEGORY_BOT",
+        "THREAT_CATEGORY_SCANNER",
+        "THREAT_CATEGORY_DDOS"
+      ],
+      "default": "THREAT_CATEGORY_UNSPECIFIED",
+      "title": "ThreatCategory はWAF脅威カテゴリ。"
+    },
+    "v1UpdateFirewallRuleResponse": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v1FirewallRule"
+        }
+      }
+    },
+    "v1UpdateIPBlockListResponse": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "$ref": "#/definitions/v1IPBlockList"
+        }
+      }
+    }
+  }
+}

@@ -392,7 +392,7 @@
         }
       }
     },
-    "v1ComparisonOperator": {
+    "sirosimeskajiv1ComparisonOperator": {
       "type": "string",
       "enum": [
         "COMPARISON_OPERATOR_UNSPECIFIED",
@@ -420,7 +420,7 @@
           "format": "double"
         },
         "operator": {
-          "$ref": "#/definitions/v1ComparisonOperator"
+          "$ref": "#/definitions/sirosimeskajiv1ComparisonOperator"
         },
         "status": {
           "$ref": "#/definitions/v1QualityGateStatus"
@@ -579,7 +579,7 @@
           "type": "string"
         },
         "operator": {
-          "$ref": "#/definitions/v1ComparisonOperator"
+          "$ref": "#/definitions/sirosimeskajiv1ComparisonOperator"
         },
         "threshold": {
           "type": "number",

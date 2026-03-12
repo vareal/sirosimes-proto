@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import type { IntegrityHash } from "../../common/v1/integrity_pb.js";
 import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { PageToken, PageTokenResponse, PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
 
@@ -138,6 +139,15 @@ export declare class ApprovalRequest extends Message<ApprovalRequest> {
    * @generated from field: google.protobuf.Timestamp responded_at = 10;
    */
   respondedAt?: Timestamp;
+
+  /**
+   * HMAC-SHA256 integrity hash for tamper detection of approval chain.
+   * Covers: execution_id, step_name, assignee, status, comment, timeout_at.
+   * previous_hash links to the preceding approval in the chain.
+   *
+   * @generated from field: sirosimes.common.v1.IntegrityHash integrity_hash = 13;
+   */
+  integrityHash?: IntegrityHash;
 
   /**
    * [Phase 2c deprecated] Use metadata.created_at. Servers no longer populate this field.

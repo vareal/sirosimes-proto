@@ -177,8 +177,10 @@ export declare class AuthSession extends Message<AuthSession> {
 /**
  * ApiKeyConfig は API キーの設定とライフサイクルを管理する。
  * API キーは長期有効トークンであるため、有効期限・スコープ制限・レート制限を必須とする。
+ * [Phase 3 deprecated] Superseded by ApiKey in api_key.proto.
  *
  * @generated from message sirosimes.mizugaki.v1.ApiKeyConfig
+ * @deprecated
  */
 export declare class ApiKeyConfig extends Message<ApiKeyConfig> {
   /**
@@ -632,150 +634,5 @@ export declare class RevokeSessionResponse extends Message<RevokeSessionResponse
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RevokeSessionResponse;
 
   static equals(a: RevokeSessionResponse | PlainMessage<RevokeSessionResponse> | undefined, b: RevokeSessionResponse | PlainMessage<RevokeSessionResponse> | undefined): boolean;
-}
-
-/**
- * CreateApiKeyRequest は API キー作成リクエストを表す。
- * Exposure: INTERNAL（管理者操作）。
- *
- * @generated from message sirosimes.mizugaki.v1.CreateApiKeyRequest
- */
-export declare class CreateApiKeyRequest extends Message<CreateApiKeyRequest> {
-  /**
-   * API キーの表示名。
-   *
-   * @generated from field: string name = 1;
-   */
-  name: string;
-
-  /**
-   * 有効期限（必須）。
-   *
-   * @generated from field: google.protobuf.Timestamp expires_at = 2;
-   */
-  expiresAt?: Timestamp;
-
-  /**
-   * 許可するスコープ。
-   *
-   * @generated from field: repeated string allowed_scopes = 3;
-   */
-  allowedScopes: string[];
-
-  /**
-   * レート制限（1分あたり）。
-   *
-   * @generated from field: int32 rate_limit_per_minute = 4;
-   */
-  rateLimitPerMinute: number;
-
-  /**
-   * キーの所有者ID。
-   *
-   * @generated from field: string owner_id = 5;
-   */
-  ownerId: string;
-
-  constructor(data?: PartialMessage<CreateApiKeyRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.mizugaki.v1.CreateApiKeyRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateApiKeyRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateApiKeyRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateApiKeyRequest;
-
-  static equals(a: CreateApiKeyRequest | PlainMessage<CreateApiKeyRequest> | undefined, b: CreateApiKeyRequest | PlainMessage<CreateApiKeyRequest> | undefined): boolean;
-}
-
-/**
- * CreateApiKeyResponse は API キー作成レスポンスを表す。
- *
- * @generated from message sirosimes.mizugaki.v1.CreateApiKeyResponse
- */
-export declare class CreateApiKeyResponse extends Message<CreateApiKeyResponse> {
-  /**
-   * 作成された API キー設定。
-   *
-   * @generated from field: sirosimes.mizugaki.v1.ApiKeyConfig api_key = 1;
-   */
-  apiKey?: ApiKeyConfig;
-
-  /**
-   * 平文の API キー（RESTRICTED — この応答でのみ返却、以降は取得不可）。
-   *
-   * @generated from field: string raw_key = 2;
-   */
-  rawKey: string;
-
-  constructor(data?: PartialMessage<CreateApiKeyResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.mizugaki.v1.CreateApiKeyResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateApiKeyResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateApiKeyResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateApiKeyResponse;
-
-  static equals(a: CreateApiKeyResponse | PlainMessage<CreateApiKeyResponse> | undefined, b: CreateApiKeyResponse | PlainMessage<CreateApiKeyResponse> | undefined): boolean;
-}
-
-/**
- * RevokeApiKeyRequest は API キー失効リクエストを表す。
- * Exposure: INTERNAL（管理者操作）。
- *
- * @generated from message sirosimes.mizugaki.v1.RevokeApiKeyRequest
- */
-export declare class RevokeApiKeyRequest extends Message<RevokeApiKeyRequest> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: string reason = 2;
-   */
-  reason: string;
-
-  constructor(data?: PartialMessage<RevokeApiKeyRequest>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.mizugaki.v1.RevokeApiKeyRequest";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RevokeApiKeyRequest;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RevokeApiKeyRequest;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RevokeApiKeyRequest;
-
-  static equals(a: RevokeApiKeyRequest | PlainMessage<RevokeApiKeyRequest> | undefined, b: RevokeApiKeyRequest | PlainMessage<RevokeApiKeyRequest> | undefined): boolean;
-}
-
-/**
- * RevokeApiKeyResponse は API キー失効レスポンスを表す。
- *
- * @generated from message sirosimes.mizugaki.v1.RevokeApiKeyResponse
- */
-export declare class RevokeApiKeyResponse extends Message<RevokeApiKeyResponse> {
-  constructor(data?: PartialMessage<RevokeApiKeyResponse>);
-
-  static readonly runtime: typeof proto3;
-  static readonly typeName = "sirosimes.mizugaki.v1.RevokeApiKeyResponse";
-  static readonly fields: FieldList;
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RevokeApiKeyResponse;
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RevokeApiKeyResponse;
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RevokeApiKeyResponse;
-
-  static equals(a: RevokeApiKeyResponse | PlainMessage<RevokeApiKeyResponse> | undefined, b: RevokeApiKeyResponse | PlainMessage<RevokeApiKeyResponse> | undefined): boolean;
 }
 

@@ -7,8 +7,8 @@
 package mikurav1
 
 import (
-	_ "github.com/vareal/sirosimes-proto/gen/go/google/api"
 	v1 "github.com/vareal/sirosimes-proto/gen/go/sirosimes/common/v1"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	structpb "google.golang.org/protobuf/types/known/structpb"

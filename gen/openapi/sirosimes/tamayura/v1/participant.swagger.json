@@ -336,7 +336,7 @@
       "type": "object",
       "properties": {
         "role": {
-          "$ref": "#/definitions/v1ParticipantRole"
+          "$ref": "#/definitions/sirosimestamayurav1ParticipantRole"
         },
         "muted": {
           "type": "boolean"
@@ -383,6 +383,57 @@
           }
         }
       }
+    },
+    "sirosimestamayurav1Participant": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "channelId": {
+          "type": "string"
+        },
+        "actorId": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/definitions/sirosimestamayurav1ParticipantRole"
+        },
+        "presence": {
+          "$ref": "#/definitions/v1PresenceStatus"
+        },
+        "statusMessage": {
+          "type": "string"
+        },
+        "joinedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastReadAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "unreadCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "muted": {
+          "type": "boolean"
+        }
+      },
+      "description": "Participant represents a member of a channel."
+    },
+    "sirosimestamayurav1ParticipantRole": {
+      "type": "string",
+      "enum": [
+        "PARTICIPANT_ROLE_UNSPECIFIED",
+        "PARTICIPANT_ROLE_OWNER",
+        "PARTICIPANT_ROLE_ADMIN",
+        "PARTICIPANT_ROLE_MEMBER",
+        "PARTICIPANT_ROLE_GUEST"
+      ],
+      "default": "PARTICIPANT_ROLE_UNSPECIFIED",
+      "description": "ParticipantRole defines the role of a participant within a channel."
     },
     "v1ActorRef": {
       "type": "object",
@@ -503,68 +554,17 @@
       },
       "description": "PaginationResponse is the standard offset-based pagination output."
     },
-    "v1Participant": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "channelId": {
-          "type": "string"
-        },
-        "actorId": {
-          "type": "string"
-        },
-        "role": {
-          "$ref": "#/definitions/v1ParticipantRole"
-        },
-        "presence": {
-          "$ref": "#/definitions/v1PresenceStatus"
-        },
-        "statusMessage": {
-          "type": "string"
-        },
-        "joinedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "lastReadAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "unreadCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "muted": {
-          "type": "boolean"
-        }
-      },
-      "description": "Participant represents a member of a channel."
-    },
     "v1ParticipantDetail": {
       "type": "object",
       "properties": {
         "participant": {
-          "$ref": "#/definitions/v1Participant"
+          "$ref": "#/definitions/sirosimestamayurav1Participant"
         },
         "actor": {
           "$ref": "#/definitions/v1ActorRef"
         }
       },
       "description": "ParticipantDetail bundles a participant with resolved actor reference."
-    },
-    "v1ParticipantRole": {
-      "type": "string",
-      "enum": [
-        "PARTICIPANT_ROLE_UNSPECIFIED",
-        "PARTICIPANT_ROLE_OWNER",
-        "PARTICIPANT_ROLE_ADMIN",
-        "PARTICIPANT_ROLE_MEMBER",
-        "PARTICIPANT_ROLE_GUEST"
-      ],
-      "default": "PARTICIPANT_ROLE_UNSPECIFIED",
-      "description": "ParticipantRole defines the role of a participant within a channel."
     },
     "v1PresenceStatus": {
       "type": "string",

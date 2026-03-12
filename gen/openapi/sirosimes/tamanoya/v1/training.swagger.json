@@ -483,7 +483,7 @@
         }
       }
     },
-    "v1ContentType": {
+    "sirosimestamanoyav1ContentType": {
       "type": "string",
       "enum": [
         "CONTENT_TYPE_UNSPECIFIED",
@@ -507,7 +507,7 @@
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/v1ContentType"
+          "$ref": "#/definitions/sirosimestamanoyav1ContentType"
         },
         "skillId": {
           "type": "string"
@@ -762,7 +762,7 @@
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/v1ContentType"
+          "$ref": "#/definitions/sirosimestamanoyav1ContentType"
         },
         "status": {
           "$ref": "#/definitions/v1TrainingStatus"

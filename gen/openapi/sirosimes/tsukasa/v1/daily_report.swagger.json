@@ -45,6 +45,40 @@
         }
       }
     },
+    "sirosimestsukasav1CreateTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/v1DailyReportTemplate"
+        }
+      },
+      "description": "CreateTemplateResponse is the response after creating a report template."
+    },
+    "sirosimestsukasav1ListTemplatesResponse": {
+      "type": "object",
+      "properties": {
+        "templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DailyReportTemplate"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListTemplatesResponse is the response for listing report templates."
+    },
+    "sirosimestsukasav1UpdateTemplateResponse": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/v1DailyReportTemplate"
+        }
+      },
+      "description": "UpdateTemplateResponse is the response after updating a report template."
+    },
     "v1ActorRef": {
       "type": "object",
       "properties": {
@@ -80,15 +114,6 @@
         }
       },
       "description": "CreateReportResponse is the response after creating a daily report."
-    },
-    "v1CreateTemplateResponse": {
-      "type": "object",
-      "properties": {
-        "template": {
-          "$ref": "#/definitions/v1DailyReportTemplate"
-        }
-      },
-      "description": "CreateTemplateResponse is the response after creating a report template."
     },
     "v1DailyReport": {
       "type": "object",
@@ -220,22 +245,6 @@
         }
       },
       "description": "ListReportsResponse is the response for listing daily reports."
-    },
-    "v1ListTemplatesResponse": {
-      "type": "object",
-      "properties": {
-        "templates": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1DailyReportTemplate"
-          }
-        },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
-        }
-      },
-      "description": "ListTemplatesResponse is the response for listing report templates."
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -388,15 +397,6 @@
       ],
       "default": "SORT_ORDER_UNSPECIFIED",
       "description": "SortOrder specifies the sort direction."
-    },
-    "v1UpdateTemplateResponse": {
-      "type": "object",
-      "properties": {
-        "template": {
-          "$ref": "#/definitions/v1DailyReportTemplate"
-        }
-      },
-      "description": "UpdateTemplateResponse is the response after updating a report template."
     }
   }
 }

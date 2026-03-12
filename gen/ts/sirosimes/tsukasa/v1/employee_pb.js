@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Timestamp } from "@bufbuild/protobuf";
+import { FieldMask, proto3, Timestamp } from "@bufbuild/protobuf";
 import { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import { ActorRef } from "../../common/v1/actor_pb.js";
 import { PaginationRequest, PaginationResponse } from "../../common/v1/pagination_pb.js";
@@ -145,6 +145,7 @@ export const ListEmployeesRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(EmployeeStatus) },
     { no: 4, name: "department_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "search", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "read_mask", kind: "message", T: FieldMask },
   ],
 );
 
@@ -170,6 +171,7 @@ export const GetEmployeeRequest = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.tsukasa.v1.GetEmployeeRequest",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "read_mask", kind: "message", T: FieldMask },
   ],
 );
 

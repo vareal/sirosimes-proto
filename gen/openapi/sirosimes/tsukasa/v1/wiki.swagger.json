@@ -45,6 +45,31 @@
         }
       }
     },
+    "sirosimestsukasav1GetDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1WikiDocumentDetail"
+        }
+      },
+      "description": "GetDocumentResponse is the response containing a single wiki document."
+    },
+    "sirosimestsukasav1ListDocumentsResponse": {
+      "type": "object",
+      "properties": {
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WikiDocumentDetail"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/definitions/v1PageTokenResponse"
+        }
+      },
+      "description": "ListDocumentsResponse is the response for listing wiki documents."
+    },
     "v1ActorRef": {
       "type": "object",
       "properties": {
@@ -99,15 +124,6 @@
       },
       "description": "GetBookResponse is the response containing a single wiki book."
     },
-    "v1GetDocumentResponse": {
-      "type": "object",
-      "properties": {
-        "document": {
-          "$ref": "#/definitions/v1WikiDocumentDetail"
-        }
-      },
-      "description": "GetDocumentResponse is the response containing a single wiki document."
-    },
     "v1ListBooksResponse": {
       "type": "object",
       "properties": {
@@ -123,22 +139,6 @@
         }
       },
       "description": "ListBooksResponse is the response for listing wiki books."
-    },
-    "v1ListDocumentsResponse": {
-      "type": "object",
-      "properties": {
-        "documents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1WikiDocumentDetail"
-          }
-        },
-        "pageInfo": {
-          "$ref": "#/definitions/v1PageTokenResponse"
-        }
-      },
-      "description": "ListDocumentsResponse is the response for listing wiki documents."
     },
     "v1ListRevisionsResponse": {
       "type": "object",

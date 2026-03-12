@@ -1,0 +1,191 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/mizugaki/v1/bff_token.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "BFFTokenService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1IssueOpaqueTokenResponse": {
+      "type": "object",
+      "properties": {
+        "tokenReference": {
+          "type": "string",
+          "title": "クライアントに返却するオペーク参照値。"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "有効期限。"
+        },
+        "grantedScopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "付与されたスコープ。"
+        }
+      },
+      "title": "IssueOpaqueTokenResponse はオペークトークン発行レスポンスを表す。"
+    },
+    "v1OpaqueTokenType": {
+      "type": "string",
+      "enum": [
+        "OPAQUE_TOKEN_TYPE_UNSPECIFIED",
+        "OPAQUE_TOKEN_TYPE_SESSION",
+        "OPAQUE_TOKEN_TYPE_API",
+        "OPAQUE_TOKEN_TYPE_SERVICE"
+      ],
+      "default": "OPAQUE_TOKEN_TYPE_UNSPECIFIED",
+      "description": "- OPAQUE_TOKEN_TYPE_SESSION: セッション用アクセストークン。\n - OPAQUE_TOKEN_TYPE_API: APIアクセス用トークン。\n - OPAQUE_TOKEN_TYPE_SERVICE: サービス間通信用トークン。",
+      "title": "OpaqueTokenType はオペークトークンの種別を分類する。"
+    },
+    "v1RevokeOpaqueTokenResponse": {
+      "type": "object",
+      "title": "RevokeOpaqueTokenResponse はオペークトークン失効レスポンスを表す。"
+    },
+    "v1TokenClaims": {
+      "type": "object",
+      "properties": {
+        "sub": {
+          "type": "string",
+          "title": "Subject — ユーザーID。"
+        },
+        "iss": {
+          "type": "string",
+          "title": "Issuer — 発行者 (https://auth.vareal.group)。"
+        },
+        "aud": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Audience — 対象クライアントID。"
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "トークン発行時刻。"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "トークン有効期限。"
+        },
+        "notBefore": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Not Before — この時刻より前はトークン無効。"
+        },
+        "jti": {
+          "type": "string",
+          "title": "JWT ID — トークンの一意識別子。"
+        },
+        "name": {
+          "type": "string",
+          "title": "ユーザー表示名。"
+        },
+        "email": {
+          "type": "string",
+          "title": "ユーザーメールアドレス。"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "付与されたロール一覧。"
+        },
+        "trustLevel": {
+          "type": "integer",
+          "format": "int32",
+          "title": "信頼レベル（Role.trust_level に対応）。"
+        },
+        "actorType": {
+          "type": "string",
+          "title": "アクター種別 (human, ai_employee, system, external_service)。"
+        },
+        "identifier": {
+          "type": "string",
+          "title": "ユーザー識別子（ログイン名）。"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "許可されたスコープ。"
+        }
+      },
+      "title": "TokenClaims は JWT トークンに含まれるクレーム情報を表す。"
+    },
+    "v1ValidateOpaqueTokenResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean",
+          "title": "トークンが有効かどうか。"
+        },
+        "subjectActorId": {
+          "type": "string",
+          "title": "有効な場合のアクターID。"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "付与されたスコープ。"
+        },
+        "internalClaims": {
+          "$ref": "#/definitions/v1TokenClaims",
+          "title": "内部トークンクレーム（BFFサーバー内部用）。"
+        },
+        "rejectionReason": {
+          "type": "string",
+          "title": "無効な場合の理由。"
+        }
+      },
+      "title": "ValidateOpaqueTokenResponse はオペークトークン検証レスポンスを表す。"
+    }
+  }
+}

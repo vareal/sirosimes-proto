@@ -45,6 +45,35 @@
         }
       }
     },
+    "sirosimestsukasav1Position": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "employeeId": {
+          "type": "string"
+        },
+        "departmentId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "isPrimary": {
+          "type": "boolean"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Position represents a role assignment of an employee within a department."
+    },
     "v1ActorRef": {
       "type": "object",
       "properties": {
@@ -199,7 +228,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Position"
+            "$ref": "#/definitions/sirosimestsukasav1Position"
           }
         },
         "actorRef": {
@@ -336,35 +365,6 @@
         }
       },
       "description": "PaginationResponse is the standard offset-based pagination output."
-    },
-    "v1Position": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "employeeId": {
-          "type": "string"
-        },
-        "departmentId": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "isPrimary": {
-          "type": "boolean"
-        },
-        "startedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "endedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "description": "Position represents a role assignment of an employee within a department."
     },
     "v1ResourceMetadata": {
       "type": "object",

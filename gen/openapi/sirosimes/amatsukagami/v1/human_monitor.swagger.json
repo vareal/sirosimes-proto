@@ -1,0 +1,635 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/amatsukagami/v1/human_monitor.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "HumanMonitorService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AddressAnomalyResponse": {
+      "type": "object",
+      "properties": {
+        "anomaly": {
+          "$ref": "#/definitions/v1EmployeeAnomaly"
+        }
+      }
+    },
+    "v1AnomalyType": {
+      "type": "string",
+      "enum": [
+        "ANOMALY_TYPE_UNSPECIFIED",
+        "ANOMALY_TYPE_OFF_HOURS_ACCESS",
+        "ANOMALY_TYPE_BULK_DOWNLOAD",
+        "ANOMALY_TYPE_UNAUTHORIZED_DEVICE",
+        "ANOMALY_TYPE_PROLONGED_INACTIVITY",
+        "ANOMALY_TYPE_EXPENSE_ANOMALY",
+        "ANOMALY_TYPE_UNAUTHORIZED_ACCESS",
+        "ANOMALY_TYPE_TASK_OVERDUE",
+        "ANOMALY_TYPE_EXCESSIVE_OVERTIME",
+        "ANOMALY_TYPE_COMMUNICATION_GAP",
+        "ANOMALY_TYPE_KPI_DEGRADATION"
+      ],
+      "default": "ANOMALY_TYPE_UNSPECIFIED",
+      "description": "- ANOMALY_TYPE_OFF_HOURS_ACCESS: 業務時間外の異常アクセス。\n - ANOMALY_TYPE_BULK_DOWNLOAD: 大量データダウンロード。\n - ANOMALY_TYPE_UNAUTHORIZED_DEVICE: 未承認デバイスの使用。\n - ANOMALY_TYPE_PROLONGED_INACTIVITY: 長時間の無活動。\n - ANOMALY_TYPE_EXPENSE_ANOMALY: 異常な経費パターン。\n - ANOMALY_TYPE_UNAUTHORIZED_ACCESS: 権限外リソースへのアクセス試行。\n - ANOMALY_TYPE_TASK_OVERDUE: タスク遅延（期限超過）。\n - ANOMALY_TYPE_EXCESSIVE_OVERTIME: 過剰残業（ウェルビーイングリスク）。\n - ANOMALY_TYPE_COMMUNICATION_GAP: コミュニケーション断絶（報告なし期間超過）。\n - ANOMALY_TYPE_KPI_DEGRADATION: KPI著しい低下。",
+      "title": "AnomalyType は人間社員の異常検知種別。"
+    },
+    "v1ApproveCorrectiveActionResponse": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/v1CorrectiveAction"
+        }
+      }
+    },
+    "v1AttendanceRecord": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "社員ID（司employee_id）。"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "日付。"
+        },
+        "clockIn": {
+          "type": "string",
+          "format": "date-time",
+          "title": "出勤時刻。"
+        },
+        "clockOut": {
+          "type": "string",
+          "format": "date-time",
+          "title": "退勤時刻。"
+        },
+        "workDuration": {
+          "type": "string",
+          "title": "実労働時間。"
+        },
+        "breakDuration": {
+          "type": "string",
+          "title": "休憩時間。"
+        },
+        "overtimeDuration": {
+          "type": "string",
+          "title": "残業時間。"
+        },
+        "status": {
+          "$ref": "#/definitions/v1AttendanceStatus",
+          "title": "勤怠状態。"
+        },
+        "source": {
+          "type": "string",
+          "title": "データソース（打刻システム/カレンダー/推定）。"
+        }
+      },
+      "title": "AttendanceRecord は勤怠レコード。"
+    },
+    "v1AttendanceStatus": {
+      "type": "string",
+      "enum": [
+        "ATTENDANCE_STATUS_UNSPECIFIED",
+        "ATTENDANCE_STATUS_WORKING",
+        "ATTENDANCE_STATUS_BREAK",
+        "ATTENDANCE_STATUS_MEETING",
+        "ATTENDANCE_STATUS_ABSENT",
+        "ATTENDANCE_STATUS_LEAVE",
+        "ATTENDANCE_STATUS_HOLIDAY",
+        "ATTENDANCE_STATUS_OVERTIME"
+      ],
+      "default": "ATTENDANCE_STATUS_UNSPECIFIED",
+      "title": "AttendanceStatus は勤怠状態。"
+    },
+    "v1CompleteCorrectiveActionResponse": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/v1CorrectiveAction"
+        }
+      }
+    },
+    "v1CorrectiveAction": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "employeeId": {
+          "type": "string",
+          "title": "社員ID。"
+        },
+        "type": {
+          "$ref": "#/definitions/v1CorrectiveActionType",
+          "title": "措置種別。"
+        },
+        "status": {
+          "$ref": "#/definitions/v1CorrectiveActionStatus",
+          "title": "ステータス。"
+        },
+        "anomalyId": {
+          "type": "string",
+          "title": "トリガーとなった異常ID。"
+        },
+        "description": {
+          "type": "string",
+          "title": "措置内容。"
+        },
+        "approvedBy": {
+          "type": "string",
+          "title": "承認者（HITL）。"
+        },
+        "approvedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "承認時刻。"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "完了時刻。"
+        },
+        "outcome": {
+          "type": "string",
+          "title": "結果メモ。"
+        }
+      },
+      "title": "CorrectiveAction は是正措置レコード。"
+    },
+    "v1CorrectiveActionStatus": {
+      "type": "string",
+      "enum": [
+        "CORRECTIVE_ACTION_STATUS_UNSPECIFIED",
+        "CORRECTIVE_ACTION_STATUS_PROPOSED",
+        "CORRECTIVE_ACTION_STATUS_APPROVED",
+        "CORRECTIVE_ACTION_STATUS_IN_PROGRESS",
+        "CORRECTIVE_ACTION_STATUS_COMPLETED",
+        "CORRECTIVE_ACTION_STATUS_CANCELLED"
+      ],
+      "default": "CORRECTIVE_ACTION_STATUS_UNSPECIFIED",
+      "title": "CorrectiveActionStatus は是正措置のステータス。"
+    },
+    "v1CorrectiveActionType": {
+      "type": "string",
+      "enum": [
+        "CORRECTIVE_ACTION_TYPE_UNSPECIFIED",
+        "CORRECTIVE_ACTION_TYPE_REMINDER",
+        "CORRECTIVE_ACTION_TYPE_MANAGER_ALERT",
+        "CORRECTIVE_ACTION_TYPE_MEETING_SUGGESTION",
+        "CORRECTIVE_ACTION_TYPE_WORKLOAD_ADJUSTMENT",
+        "CORRECTIVE_ACTION_TYPE_FORMAL_WARNING",
+        "CORRECTIVE_ACTION_TYPE_RECOGNITION"
+      ],
+      "default": "CORRECTIVE_ACTION_TYPE_UNSPECIFIED",
+      "description": "- CORRECTIVE_ACTION_TYPE_REMINDER: 自動リマインダー送信。\n - CORRECTIVE_ACTION_TYPE_MANAGER_ALERT: マネージャーへの通知。\n - CORRECTIVE_ACTION_TYPE_MEETING_SUGGESTION: 1on1ミーティング提案。\n - CORRECTIVE_ACTION_TYPE_WORKLOAD_ADJUSTMENT: 業務量調整提案。\n - CORRECTIVE_ACTION_TYPE_FORMAL_WARNING: 公式警告。\n - CORRECTIVE_ACTION_TYPE_RECOGNITION: 表彰・褒賞。",
+      "title": "CorrectiveActionType は是正措置の種別。"
+    },
+    "v1CreateCorrectiveActionResponse": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/v1CorrectiveAction"
+        }
+      }
+    },
+    "v1DeviceActivity": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "社員ID。"
+        },
+        "deviceId": {
+          "type": "string",
+          "title": "デバイスID。"
+        },
+        "deviceType": {
+          "type": "string",
+          "title": "デバイス種別（laptop/mobile/tablet）。"
+        },
+        "activityType": {
+          "type": "string",
+          "title": "アクティビティ種別（login/logout/app_usage/file_access）。"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "タイムスタンプ。"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "詳細（アプリ名、ファイルパス等）。"
+        },
+        "riskScore": {
+          "type": "number",
+          "format": "float",
+          "title": "リスクスコア（0.0-1.0）。"
+        }
+      },
+      "title": "DeviceActivity はデバイス利用記録。"
+    },
+    "v1EmployeeAnomaly": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "employeeId": {
+          "type": "string",
+          "title": "社員ID。"
+        },
+        "anomalyType": {
+          "$ref": "#/definitions/v1AnomalyType",
+          "title": "異常種別。"
+        },
+        "detectedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "検知時刻。"
+        },
+        "severityScore": {
+          "type": "number",
+          "format": "float",
+          "title": "深刻度（0.0-1.0）。"
+        },
+        "description": {
+          "type": "string",
+          "title": "説明。"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "エビデンス。"
+        },
+        "addressed": {
+          "type": "boolean",
+          "title": "対応済みか。"
+        },
+        "addressedBy": {
+          "type": "string",
+          "title": "対応者。"
+        },
+        "addressedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "対応時刻。"
+        },
+        "correctiveActionId": {
+          "type": "string",
+          "title": "是正措置ID。"
+        }
+      },
+      "title": "EmployeeAnomaly は検知された異常。"
+    },
+    "v1EmployeePerformance": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "社員ID。"
+        },
+        "periodStart": {
+          "type": "string",
+          "format": "date-time",
+          "title": "期間開始。"
+        },
+        "periodEnd": {
+          "type": "string",
+          "format": "date-time",
+          "title": "期間終了。"
+        },
+        "tasksCompleted": {
+          "type": "integer",
+          "format": "int32",
+          "title": "タスク完了数。"
+        },
+        "onTimeCompletionRate": {
+          "type": "number",
+          "format": "float",
+          "title": "タスク期限内完了率。"
+        },
+        "avgTaskDuration": {
+          "type": "string",
+          "title": "平均タスク完了時間。"
+        },
+        "attendanceRate": {
+          "type": "number",
+          "format": "float",
+          "title": "出勤率。"
+        },
+        "avgDailyOvertime": {
+          "type": "string",
+          "title": "平均残業時間（日）。"
+        },
+        "anomalyCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "異常検知件数。"
+        },
+        "wellbeingScore": {
+          "type": "number",
+          "format": "float",
+          "title": "ウェルビーイングスコア（0.0-1.0）。"
+        },
+        "engagementScore": {
+          "type": "number",
+          "format": "float",
+          "title": "エンゲージメントスコア（0.0-1.0）。"
+        },
+        "kpiScores": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "KPIスコア（カスタムKPI集約）。"
+        }
+      },
+      "title": "EmployeePerformance は社員パフォーマンスサマリー。"
+    },
+    "v1GetAnomalyResponse": {
+      "type": "object",
+      "properties": {
+        "anomaly": {
+          "$ref": "#/definitions/v1EmployeeAnomaly"
+        }
+      }
+    },
+    "v1GetEmployeePerformanceResponse": {
+      "type": "object",
+      "properties": {
+        "performance": {
+          "$ref": "#/definitions/v1EmployeePerformance"
+        }
+      }
+    },
+    "v1IngestAttendanceResponse": {
+      "type": "object",
+      "properties": {
+        "acceptedCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1IngestDeviceActivityResponse": {
+      "type": "object",
+      "properties": {
+        "acceptedCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ListAnomaliesResponse": {
+      "type": "object",
+      "properties": {
+        "anomalies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeeAnomaly"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListCorrectiveActionsResponse": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CorrectiveAction"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListEmployeePerformancesResponse": {
+      "type": "object",
+      "properties": {
+        "performances": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1EmployeePerformance"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1QueryAttendanceResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AttendanceRecord"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1QueryDeviceActivityResponse": {
+      "type": "object",
+      "properties": {
+        "activities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DeviceActivity"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    }
+  }
+}

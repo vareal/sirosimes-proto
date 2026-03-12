@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
+import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage, Timestamp } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import type { ResourceMetadata } from "../../common/v1/metadata_pb.js";
 import type { ActorRef } from "../../common/v1/actor_pb.js";
@@ -400,6 +400,13 @@ export declare class ListEmployeesRequest extends Message<ListEmployeesRequest> 
    */
   search: string;
 
+  /**
+   * Optional field mask for field-level access control.
+   *
+   * @generated from field: google.protobuf.FieldMask read_mask = 6;
+   */
+  readMask?: FieldMask;
+
   constructor(data?: PartialMessage<ListEmployeesRequest>);
 
   static readonly runtime: typeof proto3;
@@ -456,6 +463,15 @@ export declare class GetEmployeeRequest extends Message<GetEmployeeRequest> {
    * @generated from field: string id = 1;
    */
   id: string;
+
+  /**
+   * Optional field mask for field-level access control.
+   * When set, only specified fields are returned (subject to FieldAccessPolicy).
+   * When empty, all fields accessible to the caller are returned.
+   *
+   * @generated from field: google.protobuf.FieldMask read_mask = 3;
+   */
+  readMask?: FieldMask;
 
   constructor(data?: PartialMessage<GetEmployeeRequest>);
 

@@ -90,57 +90,76 @@
       "default": "ACTOR_TYPE_UNSPECIFIED",
       "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
     },
-    "v1ApiKeyConfig": {
+    "v1ApiKey": {
       "type": "object",
       "properties": {
-        "id": {
+        "keyPrefix": {
           "type": "string",
-          "title": "API キーの一意識別子。"
+          "title": "APIキーのプレフィックス表示（例: \"sk_live_abc1...xyz9\"）。"
         },
         "name": {
           "type": "string",
-          "title": "API キーの表示名（用途の説明）。"
+          "title": "キー名（人間可読な識別子）。"
         },
-        "keyHash": {
+        "actorId": {
           "type": "string",
-          "title": "キーのハッシュ（元のキーは作成時のみ返却、保存しない）。SecurityLevel: RESTRICTED。"
+          "title": "発行先アクターID。"
         },
-        "expiresAt": {
-          "type": "string",
-          "format": "date-time",
-          "title": "キーの有効期限（必須 — 無期限キーは禁止）。"
+        "status": {
+          "$ref": "#/definitions/v1ApiKeyStatus",
+          "title": "キー状態。"
         },
-        "allowedScopes": {
+        "scopes": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "許可されたスコープ（空 = 全スコープ禁止）。"
+          "title": "許可スコープ。"
         },
-        "rateLimitPerMinute": {
-          "type": "integer",
-          "format": "int32",
-          "title": "1分あたりのレート制限（0 = デフォルト制限適用）。"
-        },
-        "ownerId": {
+        "expiresAt": {
           "type": "string",
-          "title": "キーの所有者（作成者）。"
+          "format": "date-time",
+          "title": "有効期限。"
         },
         "lastUsedAt": {
           "type": "string",
           "format": "date-time",
-          "title": "最後に使用された日時。"
+          "title": "最終使用時刻。"
         },
-        "enabled": {
-          "type": "boolean",
-          "title": "キーが有効かどうか。"
-        },
-        "createdAt": {
+        "usageCount": {
           "type": "string",
-          "format": "date-time"
+          "format": "int64",
+          "title": "使用回数。"
+        },
+        "allowedCidrs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "IP制限（CIDR形式、空なら制限なし）。"
+        },
+        "rateLimitRpm": {
+          "type": "integer",
+          "format": "int32",
+          "title": "レートリミット（requests per minute, 0=無制限）。"
+        },
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata",
+          "description": "メタデータ。Default security_level: RESTRICTED."
         }
       },
-      "title": "ApiKeyConfig は API キーの設定とライフサイクルを管理する。\nAPI キーは長期有効トークンであるため、有効期限・スコープ制限・レート制限を必須とする。"
+      "title": "ApiKey はAPIキーを表す。key_valueは作成時レスポンスのみに含まれる。"
+    },
+    "v1ApiKeyStatus": {
+      "type": "string",
+      "enum": [
+        "API_KEY_STATUS_UNSPECIFIED",
+        "API_KEY_STATUS_ACTIVE",
+        "API_KEY_STATUS_EXPIRED",
+        "API_KEY_STATUS_REVOKED"
+      ],
+      "default": "API_KEY_STATUS_UNSPECIFIED",
+      "title": "ApiKeyStatus はAPIキーの状態を表す。"
     },
     "v1AuthMethod": {
       "type": "string",
@@ -215,15 +234,15 @@
       "type": "object",
       "properties": {
         "apiKey": {
-          "$ref": "#/definitions/v1ApiKeyConfig",
-          "title": "作成された API キー設定。"
+          "$ref": "#/definitions/v1ApiKey",
+          "title": "作成されたAPIキー。"
         },
-        "rawKey": {
+        "keyValue": {
           "type": "string",
-          "title": "平文の API キー（RESTRICTED — この応答でのみ返却、以降は取得不可）。"
+          "title": "平文APIキー値。このレスポンスのみで返却。"
         }
       },
-      "title": "CreateApiKeyResponse は API キー作成レスポンスを表す。"
+      "title": "CreateApiKeyResponse はAPIキー作成レスポンスを表す。\nkey_valueは本レスポンスでのみ返却される。保存しなければ再取得不可。"
     },
     "v1ListSessionsResponse": {
       "type": "object",
@@ -248,9 +267,71 @@
       },
       "title": "LogoutResponse はログアウトレスポンスを表す。"
     },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
     "v1RevokeApiKeyResponse": {
       "type": "object",
-      "title": "RevokeApiKeyResponse は API キー失効レスポンスを表す。"
+      "properties": {
+        "apiKey": {
+          "$ref": "#/definitions/v1ApiKey",
+          "title": "失効後のAPIキー。"
+        }
+      },
+      "title": "RevokeApiKeyResponse はAPIキー失効レスポンスを表す。"
     },
     "v1RevokeSessionResponse": {
       "type": "object",

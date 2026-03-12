@@ -83,6 +83,20 @@ export declare enum TriggerType {
    * @generated from enum value: TRIGGER_TYPE_VM_EVENT = 13;
    */
   VM_EVENT = 13,
+
+  /**
+   * SecurityEvent連携（sentinel.proto → 機織WFトリガー）。Phase 4追加。
+   *
+   * @generated from enum value: TRIGGER_TYPE_SECURITY_EVENT = 14;
+   */
+  SECURITY_EVENT = 14,
+
+  /**
+   * 天津鏡アラート連携（amatsukagami alert → 機織WFトリガー）。Phase 4追加。
+   *
+   * @generated from enum value: TRIGGER_TYPE_TENSHU_ALERT = 15;
+   */
+  TENSHU_ALERT = 15,
 }
 
 /**

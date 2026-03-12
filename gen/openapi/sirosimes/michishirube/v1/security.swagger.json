@@ -108,7 +108,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ResolveAlertResponse"
+              "$ref": "#/definitions/sirosimesmichishirubev1ResolveAlertResponse"
             }
           },
           "default": {
@@ -130,7 +130,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/SecurityServiceResolveAlertBody"
+              "$ref": "#/definitions/v1SecurityServiceResolveAlertBody"
             }
           }
         ],
@@ -350,15 +350,6 @@
     }
   },
   "definitions": {
-    "SecurityServiceResolveAlertBody": {
-      "type": "object",
-      "properties": {
-        "resolutionNote": {
-          "type": "string"
-        }
-      },
-      "description": "ResolveAlertRequest is the request for resolving a security alert."
-    },
     "SecurityServiceUpdateWAFRuleBody": {
       "type": "object",
       "properties": {
@@ -420,6 +411,47 @@
       ],
       "default": "DETECTION_TYPE_UNSPECIFIED",
       "description": "DetectionType classifies the type of security threat detected."
+    },
+    "sirosimesmichishirubev1ResolveAlertResponse": {
+      "type": "object",
+      "properties": {
+        "alert": {
+          "$ref": "#/definitions/sirosimesmichishirubev1SecurityAlert"
+        }
+      },
+      "description": "ResolveAlertResponse is the response after resolving a security alert."
+    },
+    "sirosimesmichishirubev1SecurityAlert": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "source": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/v1ScanSeverity"
+        },
+        "description": {
+          "type": "string"
+        },
+        "targetAgent": {
+          "type": "string"
+        },
+        "messagePreview": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "SecurityAlert represents a security alert raised by the system."
     },
     "v1CreateWAFRuleRequest": {
       "type": "object",
@@ -490,7 +522,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1SecurityAlert"
+            "$ref": "#/definitions/sirosimesmichishirubev1SecurityAlert"
           }
         },
         "pagination": {
@@ -567,15 +599,6 @@
         }
       },
       "description": "PaginationResponse is the standard offset-based pagination output."
-    },
-    "v1ResolveAlertResponse": {
-      "type": "object",
-      "properties": {
-        "alert": {
-          "$ref": "#/definitions/v1SecurityAlert"
-        }
-      },
-      "description": "ResolveAlertResponse is the response after resolving a security alert."
     },
     "v1ResourceMetadata": {
       "type": "object",
@@ -682,38 +705,6 @@
       "default": "SCAN_SEVERITY_UNSPECIFIED",
       "description": "ScanSeverity classifies the severity level of a security scan finding."
     },
-    "v1SecurityAlert": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "source": {
-          "type": "string"
-        },
-        "severity": {
-          "$ref": "#/definitions/v1ScanSeverity"
-        },
-        "description": {
-          "type": "string"
-        },
-        "targetAgent": {
-          "type": "string"
-        },
-        "messagePreview": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "resolvedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "description": "SecurityAlert represents a security alert raised by the system."
-    },
     "v1SecurityLevel": {
       "type": "string",
       "enum": [
@@ -725,6 +716,15 @@
       ],
       "default": "SECURITY_LEVEL_UNSPECIFIED",
       "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SecurityServiceResolveAlertBody": {
+      "type": "object",
+      "properties": {
+        "resolutionNote": {
+          "type": "string"
+        }
+      },
+      "description": "ResolveAlertRequest is the request for resolving a security alert."
     },
     "v1SortOrder": {
       "type": "string",

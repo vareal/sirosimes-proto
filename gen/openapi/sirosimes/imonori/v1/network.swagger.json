@@ -1,0 +1,761 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/imonori/v1/network.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "NetworkService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "sirosimesimonoriv1Certificate": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1CertificateType"
+        },
+        "status": {
+          "$ref": "#/definitions/v1CertificateStatus"
+        },
+        "subject": {
+          "type": "string",
+          "title": "サブジェクト（CN等）。"
+        },
+        "issuer": {
+          "type": "string",
+          "title": "発行者。"
+        },
+        "sans": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "SANs（Subject Alternative Names）。"
+        },
+        "serialNumber": {
+          "type": "string",
+          "title": "シリアル番号。"
+        },
+        "notBefore": {
+          "type": "string",
+          "format": "date-time",
+          "title": "有効期間開始。"
+        },
+        "notAfter": {
+          "type": "string",
+          "format": "date-time",
+          "title": "有効期間終了。"
+        },
+        "fingerprint": {
+          "type": "string",
+          "title": "フィンガープリント（SHA-256）。"
+        },
+        "keyAlgorithm": {
+          "type": "string",
+          "title": "鍵アルゴリズム（ed25519/ecdsa-p256/rsa-2048）。"
+        },
+        "issuerCertificateId": {
+          "type": "string",
+          "title": "親CA証明書ID。"
+        },
+        "autoRenew": {
+          "type": "boolean",
+          "title": "自動更新有効。"
+        },
+        "renewBeforeDays": {
+          "type": "integer",
+          "format": "int32",
+          "title": "更新何日前に通知。"
+        }
+      },
+      "title": "Certificate はTLS証明書。"
+    },
+    "sirosimesimonoriv1CreateDNSRecordResponse": {
+      "type": "object",
+      "properties": {
+        "record": {
+          "$ref": "#/definitions/sirosimesimonoriv1DNSRecord"
+        }
+      }
+    },
+    "sirosimesimonoriv1DNSRecord": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "recordType": {
+          "type": "string",
+          "title": "レコード種別（A/AAAA/CNAME/SRV/TXT）。"
+        },
+        "value": {
+          "type": "string"
+        },
+        "ttl": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "internalOnly": {
+          "type": "boolean"
+        }
+      },
+      "title": "DNSRecord は内部DNS レコード。"
+    },
+    "sirosimesimonoriv1DeleteDNSRecordResponse": {
+      "type": "object"
+    },
+    "sirosimesimonoriv1IssueCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "$ref": "#/definitions/sirosimesimonoriv1Certificate"
+        },
+        "certificatePem": {
+          "type": "string",
+          "title": "PEM形式の証明書。"
+        },
+        "privateKeyPem": {
+          "type": "string",
+          "title": "PEM形式の秘密鍵（クライアントに一度だけ返す）。"
+        }
+      }
+    },
+    "sirosimesimonoriv1ListCertificatesResponse": {
+      "type": "object",
+      "properties": {
+        "certificates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/sirosimesimonoriv1Certificate"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "sirosimesimonoriv1ListDNSRecordsResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/sirosimesimonoriv1DNSRecord"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "sirosimesimonoriv1RevokeCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "$ref": "#/definitions/sirosimesimonoriv1Certificate"
+        }
+      }
+    },
+    "sirosimesimonoriv1UpdateDNSRecordResponse": {
+      "type": "object",
+      "properties": {
+        "record": {
+          "$ref": "#/definitions/sirosimesimonoriv1DNSRecord"
+        }
+      }
+    },
+    "v1CertificateStatus": {
+      "type": "string",
+      "enum": [
+        "CERTIFICATE_STATUS_UNSPECIFIED",
+        "CERTIFICATE_STATUS_ACTIVE",
+        "CERTIFICATE_STATUS_EXPIRING_SOON",
+        "CERTIFICATE_STATUS_EXPIRED",
+        "CERTIFICATE_STATUS_REVOKED",
+        "CERTIFICATE_STATUS_PENDING"
+      ],
+      "default": "CERTIFICATE_STATUS_UNSPECIFIED",
+      "title": "CertificateStatus は証明書の状態。"
+    },
+    "v1CertificateType": {
+      "type": "string",
+      "enum": [
+        "CERTIFICATE_TYPE_UNSPECIFIED",
+        "CERTIFICATE_TYPE_CA",
+        "CERTIFICATE_TYPE_SERVER",
+        "CERTIFICATE_TYPE_CLIENT",
+        "CERTIFICATE_TYPE_INTERMEDIATE"
+      ],
+      "default": "CERTIFICATE_TYPE_UNSPECIFIED",
+      "description": "- CERTIFICATE_TYPE_CA: CA（認証局）証明書。\n - CERTIFICATE_TYPE_SERVER: サーバー証明書。\n - CERTIFICATE_TYPE_CLIENT: クライアント証明書（mTLS用）。\n - CERTIFICATE_TYPE_INTERMEDIATE: 中間CA証明書。",
+      "title": "CertificateType は証明書の種別。"
+    },
+    "v1CreateMeshRouteResponse": {
+      "type": "object",
+      "properties": {
+        "route": {
+          "$ref": "#/definitions/v1MeshRoute"
+        }
+      }
+    },
+    "v1CreateTunnelResponse": {
+      "type": "object",
+      "properties": {
+        "tunnel": {
+          "$ref": "#/definitions/v1VPNTunnel"
+        },
+        "publicKey": {
+          "type": "string",
+          "title": "生成されたWireGuard公開鍵（WIREGUARD_TYPEのみ）。"
+        }
+      }
+    },
+    "v1DeleteMeshRouteResponse": {
+      "type": "object"
+    },
+    "v1DeleteTunnelResponse": {
+      "type": "object"
+    },
+    "v1DeregisterMeshNodeResponse": {
+      "type": "object"
+    },
+    "v1GetCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "$ref": "#/definitions/sirosimesimonoriv1Certificate"
+        }
+      }
+    },
+    "v1GetMeshNodeResponse": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/v1MeshNode"
+        }
+      }
+    },
+    "v1GetNetworkOverviewResponse": {
+      "type": "object",
+      "properties": {
+        "activeTunnels": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalTunnels": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "healthyMeshNodes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalMeshNodes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "activeCertificates": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "expiringCertificates": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "dnsRecords": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalRxBytes": {
+          "type": "string",
+          "format": "int64"
+        },
+        "totalTxBytes": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1GetTunnelResponse": {
+      "type": "object",
+      "properties": {
+        "tunnel": {
+          "$ref": "#/definitions/v1VPNTunnel"
+        }
+      }
+    },
+    "v1ListMeshNodesResponse": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MeshNode"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListMeshRoutesResponse": {
+      "type": "object",
+      "properties": {
+        "routes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MeshRoute"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListTunnelsResponse": {
+      "type": "object",
+      "properties": {
+        "tunnels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1VPNTunnel"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1MeshNode": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/v1MeshNodeStatus"
+        },
+        "address": {
+          "type": "string",
+          "title": "ノードのアドレス。"
+        },
+        "port": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ポート。"
+        },
+        "serviceName": {
+          "type": "string",
+          "title": "サービス名。"
+        },
+        "certificateId": {
+          "type": "string",
+          "title": "mTLS証明書ID。"
+        },
+        "healthCheckUrl": {
+          "type": "string",
+          "title": "ヘルスチェックURL。"
+        },
+        "healthCheckIntervalSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ヘルスチェック間隔。"
+        },
+        "lastHealthCheckAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "最終ヘルスチェック時刻。"
+        },
+        "latencyMs": {
+          "type": "integer",
+          "format": "int32",
+          "title": "レイテンシ（ms）。"
+        },
+        "activeConnections": {
+          "type": "integer",
+          "format": "int32",
+          "title": "アクティブ接続数。"
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ルーティング重み（ロードバランシング）。"
+        }
+      },
+      "title": "MeshNode はサービスメッシュノード。"
+    },
+    "v1MeshNodeStatus": {
+      "type": "string",
+      "enum": [
+        "MESH_NODE_STATUS_UNSPECIFIED",
+        "MESH_NODE_STATUS_HEALTHY",
+        "MESH_NODE_STATUS_DEGRADED",
+        "MESH_NODE_STATUS_DOWN",
+        "MESH_NODE_STATUS_DRAINING"
+      ],
+      "default": "MESH_NODE_STATUS_UNSPECIFIED",
+      "title": "MeshNodeStatus はサービスメッシュノードの状態。"
+    },
+    "v1MeshRoute": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sourceService": {
+          "type": "string",
+          "title": "ソースサービス。"
+        },
+        "destinationService": {
+          "type": "string",
+          "title": "宛先サービス。"
+        },
+        "pathPrefix": {
+          "type": "string",
+          "title": "パスプレフィックス。"
+        },
+        "loadBalancing": {
+          "type": "string",
+          "title": "ロードバランシング方式（round_robin/least_conn/ip_hash）。"
+        },
+        "timeout": {
+          "type": "string",
+          "title": "タイムアウト。"
+        },
+        "retries": {
+          "type": "integer",
+          "format": "int32",
+          "title": "リトライ回数。"
+        },
+        "mtlsRequired": {
+          "type": "boolean",
+          "title": "mTLS必須。"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "有効。"
+        }
+      },
+      "title": "MeshRoute はサービスメッシュルーティングルール。"
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1RegisterMeshNodeResponse": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/v1MeshNode"
+        }
+      }
+    },
+    "v1RenewCertificateResponse": {
+      "type": "object",
+      "properties": {
+        "certificate": {
+          "$ref": "#/definitions/sirosimesimonoriv1Certificate"
+        },
+        "certificatePem": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1TunnelStatus": {
+      "type": "string",
+      "enum": [
+        "TUNNEL_STATUS_UNSPECIFIED",
+        "TUNNEL_STATUS_ACTIVE",
+        "TUNNEL_STATUS_INACTIVE",
+        "TUNNEL_STATUS_CONNECTING",
+        "TUNNEL_STATUS_ERROR",
+        "TUNNEL_STATUS_MAINTENANCE"
+      ],
+      "default": "TUNNEL_STATUS_UNSPECIFIED",
+      "title": "TunnelStatus はVPNトンネルの状態。"
+    },
+    "v1TunnelType": {
+      "type": "string",
+      "enum": [
+        "TUNNEL_TYPE_UNSPECIFIED",
+        "TUNNEL_TYPE_WIREGUARD",
+        "TUNNEL_TYPE_IPSEC",
+        "TUNNEL_TYPE_SSH"
+      ],
+      "default": "TUNNEL_TYPE_UNSPECIFIED",
+      "description": "- TUNNEL_TYPE_WIREGUARD: WireGuardトンネル。\n - TUNNEL_TYPE_IPSEC: IPsec IKEv2トンネル。\n - TUNNEL_TYPE_SSH: SSHトンネル。",
+      "title": "TunnelType はトンネルの種別。"
+    },
+    "v1UpdateMeshRouteResponse": {
+      "type": "object",
+      "properties": {
+        "route": {
+          "$ref": "#/definitions/v1MeshRoute"
+        }
+      }
+    },
+    "v1UpdateTunnelResponse": {
+      "type": "object",
+      "properties": {
+        "tunnel": {
+          "$ref": "#/definitions/v1VPNTunnel"
+        }
+      }
+    },
+    "v1VPNTunnel": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1TunnelType"
+        },
+        "status": {
+          "$ref": "#/definitions/v1TunnelStatus"
+        },
+        "localEndpoint": {
+          "type": "string",
+          "title": "ローカル側のエンドポイント。"
+        },
+        "remoteEndpoint": {
+          "type": "string",
+          "title": "リモート側のエンドポイント。"
+        },
+        "internalCidr": {
+          "type": "string",
+          "title": "トンネル内部IPレンジ（CIDR）。"
+        },
+        "publicKey": {
+          "type": "string",
+          "title": "WireGuard公開鍵（WIREGUARD_TYPEのみ）。"
+        },
+        "pskSecretRef": {
+          "type": "string",
+          "title": "Pre-Shared Key参照（暗号化参照名）。"
+        },
+        "keepaliveSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "キープアライブ間隔。"
+        },
+        "mtu": {
+          "type": "integer",
+          "format": "int32",
+          "title": "MTU設定。"
+        },
+        "allowedIps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "許可されるIPレンジ。"
+        },
+        "lastHandshakeAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rxBytes": {
+          "type": "string",
+          "format": "int64"
+        },
+        "txBytes": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "VPNTunnel はVPNトンネル。"
+    }
+  }
+}

@@ -294,10 +294,12 @@
         "TRIGGER_TYPE_TSUKASA_EVENT",
         "TRIGGER_TYPE_CONTAINER",
         "TRIGGER_TYPE_PROCESS",
-        "TRIGGER_TYPE_VM_EVENT"
+        "TRIGGER_TYPE_VM_EVENT",
+        "TRIGGER_TYPE_SECURITY_EVENT",
+        "TRIGGER_TYPE_TENSHU_ALERT"
       ],
       "default": "TRIGGER_TYPE_UNSPECIFIED",
-      "description": "TriggerType classifies the event source that initiates a workflow."
+      "description": "TriggerType classifies the event source that initiates a workflow.\n\n - TRIGGER_TYPE_SECURITY_EVENT: SecurityEvent連携（sentinel.proto → 機織WFトリガー）。Phase 4追加。\n - TRIGGER_TYPE_TENSHU_ALERT: 天津鏡アラート連携（amatsukagami alert → 機織WFトリガー）。Phase 4追加。"
     },
     "v1UpdateTriggerResponse": {
       "type": "object",

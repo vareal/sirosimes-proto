@@ -1,0 +1,454 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/chakai/v1/meeting.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MeetingService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "sirosimeschakaiv1Participant": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/definitions/sirosimeschakaiv1ParticipantRole"
+        },
+        "isAi": {
+          "type": "boolean"
+        },
+        "joinedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "leftAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "speakingDuration": {
+          "type": "string"
+        }
+      },
+      "title": "Participant は会議参加者。"
+    },
+    "sirosimeschakaiv1ParticipantRole": {
+      "type": "string",
+      "enum": [
+        "PARTICIPANT_ROLE_UNSPECIFIED",
+        "PARTICIPANT_ROLE_ORGANIZER",
+        "PARTICIPANT_ROLE_PRESENTER",
+        "PARTICIPANT_ROLE_ATTENDEE",
+        "PARTICIPANT_ROLE_SCRIBE",
+        "PARTICIPANT_ROLE_OBSERVER"
+      ],
+      "default": "PARTICIPANT_ROLE_UNSPECIFIED",
+      "title": "ParticipantRole は参加者の役割。"
+    },
+    "v1ActionItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "assigneeId": {
+          "type": "string"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "taskId": {
+          "type": "string"
+        }
+      },
+      "title": "ActionItem はアクションアイテム。"
+    },
+    "v1AddParticipantResponse": {
+      "type": "object",
+      "properties": {
+        "participant": {
+          "$ref": "#/definitions/sirosimeschakaiv1Participant"
+        }
+      }
+    },
+    "v1CompleteActionItemResponse": {
+      "type": "object",
+      "properties": {
+        "actionItem": {
+          "$ref": "#/definitions/v1ActionItem"
+        }
+      }
+    },
+    "v1CreateActionItemResponse": {
+      "type": "object",
+      "properties": {
+        "actionItem": {
+          "$ref": "#/definitions/v1ActionItem"
+        }
+      }
+    },
+    "v1CreateMeetingResponse": {
+      "type": "object",
+      "properties": {
+        "meeting": {
+          "$ref": "#/definitions/v1Meeting"
+        }
+      }
+    },
+    "v1DeleteMeetingResponse": {
+      "type": "object"
+    },
+    "v1EndMeetingResponse": {
+      "type": "object",
+      "properties": {
+        "meeting": {
+          "$ref": "#/definitions/v1Meeting"
+        }
+      }
+    },
+    "v1GenerateMinutesResponse": {
+      "type": "object",
+      "properties": {
+        "minutes": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "suggestedActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ActionItem"
+          }
+        }
+      }
+    },
+    "v1GetMeetingResponse": {
+      "type": "object",
+      "properties": {
+        "meeting": {
+          "$ref": "#/definitions/v1Meeting"
+        }
+      }
+    },
+    "v1ListMeetingsResponse": {
+      "type": "object",
+      "properties": {
+        "meetings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Meeting"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1Meeting": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1MeetingType"
+        },
+        "status": {
+          "$ref": "#/definitions/v1MeetingStatus"
+        },
+        "scheduledStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "scheduledEnd": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actualStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actualEnd": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/sirosimeschakaiv1Participant"
+          }
+        },
+        "agenda": {
+          "type": "string"
+        },
+        "minutes": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "actionItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ActionItem"
+          }
+        },
+        "recordingUrl": {
+          "type": "string"
+        },
+        "transcript": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recurrenceRule": {
+          "type": "string"
+        }
+      },
+      "title": "Meeting は会議。"
+    },
+    "v1MeetingStatus": {
+      "type": "string",
+      "enum": [
+        "MEETING_STATUS_UNSPECIFIED",
+        "MEETING_STATUS_SCHEDULED",
+        "MEETING_STATUS_IN_PROGRESS",
+        "MEETING_STATUS_COMPLETED",
+        "MEETING_STATUS_CANCELLED"
+      ],
+      "default": "MEETING_STATUS_UNSPECIFIED",
+      "title": "MeetingStatus は会議の状態。"
+    },
+    "v1MeetingType": {
+      "type": "string",
+      "enum": [
+        "MEETING_TYPE_UNSPECIFIED",
+        "MEETING_TYPE_STANDUP",
+        "MEETING_TYPE_ONE_ON_ONE",
+        "MEETING_TYPE_TEAM",
+        "MEETING_TYPE_ALL_HANDS",
+        "MEETING_TYPE_REVIEW",
+        "MEETING_TYPE_PLANNING",
+        "MEETING_TYPE_RETROSPECTIVE",
+        "MEETING_TYPE_EXTERNAL"
+      ],
+      "default": "MEETING_TYPE_UNSPECIFIED",
+      "title": "MeetingType は会議の種別。"
+    },
+    "v1PaginationRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number (1-indexed)."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of items per page (max enforced per-service)."
+        },
+        "sortBy": {
+          "type": "string",
+          "description": "Field name to sort by."
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/v1SortOrder",
+          "description": "Sort direction."
+        }
+      },
+      "description": "PaginationRequest is the standard offset-based pagination input."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalItems": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of matching items (may be expensive for large datasets)."
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "hasNext": {
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "type": "boolean"
+        }
+      },
+      "description": "PaginationResponse is the standard offset-based pagination output."
+    },
+    "v1ResourceMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier (UUID format recommended)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the resource was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last update."
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Soft-delete timestamp (null if not deleted).\nFor RESTRICTED resources, see SECURITY.md for physical deletion policy."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Actor ID who created this resource."
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Actor ID who last updated this resource."
+        },
+        "version": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optimistic concurrency version counter."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value labels for filtering and organization."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value annotations for tooling metadata."
+        },
+        "securityLevel": {
+          "$ref": "#/definitions/v1SecurityLevel",
+          "description": "Security classification level for this resource (CISO directive).\nDefault when unspecified: treated as INTERNAL."
+        }
+      },
+      "description": "ResourceMetadata provides standard metadata for all Sirosimes resources.\nEvery domain entity across all products should embed this message to ensure\nconsistent tracking, versioning, and security classification.\n\nRelated types:\n  - Actor/ActorRef (actor.proto): created_by/updated_by reference Actor IDs.\n  - AuditLog (audit.proto): changes to resources are tracked via audit events.\n  - SecurityLevel: controls access, encryption, and retention policies.\n\nDefault behavior for security_level:\n  When security_level is UNSPECIFIED (0), domain services SHOULD treat the resource\n  as INTERNAL (level 2) by default. This ensures that resources without explicit\n  classification are not accidentally treated as PUBLIC. Services MAY override this\n  default with stricter levels based on their domain requirements."
+    },
+    "v1SecurityLevel": {
+      "type": "string",
+      "enum": [
+        "SECURITY_LEVEL_UNSPECIFIED",
+        "SECURITY_LEVEL_PUBLIC",
+        "SECURITY_LEVEL_INTERNAL",
+        "SECURITY_LEVEL_CONFIDENTIAL",
+        "SECURITY_LEVEL_RESTRICTED"
+      ],
+      "default": "SECURITY_LEVEL_UNSPECIFIED",
+      "description": "SecurityLevel classifies data sensitivity per CISO directive (ISO 27001 aligned).\n\nClassification guide:\n  PUBLIC (1)       — Marketing content, public documentation, open-source code.\n                     Encryption: transit only. Logging: optional. Retention: unlimited.\n  INTERNAL (2)     — Internal wikis, team communications, non-sensitive business data.\n                     Encryption: transit required. Logging: optional. Retention: 3 years.\n  CONFIDENTIAL (3) — Financial reports, HR records, customer data, business strategies.\n                     Encryption: transit + at-rest. Logging: required. Retention: 1 year.\n                     Masking required when exposed externally.\n  RESTRICTED (4)   — PII, credentials, API keys, authentication tokens, audit trails.\n                     Encryption: transit + at-rest + field-level. Logging: required + tamper detection.\n                     Retention: 6 months. Masking: always required.\n\n - SECURITY_LEVEL_PUBLIC: Open data, no access restrictions. Marketing, public docs.\n - SECURITY_LEVEL_INTERNAL: Internal use only. Team wikis, non-sensitive business data.\n - SECURITY_LEVEL_CONFIDENTIAL: Business-sensitive, need-to-know basis. Financial, HR, customer data.\n - SECURITY_LEVEL_RESTRICTED: Highest sensitivity. PII, credentials, tokens, audit trails."
+    },
+    "v1SortOrder": {
+      "type": "string",
+      "enum": [
+        "SORT_ORDER_UNSPECIFIED",
+        "SORT_ORDER_ASC",
+        "SORT_ORDER_DESC"
+      ],
+      "default": "SORT_ORDER_UNSPECIFIED",
+      "description": "SortOrder specifies the sort direction."
+    },
+    "v1StartMeetingResponse": {
+      "type": "object",
+      "properties": {
+        "meeting": {
+          "$ref": "#/definitions/v1Meeting"
+        }
+      }
+    },
+    "v1UpdateMeetingResponse": {
+      "type": "object",
+      "properties": {
+        "meeting": {
+          "$ref": "#/definitions/v1Meeting"
+        }
+      }
+    }
+  }
+}
