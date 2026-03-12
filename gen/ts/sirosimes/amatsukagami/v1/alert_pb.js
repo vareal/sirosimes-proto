@@ -10,6 +10,7 @@ import { PaginationRequest, PaginationResponse } from "../../common/v1/paginatio
 
 /**
  * AlertSeverity はアラートの深刻度を分類する。
+ * notification.proto の通知チャネル選択に直結する。
  *
  * @generated from enum sirosimes.amatsukagami.v1.AlertSeverity
  */
@@ -92,6 +93,7 @@ export const AlertAction = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "workflow_params", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 4, name: "escalation_delay", kind: "message", T: Duration },
     { no: 5, name: "escalation_channel_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "repeat_interval", kind: "message", T: Duration },
   ],
 );
 
@@ -114,6 +116,8 @@ export const AlertRule = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 10, name: "cxo_routing", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 11, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 12, name: "escalation_policy_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 13, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ],
 );
 
@@ -140,6 +144,8 @@ export const AlertInstance = /*@__PURE__*/ proto3.makeMessageType(
     { no: 13, name: "trigger_value", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
     { no: 14, name: "threshold_value", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
     { no: 15, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 16, name: "summary", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "last_notified_at", kind: "message", T: Timestamp },
   ],
 );
 
@@ -222,6 +228,8 @@ export const CreateAlertRuleRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 7, name: "pending_duration", kind: "message", T: Duration },
     { no: 8, name: "cxo_routing", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 9, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 10, name: "escalation_policy_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ],
 );
 
@@ -252,6 +260,8 @@ export const UpdateAlertRuleRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 10, name: "cxo_routing", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 11, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 12, name: "escalation_policy_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 13, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ],
 );
 

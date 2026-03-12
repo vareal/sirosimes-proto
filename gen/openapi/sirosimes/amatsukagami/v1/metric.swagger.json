@@ -102,9 +102,12 @@
         "AGGREGATION_METHOD_P50",
         "AGGREGATION_METHOD_P95",
         "AGGREGATION_METHOD_P99",
-        "AGGREGATION_METHOD_LAST"
+        "AGGREGATION_METHOD_LAST",
+        "AGGREGATION_METHOD_RATE",
+        "AGGREGATION_METHOD_STDDEV"
       ],
       "default": "AGGREGATION_METHOD_UNSPECIFIED",
+      "description": "- AGGREGATION_METHOD_SUM: 合計。\n - AGGREGATION_METHOD_AVG: 平均。\n - AGGREGATION_METHOD_MIN: 最小値。\n - AGGREGATION_METHOD_MAX: 最大値。\n - AGGREGATION_METHOD_COUNT: 件数。\n - AGGREGATION_METHOD_P50: 50パーセンタイル（中央値）。\n - AGGREGATION_METHOD_P95: 95パーセンタイル。\n - AGGREGATION_METHOD_P99: 99パーセンタイル。\n - AGGREGATION_METHOD_LAST: 最新値。\n - AGGREGATION_METHOD_RATE: レート計算（単位時間あたりの変化率）。\n - AGGREGATION_METHOD_STDDEV: 標準偏差。",
       "title": "AggregationMethod はメトリクス集約方法を定義する。"
     },
     "v1CollectorSource": {
@@ -121,7 +124,7 @@
         "COLLECTOR_SOURCE_MANUAL"
       ],
       "default": "COLLECTOR_SOURCE_UNSPECIFIED",
-      "description": "- COLLECTOR_SOURCE_OTLP: OpenTelemetry Protocol（gRPC/HTTP）。\n - COLLECTOR_SOURCE_REDIS_STREAM: Redis Streams Consumer。\n - COLLECTOR_SOURCE_SECURITY_EVENT: SecurityEvent（sentinel.proto連携）。\n - COLLECTOR_SOURCE_PROMETHEUS: Prometheus scrape endpoint。\n - COLLECTOR_SOURCE_TSUKASA_API: 司API（社員・タスク・プロジェクトデータ）。\n - COLLECTOR_SOURCE_HATAORI_EVENT: 機織WF実行データ。\n - COLLECTOR_SOURCE_WEBHOOK: 外部Webhook。\n - COLLECTOR_SOURCE_MANUAL: 手動入力。",
+      "description": "- COLLECTOR_SOURCE_OTLP: OpenTelemetry Protocol（gRPC/HTTP）。\n - COLLECTOR_SOURCE_REDIS_STREAM: Redis Streams Consumer。\n - COLLECTOR_SOURCE_SECURITY_EVENT: SecurityEvent（sentinel.proto連携）。\ncommon/v1/sentinel.proto の SecurityEvent を受信し、\nセキュリティ監視領域のメトリクスとして変換・格納する。\n - COLLECTOR_SOURCE_PROMETHEUS: Prometheus scrape endpoint。\n - COLLECTOR_SOURCE_TSUKASA_API: 司API（社員・タスク・プロジェクトデータ）。\n - COLLECTOR_SOURCE_HATAORI_EVENT: 機織WF実行データ。\n - COLLECTOR_SOURCE_WEBHOOK: 外部Webhook。\n - COLLECTOR_SOURCE_MANUAL: 手動入力。",
       "title": "CollectorSource はメトリクス収集ソースを分類する。"
     },
     "v1CreateMetricDefinitionResponse": {
@@ -200,7 +203,7 @@
           "title": "検証時刻。"
         }
       },
-      "title": "IntegrityRecord はメトリクス改ざん検知用ハッシュチェーンレコード。"
+      "title": "IntegrityRecord はメトリクス改ざん検知用ハッシュチェーンレコード。\nMAS（監視・監査・監督）フレームワークに基づく、\nメトリクスデータの完全性を保証するためのチェーン構造。"
     },
     "v1ListMetricDefinitionsResponse": {
       "type": "object",
@@ -222,7 +225,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "title": "メトリクス名（例: \"infra.cpu.usage\", \"business.revenue.monthly\"）。"
+          "title": "メトリクス名（例: \"infra.cpu.usage\", \"business.revenue.monthly\"）。\n命名規則: \"{domain}.{category}.{name}\" のドット区切り。"
         },
         "type": {
           "$ref": "#/definitions/v1MetricType",
@@ -240,7 +243,7 @@
         "value": {
           "type": "number",
           "format": "double",
-          "title": "数値（counter/gauge/histogram/summary）。"
+          "title": "数値（counter/gauge/histogram/summary/rate）。"
         },
         "boolValue": {
           "type": "boolean",
@@ -264,6 +267,22 @@
         "unit": {
           "type": "string",
           "title": "単位（例: \"percent\", \"bytes\", \"requests/s\", \"yen\"）。"
+        },
+        "histogramBuckets": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "ヒストグラムバケット境界値（METRIC_TYPE_HISTOGRAM時）。\n昇順で指定。例: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0]"
+        },
+        "histogramCounts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": "ヒストグラムバケットカウント（histogram_bucketsと同数+1）。\n最後の要素は+Infバケットのカウント。"
         }
       },
       "title": "MetricDataPoint は単一のメトリクスデータポイントを表す。"
@@ -340,10 +359,11 @@
         "METRIC_TYPE_GAUGE",
         "METRIC_TYPE_HISTOGRAM",
         "METRIC_TYPE_SUMMARY",
-        "METRIC_TYPE_BOOLEAN"
+        "METRIC_TYPE_BOOLEAN",
+        "METRIC_TYPE_RATE"
       ],
       "default": "METRIC_TYPE_UNSPECIFIED",
-      "description": "- METRIC_TYPE_COUNTER: カウンター（単調増加値）。\n - METRIC_TYPE_GAUGE: ゲージ（瞬時値）。\n - METRIC_TYPE_HISTOGRAM: ヒストグラム（分布）。\n - METRIC_TYPE_SUMMARY: サマリー（パーセンタイル）。\n - METRIC_TYPE_BOOLEAN: ブーリアン（正常/異常）。",
+      "description": "- METRIC_TYPE_COUNTER: カウンター（単調増加値）。例: リクエスト総数、エラー総数。\n - METRIC_TYPE_GAUGE: ゲージ（瞬時値）。例: CPU使用率、メモリ残量。\n - METRIC_TYPE_HISTOGRAM: ヒストグラム（分布）。例: レイテンシ分布。histogram_buckets に境界値を格納。\n - METRIC_TYPE_SUMMARY: サマリー（パーセンタイル）。例: P50/P95/P99レスポンスタイム。\n - METRIC_TYPE_BOOLEAN: ブーリアン（正常/異常）。例: サービスUp/Down。\n - METRIC_TYPE_RATE: レート（単位時間あたりの変化量）。例: requests/s, events/min。",
       "title": "MetricType はメトリクスの種別を分類する。"
     },
     "v1MonitoringDomain": {
@@ -360,8 +380,8 @@
         "MONITORING_DOMAIN_HUMAN_EMPLOYEE"
       ],
       "default": "MONITORING_DOMAIN_UNSPECIFIED",
-      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。",
-      "title": "MonitoringDomain は監視領域を分類する。"
+      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\ncommon/v1/sentinel.proto SecurityEvent と連携。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。\nhuman_monitor.proto の詳細データを集約。",
+      "title": "MonitoringDomain は監視領域を分類する。\n8領域はSirosimesアーキテクチャ設計書で定義された統合監視領域に準拠。"
     },
     "v1PaginationRequest": {
       "type": "object",

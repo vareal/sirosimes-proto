@@ -61,6 +61,10 @@ export const NotificationChannel = /*@__PURE__*/ proto3.makeMessageType(
     { no: 6, name: "min_severity", kind: "enum", T: proto3.getEnumType(AlertSeverity) },
     { no: 7, name: "cxo_roles", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 8, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "template_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "quiet_hours_start", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "quiet_hours_end", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "quiet_hours_timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -80,6 +84,34 @@ export const NotificationChannelConfig = /*@__PURE__*/ proto3.makeMessageType(
     { no: 6, name: "voice_template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "video_auto_start", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 8, name: "twilio_account_ref", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "max_retries", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 10, name: "retry_interval_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+
+/**
+ * NotificationTemplate は通知メッセージテンプレート。
+ * チャネル種別ごとに異なるフォーマットのテンプレートを管理する。
+ * Go template 形式のプレースホルダ使用:
+ *   {{.AlertName}} — アラートルール名
+ *   {{.Severity}} — 深刻度
+ *   {{.Value}} — トリガー値
+ *   {{.Threshold}} — 閾値
+ *   {{.Domain}} — 監視領域名
+ *   {{.Summary}} — サマリーテキスト
+ *   {{.Labels}} — ラベルmap
+ *
+ * @generated from message sirosimes.amatsukagami.v1.NotificationTemplate
+ */
+export const NotificationTemplate = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.NotificationTemplate",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "channel_type", kind: "enum", T: proto3.getEnumType(NotificationChannelType) },
+    { no: 4, name: "subject_template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "body_template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -192,6 +224,10 @@ export const CreateNotificationChannelRequest = /*@__PURE__*/ proto3.makeMessage
     { no: 4, name: "min_severity", kind: "enum", T: proto3.getEnumType(AlertSeverity) },
     { no: 5, name: "cxo_roles", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 6, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "template_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "quiet_hours_start", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "quiet_hours_end", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "quiet_hours_timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -218,6 +254,10 @@ export const UpdateNotificationChannelRequest = /*@__PURE__*/ proto3.makeMessage
     { no: 5, name: "min_severity", kind: "enum", T: proto3.getEnumType(AlertSeverity) },
     { no: 6, name: "cxo_roles", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 7, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "template_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "quiet_hours_start", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "quiet_hours_end", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "quiet_hours_timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

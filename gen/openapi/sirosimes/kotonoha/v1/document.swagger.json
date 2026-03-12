@@ -45,7 +45,53 @@
         }
       }
     },
+    "sirosimeskotonohav1DeleteDocumentResponse": {
+      "type": "object"
+    },
     "sirosimeskotonohav1GetDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1Document"
+        }
+      }
+    },
+    "sirosimeskotonohav1IngestDocumentRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1DocumentType"
+        },
+        "content": {
+          "type": "string"
+        },
+        "sourceUrl": {
+          "type": "string"
+        },
+        "sourceService": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "customMetadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sirosimeskotonohav1IngestDocumentResponse": {
       "type": "object",
       "properties": {
         "document": {
@@ -87,9 +133,6 @@
           "format": "int32"
         }
       }
-    },
-    "v1DeleteDocumentResponse": {
-      "type": "object"
     },
     "v1Document": {
       "type": "object",
@@ -187,49 +230,6 @@
         },
         "pagination": {
           "$ref": "#/definitions/v1PaginationResponse"
-        }
-      }
-    },
-    "v1IngestDocumentRequest": {
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/v1DocumentType"
-        },
-        "content": {
-          "type": "string"
-        },
-        "sourceUrl": {
-          "type": "string"
-        },
-        "sourceService": {
-          "type": "string"
-        },
-        "language": {
-          "type": "string"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "customMetadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "v1IngestDocumentResponse": {
-      "type": "object",
-      "properties": {
-        "document": {
-          "$ref": "#/definitions/v1Document"
         }
       }
     },

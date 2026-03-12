@@ -20,39 +20,67 @@ export declare enum AttendanceStatus {
   UNSPECIFIED = 0,
 
   /**
+   * 勤務中。
+   *
    * @generated from enum value: ATTENDANCE_STATUS_WORKING = 1;
    */
   WORKING = 1,
 
   /**
+   * 休憩中。
+   *
    * @generated from enum value: ATTENDANCE_STATUS_BREAK = 2;
    */
   BREAK = 2,
 
   /**
+   * 会議中。
+   *
    * @generated from enum value: ATTENDANCE_STATUS_MEETING = 3;
    */
   MEETING = 3,
 
   /**
+   * 欠勤。
+   *
    * @generated from enum value: ATTENDANCE_STATUS_ABSENT = 4;
    */
   ABSENT = 4,
 
   /**
+   * 有給休暇。
+   *
    * @generated from enum value: ATTENDANCE_STATUS_LEAVE = 5;
    */
   LEAVE = 5,
 
   /**
+   * 祝日・公休。
+   *
    * @generated from enum value: ATTENDANCE_STATUS_HOLIDAY = 6;
    */
   HOLIDAY = 6,
 
   /**
+   * 残業中。
+   *
    * @generated from enum value: ATTENDANCE_STATUS_OVERTIME = 7;
    */
   OVERTIME = 7,
+
+  /**
+   * リモートワーク中。
+   *
+   * @generated from enum value: ATTENDANCE_STATUS_REMOTE = 8;
+   */
+  REMOTE = 8,
+
+  /**
+   * 出張中。
+   *
+   * @generated from enum value: ATTENDANCE_STATUS_BUSINESS_TRIP = 9;
+   */
+  BUSINESS_TRIP = 9,
 }
 
 /**
@@ -203,29 +231,100 @@ export declare enum CorrectiveActionStatus {
   UNSPECIFIED = 0,
 
   /**
+   * 提案済み（AI/システムが提案）。
+   *
    * @generated from enum value: CORRECTIVE_ACTION_STATUS_PROPOSED = 1;
    */
   PROPOSED = 1,
 
   /**
+   * 承認済み（HITL: 人間が承認）。
+   *
    * @generated from enum value: CORRECTIVE_ACTION_STATUS_APPROVED = 2;
    */
   APPROVED = 2,
 
   /**
+   * 実行中。
+   *
    * @generated from enum value: CORRECTIVE_ACTION_STATUS_IN_PROGRESS = 3;
    */
   IN_PROGRESS = 3,
 
   /**
+   * 完了。
+   *
    * @generated from enum value: CORRECTIVE_ACTION_STATUS_COMPLETED = 4;
    */
   COMPLETED = 4,
 
   /**
+   * 取消。
+   *
    * @generated from enum value: CORRECTIVE_ACTION_STATUS_CANCELLED = 5;
    */
   CANCELLED = 5,
+}
+
+/**
+ * ExpenseCategory は経費カテゴリ。
+ *
+ * @generated from enum sirosimes.amatsukagami.v1.ExpenseCategory
+ */
+export declare enum ExpenseCategory {
+  /**
+   * @generated from enum value: EXPENSE_CATEGORY_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * 交通費。
+   *
+   * @generated from enum value: EXPENSE_CATEGORY_TRANSPORTATION = 1;
+   */
+  TRANSPORTATION = 1,
+
+  /**
+   * 宿泊費。
+   *
+   * @generated from enum value: EXPENSE_CATEGORY_ACCOMMODATION = 2;
+   */
+  ACCOMMODATION = 2,
+
+  /**
+   * 接待交際費。
+   *
+   * @generated from enum value: EXPENSE_CATEGORY_ENTERTAINMENT = 3;
+   */
+  ENTERTAINMENT = 3,
+
+  /**
+   * 備品・消耗品。
+   *
+   * @generated from enum value: EXPENSE_CATEGORY_SUPPLIES = 4;
+   */
+  SUPPLIES = 4,
+
+  /**
+   * 通信費。
+   *
+   * @generated from enum value: EXPENSE_CATEGORY_COMMUNICATION = 5;
+   */
+  COMMUNICATION = 5,
+
+  /**
+   * 研修・教育費。
+   *
+   * @generated from enum value: EXPENSE_CATEGORY_TRAINING = 6;
+   */
+  TRAINING = 6,
+
+  /**
+   * その他。
+   *
+   * @generated from enum value: EXPENSE_CATEGORY_OTHER = 7;
+   */
+  OTHER = 7,
 }
 
 /**
@@ -380,6 +479,190 @@ export declare class DeviceActivity extends Message<DeviceActivity> {
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeviceActivity;
 
   static equals(a: DeviceActivity | PlainMessage<DeviceActivity> | undefined, b: DeviceActivity | PlainMessage<DeviceActivity> | undefined): boolean;
+}
+
+/**
+ * AccessLogRecord はシステムアクセスログ（監視カテゴリ4）。
+ * 社員のシステム・リソースへのアクセスを記録する。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.AccessLogRecord
+ */
+export declare class AccessLogRecord extends Message<AccessLogRecord> {
+  /**
+   * 社員ID。
+   *
+   * @generated from field: string employee_id = 1;
+   */
+  employeeId: string;
+
+  /**
+   * アクセス対象リソース種別（file/api/database/admin_panel 等）。
+   *
+   * @generated from field: string resource_type = 2;
+   */
+  resourceType: string;
+
+  /**
+   * アクセス対象リソースID/パス。
+   *
+   * @generated from field: string resource_id = 3;
+   */
+  resourceId: string;
+
+  /**
+   * アクション（read/write/delete/export）。
+   *
+   * @generated from field: string action = 4;
+   */
+  action: string;
+
+  /**
+   * タイムスタンプ。
+   *
+   * @generated from field: google.protobuf.Timestamp timestamp = 5;
+   */
+  timestamp?: Timestamp;
+
+  /**
+   * アクセス元IPアドレス。
+   *
+   * @generated from field: string source_ip = 6;
+   */
+  sourceIp: string;
+
+  /**
+   * ユーザーエージェント。
+   *
+   * @generated from field: string user_agent = 7;
+   */
+  userAgent: string;
+
+  /**
+   * 成功/失敗。
+   *
+   * @generated from field: bool success = 8;
+   */
+  success: boolean;
+
+  /**
+   * 失敗理由（success=false時）。
+   *
+   * @generated from field: string failure_reason = 9;
+   */
+  failureReason: string;
+
+  /**
+   * リスクスコア（0.0-1.0、異常アクセスパターン検知時に高値）。
+   *
+   * @generated from field: float risk_score = 10;
+   */
+  riskScore: number;
+
+  constructor(data?: PartialMessage<AccessLogRecord>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.AccessLogRecord";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AccessLogRecord;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AccessLogRecord;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AccessLogRecord;
+
+  static equals(a: AccessLogRecord | PlainMessage<AccessLogRecord> | undefined, b: AccessLogRecord | PlainMessage<AccessLogRecord> | undefined): boolean;
+}
+
+/**
+ * ExpenseRecord は経費利用記録（監視カテゴリ8）。
+ * 社員の経費申請・利用パターンを記録し、異常検知に活用する。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.ExpenseRecord
+ */
+export declare class ExpenseRecord extends Message<ExpenseRecord> {
+  /**
+   * 社員ID。
+   *
+   * @generated from field: string employee_id = 1;
+   */
+  employeeId: string;
+
+  /**
+   * 経費カテゴリ。
+   *
+   * @generated from field: sirosimes.amatsukagami.v1.ExpenseCategory category = 2;
+   */
+  category: ExpenseCategory;
+
+  /**
+   * 金額（円）。
+   *
+   * @generated from field: double amount = 3;
+   */
+  amount: number;
+
+  /**
+   * 通貨コード（ISO 4217。例: "JPY"）。
+   *
+   * @generated from field: string currency = 4;
+   */
+  currency: string;
+
+  /**
+   * 申請日。
+   *
+   * @generated from field: google.protobuf.Timestamp date = 5;
+   */
+  date?: Timestamp;
+
+  /**
+   * 説明。
+   *
+   * @generated from field: string description = 6;
+   */
+  description: string;
+
+  /**
+   * 承認ステータス（pending/approved/rejected）。
+   *
+   * @generated from field: string approval_status = 7;
+   */
+  approvalStatus: string;
+
+  /**
+   * 承認者。
+   *
+   * @generated from field: string approved_by = 8;
+   */
+  approvedBy: string;
+
+  /**
+   * 領収書添付有無。
+   *
+   * @generated from field: bool receipt_attached = 9;
+   */
+  receiptAttached: boolean;
+
+  /**
+   * リスクスコア（0.0-1.0、異常パターン検知時に高値）。
+   *
+   * @generated from field: float risk_score = 10;
+   */
+  riskScore: number;
+
+  constructor(data?: PartialMessage<ExpenseRecord>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.ExpenseRecord";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExpenseRecord;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExpenseRecord;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExpenseRecord;
+
+  static equals(a: ExpenseRecord | PlainMessage<ExpenseRecord> | undefined, b: ExpenseRecord | PlainMessage<ExpenseRecord> | undefined): boolean;
 }
 
 /**
@@ -581,6 +864,82 @@ export declare class EmployeePerformance extends Message<EmployeePerformance> {
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EmployeePerformance;
 
   static equals(a: EmployeePerformance | PlainMessage<EmployeePerformance> | undefined, b: EmployeePerformance | PlainMessage<EmployeePerformance> | undefined): boolean;
+}
+
+/**
+ * RecognitionRecord は表彰記録（監視カテゴリ10）。
+ * 優秀な業績・行動に対する表彰を記録する。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.RecognitionRecord
+ */
+export declare class RecognitionRecord extends Message<RecognitionRecord> {
+  /**
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   */
+  metadata?: ResourceMetadata;
+
+  /**
+   * 表彰対象社員ID。
+   *
+   * @generated from field: string employee_id = 2;
+   */
+  employeeId: string;
+
+  /**
+   * 表彰タイトル。
+   *
+   * @generated from field: string title = 3;
+   */
+  title: string;
+
+  /**
+   * 表彰理由。
+   *
+   * @generated from field: string reason = 4;
+   */
+  reason: string;
+
+  /**
+   * 表彰者（推薦者）。
+   *
+   * @generated from field: string awarded_by = 5;
+   */
+  awardedBy: string;
+
+  /**
+   * 表彰日。
+   *
+   * @generated from field: google.protobuf.Timestamp awarded_at = 6;
+   */
+  awardedAt?: Timestamp;
+
+  /**
+   * 表彰カテゴリ（例: "月間MVP", "改善提案", "チーム貢献"）。
+   *
+   * @generated from field: string category = 7;
+   */
+  category: string;
+
+  /**
+   * 関連KPI改善値（定量的評価がある場合）。
+   *
+   * @generated from field: map<string, double> metrics = 8;
+   */
+  metrics: { [key: string]: number };
+
+  constructor(data?: PartialMessage<RecognitionRecord>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.RecognitionRecord";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RecognitionRecord;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RecognitionRecord;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RecognitionRecord;
+
+  static equals(a: RecognitionRecord | PlainMessage<RecognitionRecord> | undefined, b: RecognitionRecord | PlainMessage<RecognitionRecord> | undefined): boolean;
 }
 
 /**
@@ -912,6 +1271,269 @@ export declare class QueryDeviceActivityResponse extends Message<QueryDeviceActi
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): QueryDeviceActivityResponse;
 
   static equals(a: QueryDeviceActivityResponse | PlainMessage<QueryDeviceActivityResponse> | undefined, b: QueryDeviceActivityResponse | PlainMessage<QueryDeviceActivityResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestAccessLogsRequest
+ */
+export declare class IngestAccessLogsRequest extends Message<IngestAccessLogsRequest> {
+  /**
+   * @generated from field: repeated sirosimes.amatsukagami.v1.AccessLogRecord records = 1;
+   */
+  records: AccessLogRecord[];
+
+  constructor(data?: PartialMessage<IngestAccessLogsRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.IngestAccessLogsRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IngestAccessLogsRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IngestAccessLogsRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IngestAccessLogsRequest;
+
+  static equals(a: IngestAccessLogsRequest | PlainMessage<IngestAccessLogsRequest> | undefined, b: IngestAccessLogsRequest | PlainMessage<IngestAccessLogsRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestAccessLogsResponse
+ */
+export declare class IngestAccessLogsResponse extends Message<IngestAccessLogsResponse> {
+  /**
+   * @generated from field: int32 accepted_count = 1;
+   */
+  acceptedCount: number;
+
+  constructor(data?: PartialMessage<IngestAccessLogsResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.IngestAccessLogsResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IngestAccessLogsResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IngestAccessLogsResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IngestAccessLogsResponse;
+
+  static equals(a: IngestAccessLogsResponse | PlainMessage<IngestAccessLogsResponse> | undefined, b: IngestAccessLogsResponse | PlainMessage<IngestAccessLogsResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryAccessLogsRequest
+ */
+export declare class QueryAccessLogsRequest extends Message<QueryAccessLogsRequest> {
+  /**
+   * @generated from field: string employee_id = 1;
+   */
+  employeeId: string;
+
+  /**
+   * @generated from field: string resource_type = 2;
+   */
+  resourceType: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_time = 3;
+   */
+  startTime?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp end_time = 4;
+   */
+  endTime?: Timestamp;
+
+  /**
+   * 失敗のみフィルタ。
+   *
+   * @generated from field: bool failures_only = 5;
+   */
+  failuresOnly: boolean;
+
+  /**
+   * 最小リスクスコアフィルタ。
+   *
+   * @generated from field: float min_risk_score = 6;
+   */
+  minRiskScore: number;
+
+  /**
+   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 7;
+   */
+  pagination?: PaginationRequest;
+
+  constructor(data?: PartialMessage<QueryAccessLogsRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.QueryAccessLogsRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): QueryAccessLogsRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): QueryAccessLogsRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): QueryAccessLogsRequest;
+
+  static equals(a: QueryAccessLogsRequest | PlainMessage<QueryAccessLogsRequest> | undefined, b: QueryAccessLogsRequest | PlainMessage<QueryAccessLogsRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryAccessLogsResponse
+ */
+export declare class QueryAccessLogsResponse extends Message<QueryAccessLogsResponse> {
+  /**
+   * @generated from field: repeated sirosimes.amatsukagami.v1.AccessLogRecord records = 1;
+   */
+  records: AccessLogRecord[];
+
+  /**
+   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   */
+  pagination?: PaginationResponse;
+
+  constructor(data?: PartialMessage<QueryAccessLogsResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.QueryAccessLogsResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): QueryAccessLogsResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): QueryAccessLogsResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): QueryAccessLogsResponse;
+
+  static equals(a: QueryAccessLogsResponse | PlainMessage<QueryAccessLogsResponse> | undefined, b: QueryAccessLogsResponse | PlainMessage<QueryAccessLogsResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestExpensesRequest
+ */
+export declare class IngestExpensesRequest extends Message<IngestExpensesRequest> {
+  /**
+   * @generated from field: repeated sirosimes.amatsukagami.v1.ExpenseRecord records = 1;
+   */
+  records: ExpenseRecord[];
+
+  constructor(data?: PartialMessage<IngestExpensesRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.IngestExpensesRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IngestExpensesRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IngestExpensesRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IngestExpensesRequest;
+
+  static equals(a: IngestExpensesRequest | PlainMessage<IngestExpensesRequest> | undefined, b: IngestExpensesRequest | PlainMessage<IngestExpensesRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestExpensesResponse
+ */
+export declare class IngestExpensesResponse extends Message<IngestExpensesResponse> {
+  /**
+   * @generated from field: int32 accepted_count = 1;
+   */
+  acceptedCount: number;
+
+  constructor(data?: PartialMessage<IngestExpensesResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.IngestExpensesResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IngestExpensesResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IngestExpensesResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IngestExpensesResponse;
+
+  static equals(a: IngestExpensesResponse | PlainMessage<IngestExpensesResponse> | undefined, b: IngestExpensesResponse | PlainMessage<IngestExpensesResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryExpensesRequest
+ */
+export declare class QueryExpensesRequest extends Message<QueryExpensesRequest> {
+  /**
+   * @generated from field: string employee_id = 1;
+   */
+  employeeId: string;
+
+  /**
+   * @generated from field: sirosimes.amatsukagami.v1.ExpenseCategory category = 2;
+   */
+  category: ExpenseCategory;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_date = 3;
+   */
+  startDate?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp end_date = 4;
+   */
+  endDate?: Timestamp;
+
+  /**
+   * 最小リスクスコアフィルタ。
+   *
+   * @generated from field: float min_risk_score = 5;
+   */
+  minRiskScore: number;
+
+  /**
+   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 6;
+   */
+  pagination?: PaginationRequest;
+
+  constructor(data?: PartialMessage<QueryExpensesRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.QueryExpensesRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): QueryExpensesRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): QueryExpensesRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): QueryExpensesRequest;
+
+  static equals(a: QueryExpensesRequest | PlainMessage<QueryExpensesRequest> | undefined, b: QueryExpensesRequest | PlainMessage<QueryExpensesRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryExpensesResponse
+ */
+export declare class QueryExpensesResponse extends Message<QueryExpensesResponse> {
+  /**
+   * @generated from field: repeated sirosimes.amatsukagami.v1.ExpenseRecord records = 1;
+   */
+  records: ExpenseRecord[];
+
+  /**
+   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   */
+  pagination?: PaginationResponse;
+
+  constructor(data?: PartialMessage<QueryExpensesResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.QueryExpensesResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): QueryExpensesResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): QueryExpensesResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): QueryExpensesResponse;
+
+  static equals(a: QueryExpensesResponse | PlainMessage<QueryExpensesResponse> | undefined, b: QueryExpensesResponse | PlainMessage<QueryExpensesResponse> | undefined): boolean;
 }
 
 /**
@@ -1459,5 +2081,151 @@ export declare class CompleteCorrectiveActionResponse extends Message<CompleteCo
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CompleteCorrectiveActionResponse;
 
   static equals(a: CompleteCorrectiveActionResponse | PlainMessage<CompleteCorrectiveActionResponse> | undefined, b: CompleteCorrectiveActionResponse | PlainMessage<CompleteCorrectiveActionResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.CreateRecognitionRequest
+ */
+export declare class CreateRecognitionRequest extends Message<CreateRecognitionRequest> {
+  /**
+   * @generated from field: string employee_id = 1;
+   */
+  employeeId: string;
+
+  /**
+   * @generated from field: string title = 2;
+   */
+  title: string;
+
+  /**
+   * @generated from field: string reason = 3;
+   */
+  reason: string;
+
+  /**
+   * @generated from field: string awarded_by = 4;
+   */
+  awardedBy: string;
+
+  /**
+   * @generated from field: string category = 5;
+   */
+  category: string;
+
+  /**
+   * @generated from field: map<string, double> metrics = 6;
+   */
+  metrics: { [key: string]: number };
+
+  constructor(data?: PartialMessage<CreateRecognitionRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.CreateRecognitionRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateRecognitionRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateRecognitionRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateRecognitionRequest;
+
+  static equals(a: CreateRecognitionRequest | PlainMessage<CreateRecognitionRequest> | undefined, b: CreateRecognitionRequest | PlainMessage<CreateRecognitionRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.CreateRecognitionResponse
+ */
+export declare class CreateRecognitionResponse extends Message<CreateRecognitionResponse> {
+  /**
+   * @generated from field: sirosimes.amatsukagami.v1.RecognitionRecord recognition = 1;
+   */
+  recognition?: RecognitionRecord;
+
+  constructor(data?: PartialMessage<CreateRecognitionResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.CreateRecognitionResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateRecognitionResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateRecognitionResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateRecognitionResponse;
+
+  static equals(a: CreateRecognitionResponse | PlainMessage<CreateRecognitionResponse> | undefined, b: CreateRecognitionResponse | PlainMessage<CreateRecognitionResponse> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.ListRecognitionsRequest
+ */
+export declare class ListRecognitionsRequest extends Message<ListRecognitionsRequest> {
+  /**
+   * @generated from field: sirosimes.common.v1.PaginationRequest pagination = 1;
+   */
+  pagination?: PaginationRequest;
+
+  /**
+   * @generated from field: string employee_id = 2;
+   */
+  employeeId: string;
+
+  /**
+   * @generated from field: string category = 3;
+   */
+  category: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_date = 4;
+   */
+  startDate?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp end_date = 5;
+   */
+  endDate?: Timestamp;
+
+  constructor(data?: PartialMessage<ListRecognitionsRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.ListRecognitionsRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListRecognitionsRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListRecognitionsRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListRecognitionsRequest;
+
+  static equals(a: ListRecognitionsRequest | PlainMessage<ListRecognitionsRequest> | undefined, b: ListRecognitionsRequest | PlainMessage<ListRecognitionsRequest> | undefined): boolean;
+}
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.ListRecognitionsResponse
+ */
+export declare class ListRecognitionsResponse extends Message<ListRecognitionsResponse> {
+  /**
+   * @generated from field: repeated sirosimes.amatsukagami.v1.RecognitionRecord recognitions = 1;
+   */
+  recognitions: RecognitionRecord[];
+
+  /**
+   * @generated from field: sirosimes.common.v1.PaginationResponse pagination = 2;
+   */
+  pagination?: PaginationResponse;
+
+  constructor(data?: PartialMessage<ListRecognitionsResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.ListRecognitionsResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListRecognitionsResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListRecognitionsResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListRecognitionsResponse;
+
+  static equals(a: ListRecognitionsResponse | PlainMessage<ListRecognitionsResponse> | undefined, b: ListRecognitionsResponse | PlainMessage<ListRecognitionsResponse> | undefined): boolean;
 }
 

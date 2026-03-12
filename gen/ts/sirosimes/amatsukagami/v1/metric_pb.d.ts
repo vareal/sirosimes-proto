@@ -20,43 +20,51 @@ export declare enum MetricType {
   UNSPECIFIED = 0,
 
   /**
-   * カウンター（単調増加値）。
+   * カウンター（単調増加値）。例: リクエスト総数、エラー総数。
    *
    * @generated from enum value: METRIC_TYPE_COUNTER = 1;
    */
   COUNTER = 1,
 
   /**
-   * ゲージ（瞬時値）。
+   * ゲージ（瞬時値）。例: CPU使用率、メモリ残量。
    *
    * @generated from enum value: METRIC_TYPE_GAUGE = 2;
    */
   GAUGE = 2,
 
   /**
-   * ヒストグラム（分布）。
+   * ヒストグラム（分布）。例: レイテンシ分布。histogram_buckets に境界値を格納。
    *
    * @generated from enum value: METRIC_TYPE_HISTOGRAM = 3;
    */
   HISTOGRAM = 3,
 
   /**
-   * サマリー（パーセンタイル）。
+   * サマリー（パーセンタイル）。例: P50/P95/P99レスポンスタイム。
    *
    * @generated from enum value: METRIC_TYPE_SUMMARY = 4;
    */
   SUMMARY = 4,
 
   /**
-   * ブーリアン（正常/異常）。
+   * ブーリアン（正常/異常）。例: サービスUp/Down。
    *
    * @generated from enum value: METRIC_TYPE_BOOLEAN = 5;
    */
   BOOLEAN = 5,
+
+  /**
+   * レート（単位時間あたりの変化量）。例: requests/s, events/min。
+   *
+   * @generated from enum value: METRIC_TYPE_RATE = 6;
+   */
+  RATE = 6,
 }
 
 /**
  * MonitoringDomain は監視領域を分類する。
+ * 8領域はSirosimesアーキテクチャ設計書で定義された統合監視領域に準拠。
  *
  * @generated from enum sirosimes.amatsukagami.v1.MonitoringDomain
  */
@@ -96,6 +104,7 @@ export declare enum MonitoringDomain {
 
   /**
    * 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。
+   * common/v1/sentinel.proto SecurityEvent と連携。
    *
    * @generated from enum value: MONITORING_DOMAIN_SECURITY = 5;
    */
@@ -117,6 +126,7 @@ export declare enum MonitoringDomain {
 
   /**
    * 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。
+   * human_monitor.proto の詳細データを集約。
    *
    * @generated from enum value: MONITORING_DOMAIN_HUMAN_EMPLOYEE = 8;
    */
@@ -135,49 +145,81 @@ export declare enum AggregationMethod {
   UNSPECIFIED = 0,
 
   /**
+   * 合計。
+   *
    * @generated from enum value: AGGREGATION_METHOD_SUM = 1;
    */
   SUM = 1,
 
   /**
+   * 平均。
+   *
    * @generated from enum value: AGGREGATION_METHOD_AVG = 2;
    */
   AVG = 2,
 
   /**
+   * 最小値。
+   *
    * @generated from enum value: AGGREGATION_METHOD_MIN = 3;
    */
   MIN = 3,
 
   /**
+   * 最大値。
+   *
    * @generated from enum value: AGGREGATION_METHOD_MAX = 4;
    */
   MAX = 4,
 
   /**
+   * 件数。
+   *
    * @generated from enum value: AGGREGATION_METHOD_COUNT = 5;
    */
   COUNT = 5,
 
   /**
+   * 50パーセンタイル（中央値）。
+   *
    * @generated from enum value: AGGREGATION_METHOD_P50 = 6;
    */
   P50 = 6,
 
   /**
+   * 95パーセンタイル。
+   *
    * @generated from enum value: AGGREGATION_METHOD_P95 = 7;
    */
   P95 = 7,
 
   /**
+   * 99パーセンタイル。
+   *
    * @generated from enum value: AGGREGATION_METHOD_P99 = 8;
    */
   P99 = 8,
 
   /**
+   * 最新値。
+   *
    * @generated from enum value: AGGREGATION_METHOD_LAST = 9;
    */
   LAST = 9,
+
+  /**
+   * レート計算（単位時間あたりの変化率）。
+   *
+   * @generated from enum value: AGGREGATION_METHOD_RATE = 10;
+   */
+  RATE = 10,
+
+  /**
+   * 標準偏差。
+   *
+   * @generated from enum value: AGGREGATION_METHOD_STDDEV = 11;
+   */
+  STDDEV = 11,
 }
 
 /**
@@ -207,6 +249,8 @@ export declare enum CollectorSource {
 
   /**
    * SecurityEvent（sentinel.proto連携）。
+   * common/v1/sentinel.proto の SecurityEvent を受信し、
+   * セキュリティ監視領域のメトリクスとして変換・格納する。
    *
    * @generated from enum value: COLLECTOR_SOURCE_SECURITY_EVENT = 3;
    */
@@ -256,6 +300,7 @@ export declare enum CollectorSource {
 export declare class MetricDataPoint extends Message<MetricDataPoint> {
   /**
    * メトリクス名（例: "infra.cpu.usage", "business.revenue.monthly"）。
+   * 命名規則: "{domain}.{category}.{name}" のドット区切り。
    *
    * @generated from field: string name = 1;
    */
@@ -283,7 +328,7 @@ export declare class MetricDataPoint extends Message<MetricDataPoint> {
   timestamp?: Timestamp;
 
   /**
-   * 数値（counter/gauge/histogram/summary）。
+   * 数値（counter/gauge/histogram/summary/rate）。
    *
    * @generated from field: double value = 5;
    */
@@ -323,6 +368,22 @@ export declare class MetricDataPoint extends Message<MetricDataPoint> {
    * @generated from field: string unit = 10;
    */
   unit: string;
+
+  /**
+   * ヒストグラムバケット境界値（METRIC_TYPE_HISTOGRAM時）。
+   * 昇順で指定。例: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0]
+   *
+   * @generated from field: repeated double histogram_buckets = 11;
+   */
+  histogramBuckets: number[];
+
+  /**
+   * ヒストグラムバケットカウント（histogram_bucketsと同数+1）。
+   * 最後の要素は+Infバケットのカウント。
+   *
+   * @generated from field: repeated int64 histogram_counts = 12;
+   */
+  histogramCounts: bigint[];
 
   constructor(data?: PartialMessage<MetricDataPoint>);
 
@@ -528,6 +589,8 @@ export declare class AggregatedMetric extends Message<AggregatedMetric> {
 
 /**
  * IntegrityRecord はメトリクス改ざん検知用ハッシュチェーンレコード。
+ * MAS（監視・監査・監督）フレームワークに基づく、
+ * メトリクスデータの完全性を保証するためのチェーン構造。
  *
  * @generated from message sirosimes.amatsukagami.v1.IntegrityRecord
  */

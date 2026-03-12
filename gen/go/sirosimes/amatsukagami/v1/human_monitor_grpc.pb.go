@@ -23,6 +23,10 @@ const (
 	HumanMonitorService_QueryAttendance_FullMethodName          = "/sirosimes.amatsukagami.v1.HumanMonitorService/QueryAttendance"
 	HumanMonitorService_IngestDeviceActivity_FullMethodName     = "/sirosimes.amatsukagami.v1.HumanMonitorService/IngestDeviceActivity"
 	HumanMonitorService_QueryDeviceActivity_FullMethodName      = "/sirosimes.amatsukagami.v1.HumanMonitorService/QueryDeviceActivity"
+	HumanMonitorService_IngestAccessLogs_FullMethodName         = "/sirosimes.amatsukagami.v1.HumanMonitorService/IngestAccessLogs"
+	HumanMonitorService_QueryAccessLogs_FullMethodName          = "/sirosimes.amatsukagami.v1.HumanMonitorService/QueryAccessLogs"
+	HumanMonitorService_IngestExpenses_FullMethodName           = "/sirosimes.amatsukagami.v1.HumanMonitorService/IngestExpenses"
+	HumanMonitorService_QueryExpenses_FullMethodName            = "/sirosimes.amatsukagami.v1.HumanMonitorService/QueryExpenses"
 	HumanMonitorService_ListAnomalies_FullMethodName            = "/sirosimes.amatsukagami.v1.HumanMonitorService/ListAnomalies"
 	HumanMonitorService_GetAnomaly_FullMethodName               = "/sirosimes.amatsukagami.v1.HumanMonitorService/GetAnomaly"
 	HumanMonitorService_AddressAnomaly_FullMethodName           = "/sirosimes.amatsukagami.v1.HumanMonitorService/AddressAnomaly"
@@ -32,6 +36,8 @@ const (
 	HumanMonitorService_ListCorrectiveActions_FullMethodName    = "/sirosimes.amatsukagami.v1.HumanMonitorService/ListCorrectiveActions"
 	HumanMonitorService_ApproveCorrectiveAction_FullMethodName  = "/sirosimes.amatsukagami.v1.HumanMonitorService/ApproveCorrectiveAction"
 	HumanMonitorService_CompleteCorrectiveAction_FullMethodName = "/sirosimes.amatsukagami.v1.HumanMonitorService/CompleteCorrectiveAction"
+	HumanMonitorService_CreateRecognition_FullMethodName        = "/sirosimes.amatsukagami.v1.HumanMonitorService/CreateRecognition"
+	HumanMonitorService_ListRecognitions_FullMethodName         = "/sirosimes.amatsukagami.v1.HumanMonitorService/ListRecognitions"
 )
 
 // HumanMonitorServiceClient is the client API for HumanMonitorService service.
@@ -48,6 +54,14 @@ type HumanMonitorServiceClient interface {
 	IngestDeviceActivity(ctx context.Context, in *IngestDeviceActivityRequest, opts ...grpc.CallOption) (*IngestDeviceActivityResponse, error)
 	// デバイスアクティビティを照会する。
 	QueryDeviceActivity(ctx context.Context, in *QueryDeviceActivityRequest, opts ...grpc.CallOption) (*QueryDeviceActivityResponse, error)
+	// アクセスログを送信する。
+	IngestAccessLogs(ctx context.Context, in *IngestAccessLogsRequest, opts ...grpc.CallOption) (*IngestAccessLogsResponse, error)
+	// アクセスログを照会する。
+	QueryAccessLogs(ctx context.Context, in *QueryAccessLogsRequest, opts ...grpc.CallOption) (*QueryAccessLogsResponse, error)
+	// 経費レコードを送信する。
+	IngestExpenses(ctx context.Context, in *IngestExpensesRequest, opts ...grpc.CallOption) (*IngestExpensesResponse, error)
+	// 経費レコードを照会する。
+	QueryExpenses(ctx context.Context, in *QueryExpensesRequest, opts ...grpc.CallOption) (*QueryExpensesResponse, error)
 	// 異常を一覧する。
 	ListAnomalies(ctx context.Context, in *ListAnomaliesRequest, opts ...grpc.CallOption) (*ListAnomaliesResponse, error)
 	// 異常を取得する。
@@ -66,6 +80,10 @@ type HumanMonitorServiceClient interface {
 	ApproveCorrectiveAction(ctx context.Context, in *ApproveCorrectiveActionRequest, opts ...grpc.CallOption) (*ApproveCorrectiveActionResponse, error)
 	// 是正措置を完了する。
 	CompleteCorrectiveAction(ctx context.Context, in *CompleteCorrectiveActionRequest, opts ...grpc.CallOption) (*CompleteCorrectiveActionResponse, error)
+	// 表彰を作成する。
+	CreateRecognition(ctx context.Context, in *CreateRecognitionRequest, opts ...grpc.CallOption) (*CreateRecognitionResponse, error)
+	// 表彰を一覧する。
+	ListRecognitions(ctx context.Context, in *ListRecognitionsRequest, opts ...grpc.CallOption) (*ListRecognitionsResponse, error)
 }
 
 type humanMonitorServiceClient struct {
@@ -110,6 +128,46 @@ func (c *humanMonitorServiceClient) QueryDeviceActivity(ctx context.Context, in 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(QueryDeviceActivityResponse)
 	err := c.cc.Invoke(ctx, HumanMonitorService_QueryDeviceActivity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *humanMonitorServiceClient) IngestAccessLogs(ctx context.Context, in *IngestAccessLogsRequest, opts ...grpc.CallOption) (*IngestAccessLogsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IngestAccessLogsResponse)
+	err := c.cc.Invoke(ctx, HumanMonitorService_IngestAccessLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *humanMonitorServiceClient) QueryAccessLogs(ctx context.Context, in *QueryAccessLogsRequest, opts ...grpc.CallOption) (*QueryAccessLogsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryAccessLogsResponse)
+	err := c.cc.Invoke(ctx, HumanMonitorService_QueryAccessLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *humanMonitorServiceClient) IngestExpenses(ctx context.Context, in *IngestExpensesRequest, opts ...grpc.CallOption) (*IngestExpensesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IngestExpensesResponse)
+	err := c.cc.Invoke(ctx, HumanMonitorService_IngestExpenses_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *humanMonitorServiceClient) QueryExpenses(ctx context.Context, in *QueryExpensesRequest, opts ...grpc.CallOption) (*QueryExpensesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryExpensesResponse)
+	err := c.cc.Invoke(ctx, HumanMonitorService_QueryExpenses_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -206,6 +264,26 @@ func (c *humanMonitorServiceClient) CompleteCorrectiveAction(ctx context.Context
 	return out, nil
 }
 
+func (c *humanMonitorServiceClient) CreateRecognition(ctx context.Context, in *CreateRecognitionRequest, opts ...grpc.CallOption) (*CreateRecognitionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateRecognitionResponse)
+	err := c.cc.Invoke(ctx, HumanMonitorService_CreateRecognition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *humanMonitorServiceClient) ListRecognitions(ctx context.Context, in *ListRecognitionsRequest, opts ...grpc.CallOption) (*ListRecognitionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRecognitionsResponse)
+	err := c.cc.Invoke(ctx, HumanMonitorService_ListRecognitions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HumanMonitorServiceServer is the server API for HumanMonitorService service.
 // All implementations must embed UnimplementedHumanMonitorServiceServer
 // for forward compatibility.
@@ -220,6 +298,14 @@ type HumanMonitorServiceServer interface {
 	IngestDeviceActivity(context.Context, *IngestDeviceActivityRequest) (*IngestDeviceActivityResponse, error)
 	// デバイスアクティビティを照会する。
 	QueryDeviceActivity(context.Context, *QueryDeviceActivityRequest) (*QueryDeviceActivityResponse, error)
+	// アクセスログを送信する。
+	IngestAccessLogs(context.Context, *IngestAccessLogsRequest) (*IngestAccessLogsResponse, error)
+	// アクセスログを照会する。
+	QueryAccessLogs(context.Context, *QueryAccessLogsRequest) (*QueryAccessLogsResponse, error)
+	// 経費レコードを送信する。
+	IngestExpenses(context.Context, *IngestExpensesRequest) (*IngestExpensesResponse, error)
+	// 経費レコードを照会する。
+	QueryExpenses(context.Context, *QueryExpensesRequest) (*QueryExpensesResponse, error)
 	// 異常を一覧する。
 	ListAnomalies(context.Context, *ListAnomaliesRequest) (*ListAnomaliesResponse, error)
 	// 異常を取得する。
@@ -238,6 +324,10 @@ type HumanMonitorServiceServer interface {
 	ApproveCorrectiveAction(context.Context, *ApproveCorrectiveActionRequest) (*ApproveCorrectiveActionResponse, error)
 	// 是正措置を完了する。
 	CompleteCorrectiveAction(context.Context, *CompleteCorrectiveActionRequest) (*CompleteCorrectiveActionResponse, error)
+	// 表彰を作成する。
+	CreateRecognition(context.Context, *CreateRecognitionRequest) (*CreateRecognitionResponse, error)
+	// 表彰を一覧する。
+	ListRecognitions(context.Context, *ListRecognitionsRequest) (*ListRecognitionsResponse, error)
 	mustEmbedUnimplementedHumanMonitorServiceServer()
 }
 
@@ -259,6 +349,18 @@ func (UnimplementedHumanMonitorServiceServer) IngestDeviceActivity(context.Conte
 }
 func (UnimplementedHumanMonitorServiceServer) QueryDeviceActivity(context.Context, *QueryDeviceActivityRequest) (*QueryDeviceActivityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryDeviceActivity not implemented")
+}
+func (UnimplementedHumanMonitorServiceServer) IngestAccessLogs(context.Context, *IngestAccessLogsRequest) (*IngestAccessLogsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IngestAccessLogs not implemented")
+}
+func (UnimplementedHumanMonitorServiceServer) QueryAccessLogs(context.Context, *QueryAccessLogsRequest) (*QueryAccessLogsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryAccessLogs not implemented")
+}
+func (UnimplementedHumanMonitorServiceServer) IngestExpenses(context.Context, *IngestExpensesRequest) (*IngestExpensesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IngestExpenses not implemented")
+}
+func (UnimplementedHumanMonitorServiceServer) QueryExpenses(context.Context, *QueryExpensesRequest) (*QueryExpensesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryExpenses not implemented")
 }
 func (UnimplementedHumanMonitorServiceServer) ListAnomalies(context.Context, *ListAnomaliesRequest) (*ListAnomaliesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAnomalies not implemented")
@@ -286,6 +388,12 @@ func (UnimplementedHumanMonitorServiceServer) ApproveCorrectiveAction(context.Co
 }
 func (UnimplementedHumanMonitorServiceServer) CompleteCorrectiveAction(context.Context, *CompleteCorrectiveActionRequest) (*CompleteCorrectiveActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompleteCorrectiveAction not implemented")
+}
+func (UnimplementedHumanMonitorServiceServer) CreateRecognition(context.Context, *CreateRecognitionRequest) (*CreateRecognitionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRecognition not implemented")
+}
+func (UnimplementedHumanMonitorServiceServer) ListRecognitions(context.Context, *ListRecognitionsRequest) (*ListRecognitionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRecognitions not implemented")
 }
 func (UnimplementedHumanMonitorServiceServer) mustEmbedUnimplementedHumanMonitorServiceServer() {}
 func (UnimplementedHumanMonitorServiceServer) testEmbeddedByValue()                             {}
@@ -376,6 +484,78 @@ func _HumanMonitorService_QueryDeviceActivity_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HumanMonitorServiceServer).QueryDeviceActivity(ctx, req.(*QueryDeviceActivityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HumanMonitorService_IngestAccessLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IngestAccessLogsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HumanMonitorServiceServer).IngestAccessLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HumanMonitorService_IngestAccessLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HumanMonitorServiceServer).IngestAccessLogs(ctx, req.(*IngestAccessLogsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HumanMonitorService_QueryAccessLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAccessLogsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HumanMonitorServiceServer).QueryAccessLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HumanMonitorService_QueryAccessLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HumanMonitorServiceServer).QueryAccessLogs(ctx, req.(*QueryAccessLogsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HumanMonitorService_IngestExpenses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IngestExpensesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HumanMonitorServiceServer).IngestExpenses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HumanMonitorService_IngestExpenses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HumanMonitorServiceServer).IngestExpenses(ctx, req.(*IngestExpensesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HumanMonitorService_QueryExpenses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryExpensesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HumanMonitorServiceServer).QueryExpenses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HumanMonitorService_QueryExpenses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HumanMonitorServiceServer).QueryExpenses(ctx, req.(*QueryExpensesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -542,6 +722,42 @@ func _HumanMonitorService_CompleteCorrectiveAction_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HumanMonitorService_CreateRecognition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRecognitionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HumanMonitorServiceServer).CreateRecognition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HumanMonitorService_CreateRecognition_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HumanMonitorServiceServer).CreateRecognition(ctx, req.(*CreateRecognitionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HumanMonitorService_ListRecognitions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRecognitionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HumanMonitorServiceServer).ListRecognitions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HumanMonitorService_ListRecognitions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HumanMonitorServiceServer).ListRecognitions(ctx, req.(*ListRecognitionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HumanMonitorService_ServiceDesc is the grpc.ServiceDesc for HumanMonitorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -564,6 +780,22 @@ var HumanMonitorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "QueryDeviceActivity",
 			Handler:    _HumanMonitorService_QueryDeviceActivity_Handler,
+		},
+		{
+			MethodName: "IngestAccessLogs",
+			Handler:    _HumanMonitorService_IngestAccessLogs_Handler,
+		},
+		{
+			MethodName: "QueryAccessLogs",
+			Handler:    _HumanMonitorService_QueryAccessLogs_Handler,
+		},
+		{
+			MethodName: "IngestExpenses",
+			Handler:    _HumanMonitorService_IngestExpenses_Handler,
+		},
+		{
+			MethodName: "QueryExpenses",
+			Handler:    _HumanMonitorService_QueryExpenses_Handler,
 		},
 		{
 			MethodName: "ListAnomalies",
@@ -600,6 +832,14 @@ var HumanMonitorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CompleteCorrectiveAction",
 			Handler:    _HumanMonitorService_CompleteCorrectiveAction_Handler,
+		},
+		{
+			MethodName: "CreateRecognition",
+			Handler:    _HumanMonitorService_CreateRecognition_Handler,
+		},
+		{
+			MethodName: "ListRecognitions",
+			Handler:    _HumanMonitorService_ListRecognitions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

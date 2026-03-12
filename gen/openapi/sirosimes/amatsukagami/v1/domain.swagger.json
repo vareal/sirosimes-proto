@@ -65,7 +65,7 @@
       ],
       "default": "ALERT_SEVERITY_UNSPECIFIED",
       "description": "- ALERT_SEVERITY_INFO: 情報（ログ記録のみ）。\n - ALERT_SEVERITY_WARNING: 警告（司チャットで通知）。\n - ALERT_SEVERITY_HIGH: 高（SMS + 司チャットで通知）。\n - ALERT_SEVERITY_CRITICAL: クリティカル（電話 + SMS + 司チャットで通知）。\n - ALERT_SEVERITY_EMERGENCY: 緊急（Video Call + 電話 + SMS + 司チャットで通知）。",
-      "title": "AlertSeverity はアラートの深刻度を分類する。"
+      "title": "AlertSeverity はアラートの深刻度を分類する。\nnotification.proto の通知チャネル選択に直結する。"
     },
     "v1CollectorSource": {
       "type": "string",
@@ -81,7 +81,7 @@
         "COLLECTOR_SOURCE_MANUAL"
       ],
       "default": "COLLECTOR_SOURCE_UNSPECIFIED",
-      "description": "- COLLECTOR_SOURCE_OTLP: OpenTelemetry Protocol（gRPC/HTTP）。\n - COLLECTOR_SOURCE_REDIS_STREAM: Redis Streams Consumer。\n - COLLECTOR_SOURCE_SECURITY_EVENT: SecurityEvent（sentinel.proto連携）。\n - COLLECTOR_SOURCE_PROMETHEUS: Prometheus scrape endpoint。\n - COLLECTOR_SOURCE_TSUKASA_API: 司API（社員・タスク・プロジェクトデータ）。\n - COLLECTOR_SOURCE_HATAORI_EVENT: 機織WF実行データ。\n - COLLECTOR_SOURCE_WEBHOOK: 外部Webhook。\n - COLLECTOR_SOURCE_MANUAL: 手動入力。",
+      "description": "- COLLECTOR_SOURCE_OTLP: OpenTelemetry Protocol（gRPC/HTTP）。\n - COLLECTOR_SOURCE_REDIS_STREAM: Redis Streams Consumer。\n - COLLECTOR_SOURCE_SECURITY_EVENT: SecurityEvent（sentinel.proto連携）。\ncommon/v1/sentinel.proto の SecurityEvent を受信し、\nセキュリティ監視領域のメトリクスとして変換・格納する。\n - COLLECTOR_SOURCE_PROMETHEUS: Prometheus scrape endpoint。\n - COLLECTOR_SOURCE_TSUKASA_API: 司API（社員・タスク・プロジェクトデータ）。\n - COLLECTOR_SOURCE_HATAORI_EVENT: 機織WF実行データ。\n - COLLECTOR_SOURCE_WEBHOOK: 外部Webhook。\n - COLLECTOR_SOURCE_MANUAL: 手動入力。",
       "title": "CollectorSource はメトリクス収集ソースを分類する。"
     },
     "v1DataSourceConfig": {
@@ -177,6 +177,15 @@
             "$ref": "#/definitions/v1DataSourceConfig"
           },
           "title": "データソース。"
+        },
+        "icon": {
+          "type": "string",
+          "title": "アイコン名（ダッシュボードUI表示用）。"
+        },
+        "displayOrder": {
+          "type": "integer",
+          "format": "int32",
+          "title": "表示順序（ダッシュボード上の並び順、昇順）。"
         }
       },
       "title": "DomainConfig は監視領域の設定を表す。"
@@ -226,6 +235,20 @@
         "statusMessage": {
           "type": "string",
           "title": "ステータスメッセージ。"
+        },
+        "trend": {
+          "$ref": "#/definitions/v1TrendDirection",
+          "title": "ヘルストレンド方向（直近の変動傾向）。"
+        },
+        "trendChangePercent": {
+          "type": "number",
+          "format": "float",
+          "title": "トレンド変化率（パーセント。正=改善、負=悪化）。"
+        },
+        "previousHealthScore": {
+          "type": "number",
+          "format": "float",
+          "title": "前回ヘルススコア（トレンド計算の基準値）。"
         }
       },
       "title": "DomainHealth は監視領域のヘルスサマリー。"
@@ -331,8 +354,8 @@
         "MONITORING_DOMAIN_HUMAN_EMPLOYEE"
       ],
       "default": "MONITORING_DOMAIN_UNSPECIFIED",
-      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。",
-      "title": "MonitoringDomain は監視領域を分類する。"
+      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\ncommon/v1/sentinel.proto SecurityEvent と連携。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。\nhuman_monitor.proto の詳細データを集約。",
+      "title": "MonitoringDomain は監視領域を分類する。\n8領域はSirosimesアーキテクチャ設計書で定義された統合監視領域に準拠。"
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -498,9 +521,25 @@
         "summary": {
           "type": "string",
           "title": "概況メッセージ。"
+        },
+        "overallTrend": {
+          "$ref": "#/definitions/v1TrendDirection",
+          "title": "システム全体のトレンド方向。"
         }
       },
       "title": "SystemOverview は全領域の統合ヘルスサマリー。"
+    },
+    "v1TrendDirection": {
+      "type": "string",
+      "enum": [
+        "TREND_DIRECTION_UNSPECIFIED",
+        "TREND_DIRECTION_IMPROVING",
+        "TREND_DIRECTION_STABLE",
+        "TREND_DIRECTION_DEGRADING"
+      ],
+      "default": "TREND_DIRECTION_UNSPECIFIED",
+      "description": "- TREND_DIRECTION_IMPROVING: 改善傾向。\n - TREND_DIRECTION_STABLE: 安定。\n - TREND_DIRECTION_DEGRADING: 悪化傾向。",
+      "title": "TrendDirection はヘルストレンドの方向。"
     },
     "v1UpdateDomainConfigResponse": {
       "type": "object",

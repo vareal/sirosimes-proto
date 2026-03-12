@@ -45,6 +45,54 @@
         }
       }
     },
+    "v1AccessLogRecord": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "社員ID。"
+        },
+        "resourceType": {
+          "type": "string",
+          "title": "アクセス対象リソース種別（file/api/database/admin_panel 等）。"
+        },
+        "resourceId": {
+          "type": "string",
+          "title": "アクセス対象リソースID/パス。"
+        },
+        "action": {
+          "type": "string",
+          "title": "アクション（read/write/delete/export）。"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "タイムスタンプ。"
+        },
+        "sourceIp": {
+          "type": "string",
+          "title": "アクセス元IPアドレス。"
+        },
+        "userAgent": {
+          "type": "string",
+          "title": "ユーザーエージェント。"
+        },
+        "success": {
+          "type": "boolean",
+          "title": "成功/失敗。"
+        },
+        "failureReason": {
+          "type": "string",
+          "title": "失敗理由（success=false時）。"
+        },
+        "riskScore": {
+          "type": "number",
+          "format": "float",
+          "title": "リスクスコア（0.0-1.0、異常アクセスパターン検知時に高値）。"
+        }
+      },
+      "title": "AccessLogRecord はシステムアクセスログ（監視カテゴリ4）。\n社員のシステム・リソースへのアクセスを記録する。"
+    },
     "v1AddressAnomalyResponse": {
       "type": "object",
       "properties": {
@@ -135,9 +183,12 @@
         "ATTENDANCE_STATUS_ABSENT",
         "ATTENDANCE_STATUS_LEAVE",
         "ATTENDANCE_STATUS_HOLIDAY",
-        "ATTENDANCE_STATUS_OVERTIME"
+        "ATTENDANCE_STATUS_OVERTIME",
+        "ATTENDANCE_STATUS_REMOTE",
+        "ATTENDANCE_STATUS_BUSINESS_TRIP"
       ],
       "default": "ATTENDANCE_STATUS_UNSPECIFIED",
+      "description": "- ATTENDANCE_STATUS_WORKING: 勤務中。\n - ATTENDANCE_STATUS_BREAK: 休憩中。\n - ATTENDANCE_STATUS_MEETING: 会議中。\n - ATTENDANCE_STATUS_ABSENT: 欠勤。\n - ATTENDANCE_STATUS_LEAVE: 有給休暇。\n - ATTENDANCE_STATUS_HOLIDAY: 祝日・公休。\n - ATTENDANCE_STATUS_OVERTIME: 残業中。\n - ATTENDANCE_STATUS_REMOTE: リモートワーク中。\n - ATTENDANCE_STATUS_BUSINESS_TRIP: 出張中。",
       "title": "AttendanceStatus は勤怠状態。"
     },
     "v1CompleteCorrectiveActionResponse": {
@@ -206,6 +257,7 @@
         "CORRECTIVE_ACTION_STATUS_CANCELLED"
       ],
       "default": "CORRECTIVE_ACTION_STATUS_UNSPECIFIED",
+      "description": "- CORRECTIVE_ACTION_STATUS_PROPOSED: 提案済み（AI/システムが提案）。\n - CORRECTIVE_ACTION_STATUS_APPROVED: 承認済み（HITL: 人間が承認）。\n - CORRECTIVE_ACTION_STATUS_IN_PROGRESS: 実行中。\n - CORRECTIVE_ACTION_STATUS_COMPLETED: 完了。\n - CORRECTIVE_ACTION_STATUS_CANCELLED: 取消。",
       "title": "CorrectiveActionStatus は是正措置のステータス。"
     },
     "v1CorrectiveActionType": {
@@ -228,6 +280,14 @@
       "properties": {
         "action": {
           "$ref": "#/definitions/v1CorrectiveAction"
+        }
+      }
+    },
+    "v1CreateRecognitionResponse": {
+      "type": "object",
+      "properties": {
+        "recognition": {
+          "$ref": "#/definitions/v1RecognitionRecord"
         }
       }
     },
@@ -391,6 +451,71 @@
       },
       "title": "EmployeePerformance は社員パフォーマンスサマリー。"
     },
+    "v1ExpenseCategory": {
+      "type": "string",
+      "enum": [
+        "EXPENSE_CATEGORY_UNSPECIFIED",
+        "EXPENSE_CATEGORY_TRANSPORTATION",
+        "EXPENSE_CATEGORY_ACCOMMODATION",
+        "EXPENSE_CATEGORY_ENTERTAINMENT",
+        "EXPENSE_CATEGORY_SUPPLIES",
+        "EXPENSE_CATEGORY_COMMUNICATION",
+        "EXPENSE_CATEGORY_TRAINING",
+        "EXPENSE_CATEGORY_OTHER"
+      ],
+      "default": "EXPENSE_CATEGORY_UNSPECIFIED",
+      "description": "- EXPENSE_CATEGORY_TRANSPORTATION: 交通費。\n - EXPENSE_CATEGORY_ACCOMMODATION: 宿泊費。\n - EXPENSE_CATEGORY_ENTERTAINMENT: 接待交際費。\n - EXPENSE_CATEGORY_SUPPLIES: 備品・消耗品。\n - EXPENSE_CATEGORY_COMMUNICATION: 通信費。\n - EXPENSE_CATEGORY_TRAINING: 研修・教育費。\n - EXPENSE_CATEGORY_OTHER: その他。",
+      "title": "ExpenseCategory は経費カテゴリ。"
+    },
+    "v1ExpenseRecord": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "社員ID。"
+        },
+        "category": {
+          "$ref": "#/definitions/v1ExpenseCategory",
+          "title": "経費カテゴリ。"
+        },
+        "amount": {
+          "type": "number",
+          "format": "double",
+          "title": "金額（円）。"
+        },
+        "currency": {
+          "type": "string",
+          "title": "通貨コード（ISO 4217。例: \"JPY\"）。"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "申請日。"
+        },
+        "description": {
+          "type": "string",
+          "title": "説明。"
+        },
+        "approvalStatus": {
+          "type": "string",
+          "title": "承認ステータス（pending/approved/rejected）。"
+        },
+        "approvedBy": {
+          "type": "string",
+          "title": "承認者。"
+        },
+        "receiptAttached": {
+          "type": "boolean",
+          "title": "領収書添付有無。"
+        },
+        "riskScore": {
+          "type": "number",
+          "format": "float",
+          "title": "リスクスコア（0.0-1.0、異常パターン検知時に高値）。"
+        }
+      },
+      "title": "ExpenseRecord は経費利用記録（監視カテゴリ8）。\n社員の経費申請・利用パターンを記録し、異常検知に活用する。"
+    },
     "v1GetAnomalyResponse": {
       "type": "object",
       "properties": {
@@ -407,6 +532,15 @@
         }
       }
     },
+    "v1IngestAccessLogsResponse": {
+      "type": "object",
+      "properties": {
+        "acceptedCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "v1IngestAttendanceResponse": {
       "type": "object",
       "properties": {
@@ -417,6 +551,15 @@
       }
     },
     "v1IngestDeviceActivityResponse": {
+      "type": "object",
+      "properties": {
+        "acceptedCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1IngestExpensesResponse": {
       "type": "object",
       "properties": {
         "acceptedCount": {
@@ -463,6 +606,21 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1EmployeePerformance"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1ListRecognitionsResponse": {
+      "type": "object",
+      "properties": {
+        "recognitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RecognitionRecord"
           }
         },
         "pagination": {
@@ -523,6 +681,21 @@
       },
       "description": "PaginationResponse is the standard offset-based pagination output."
     },
+    "v1QueryAccessLogsResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AccessLogRecord"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
     "v1QueryAttendanceResponse": {
       "type": "object",
       "properties": {
@@ -552,6 +725,63 @@
           "$ref": "#/definitions/v1PaginationResponse"
         }
       }
+    },
+    "v1QueryExpensesResponse": {
+      "type": "object",
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ExpenseRecord"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "v1RecognitionRecord": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "employeeId": {
+          "type": "string",
+          "title": "表彰対象社員ID。"
+        },
+        "title": {
+          "type": "string",
+          "title": "表彰タイトル。"
+        },
+        "reason": {
+          "type": "string",
+          "title": "表彰理由。"
+        },
+        "awardedBy": {
+          "type": "string",
+          "title": "表彰者（推薦者）。"
+        },
+        "awardedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "表彰日。"
+        },
+        "category": {
+          "type": "string",
+          "title": "表彰カテゴリ（例: \"月間MVP\", \"改善提案\", \"チーム貢献\"）。"
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "関連KPI改善値（定量的評価がある場合）。"
+        }
+      },
+      "title": "RecognitionRecord は表彰記録（監視カテゴリ10）。\n優秀な業績・行動に対する表彰を記録する。"
     },
     "v1ResourceMetadata": {
       "type": "object",

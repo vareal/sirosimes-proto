@@ -11,6 +11,7 @@ import type { PaginationRequest, PaginationResponse } from "../../common/v1/pagi
 
 /**
  * AlertSeverity はアラートの深刻度を分類する。
+ * notification.proto の通知チャネル選択に直結する。
  *
  * @generated from enum sirosimes.amatsukagami.v1.AlertSeverity
  */
@@ -237,6 +238,7 @@ export declare class AlertAction extends Message<AlertAction> {
 
   /**
    * 機織WF ID（自動実行するワークフロー）。
+   * hataori/v1/trigger.proto の TRIGGER_TYPE_TENSHU_ALERT と連動。
    *
    * @generated from field: string hataori_workflow_id = 2;
    */
@@ -262,6 +264,14 @@ export declare class AlertAction extends Message<AlertAction> {
    * @generated from field: repeated string escalation_channel_ids = 5;
    */
   escalationChannelIds: string[];
+
+  /**
+   * 通知繰り返し間隔（アラート継続中の再通知間隔）。
+   * 未設定（0）の場合、発火時に一度だけ通知。
+   *
+   * @generated from field: google.protobuf.Duration repeat_interval = 6;
+   */
+  repeatInterval?: Duration;
 
   constructor(data?: PartialMessage<AlertAction>);
 
@@ -358,6 +368,22 @@ export declare class AlertRule extends Message<AlertRule> {
    * @generated from field: map<string, string> labels = 11;
    */
   labels: { [key: string]: string };
+
+  /**
+   * エスカレーションポリシーID（notification.proto EscalationPolicy参照）。
+   * AlertAction内のescalation_delay/escalation_channel_idsより優先される。
+   *
+   * @generated from field: string escalation_policy_id = 12;
+   */
+  escalationPolicyId: string;
+
+  /**
+   * アノテーション（アラート本文テンプレート等の補足情報）。
+   * 例: {"summary": "CPU使用率が{{value}}%に達しました", "runbook": "https://..."}
+   *
+   * @generated from field: map<string, string> annotations = 13;
+   */
+  annotations: { [key: string]: string };
 
   constructor(data?: PartialMessage<AlertRule>);
 
@@ -482,6 +508,20 @@ export declare class AlertInstance extends Message<AlertInstance> {
    * @generated from field: map<string, string> labels = 15;
    */
   labels: { [key: string]: string };
+
+  /**
+   * 人間可読なサマリー（アノテーションテンプレート展開結果）。
+   *
+   * @generated from field: string summary = 16;
+   */
+  summary: string;
+
+  /**
+   * 最終通知送信時刻（repeat_interval使用時）。
+   *
+   * @generated from field: google.protobuf.Timestamp last_notified_at = 17;
+   */
+  lastNotifiedAt?: Timestamp;
 
   constructor(data?: PartialMessage<AlertInstance>);
 
@@ -743,6 +783,20 @@ export declare class CreateAlertRuleRequest extends Message<CreateAlertRuleReque
    */
   labels: { [key: string]: string };
 
+  /**
+   * エスカレーションポリシーID。
+   *
+   * @generated from field: string escalation_policy_id = 10;
+   */
+  escalationPolicyId: string;
+
+  /**
+   * アノテーション。
+   *
+   * @generated from field: map<string, string> annotations = 11;
+   */
+  annotations: { [key: string]: string };
+
   constructor(data?: PartialMessage<CreateAlertRuleRequest>);
 
   static readonly runtime: typeof proto3;
@@ -840,6 +894,20 @@ export declare class UpdateAlertRuleRequest extends Message<UpdateAlertRuleReque
    * @generated from field: map<string, string> labels = 11;
    */
   labels: { [key: string]: string };
+
+  /**
+   * エスカレーションポリシーID。
+   *
+   * @generated from field: string escalation_policy_id = 12;
+   */
+  escalationPolicyId: string;
+
+  /**
+   * アノテーション。
+   *
+   * @generated from field: map<string, string> annotations = 13;
+   */
+  annotations: { [key: string]: string };
 
   constructor(data?: PartialMessage<UpdateAlertRuleRequest>);
 

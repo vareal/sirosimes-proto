@@ -96,6 +96,20 @@ export declare enum PanelType {
    * @generated from enum value: PANEL_TYPE_TEXT = 11;
    */
   TEXT = 11,
+
+  /**
+   * トポロジーマップ（ネットワーク・サービス依存関係図）。
+   *
+   * @generated from enum value: PANEL_TYPE_TOPOLOGY = 12;
+   */
+  TOPOLOGY = 12,
+
+  /**
+   * フローダイアグラム（Sankey図: データフロー・コスト配分可視化）。
+   *
+   * @generated from enum value: PANEL_TYPE_FLOW = 13;
+   */
+  FLOW = 13,
 }
 
 /**
@@ -167,6 +181,145 @@ export declare enum DashboardPreset {
 }
 
 /**
+ * VariableType はダッシュボード変数の種別。
+ *
+ * @generated from enum sirosimes.amatsukagami.v1.VariableType
+ */
+export declare enum VariableType {
+  /**
+   * @generated from enum value: VARIABLE_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * 固定値リストから選択。
+   *
+   * @generated from enum value: VARIABLE_TYPE_CUSTOM = 1;
+   */
+  CUSTOM = 1,
+
+  /**
+   * メトリクスラベル値から動的取得。
+   *
+   * @generated from enum value: VARIABLE_TYPE_LABEL_VALUES = 2;
+   */
+  LABEL_VALUES = 2,
+
+  /**
+   * メトリクス名一覧から動的取得。
+   *
+   * @generated from enum value: VARIABLE_TYPE_METRIC_NAMES = 3;
+   */
+  METRIC_NAMES = 3,
+
+  /**
+   * 監視領域選択。
+   *
+   * @generated from enum value: VARIABLE_TYPE_DOMAIN = 4;
+   */
+  DOMAIN = 4,
+
+  /**
+   * テキスト入力。
+   *
+   * @generated from enum value: VARIABLE_TYPE_TEXT = 5;
+   */
+  TEXT = 5,
+
+  /**
+   * 時間間隔（例: 5m, 1h, 1d）。
+   *
+   * @generated from enum value: VARIABLE_TYPE_INTERVAL = 6;
+   */
+  INTERVAL = 6,
+}
+
+/**
+ * DashboardVariable はダッシュボードのテンプレート変数を定義する。
+ * パネルクエリのフィルタで "${name}" として参照可能。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.DashboardVariable
+ */
+export declare class DashboardVariable extends Message<DashboardVariable> {
+  /**
+   * 変数名（パネルクエリで ${name} として参照）。
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * 表示ラベル。
+   *
+   * @generated from field: string label = 2;
+   */
+  label: string;
+
+  /**
+   * 変数種別。
+   *
+   * @generated from field: sirosimes.amatsukagami.v1.VariableType type = 3;
+   */
+  type: VariableType;
+
+  /**
+   * デフォルト値。
+   *
+   * @generated from field: string default_value = 4;
+   */
+  defaultValue: string;
+
+  /**
+   * 選択肢（VARIABLE_TYPE_CUSTOM時）。
+   *
+   * @generated from field: repeated string options = 5;
+   */
+  options: string[];
+
+  /**
+   * ラベルキー（VARIABLE_TYPE_LABEL_VALUES時: このラベルの値を取得）。
+   *
+   * @generated from field: string label_key = 6;
+   */
+  labelKey: string;
+
+  /**
+   * メトリクス名（VARIABLE_TYPE_LABEL_VALUES時: このメトリクスのラベル値を取得）。
+   *
+   * @generated from field: string source_metric = 7;
+   */
+  sourceMetric: string;
+
+  /**
+   * 複数選択可。
+   *
+   * @generated from field: bool multi_select = 8;
+   */
+  multiSelect: boolean;
+
+  /**
+   * 「全て」オプション追加。
+   *
+   * @generated from field: bool include_all = 9;
+   */
+  includeAll: boolean;
+
+  constructor(data?: PartialMessage<DashboardVariable>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.DashboardVariable";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DashboardVariable;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DashboardVariable;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DashboardVariable;
+
+  static equals(a: DashboardVariable | PlainMessage<DashboardVariable> | undefined, b: DashboardVariable | PlainMessage<DashboardVariable> | undefined): boolean;
+}
+
+/**
  * PanelQuery はパネルのデータ取得クエリを定義する。
  *
  * @generated from message sirosimes.amatsukagami.v1.PanelQuery
@@ -201,14 +354,14 @@ export declare class PanelQuery extends Message<PanelQuery> {
   groupBy: string[];
 
   /**
-   * フィルタ条件。
+   * フィルタ条件。テンプレート変数は "${variable_name}" で参照可能。
    *
    * @generated from field: map<string, string> filters = 5;
    */
   filters: { [key: string]: string };
 
   /**
-   * クエリ表示名（凡例）。
+   * クエリ表示名（凡例）。テンプレート変数使用可。
    *
    * @generated from field: string legend = 6;
    */
@@ -285,7 +438,7 @@ export declare class Panel extends Message<Panel> {
   id: string;
 
   /**
-   * タイトル。
+   * タイトル。テンプレート変数使用可。
    *
    * @generated from field: string title = 2;
    */
@@ -341,7 +494,7 @@ export declare class Panel extends Message<Panel> {
   thresholds: PanelThreshold[];
 
   /**
-   * テキスト内容（PANEL_TYPE_TEXT用）。
+   * テキスト内容（PANEL_TYPE_TEXT用）。マークダウン形式。
    *
    * @generated from field: string text_content = 10;
    */
@@ -360,6 +513,13 @@ export declare class Panel extends Message<Panel> {
    * @generated from field: int32 decimals = 12;
    */
   decimals: number;
+
+  /**
+   * パネル説明（ツールチップ表示用）。
+   *
+   * @generated from field: string description = 13;
+   */
+  description: string;
 
   constructor(data?: PartialMessage<Panel>);
 
@@ -498,6 +658,13 @@ export declare class Dashboard extends Message<Dashboard> {
    * @generated from field: repeated string tags = 10;
    */
   tags: string[];
+
+  /**
+   * テンプレート変数（パネルクエリのパラメータ化に使用）。
+   *
+   * @generated from field: repeated sirosimes.amatsukagami.v1.DashboardVariable variables = 11;
+   */
+  variables: DashboardVariable[];
 
   constructor(data?: PartialMessage<Dashboard>);
 
@@ -679,6 +846,13 @@ export declare class CreateDashboardRequest extends Message<CreateDashboardReque
    */
   tags: string[];
 
+  /**
+   * テンプレート変数。
+   *
+   * @generated from field: repeated sirosimes.amatsukagami.v1.DashboardVariable variables = 9;
+   */
+  variables: DashboardVariable[];
+
   constructor(data?: PartialMessage<CreateDashboardRequest>);
 
   static readonly runtime: typeof proto3;
@@ -761,6 +935,13 @@ export declare class UpdateDashboardRequest extends Message<UpdateDashboardReque
    * @generated from field: repeated string tags = 8;
    */
   tags: string[];
+
+  /**
+   * テンプレート変数。
+   *
+   * @generated from field: repeated sirosimes.amatsukagami.v1.DashboardVariable variables = 9;
+   */
+  variables: DashboardVariable[];
 
   constructor(data?: PartialMessage<UpdateDashboardRequest>);
 

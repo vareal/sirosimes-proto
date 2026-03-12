@@ -23,6 +23,8 @@ export const AttendanceStatus = /*@__PURE__*/ proto3.makeEnum(
     {no: 5, name: "ATTENDANCE_STATUS_LEAVE", localName: "LEAVE"},
     {no: 6, name: "ATTENDANCE_STATUS_HOLIDAY", localName: "HOLIDAY"},
     {no: 7, name: "ATTENDANCE_STATUS_OVERTIME", localName: "OVERTIME"},
+    {no: 8, name: "ATTENDANCE_STATUS_REMOTE", localName: "REMOTE"},
+    {no: 9, name: "ATTENDANCE_STATUS_BUSINESS_TRIP", localName: "BUSINESS_TRIP"},
   ],
 );
 
@@ -84,6 +86,25 @@ export const CorrectiveActionStatus = /*@__PURE__*/ proto3.makeEnum(
 );
 
 /**
+ * ExpenseCategory は経費カテゴリ。
+ *
+ * @generated from enum sirosimes.amatsukagami.v1.ExpenseCategory
+ */
+export const ExpenseCategory = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.amatsukagami.v1.ExpenseCategory",
+  [
+    {no: 0, name: "EXPENSE_CATEGORY_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "EXPENSE_CATEGORY_TRANSPORTATION", localName: "TRANSPORTATION"},
+    {no: 2, name: "EXPENSE_CATEGORY_ACCOMMODATION", localName: "ACCOMMODATION"},
+    {no: 3, name: "EXPENSE_CATEGORY_ENTERTAINMENT", localName: "ENTERTAINMENT"},
+    {no: 4, name: "EXPENSE_CATEGORY_SUPPLIES", localName: "SUPPLIES"},
+    {no: 5, name: "EXPENSE_CATEGORY_COMMUNICATION", localName: "COMMUNICATION"},
+    {no: 6, name: "EXPENSE_CATEGORY_TRAINING", localName: "TRAINING"},
+    {no: 7, name: "EXPENSE_CATEGORY_OTHER", localName: "OTHER"},
+  ],
+);
+
+/**
  * AttendanceRecord は勤怠レコード。
  *
  * @generated from message sirosimes.amatsukagami.v1.AttendanceRecord
@@ -118,6 +139,50 @@ export const DeviceActivity = /*@__PURE__*/ proto3.makeMessageType(
     { no: 5, name: "timestamp", kind: "message", T: Timestamp },
     { no: 6, name: "details", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 7, name: "risk_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+  ],
+);
+
+/**
+ * AccessLogRecord はシステムアクセスログ（監視カテゴリ4）。
+ * 社員のシステム・リソースへのアクセスを記録する。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.AccessLogRecord
+ */
+export const AccessLogRecord = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.AccessLogRecord",
+  () => [
+    { no: 1, name: "employee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "resource_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "resource_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "action", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
+    { no: 6, name: "source_ip", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "user_agent", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "failure_reason", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "risk_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+  ],
+);
+
+/**
+ * ExpenseRecord は経費利用記録（監視カテゴリ8）。
+ * 社員の経費申請・利用パターンを記録し、異常検知に活用する。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.ExpenseRecord
+ */
+export const ExpenseRecord = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.ExpenseRecord",
+  () => [
+    { no: 1, name: "employee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "category", kind: "enum", T: proto3.getEnumType(ExpenseCategory) },
+    { no: 3, name: "amount", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 4, name: "currency", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "date", kind: "message", T: Timestamp },
+    { no: 6, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "approval_status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "approved_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "receipt_attached", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 10, name: "risk_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
   ],
 );
 
@@ -163,6 +228,26 @@ export const EmployeePerformance = /*@__PURE__*/ proto3.makeMessageType(
     { no: 10, name: "wellbeing_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
     { no: 11, name: "engagement_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
     { no: 12, name: "kpi_scores", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 1 /* ScalarType.DOUBLE */} },
+  ],
+);
+
+/**
+ * RecognitionRecord は表彰記録（監視カテゴリ10）。
+ * 優秀な業績・行動に対する表彰を記録する。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.RecognitionRecord
+ */
+export const RecognitionRecord = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.RecognitionRecord",
+  () => [
+    { no: 1, name: "metadata", kind: "message", T: ResourceMetadata },
+    { no: 2, name: "employee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "reason", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "awarded_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "awarded_at", kind: "message", T: Timestamp },
+    { no: 7, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "metrics", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 1 /* ScalarType.DOUBLE */} },
   ],
 );
 
@@ -273,6 +358,99 @@ export const QueryDeviceActivityResponse = /*@__PURE__*/ proto3.makeMessageType(
   "sirosimes.amatsukagami.v1.QueryDeviceActivityResponse",
   () => [
     { no: 1, name: "activities", kind: "message", T: DeviceActivity, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestAccessLogsRequest
+ */
+export const IngestAccessLogsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.IngestAccessLogsRequest",
+  () => [
+    { no: 1, name: "records", kind: "message", T: AccessLogRecord, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestAccessLogsResponse
+ */
+export const IngestAccessLogsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.IngestAccessLogsResponse",
+  () => [
+    { no: 1, name: "accepted_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryAccessLogsRequest
+ */
+export const QueryAccessLogsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.QueryAccessLogsRequest",
+  () => [
+    { no: 1, name: "employee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "resource_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "start_time", kind: "message", T: Timestamp },
+    { no: 4, name: "end_time", kind: "message", T: Timestamp },
+    { no: 5, name: "failures_only", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "min_risk_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 7, name: "pagination", kind: "message", T: PaginationRequest },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryAccessLogsResponse
+ */
+export const QueryAccessLogsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.QueryAccessLogsResponse",
+  () => [
+    { no: 1, name: "records", kind: "message", T: AccessLogRecord, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestExpensesRequest
+ */
+export const IngestExpensesRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.IngestExpensesRequest",
+  () => [
+    { no: 1, name: "records", kind: "message", T: ExpenseRecord, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.IngestExpensesResponse
+ */
+export const IngestExpensesResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.IngestExpensesResponse",
+  () => [
+    { no: 1, name: "accepted_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryExpensesRequest
+ */
+export const QueryExpensesRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.QueryExpensesRequest",
+  () => [
+    { no: 1, name: "employee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "category", kind: "enum", T: proto3.getEnumType(ExpenseCategory) },
+    { no: 3, name: "start_date", kind: "message", T: Timestamp },
+    { no: 4, name: "end_date", kind: "message", T: Timestamp },
+    { no: 5, name: "min_risk_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 6, name: "pagination", kind: "message", T: PaginationRequest },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.QueryExpensesResponse
+ */
+export const QueryExpensesResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.QueryExpensesResponse",
+  () => [
+    { no: 1, name: "records", kind: "message", T: ExpenseRecord, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
   ],
 );
@@ -477,6 +655,56 @@ export const CompleteCorrectiveActionResponse = /*@__PURE__*/ proto3.makeMessage
   "sirosimes.amatsukagami.v1.CompleteCorrectiveActionResponse",
   () => [
     { no: 1, name: "action", kind: "message", T: CorrectiveAction },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.CreateRecognitionRequest
+ */
+export const CreateRecognitionRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.CreateRecognitionRequest",
+  () => [
+    { no: 1, name: "employee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "title", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "reason", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "awarded_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "metrics", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 1 /* ScalarType.DOUBLE */} },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.CreateRecognitionResponse
+ */
+export const CreateRecognitionResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.CreateRecognitionResponse",
+  () => [
+    { no: 1, name: "recognition", kind: "message", T: RecognitionRecord },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.ListRecognitionsRequest
+ */
+export const ListRecognitionsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.ListRecognitionsRequest",
+  () => [
+    { no: 1, name: "pagination", kind: "message", T: PaginationRequest },
+    { no: 2, name: "employee_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "start_date", kind: "message", T: Timestamp },
+    { no: 5, name: "end_date", kind: "message", T: Timestamp },
+  ],
+);
+
+/**
+ * @generated from message sirosimes.amatsukagami.v1.ListRecognitionsResponse
+ */
+export const ListRecognitionsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.ListRecognitionsResponse",
+  () => [
+    { no: 1, name: "recognitions", kind: "message", T: RecognitionRecord, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
   ],
 );
 

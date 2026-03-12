@@ -21,11 +21,13 @@ export const MetricType = /*@__PURE__*/ proto3.makeEnum(
     {no: 3, name: "METRIC_TYPE_HISTOGRAM", localName: "HISTOGRAM"},
     {no: 4, name: "METRIC_TYPE_SUMMARY", localName: "SUMMARY"},
     {no: 5, name: "METRIC_TYPE_BOOLEAN", localName: "BOOLEAN"},
+    {no: 6, name: "METRIC_TYPE_RATE", localName: "RATE"},
   ],
 );
 
 /**
  * MonitoringDomain は監視領域を分類する。
+ * 8領域はSirosimesアーキテクチャ設計書で定義された統合監視領域に準拠。
  *
  * @generated from enum sirosimes.amatsukagami.v1.MonitoringDomain
  */
@@ -62,6 +64,8 @@ export const AggregationMethod = /*@__PURE__*/ proto3.makeEnum(
     {no: 7, name: "AGGREGATION_METHOD_P95", localName: "P95"},
     {no: 8, name: "AGGREGATION_METHOD_P99", localName: "P99"},
     {no: 9, name: "AGGREGATION_METHOD_LAST", localName: "LAST"},
+    {no: 10, name: "AGGREGATION_METHOD_RATE", localName: "RATE"},
+    {no: 11, name: "AGGREGATION_METHOD_STDDEV", localName: "STDDEV"},
   ],
 );
 
@@ -103,6 +107,8 @@ export const MetricDataPoint = /*@__PURE__*/ proto3.makeMessageType(
     { no: 8, name: "source", kind: "enum", T: proto3.getEnumType(CollectorSource) },
     { no: 9, name: "source_service", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 10, name: "unit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "histogram_buckets", kind: "scalar", T: 1 /* ScalarType.DOUBLE */, repeated: true },
+    { no: 12, name: "histogram_counts", kind: "scalar", T: 3 /* ScalarType.INT64 */, repeated: true },
   ],
 );
 
@@ -151,6 +157,8 @@ export const AggregatedMetric = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * IntegrityRecord はメトリクス改ざん検知用ハッシュチェーンレコード。
+ * MAS（監視・監査・監督）フレームワークに基づく、
+ * メトリクスデータの完全性を保証するためのチェーン構造。
  *
  * @generated from message sirosimes.amatsukagami.v1.IntegrityRecord
  */

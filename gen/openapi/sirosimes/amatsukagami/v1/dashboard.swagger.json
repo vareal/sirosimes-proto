@@ -57,9 +57,12 @@
         "AGGREGATION_METHOD_P50",
         "AGGREGATION_METHOD_P95",
         "AGGREGATION_METHOD_P99",
-        "AGGREGATION_METHOD_LAST"
+        "AGGREGATION_METHOD_LAST",
+        "AGGREGATION_METHOD_RATE",
+        "AGGREGATION_METHOD_STDDEV"
       ],
       "default": "AGGREGATION_METHOD_UNSPECIFIED",
+      "description": "- AGGREGATION_METHOD_SUM: 合計。\n - AGGREGATION_METHOD_AVG: 平均。\n - AGGREGATION_METHOD_MIN: 最小値。\n - AGGREGATION_METHOD_MAX: 最大値。\n - AGGREGATION_METHOD_COUNT: 件数。\n - AGGREGATION_METHOD_P50: 50パーセンタイル（中央値）。\n - AGGREGATION_METHOD_P95: 95パーセンタイル。\n - AGGREGATION_METHOD_P99: 99パーセンタイル。\n - AGGREGATION_METHOD_LAST: 最新値。\n - AGGREGATION_METHOD_RATE: レート計算（単位時間あたりの変化率）。\n - AGGREGATION_METHOD_STDDEV: 標準偏差。",
       "title": "AggregationMethod はメトリクス集約方法を定義する。"
     },
     "v1CloneDashboardResponse": {
@@ -131,6 +134,14 @@
             "type": "string"
           },
           "title": "タグ。"
+        },
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1DashboardVariable"
+          },
+          "title": "テンプレート変数（パネルクエリのパラメータ化に使用）。"
         }
       },
       "title": "Dashboard はダッシュボード構成を表す。"
@@ -177,6 +188,51 @@
         }
       },
       "title": "DashboardRow はパネルを含む行グループ。"
+    },
+    "v1DashboardVariable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "変数名（パネルクエリで ${name} として参照）。"
+        },
+        "label": {
+          "type": "string",
+          "title": "表示ラベル。"
+        },
+        "type": {
+          "$ref": "#/definitions/v1VariableType",
+          "title": "変数種別。"
+        },
+        "defaultValue": {
+          "type": "string",
+          "title": "デフォルト値。"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "選択肢（VARIABLE_TYPE_CUSTOM時）。"
+        },
+        "labelKey": {
+          "type": "string",
+          "title": "ラベルキー（VARIABLE_TYPE_LABEL_VALUES時: このラベルの値を取得）。"
+        },
+        "sourceMetric": {
+          "type": "string",
+          "title": "メトリクス名（VARIABLE_TYPE_LABEL_VALUES時: このメトリクスのラベル値を取得）。"
+        },
+        "multiSelect": {
+          "type": "boolean",
+          "title": "複数選択可。"
+        },
+        "includeAll": {
+          "type": "boolean",
+          "title": "「全て」オプション追加。"
+        }
+      },
+      "title": "DashboardVariable はダッシュボードのテンプレート変数を定義する。\nパネルクエリのフィルタで \"${name}\" として参照可能。"
     },
     "v1DeleteDashboardResponse": {
       "type": "object"
@@ -226,8 +282,8 @@
         "MONITORING_DOMAIN_HUMAN_EMPLOYEE"
       ],
       "default": "MONITORING_DOMAIN_UNSPECIFIED",
-      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。",
-      "title": "MonitoringDomain は監視領域を分類する。"
+      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\ncommon/v1/sentinel.proto SecurityEvent と連携。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。\nhuman_monitor.proto の詳細データを集約。",
+      "title": "MonitoringDomain は監視領域を分類する。\n8領域はSirosimesアーキテクチャ設計書で定義された統合監視領域に準拠。"
     },
     "v1PaginationRequest": {
       "type": "object",
@@ -291,7 +347,7 @@
         },
         "title": {
           "type": "string",
-          "title": "タイトル。"
+          "title": "タイトル。テンプレート変数使用可。"
         },
         "type": {
           "$ref": "#/definitions/v1PanelType",
@@ -335,7 +391,7 @@
         },
         "textContent": {
           "type": "string",
-          "title": "テキスト内容（PANEL_TYPE_TEXT用）。"
+          "title": "テキスト内容（PANEL_TYPE_TEXT用）。マークダウン形式。"
         },
         "unit": {
           "type": "string",
@@ -345,6 +401,10 @@
           "type": "integer",
           "format": "int32",
           "title": "小数桁数。"
+        },
+        "description": {
+          "type": "string",
+          "title": "パネル説明（ツールチップ表示用）。"
         }
       },
       "title": "Panel はダッシュボード上の個別パネルを定義する。"
@@ -376,11 +436,11 @@
           "additionalProperties": {
             "type": "string"
           },
-          "title": "フィルタ条件。"
+          "title": "フィルタ条件。テンプレート変数は \"${variable_name}\" で参照可能。"
         },
         "legend": {
           "type": "string",
-          "title": "クエリ表示名（凡例）。"
+          "title": "クエリ表示名（凡例）。テンプレート変数使用可。"
         }
       },
       "title": "PanelQuery はパネルのデータ取得クエリを定義する。"
@@ -418,10 +478,12 @@
         "PANEL_TYPE_STATUS_MAP",
         "PANEL_TYPE_ALERT_LIST",
         "PANEL_TYPE_LOG",
-        "PANEL_TYPE_TEXT"
+        "PANEL_TYPE_TEXT",
+        "PANEL_TYPE_TOPOLOGY",
+        "PANEL_TYPE_FLOW"
       ],
       "default": "PANEL_TYPE_UNSPECIFIED",
-      "description": "- PANEL_TYPE_TIME_SERIES: 時系列折れ線グラフ。\n - PANEL_TYPE_GAUGE: ゲージ（単一値メーター）。\n - PANEL_TYPE_STAT: 統計カード（現在値 + 変動率）。\n - PANEL_TYPE_TABLE: テーブル。\n - PANEL_TYPE_HEATMAP: ヒートマップ。\n - PANEL_TYPE_PIE: 円グラフ。\n - PANEL_TYPE_BAR: 棒グラフ。\n - PANEL_TYPE_STATUS_MAP: ステータスマップ（サービス正常/異常一覧）。\n - PANEL_TYPE_ALERT_LIST: アラートリスト。\n - PANEL_TYPE_LOG: ログビューア。\n - PANEL_TYPE_TEXT: マークダウンテキスト。",
+      "description": "- PANEL_TYPE_TIME_SERIES: 時系列折れ線グラフ。\n - PANEL_TYPE_GAUGE: ゲージ（単一値メーター）。\n - PANEL_TYPE_STAT: 統計カード（現在値 + 変動率）。\n - PANEL_TYPE_TABLE: テーブル。\n - PANEL_TYPE_HEATMAP: ヒートマップ。\n - PANEL_TYPE_PIE: 円グラフ。\n - PANEL_TYPE_BAR: 棒グラフ。\n - PANEL_TYPE_STATUS_MAP: ステータスマップ（サービス正常/異常一覧）。\n - PANEL_TYPE_ALERT_LIST: アラートリスト。\n - PANEL_TYPE_LOG: ログビューア。\n - PANEL_TYPE_TEXT: マークダウンテキスト。\n - PANEL_TYPE_TOPOLOGY: トポロジーマップ（ネットワーク・サービス依存関係図）。\n - PANEL_TYPE_FLOW: フローダイアグラム（Sankey図: データフロー・コスト配分可視化）。",
       "title": "PanelType はダッシュボードパネルの表示種別。"
     },
     "v1ResourceMetadata": {
@@ -509,6 +571,21 @@
           "$ref": "#/definitions/v1Dashboard"
         }
       }
+    },
+    "v1VariableType": {
+      "type": "string",
+      "enum": [
+        "VARIABLE_TYPE_UNSPECIFIED",
+        "VARIABLE_TYPE_CUSTOM",
+        "VARIABLE_TYPE_LABEL_VALUES",
+        "VARIABLE_TYPE_METRIC_NAMES",
+        "VARIABLE_TYPE_DOMAIN",
+        "VARIABLE_TYPE_TEXT",
+        "VARIABLE_TYPE_INTERVAL"
+      ],
+      "default": "VARIABLE_TYPE_UNSPECIFIED",
+      "description": "- VARIABLE_TYPE_CUSTOM: 固定値リストから選択。\n - VARIABLE_TYPE_LABEL_VALUES: メトリクスラベル値から動的取得。\n - VARIABLE_TYPE_METRIC_NAMES: メトリクス名一覧から動的取得。\n - VARIABLE_TYPE_DOMAIN: 監視領域選択。\n - VARIABLE_TYPE_TEXT: テキスト入力。\n - VARIABLE_TYPE_INTERVAL: 時間間隔（例: 5m, 1h, 1d）。",
+      "title": "VariableType はダッシュボード変数の種別。"
     }
   }
 }

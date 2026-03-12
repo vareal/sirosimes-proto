@@ -58,6 +58,39 @@ export declare enum DomainHealthStatus {
 }
 
 /**
+ * TrendDirection はヘルストレンドの方向。
+ *
+ * @generated from enum sirosimes.amatsukagami.v1.TrendDirection
+ */
+export declare enum TrendDirection {
+  /**
+   * @generated from enum value: TREND_DIRECTION_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * 改善傾向。
+   *
+   * @generated from enum value: TREND_DIRECTION_IMPROVING = 1;
+   */
+  IMPROVING = 1,
+
+  /**
+   * 安定。
+   *
+   * @generated from enum value: TREND_DIRECTION_STABLE = 2;
+   */
+  STABLE = 2,
+
+  /**
+   * 悪化傾向。
+   *
+   * @generated from enum value: TREND_DIRECTION_DEGRADING = 3;
+   */
+  DEGRADING = 3,
+}
+
+/**
  * DomainConfig は監視領域の設定を表す。
  *
  * @generated from message sirosimes.amatsukagami.v1.DomainConfig
@@ -130,6 +163,20 @@ export declare class DomainConfig extends Message<DomainConfig> {
    * @generated from field: repeated sirosimes.amatsukagami.v1.DataSourceConfig data_sources = 10;
    */
   dataSources: DataSourceConfig[];
+
+  /**
+   * アイコン名（ダッシュボードUI表示用）。
+   *
+   * @generated from field: string icon = 11;
+   */
+  icon: string;
+
+  /**
+   * 表示順序（ダッシュボード上の並び順、昇順）。
+   *
+   * @generated from field: int32 display_order = 12;
+   */
+  displayOrder: number;
 
   constructor(data?: PartialMessage<DomainConfig>);
 
@@ -348,6 +395,27 @@ export declare class DomainHealth extends Message<DomainHealth> {
    */
   statusMessage: string;
 
+  /**
+   * ヘルストレンド方向（直近の変動傾向）。
+   *
+   * @generated from field: sirosimes.amatsukagami.v1.TrendDirection trend = 10;
+   */
+  trend: TrendDirection;
+
+  /**
+   * トレンド変化率（パーセント。正=改善、負=悪化）。
+   *
+   * @generated from field: float trend_change_percent = 11;
+   */
+  trendChangePercent: number;
+
+  /**
+   * 前回ヘルススコア（トレンド計算の基準値）。
+   *
+   * @generated from field: float previous_health_score = 12;
+   */
+  previousHealthScore: number;
+
   constructor(data?: PartialMessage<DomainHealth>);
 
   static readonly runtime: typeof proto3;
@@ -410,6 +478,13 @@ export declare class SystemOverview extends Message<SystemOverview> {
    * @generated from field: string summary = 6;
    */
   summary: string;
+
+  /**
+   * システム全体のトレンド方向。
+   *
+   * @generated from field: sirosimes.amatsukagami.v1.TrendDirection overall_trend = 7;
+   */
+  overallTrend: TrendDirection;
 
   constructor(data?: PartialMessage<SystemOverview>);
 
@@ -671,6 +746,20 @@ export declare class UpdateDomainConfigRequest extends Message<UpdateDomainConfi
    * @generated from field: repeated sirosimes.amatsukagami.v1.DataSourceConfig data_sources = 9;
    */
   dataSources: DataSourceConfig[];
+
+  /**
+   * アイコン名。
+   *
+   * @generated from field: string icon = 10;
+   */
+  icon: string;
+
+  /**
+   * 表示順序。
+   *
+   * @generated from field: int32 display_order = 11;
+   */
+  displayOrder: number;
 
   constructor(data?: PartialMessage<UpdateDomainConfigRequest>);
 

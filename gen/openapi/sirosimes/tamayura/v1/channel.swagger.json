@@ -23,7 +23,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ListChannelsResponse"
+              "$ref": "#/definitions/sirosimestamayurav1ListChannelsResponse"
             }
           },
           "default": {
@@ -120,7 +120,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateChannelResponse"
+              "$ref": "#/definitions/sirosimestamayurav1CreateChannelResponse"
             }
           },
           "default": {
@@ -137,7 +137,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateChannelRequest"
+              "$ref": "#/definitions/sirosimestamayurav1CreateChannelRequest"
             }
           }
         ],
@@ -385,6 +385,119 @@
         }
       }
     },
+    "sirosimestamayurav1Channel": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/sirosimestamayurav1ChannelType"
+        },
+        "status": {
+          "$ref": "#/definitions/v1ChannelStatus"
+        },
+        "visibility": {
+          "$ref": "#/definitions/v1ChannelVisibility"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "createdById": {
+          "type": "string"
+        },
+        "parentChannelId": {
+          "type": "string"
+        },
+        "memberCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "topic": {
+          "type": "string"
+        }
+      },
+      "description": "Channel represents a communication channel."
+    },
+    "sirosimestamayurav1ChannelType": {
+      "type": "string",
+      "enum": [
+        "CHANNEL_TYPE_UNSPECIFIED",
+        "CHANNEL_TYPE_TEXT",
+        "CHANNEL_TYPE_VOICE",
+        "CHANNEL_TYPE_VIDEO",
+        "CHANNEL_TYPE_THREAD"
+      ],
+      "default": "CHANNEL_TYPE_UNSPECIFIED",
+      "description": "ChannelType classifies the communication channel type."
+    },
+    "sirosimestamayurav1CreateChannelRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/sirosimestamayurav1ChannelType"
+        },
+        "visibility": {
+          "$ref": "#/definitions/v1ChannelVisibility"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "createdById": {
+          "type": "string"
+        },
+        "parentChannelId": {
+          "type": "string"
+        },
+        "topic": {
+          "type": "string"
+        }
+      },
+      "description": "CreateChannelRequest is the request for creating a channel."
+    },
+    "sirosimestamayurav1CreateChannelResponse": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/definitions/v1ChannelDetail"
+        }
+      },
+      "description": "CreateChannelResponse is the response after creating a channel."
+    },
+    "sirosimestamayurav1ListChannelsResponse": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ChannelDetail"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      },
+      "description": "ListChannelsResponse is the response for listing channels."
+    },
     "v1ActorRef": {
       "type": "object",
       "properties": {
@@ -412,54 +525,11 @@
       "default": "ACTOR_TYPE_UNSPECIFIED",
       "description": "ActorType classifies the entity performing actions.\n\n - ACTOR_TYPE_HUMAN: A human employee of the Vareal Group.\n - ACTOR_TYPE_AI_EMPLOYEE: An AI employee (e.g., Fujiwara Ai, Stefan Skye).\n - ACTOR_TYPE_SYSTEM: An automated system process (cron, workflow engine, etc.).\n - ACTOR_TYPE_EXTERNAL_SERVICE: An external service or API client."
     },
-    "v1Channel": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "name": {
-          "type": "string"
-        },
-        "slug": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/v1ChannelType"
-        },
-        "status": {
-          "$ref": "#/definitions/v1ChannelStatus"
-        },
-        "visibility": {
-          "$ref": "#/definitions/v1ChannelVisibility"
-        },
-        "organizationId": {
-          "type": "string"
-        },
-        "createdById": {
-          "type": "string"
-        },
-        "parentChannelId": {
-          "type": "string"
-        },
-        "memberCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "topic": {
-          "type": "string"
-        }
-      },
-      "description": "Channel represents a communication channel."
-    },
     "v1ChannelDetail": {
       "type": "object",
       "properties": {
         "channel": {
-          "$ref": "#/definitions/v1Channel"
+          "$ref": "#/definitions/sirosimestamayurav1Channel"
         },
         "createdBy": {
           "$ref": "#/definitions/v1ActorRef"
@@ -478,18 +548,6 @@
       "default": "CHANNEL_STATUS_UNSPECIFIED",
       "description": "ChannelStatus represents the operational state of a channel."
     },
-    "v1ChannelType": {
-      "type": "string",
-      "enum": [
-        "CHANNEL_TYPE_UNSPECIFIED",
-        "CHANNEL_TYPE_TEXT",
-        "CHANNEL_TYPE_VOICE",
-        "CHANNEL_TYPE_VIDEO",
-        "CHANNEL_TYPE_THREAD"
-      ],
-      "default": "CHANNEL_TYPE_UNSPECIFIED",
-      "description": "ChannelType classifies the communication channel type."
-    },
     "v1ChannelVisibility": {
       "type": "string",
       "enum": [
@@ -499,48 +557,6 @@
       ],
       "default": "CHANNEL_VISIBILITY_UNSPECIFIED",
       "description": "ChannelVisibility controls who can see and join a channel."
-    },
-    "v1CreateChannelRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "slug": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/v1ChannelType"
-        },
-        "visibility": {
-          "$ref": "#/definitions/v1ChannelVisibility"
-        },
-        "organizationId": {
-          "type": "string"
-        },
-        "createdById": {
-          "type": "string"
-        },
-        "parentChannelId": {
-          "type": "string"
-        },
-        "topic": {
-          "type": "string"
-        }
-      },
-      "description": "CreateChannelRequest is the request for creating a channel."
-    },
-    "v1CreateChannelResponse": {
-      "type": "object",
-      "properties": {
-        "channel": {
-          "$ref": "#/definitions/v1ChannelDetail"
-        }
-      },
-      "description": "CreateChannelResponse is the response after creating a channel."
     },
     "v1DeleteChannelResponse": {
       "type": "object",
@@ -562,22 +578,6 @@
     "v1LeaveChannelResponse": {
       "type": "object",
       "description": "LeaveChannelResponse is the response after leaving a channel."
-    },
-    "v1ListChannelsResponse": {
-      "type": "object",
-      "properties": {
-        "channels": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1ChannelDetail"
-          }
-        },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
-        }
-      },
-      "description": "ListChannelsResponse is the response for listing channels."
     },
     "v1PaginationRequest": {
       "type": "object",

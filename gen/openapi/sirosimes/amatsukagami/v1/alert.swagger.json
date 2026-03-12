@@ -87,9 +87,12 @@
         "AGGREGATION_METHOD_P50",
         "AGGREGATION_METHOD_P95",
         "AGGREGATION_METHOD_P99",
-        "AGGREGATION_METHOD_LAST"
+        "AGGREGATION_METHOD_LAST",
+        "AGGREGATION_METHOD_RATE",
+        "AGGREGATION_METHOD_STDDEV"
       ],
       "default": "AGGREGATION_METHOD_UNSPECIFIED",
+      "description": "- AGGREGATION_METHOD_SUM: 合計。\n - AGGREGATION_METHOD_AVG: 平均。\n - AGGREGATION_METHOD_MIN: 最小値。\n - AGGREGATION_METHOD_MAX: 最大値。\n - AGGREGATION_METHOD_COUNT: 件数。\n - AGGREGATION_METHOD_P50: 50パーセンタイル（中央値）。\n - AGGREGATION_METHOD_P95: 95パーセンタイル。\n - AGGREGATION_METHOD_P99: 99パーセンタイル。\n - AGGREGATION_METHOD_LAST: 最新値。\n - AGGREGATION_METHOD_RATE: レート計算（単位時間あたりの変化率）。\n - AGGREGATION_METHOD_STDDEV: 標準偏差。",
       "title": "AggregationMethod はメトリクス集約方法を定義する。"
     },
     "v1AlertAction": {
@@ -104,7 +107,7 @@
         },
         "hataoriWorkflowId": {
           "type": "string",
-          "title": "機織WF ID（自動実行するワークフロー）。"
+          "title": "機織WF ID（自動実行するワークフロー）。\nhataori/v1/trigger.proto の TRIGGER_TYPE_TENSHU_ALERT と連動。"
         },
         "workflowParams": {
           "type": "object",
@@ -123,6 +126,10 @@
             "type": "string"
           },
           "title": "エスカレーション先通知チャネルID。"
+        },
+        "repeatInterval": {
+          "type": "string",
+          "title": "通知繰り返し間隔（アラート継続中の再通知間隔）。\n未設定（0）の場合、発火時に一度だけ通知。"
         }
       },
       "title": "AlertAction はアラート発火時のアクションを定義する。"
@@ -237,6 +244,15 @@
             "type": "string"
           },
           "title": "発火時のラベル。"
+        },
+        "summary": {
+          "type": "string",
+          "title": "人間可読なサマリー（アノテーションテンプレート展開結果）。"
+        },
+        "lastNotifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "最終通知送信時刻（repeat_interval使用時）。"
         }
       },
       "title": "AlertInstance はアラートルールの評価結果（発火インスタンス）を表す。"
@@ -296,6 +312,17 @@
             "type": "string"
           },
           "title": "ラベル（グルーピング・フィルタ用）。"
+        },
+        "escalationPolicyId": {
+          "type": "string",
+          "title": "エスカレーションポリシーID（notification.proto EscalationPolicy参照）。\nAlertAction内のescalation_delay/escalation_channel_idsより優先される。"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "アノテーション（アラート本文テンプレート等の補足情報）。\n例: {\"summary\": \"CPU使用率が{{value}}%に達しました\", \"runbook\": \"https://...\"}"
         }
       },
       "title": "AlertRule はアラートルールを定義する。"
@@ -312,7 +339,7 @@
       ],
       "default": "ALERT_SEVERITY_UNSPECIFIED",
       "description": "- ALERT_SEVERITY_INFO: 情報（ログ記録のみ）。\n - ALERT_SEVERITY_WARNING: 警告（司チャットで通知）。\n - ALERT_SEVERITY_HIGH: 高（SMS + 司チャットで通知）。\n - ALERT_SEVERITY_CRITICAL: クリティカル（電話 + SMS + 司チャットで通知）。\n - ALERT_SEVERITY_EMERGENCY: 緊急（Video Call + 電話 + SMS + 司チャットで通知）。",
-      "title": "AlertSeverity はアラートの深刻度を分類する。"
+      "title": "AlertSeverity はアラートの深刻度を分類する。\nnotification.proto の通知チャネル選択に直結する。"
     },
     "v1AlertState": {
       "type": "string",
@@ -426,8 +453,8 @@
         "MONITORING_DOMAIN_HUMAN_EMPLOYEE"
       ],
       "default": "MONITORING_DOMAIN_UNSPECIFIED",
-      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。",
-      "title": "MonitoringDomain は監視領域を分類する。"
+      "description": "- MONITORING_DOMAIN_BUSINESS: 領域1: ビジネスメトリクス（売上・案件・KPI）。\n - MONITORING_DOMAIN_FINANCE: 領域2: 財務メトリクス（キャッシュフロー・予実・経費）。\n - MONITORING_DOMAIN_AI_EMPLOYEE: 領域3: AI社員メトリクス（稼働・トークン・タスク完了率）。\n - MONITORING_DOMAIN_PRODUCT: 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。\n - MONITORING_DOMAIN_SECURITY: 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。\ncommon/v1/sentinel.proto SecurityEvent と連携。\n - MONITORING_DOMAIN_INFRASTRUCTURE: 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。\n - MONITORING_DOMAIN_PHYSICAL: 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。\n - MONITORING_DOMAIN_HUMAN_EMPLOYEE: 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。\nhuman_monitor.proto の詳細データを集約。",
+      "title": "MonitoringDomain は監視領域を分類する。\n8領域はSirosimesアーキテクチャ設計書で定義された統合監視領域に準拠。"
     },
     "v1PaginationRequest": {
       "type": "object",

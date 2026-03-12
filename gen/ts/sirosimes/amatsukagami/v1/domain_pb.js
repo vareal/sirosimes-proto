@@ -27,6 +27,21 @@ export const DomainHealthStatus = /*@__PURE__*/ proto3.makeEnum(
 );
 
 /**
+ * TrendDirection はヘルストレンドの方向。
+ *
+ * @generated from enum sirosimes.amatsukagami.v1.TrendDirection
+ */
+export const TrendDirection = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.amatsukagami.v1.TrendDirection",
+  [
+    {no: 0, name: "TREND_DIRECTION_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "TREND_DIRECTION_IMPROVING", localName: "IMPROVING"},
+    {no: 2, name: "TREND_DIRECTION_STABLE", localName: "STABLE"},
+    {no: 3, name: "TREND_DIRECTION_DEGRADING", localName: "DEGRADING"},
+  ],
+);
+
+/**
  * DomainConfig は監視領域の設定を表す。
  *
  * @generated from message sirosimes.amatsukagami.v1.DomainConfig
@@ -44,6 +59,8 @@ export const DomainConfig = /*@__PURE__*/ proto3.makeMessageType(
     { no: 8, name: "responsible_cxo_roles", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 9, name: "related_products", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 10, name: "data_sources", kind: "message", T: DataSourceConfig, repeated: true },
+    { no: 11, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ],
 );
 
@@ -99,6 +116,9 @@ export const DomainHealth = /*@__PURE__*/ proto3.makeMessageType(
     { no: 7, name: "last_updated", kind: "message", T: Timestamp },
     { no: 8, name: "key_metrics", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 1 /* ScalarType.DOUBLE */} },
     { no: 9, name: "status_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "trend", kind: "enum", T: proto3.getEnumType(TrendDirection) },
+    { no: 11, name: "trend_change_percent", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 12, name: "previous_health_score", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
   ],
 );
 
@@ -116,6 +136,7 @@ export const SystemOverview = /*@__PURE__*/ proto3.makeMessageType(
     { no: 4, name: "total_active_alerts", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "last_updated", kind: "message", T: Timestamp },
     { no: 6, name: "summary", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "overall_trend", kind: "enum", T: proto3.getEnumType(TrendDirection) },
   ],
 );
 
@@ -214,6 +235,8 @@ export const UpdateDomainConfigRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 7, name: "responsible_cxo_roles", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 8, name: "related_products", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 9, name: "data_sources", kind: "message", T: DataSourceConfig, repeated: true },
+    { no: 10, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ],
 );
 

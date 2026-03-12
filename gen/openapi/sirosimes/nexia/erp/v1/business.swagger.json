@@ -17,6 +17,105 @@
   ],
   "paths": {},
   "definitions": {
+    "nexiaerpv1CreateDealResponse": {
+      "type": "object",
+      "properties": {
+        "deal": {
+          "$ref": "#/definitions/nexiaerpv1Deal"
+        }
+      }
+    },
+    "nexiaerpv1Deal": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/v1ResourceMetadata"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "stage": {
+          "$ref": "#/definitions/nexiaerpv1DealStage"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "probability": {
+          "type": "number",
+          "format": "float"
+        },
+        "assignedTo": {
+          "type": "string"
+        },
+        "expectedCloseDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "closedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lostReason": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "title": "Deal は商談。"
+    },
+    "nexiaerpv1DealStage": {
+      "type": "string",
+      "enum": [
+        "DEAL_STAGE_UNSPECIFIED",
+        "DEAL_STAGE_INITIAL_CONTACT",
+        "DEAL_STAGE_QUALIFICATION",
+        "DEAL_STAGE_PROPOSAL",
+        "DEAL_STAGE_NEGOTIATION",
+        "DEAL_STAGE_CLOSED_WON",
+        "DEAL_STAGE_CLOSED_LOST"
+      ],
+      "default": "DEAL_STAGE_UNSPECIFIED",
+      "title": "DealStage は商談ステージ。"
+    },
+    "nexiaerpv1GetDealResponse": {
+      "type": "object",
+      "properties": {
+        "deal": {
+          "$ref": "#/definitions/nexiaerpv1Deal"
+        }
+      }
+    },
+    "nexiaerpv1ListDealsResponse": {
+      "type": "object",
+      "properties": {
+        "deals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/nexiaerpv1Deal"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse"
+        }
+      }
+    },
+    "nexiaerpv1UpdateDealResponse": {
+      "type": "object",
+      "properties": {
+        "deal": {
+          "$ref": "#/definitions/nexiaerpv1Deal"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -50,14 +149,6 @@
       "properties": {
         "customer": {
           "$ref": "#/definitions/v1Customer"
-        }
-      }
-    },
-    "v1CreateDealResponse": {
-      "type": "object",
-      "properties": {
-        "deal": {
-          "$ref": "#/definitions/v1Deal"
         }
       }
     },
@@ -128,66 +219,6 @@
       "default": "CUSTOMER_STATUS_UNSPECIFIED",
       "title": "CustomerStatus は顧客のステータス。"
     },
-    "v1Deal": {
-      "type": "object",
-      "properties": {
-        "metadata": {
-          "$ref": "#/definitions/v1ResourceMetadata"
-        },
-        "customerId": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "stage": {
-          "$ref": "#/definitions/v1DealStage"
-        },
-        "amount": {
-          "type": "string",
-          "format": "int64"
-        },
-        "currency": {
-          "type": "string"
-        },
-        "probability": {
-          "type": "number",
-          "format": "float"
-        },
-        "assignedTo": {
-          "type": "string"
-        },
-        "expectedCloseDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "closedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "lostReason": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        }
-      },
-      "title": "Deal は商談。"
-    },
-    "v1DealStage": {
-      "type": "string",
-      "enum": [
-        "DEAL_STAGE_UNSPECIFIED",
-        "DEAL_STAGE_INITIAL_CONTACT",
-        "DEAL_STAGE_QUALIFICATION",
-        "DEAL_STAGE_PROPOSAL",
-        "DEAL_STAGE_NEGOTIATION",
-        "DEAL_STAGE_CLOSED_WON",
-        "DEAL_STAGE_CLOSED_LOST"
-      ],
-      "default": "DEAL_STAGE_UNSPECIFIED",
-      "title": "DealStage は商談ステージ。"
-    },
     "v1DeleteCustomerResponse": {
       "type": "object"
     },
@@ -196,14 +227,6 @@
       "properties": {
         "customer": {
           "$ref": "#/definitions/v1Customer"
-        }
-      }
-    },
-    "v1GetDealResponse": {
-      "type": "object",
-      "properties": {
-        "deal": {
-          "$ref": "#/definitions/v1Deal"
         }
       }
     },
@@ -353,21 +376,6 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Customer"
-          }
-        },
-        "pagination": {
-          "$ref": "#/definitions/v1PaginationResponse"
-        }
-      }
-    },
-    "v1ListDealsResponse": {
-      "type": "object",
-      "properties": {
-        "deals": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1Deal"
           }
         },
         "pagination": {
@@ -526,14 +534,6 @@
       "properties": {
         "customer": {
           "$ref": "#/definitions/v1Customer"
-        }
-      }
-    },
-    "v1UpdateDealResponse": {
-      "type": "object",
-      "properties": {
-        "deal": {
-          "$ref": "#/definitions/v1Deal"
         }
       }
     },

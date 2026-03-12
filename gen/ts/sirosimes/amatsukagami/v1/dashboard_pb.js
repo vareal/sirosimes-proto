@@ -28,6 +28,8 @@ export const PanelType = /*@__PURE__*/ proto3.makeEnum(
     {no: 9, name: "PANEL_TYPE_ALERT_LIST", localName: "ALERT_LIST"},
     {no: 10, name: "PANEL_TYPE_LOG", localName: "LOG"},
     {no: 11, name: "PANEL_TYPE_TEXT", localName: "TEXT"},
+    {no: 12, name: "PANEL_TYPE_TOPOLOGY", localName: "TOPOLOGY"},
+    {no: 13, name: "PANEL_TYPE_FLOW", localName: "FLOW"},
   ],
 );
 
@@ -48,6 +50,45 @@ export const DashboardPreset = /*@__PURE__*/ proto3.makeEnum(
     {no: 6, name: "DASHBOARD_PRESET_CHRO", localName: "CHRO"},
     {no: 7, name: "DASHBOARD_PRESET_OVERVIEW", localName: "OVERVIEW"},
     {no: 8, name: "DASHBOARD_PRESET_CUSTOM", localName: "CUSTOM"},
+  ],
+);
+
+/**
+ * VariableType はダッシュボード変数の種別。
+ *
+ * @generated from enum sirosimes.amatsukagami.v1.VariableType
+ */
+export const VariableType = /*@__PURE__*/ proto3.makeEnum(
+  "sirosimes.amatsukagami.v1.VariableType",
+  [
+    {no: 0, name: "VARIABLE_TYPE_UNSPECIFIED", localName: "UNSPECIFIED"},
+    {no: 1, name: "VARIABLE_TYPE_CUSTOM", localName: "CUSTOM"},
+    {no: 2, name: "VARIABLE_TYPE_LABEL_VALUES", localName: "LABEL_VALUES"},
+    {no: 3, name: "VARIABLE_TYPE_METRIC_NAMES", localName: "METRIC_NAMES"},
+    {no: 4, name: "VARIABLE_TYPE_DOMAIN", localName: "DOMAIN"},
+    {no: 5, name: "VARIABLE_TYPE_TEXT", localName: "TEXT"},
+    {no: 6, name: "VARIABLE_TYPE_INTERVAL", localName: "INTERVAL"},
+  ],
+);
+
+/**
+ * DashboardVariable はダッシュボードのテンプレート変数を定義する。
+ * パネルクエリのフィルタで "${name}" として参照可能。
+ *
+ * @generated from message sirosimes.amatsukagami.v1.DashboardVariable
+ */
+export const DashboardVariable = /*@__PURE__*/ proto3.makeMessageType(
+  "sirosimes.amatsukagami.v1.DashboardVariable",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "type", kind: "enum", T: proto3.getEnumType(VariableType) },
+    { no: 4, name: "default_value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "options", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "label_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "source_metric", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "multi_select", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "include_all", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
@@ -102,6 +143,7 @@ export const Panel = /*@__PURE__*/ proto3.makeMessageType(
     { no: 10, name: "text_content", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 11, name: "unit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 12, name: "decimals", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 13, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -138,6 +180,7 @@ export const Dashboard = /*@__PURE__*/ proto3.makeMessageType(
     { no: 8, name: "shared", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 9, name: "favorited_by", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 10, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 11, name: "variables", kind: "message", T: DashboardVariable, repeated: true },
   ],
 );
 
@@ -200,6 +243,7 @@ export const CreateDashboardRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 6, name: "default_time_range_hours", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 7, name: "shared", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 8, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 9, name: "variables", kind: "message", T: DashboardVariable, repeated: true },
   ],
 );
 
@@ -227,6 +271,7 @@ export const UpdateDashboardRequest = /*@__PURE__*/ proto3.makeMessageType(
     { no: 6, name: "default_time_range_hours", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 7, name: "shared", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 8, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 9, name: "variables", kind: "message", T: DashboardVariable, repeated: true },
   ],
 );
 

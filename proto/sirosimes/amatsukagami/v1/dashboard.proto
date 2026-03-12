@@ -301,3 +301,100 @@ message CloneDashboardRequest {
 message CloneDashboardResponse {
   Dashboard dashboard = 1;
 }
+
+// ===== WebSocket Session Security (CISO Review 2026-03-12) =====
+
+// WebSocketAuthRequest is sent by the client during WebSocket handshake.
+message WebSocketAuthRequest {
+  // OAuth2 Bearer token from Mizugaki SSO (JWT Ed25519).
+  string access_token = 1;
+  // CSRF token for origin validation.
+  string csrf_token = 2;
+  // Client origin URL for server-side origin check.
+  string origin = 3;
+}
+
+// WebSocketAuthResponse is returned by the server after handshake validation.
+message WebSocketAuthResponse {
+  // Whether authentication was successful.
+  bool authenticated = 1;
+  // Session ID for this WebSocket connection.
+  string session_id = 2;
+  // When the token expires (client must re-authenticate before this).
+  google.protobuf.Timestamp token_expires_at = 3;
+  // Error message if authentication failed.
+  string error_message = 4;
+}
+
+// WebSocketReauthRequest is sent by the client to refresh the session token.
+// Must be sent before token_expires_at (default: 30 minutes).
+message WebSocketReauthRequest {
+  // Current session ID.
+  string session_id = 1;
+  // New refreshed access token from Mizugaki SSO.
+  string new_access_token = 2;
+}
+
+// WebSocketSessionEvent tracks session lifecycle for audit logging.
+message WebSocketSessionEvent {
+  // Unique session ID.
+  string session_id = 1;
+  // Event type.
+  WebSocketSessionEventType event_type = 2;
+  // When the event occurred.
+  google.protobuf.Timestamp timestamp = 3;
+  // Actor who owns this session.
+  string actor_id = 4;
+  // Client IP address.
+  string ip_address = 5;
+  // Reason for disconnect/invalidation (if applicable).
+  string reason = 6;
+}
+
+// WebSocketSessionEventType classifies session lifecycle events.
+enum WebSocketSessionEventType {
+  WS_SESSION_EVENT_UNSPECIFIED = 0;
+  // Client connected and authenticated.
+  WS_SESSION_EVENT_CONNECTED = 1;
+  // Client re-authenticated (token refresh).
+  WS_SESSION_EVENT_REAUTHENTICATED = 2;
+  // Normal client disconnect.
+  WS_SESSION_EVENT_DISCONNECTED = 3;
+  // Server-side forced disconnect (abnormal — token expired, policy violation).
+  WS_SESSION_EVENT_INVALIDATED = 4;
+  // Abnormal disconnect detected — token immediately invalidated (CISO requirement).
+  WS_SESSION_EVENT_ABNORMAL_DISCONNECT = 5;
+}
+
+// DashboardRBACPolicy defines role-based access control for API endpoints.
+// Each CXO role has an explicit list of accessible endpoints and data scopes.
+message DashboardRBACPolicy {
+  // Role identifier (maps to DashboardPreset or custom role).
+  string role = 1;
+  // List of API endpoints this role can access.
+  repeated RBACEndpointAccess endpoints = 2;
+  // Data scope restrictions.
+  RBACDataScope data_scope = 3;
+}
+
+// RBACEndpointAccess defines access to a specific API endpoint.
+message RBACEndpointAccess {
+  // API endpoint path pattern (e.g., "/api/v1/metrics/*").
+  string endpoint_pattern = 1;
+  // Allowed HTTP methods.
+  repeated string methods = 2;
+  // Whether field-level access policy (field_access.proto) applies.
+  bool field_access_policy_enabled = 3;
+}
+
+// RBACDataScope defines what data a role can access.
+message RBACDataScope {
+  // Which monitoring domains are visible to this role.
+  repeated string allowed_domains = 1;
+  // Whether human employee individual data is accessible.
+  bool human_individual_access = 2;
+  // Whether AI employee cost details are accessible.
+  bool ai_cost_detail_access = 3;
+  // Maximum data retention depth (e.g., "30d", "90d", "365d").
+  string max_retention_access = 4;
+}

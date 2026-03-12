@@ -117,7 +117,7 @@ export declare enum NotificationStatus {
   RETRYING = 5,
 
   /**
-   * スキップ（抑制/重複排除）。
+   * スキップ（抑制/重複排除/Quiet Hours）。
    *
    * @generated from enum value: NOTIFICATION_STATUS_SKIPPED = 6;
    */
@@ -183,6 +183,35 @@ export declare class NotificationChannel extends Message<NotificationChannel> {
    * @generated from field: string description = 8;
    */
   description: string;
+
+  /**
+   * 通知テンプレートID（未設定時はデフォルトテンプレート使用）。
+   *
+   * @generated from field: string template_id = 9;
+   */
+  templateId: string;
+
+  /**
+   * Quiet Hours 開始時刻（HH:MM形式、ローカルタイム。例: "22:00"）。
+   * この時間帯は min_severity が CRITICAL 未満の通知を抑制する。
+   *
+   * @generated from field: string quiet_hours_start = 10;
+   */
+  quietHoursStart: string;
+
+  /**
+   * Quiet Hours 終了時刻（HH:MM形式。例: "07:00"）。
+   *
+   * @generated from field: string quiet_hours_end = 11;
+   */
+  quietHoursEnd: string;
+
+  /**
+   * Quiet Hours タイムゾーン（IANA形式。例: "Asia/Tokyo"）。
+   *
+   * @generated from field: string quiet_hours_timezone = 12;
+   */
+  quietHoursTimezone: string;
 
   constructor(data?: PartialMessage<NotificationChannel>);
 
@@ -261,6 +290,20 @@ export declare class NotificationChannelConfig extends Message<NotificationChann
    */
   twilioAccountRef: string;
 
+  /**
+   * 最大リトライ回数（0 = リトライなし）。
+   *
+   * @generated from field: int32 max_retries = 9;
+   */
+  maxRetries: number;
+
+  /**
+   * リトライ間隔（秒）。
+   *
+   * @generated from field: int32 retry_interval_seconds = 10;
+   */
+  retryIntervalSeconds: number;
+
   constructor(data?: PartialMessage<NotificationChannelConfig>);
 
   static readonly runtime: typeof proto3;
@@ -274,6 +317,76 @@ export declare class NotificationChannelConfig extends Message<NotificationChann
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NotificationChannelConfig;
 
   static equals(a: NotificationChannelConfig | PlainMessage<NotificationChannelConfig> | undefined, b: NotificationChannelConfig | PlainMessage<NotificationChannelConfig> | undefined): boolean;
+}
+
+/**
+ * NotificationTemplate は通知メッセージテンプレート。
+ * チャネル種別ごとに異なるフォーマットのテンプレートを管理する。
+ * Go template 形式のプレースホルダ使用:
+ *   {{.AlertName}} — アラートルール名
+ *   {{.Severity}} — 深刻度
+ *   {{.Value}} — トリガー値
+ *   {{.Threshold}} — 閾値
+ *   {{.Domain}} — 監視領域名
+ *   {{.Summary}} — サマリーテキスト
+ *   {{.Labels}} — ラベルmap
+ *
+ * @generated from message sirosimes.amatsukagami.v1.NotificationTemplate
+ */
+export declare class NotificationTemplate extends Message<NotificationTemplate> {
+  /**
+   * @generated from field: sirosimes.common.v1.ResourceMetadata metadata = 1;
+   */
+  metadata?: ResourceMetadata;
+
+  /**
+   * テンプレート名。
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * 対象チャネル種別。
+   *
+   * @generated from field: sirosimes.amatsukagami.v1.NotificationChannelType channel_type = 3;
+   */
+  channelType: NotificationChannelType;
+
+  /**
+   * 件名テンプレート（メール/プッシュ通知用）。
+   *
+   * @generated from field: string subject_template = 4;
+   */
+  subjectTemplate: string;
+
+  /**
+   * 本文テンプレート。
+   *
+   * @generated from field: string body_template = 5;
+   */
+  bodyTemplate: string;
+
+  /**
+   * 説明。
+   *
+   * @generated from field: string description = 6;
+   */
+  description: string;
+
+  constructor(data?: PartialMessage<NotificationTemplate>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "sirosimes.amatsukagami.v1.NotificationTemplate";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NotificationTemplate;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NotificationTemplate;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NotificationTemplate;
+
+  static equals(a: NotificationTemplate | PlainMessage<NotificationTemplate> | undefined, b: NotificationTemplate | PlainMessage<NotificationTemplate> | undefined): boolean;
 }
 
 /**
@@ -627,6 +740,30 @@ export declare class CreateNotificationChannelRequest extends Message<CreateNoti
    */
   description: string;
 
+  /**
+   * 通知テンプレートID。
+   *
+   * @generated from field: string template_id = 7;
+   */
+  templateId: string;
+
+  /**
+   * Quiet Hours設定。
+   *
+   * @generated from field: string quiet_hours_start = 8;
+   */
+  quietHoursStart: string;
+
+  /**
+   * @generated from field: string quiet_hours_end = 9;
+   */
+  quietHoursEnd: string;
+
+  /**
+   * @generated from field: string quiet_hours_timezone = 10;
+   */
+  quietHoursTimezone: string;
+
   constructor(data?: PartialMessage<CreateNotificationChannelRequest>);
 
   static readonly runtime: typeof proto3;
@@ -704,6 +841,30 @@ export declare class UpdateNotificationChannelRequest extends Message<UpdateNoti
    * @generated from field: string description = 7;
    */
   description: string;
+
+  /**
+   * 通知テンプレートID。
+   *
+   * @generated from field: string template_id = 8;
+   */
+  templateId: string;
+
+  /**
+   * Quiet Hours設定。
+   *
+   * @generated from field: string quiet_hours_start = 9;
+   */
+  quietHoursStart: string;
+
+  /**
+   * @generated from field: string quiet_hours_end = 10;
+   */
+  quietHoursEnd: string;
+
+  /**
+   * @generated from field: string quiet_hours_timezone = 11;
+   */
+  quietHoursTimezone: string;
 
   constructor(data?: PartialMessage<UpdateNotificationChannelRequest>);
 

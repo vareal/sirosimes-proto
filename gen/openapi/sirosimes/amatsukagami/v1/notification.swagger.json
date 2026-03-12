@@ -93,7 +93,7 @@
       ],
       "default": "ALERT_SEVERITY_UNSPECIFIED",
       "description": "- ALERT_SEVERITY_INFO: 情報（ログ記録のみ）。\n - ALERT_SEVERITY_WARNING: 警告（司チャットで通知）。\n - ALERT_SEVERITY_HIGH: 高（SMS + 司チャットで通知）。\n - ALERT_SEVERITY_CRITICAL: クリティカル（電話 + SMS + 司チャットで通知）。\n - ALERT_SEVERITY_EMERGENCY: 緊急（Video Call + 電話 + SMS + 司チャットで通知）。",
-      "title": "AlertSeverity はアラートの深刻度を分類する。"
+      "title": "AlertSeverity はアラートの深刻度を分類する。\nnotification.proto の通知チャネル選択に直結する。"
     },
     "v1CreateEscalationPolicyResponse": {
       "type": "object",
@@ -244,6 +244,22 @@
         "description": {
           "type": "string",
           "title": "説明。"
+        },
+        "templateId": {
+          "type": "string",
+          "title": "通知テンプレートID（未設定時はデフォルトテンプレート使用）。"
+        },
+        "quietHoursStart": {
+          "type": "string",
+          "title": "Quiet Hours 開始時刻（HH:MM形式、ローカルタイム。例: \"22:00\"）。\nこの時間帯は min_severity が CRITICAL 未満の通知を抑制する。"
+        },
+        "quietHoursEnd": {
+          "type": "string",
+          "title": "Quiet Hours 終了時刻（HH:MM形式。例: \"07:00\"）。"
+        },
+        "quietHoursTimezone": {
+          "type": "string",
+          "title": "Quiet Hours タイムゾーン（IANA形式。例: \"Asia/Tokyo\"）。"
         }
       },
       "title": "NotificationChannel は通知チャネルの設定を表す。"
@@ -291,6 +307,16 @@
         "twilioAccountRef": {
           "type": "string",
           "title": "Twilio Account SID（暗号化参照）。"
+        },
+        "maxRetries": {
+          "type": "integer",
+          "format": "int32",
+          "title": "最大リトライ回数（0 = リトライなし）。"
+        },
+        "retryIntervalSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "リトライ間隔（秒）。"
         }
       },
       "title": "NotificationChannelConfig はチャネル種別固有の設定。"
@@ -375,7 +401,7 @@
         "NOTIFICATION_STATUS_SKIPPED"
       ],
       "default": "NOTIFICATION_STATUS_UNSPECIFIED",
-      "description": "- NOTIFICATION_STATUS_PENDING: 送信待ち。\n - NOTIFICATION_STATUS_SENDING: 送信中。\n - NOTIFICATION_STATUS_DELIVERED: 配信完了。\n - NOTIFICATION_STATUS_FAILED: 配信失敗。\n - NOTIFICATION_STATUS_RETRYING: 再試行中。\n - NOTIFICATION_STATUS_SKIPPED: スキップ（抑制/重複排除）。",
+      "description": "- NOTIFICATION_STATUS_PENDING: 送信待ち。\n - NOTIFICATION_STATUS_SENDING: 送信中。\n - NOTIFICATION_STATUS_DELIVERED: 配信完了。\n - NOTIFICATION_STATUS_FAILED: 配信失敗。\n - NOTIFICATION_STATUS_RETRYING: 再試行中。\n - NOTIFICATION_STATUS_SKIPPED: スキップ（抑制/重複排除/Quiet Hours）。",
       "title": "NotificationStatus は通知の配信状態。"
     },
     "v1PaginationRequest": {
