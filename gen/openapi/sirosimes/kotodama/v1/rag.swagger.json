@@ -1,0 +1,245 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kotodama/v1/rag.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "RAGService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "sirosimeskotodamav1DeleteDocumentResponse": {
+      "type": "object"
+    },
+    "sirosimeskotodamav1GetDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1RAGDocument"
+        }
+      }
+    },
+    "sirosimeskotodamav1IngestDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1RAGDocument"
+        }
+      }
+    },
+    "sirosimeskotodamav1ListDocumentsResponse": {
+      "type": "object",
+      "properties": {
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1RAGDocument"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1GetRAGStatsResponse": {
+      "type": "object",
+      "properties": {
+        "stats": {
+          "$ref": "#/definitions/v1RAGStats"
+        }
+      }
+    },
+    "v1RAGChunk": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "documentId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "chunkIndex": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "embedding": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "metadata": {
+          "type": "object"
+        }
+      },
+      "description": "RAGChunk represents a chunk of a document with its embedding."
+    },
+    "v1RAGDocument": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "sourceType": {
+          "type": "string",
+          "title": "markdown, pdf, text, html"
+        },
+        "sourceRef": {
+          "type": "string",
+          "title": "URL or file path"
+        },
+        "content": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        },
+        "status": {
+          "type": "string",
+          "title": "pending, indexed, failed"
+        },
+        "chunkCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "RAGDocument represents an ingested document for retrieval-augmented generation."
+    },
+    "v1RAGStats": {
+      "type": "object",
+      "properties": {
+        "totalDocuments": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalChunks": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalEmbeddingsSize": {
+          "type": "string",
+          "format": "int64"
+        },
+        "documentsByStatus": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "documentsBySourceType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "description": "RAGStats contains aggregate statistics for the RAG system."
+    },
+    "v1ReindexDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "$ref": "#/definitions/v1RAGDocument"
+        }
+      }
+    },
+    "v1SearchResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1SearchResult"
+          }
+        }
+      }
+    },
+    "v1SearchResult": {
+      "type": "object",
+      "properties": {
+        "chunk": {
+          "$ref": "#/definitions/v1RAGChunk"
+        },
+        "score": {
+          "type": "number",
+          "format": "double"
+        },
+        "documentTitle": {
+          "type": "string"
+        },
+        "sourceRef": {
+          "type": "string"
+        }
+      },
+      "description": "SearchResult contains a matching chunk with relevance score."
+    }
+  }
+}

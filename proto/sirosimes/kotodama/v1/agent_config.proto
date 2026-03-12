@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// agent_config.proto — Agent loop configuration management.
+
+// AgentLoopConfig defines the configuration for an agent execution loop.
+message AgentLoopConfig {
+  string id = 1;
+  string model_id = 2;
+  int32 max_iterations = 3;        // default 15
+  int32 timeout_seconds = 4;       // default 30
+  repeated string enabled_tools = 5; // execute_code, write_file, read_file, list_files, web_search
+  string sandbox_mode = 6;         // full, restricted, read_only
+  string auto_escalation_model = 7;
+  bool is_active = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+// AgentConfigService manages agent loop configurations.
+service AgentConfigService {
+  rpc CreateAgentLoopConfig(CreateAgentLoopConfigRequest) returns (CreateAgentLoopConfigResponse);
+  rpc GetAgentLoopConfig(GetAgentLoopConfigRequest) returns (GetAgentLoopConfigResponse);
+  rpc ListAgentLoopConfigs(ListAgentLoopConfigsRequest) returns (ListAgentLoopConfigsResponse);
+  rpc UpdateAgentLoopConfig(UpdateAgentLoopConfigRequest) returns (UpdateAgentLoopConfigResponse);
+  rpc DeleteAgentLoopConfig(DeleteAgentLoopConfigRequest) returns (DeleteAgentLoopConfigResponse);
+}
+
+message CreateAgentLoopConfigRequest { AgentLoopConfig config = 1; }
+message CreateAgentLoopConfigResponse { AgentLoopConfig config = 1; }
+message GetAgentLoopConfigRequest { string id = 1; string model_id = 2; }
+message GetAgentLoopConfigResponse { AgentLoopConfig config = 1; }
+message ListAgentLoopConfigsRequest { int32 page_size = 1; string page_token = 2; }
+message ListAgentLoopConfigsResponse { repeated AgentLoopConfig configs = 1; string next_page_token = 2; int32 total_count = 3; }
+message UpdateAgentLoopConfigRequest { AgentLoopConfig config = 1; repeated string update_mask = 2; }
+message UpdateAgentLoopConfigResponse { AgentLoopConfig config = 1; }
+message DeleteAgentLoopConfigRequest { string id = 1; }
+message DeleteAgentLoopConfigResponse {}

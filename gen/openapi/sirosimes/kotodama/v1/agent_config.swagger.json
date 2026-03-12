@@ -1,0 +1,142 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "sirosimes/kotodama/v1/agent_config.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AgentConfigService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AgentLoopConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "modelId": {
+          "type": "string"
+        },
+        "maxIterations": {
+          "type": "integer",
+          "format": "int32",
+          "title": "default 15"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "default 30"
+        },
+        "enabledTools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "execute_code, write_file, read_file, list_files, web_search"
+        },
+        "sandboxMode": {
+          "type": "string",
+          "title": "full, restricted, read_only"
+        },
+        "autoEscalationModel": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "AgentLoopConfig defines the configuration for an agent execution loop."
+    },
+    "v1CreateAgentLoopConfigResponse": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/v1AgentLoopConfig"
+        }
+      }
+    },
+    "v1DeleteAgentLoopConfigResponse": {
+      "type": "object"
+    },
+    "v1GetAgentLoopConfigResponse": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/v1AgentLoopConfig"
+        }
+      }
+    },
+    "v1ListAgentLoopConfigsResponse": {
+      "type": "object",
+      "properties": {
+        "configs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AgentLoopConfig"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1UpdateAgentLoopConfigResponse": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/v1AgentLoopConfig"
+        }
+      }
+    }
+  }
+}

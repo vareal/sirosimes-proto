@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// rag.proto — RAG document ingestion, search, and management.
+
+// RAGDocument represents an ingested document for retrieval-augmented generation.
+message RAGDocument {
+  string id = 1;
+  string title = 2;
+  string source_type = 3;     // markdown, pdf, text, html
+  string source_ref = 4;      // URL or file path
+  string content = 5;
+  google.protobuf.Struct metadata = 6;
+  string status = 7;          // pending, indexed, failed
+  int32 chunk_count = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+// RAGChunk represents a chunk of a document with its embedding.
+message RAGChunk {
+  string id = 1;
+  string document_id = 2;
+  string content = 3;
+  int32 chunk_index = 4;
+  repeated float embedding = 5;
+  google.protobuf.Struct metadata = 6;
+}
+
+// SearchResult contains a matching chunk with relevance score.
+message SearchResult {
+  RAGChunk chunk = 1;
+  double score = 2;
+  string document_title = 3;
+  string source_ref = 4;
+}
+
+// RAGStats contains aggregate statistics for the RAG system.
+message RAGStats {
+  int32 total_documents = 1;
+  int32 total_chunks = 2;
+  int64 total_embeddings_size = 3;
+  map<string, int32> documents_by_status = 4;
+  map<string, int32> documents_by_source_type = 5;
+}
+
+// RAGService manages document ingestion, search, and statistics.
+service RAGService {
+  rpc IngestDocument(IngestDocumentRequest) returns (IngestDocumentResponse);
+  rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse);
+  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse);
+  rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse);
+  rpc ReindexDocument(ReindexDocumentRequest) returns (ReindexDocumentResponse);
+  // Search
+  rpc Search(SearchRequest) returns (SearchResponse);
+  // Stats
+  rpc GetRAGStats(GetRAGStatsRequest) returns (GetRAGStatsResponse);
+}
+
+message IngestDocumentRequest { string title = 1; string source_type = 2; string source_ref = 3; string content = 4; google.protobuf.Struct metadata = 5; }
+message IngestDocumentResponse { RAGDocument document = 1; }
+message GetDocumentRequest { string id = 1; }
+message GetDocumentResponse { RAGDocument document = 1; }
+message ListDocumentsRequest { int32 page_size = 1; string page_token = 2; string status = 3; string source_type = 4; }
+message ListDocumentsResponse { repeated RAGDocument documents = 1; string next_page_token = 2; int32 total_count = 3; }
+message DeleteDocumentRequest { string id = 1; }
+message DeleteDocumentResponse {}
+message ReindexDocumentRequest { string id = 1; }
+message ReindexDocumentResponse { RAGDocument document = 1; }
+message SearchRequest { string query = 1; int32 top_k = 2; double min_score = 3; repeated string source_types = 4; google.protobuf.Struct metadata_filter = 5; }
+message SearchResponse { repeated SearchResult results = 1; }
+message GetRAGStatsRequest {}
+message GetRAGStatsResponse { RAGStats stats = 1; }

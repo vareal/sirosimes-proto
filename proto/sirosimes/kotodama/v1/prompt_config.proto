@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// prompt_config.proto — Prompt configuration and template management.
+
+// PromptConfig defines the prompt configuration for a model.
+message PromptConfig {
+  string id = 1;
+  string model_id = 2;
+  string system_prompt = 3;
+  double temperature = 4;
+  int32 max_tokens = 5;
+  double top_p = 6;
+  string template_id = 7;
+  int32 version = 8;
+  bool is_active = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+// PromptTemplate defines a reusable prompt template.
+message PromptTemplate {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string content = 4;
+  string category = 5;
+  repeated string tags = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// PromptConfigService manages prompt configurations and templates.
+service PromptConfigService {
+  rpc CreatePromptConfig(CreatePromptConfigRequest) returns (CreatePromptConfigResponse);
+  rpc GetPromptConfig(GetPromptConfigRequest) returns (GetPromptConfigResponse);
+  rpc ListPromptConfigs(ListPromptConfigsRequest) returns (ListPromptConfigsResponse);
+  rpc UpdatePromptConfig(UpdatePromptConfigRequest) returns (UpdatePromptConfigResponse);
+  rpc DeletePromptConfig(DeletePromptConfigRequest) returns (DeletePromptConfigResponse);
+  // Templates
+  rpc CreatePromptTemplate(CreatePromptTemplateRequest) returns (CreatePromptTemplateResponse);
+  rpc GetPromptTemplate(GetPromptTemplateRequest) returns (GetPromptTemplateResponse);
+  rpc ListPromptTemplates(ListPromptTemplatesRequest) returns (ListPromptTemplatesResponse);
+  rpc UpdatePromptTemplate(UpdatePromptTemplateRequest) returns (UpdatePromptTemplateResponse);
+  rpc DeletePromptTemplate(DeletePromptTemplateRequest) returns (DeletePromptTemplateResponse);
+  // Version history
+  rpc ListPromptConfigVersions(ListPromptConfigVersionsRequest) returns (ListPromptConfigVersionsResponse);
+}
+
+message CreatePromptConfigRequest { PromptConfig config = 1; }
+message CreatePromptConfigResponse { PromptConfig config = 1; }
+message GetPromptConfigRequest { string id = 1; string model_id = 2; }
+message GetPromptConfigResponse { PromptConfig config = 1; }
+message ListPromptConfigsRequest { int32 page_size = 1; string page_token = 2; string model_id = 3; }
+message ListPromptConfigsResponse { repeated PromptConfig configs = 1; string next_page_token = 2; int32 total_count = 3; }
+message UpdatePromptConfigRequest { PromptConfig config = 1; repeated string update_mask = 2; }
+message UpdatePromptConfigResponse { PromptConfig config = 1; }
+message DeletePromptConfigRequest { string id = 1; }
+message DeletePromptConfigResponse {}
+message CreatePromptTemplateRequest { PromptTemplate template = 1; }
+message CreatePromptTemplateResponse { PromptTemplate template = 1; }
+message GetPromptTemplateRequest { string id = 1; }
+message GetPromptTemplateResponse { PromptTemplate template = 1; }
+message ListPromptTemplatesRequest { int32 page_size = 1; string page_token = 2; string category = 3; }
+message ListPromptTemplatesResponse { repeated PromptTemplate templates = 1; string next_page_token = 2; int32 total_count = 3; }
+message UpdatePromptTemplateRequest { PromptTemplate template = 1; repeated string update_mask = 2; }
+message UpdatePromptTemplateResponse { PromptTemplate template = 1; }
+message DeletePromptTemplateRequest { string id = 1; }
+message DeletePromptTemplateResponse {}
+message ListPromptConfigVersionsRequest { string model_id = 1; int32 page_size = 2; string page_token = 3; }
+message ListPromptConfigVersionsResponse { repeated PromptConfig versions = 1; string next_page_token = 2; }
