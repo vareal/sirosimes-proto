@@ -1,0 +1,82 @@
+// Copyright 2026 Vareal Group. All rights reserved.
+//
+// 響（Hibiki）Strategic Growth Engine — コンバージョンサービス (L4)
+// MQL/SQL管理、商談管理、受注パイプラインを管理する。
+
+syntax = "proto3";
+
+package sirosimes.hibiki.v1;
+
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/sirosimes/hibiki/v1;hibikiv1";
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "google/protobuf/timestamp.proto";
+
+enum DealStage {
+  DEAL_STAGE_UNSPECIFIED = 0;
+  DEAL_STAGE_PROSPECT = 1;
+  DEAL_STAGE_QUALIFICATION = 2;
+  DEAL_STAGE_PROPOSAL = 3;
+  DEAL_STAGE_NEGOTIATION = 4;
+  DEAL_STAGE_CLOSED_WON = 5;
+  DEAL_STAGE_CLOSED_LOST = 6;
+}
+
+message Deal {
+  string id = 1;
+  string lead_id = 2;
+  string name = 3;
+  DealStage stage = 4;
+  // 商談金額（USD）。
+  int64 amount_usd = 5;
+  // 確度（0-100%）。
+  int32 probability_percent = 6;
+  // 想定受注日。
+  google.protobuf.Timestamp expected_close_date = 7;
+  // 備（Nexia ERP）連携ID。
+  string erp_order_id = 8;
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+service ConversionService {
+  rpc CreateDeal(CreateDealRequest) returns (CreateDealResponse);
+  rpc GetDeal(GetDealRequest) returns (GetDealResponse);
+  rpc UpdateDeal(UpdateDealRequest) returns (UpdateDealResponse);
+  rpc ListDeals(ListDealsRequest) returns (ListDealsResponse);
+  rpc ConvertLeadToDeal(ConvertLeadToDealRequest) returns (ConvertLeadToDealResponse);
+  rpc GetFunnelAnalysis(GetFunnelAnalysisRequest) returns (GetFunnelAnalysisResponse);
+}
+
+message CreateDealRequest { Deal deal = 1; }
+message CreateDealResponse { Deal deal = 1; }
+message GetDealRequest { string id = 1; }
+message GetDealResponse { Deal deal = 1; }
+message UpdateDealRequest { Deal deal = 1; }
+message UpdateDealResponse { Deal deal = 1; }
+message ListDealsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  DealStage stage_filter = 2;
+}
+message ListDealsResponse {
+  repeated Deal deals = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message ConvertLeadToDealRequest {
+  string lead_id = 1;
+  string deal_name = 2;
+  int64 amount_usd = 3;
+}
+message ConvertLeadToDealResponse { Deal deal = 1; }
+message GetFunnelAnalysisRequest {
+  string market_segment_id = 1;
+}
+message GetFunnelAnalysisResponse {
+  int32 total_leads = 1;
+  int32 mql_count = 2;
+  int32 sql_count = 3;
+  int32 opportunity_count = 4;
+  int32 won_count = 5;
+  double conversion_rate_percent = 6;
+  int64 pipeline_value_usd = 7;
+}

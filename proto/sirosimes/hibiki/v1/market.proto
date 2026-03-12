@@ -1,0 +1,128 @@
+// Copyright 2026 Vareal Group. All rights reserved.
+//
+// 響（Hibiki）Strategic Growth Engine — マーケットリサーチサービス (L2)
+// マーケットリサーチ、TAM/SAM/SOM算出、競合分析、ペルソナ定義を行う。
+
+syntax = "proto3";
+
+package sirosimes.hibiki.v1;
+
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/sirosimes/hibiki/v1;hibikiv1";
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// MarketSegment は市場セグメントを表す。
+message MarketSegment {
+  string id = 1;
+  // 対応する産業ID。
+  string industry_id = 2;
+  // セグメント名。
+  string name = 3;
+  // 説明。
+  string description = 4;
+  // TAM（Total Addressable Market, USD）。
+  int64 tam_usd = 5;
+  // SAM（Serviceable Addressable Market, USD）。
+  int64 sam_usd = 6;
+  // SOM（Serviceable Obtainable Market, USD）。
+  int64 som_usd = 7;
+  // 成長率（年率%）。
+  double growth_rate_percent = 8;
+  // メタデータ。
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+// Competitor は競合を表す。
+message Competitor {
+  string id = 1;
+  string market_segment_id = 2;
+  string name = 3;
+  string description = 4;
+  // 推定市場シェア（%）。
+  double market_share_percent = 5;
+  // 強み。
+  repeated string strengths = 6;
+  // 弱み。
+  repeated string weaknesses = 7;
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+// Persona はターゲットペルソナを表す。
+message Persona {
+  string id = 1;
+  string market_segment_id = 2;
+  string name = 3;
+  string description = 4;
+  // 属性。
+  map<string, string> attributes = 5;
+  // 課題・ペインポイント。
+  repeated string pain_points = 6;
+  // 購買動機。
+  repeated string motivations = 7;
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+// MarketResearchService はマーケットリサーチを管理する。
+service MarketResearchService {
+  // 市場セグメントを作成する。
+  rpc CreateMarketSegment(CreateMarketSegmentRequest) returns (CreateMarketSegmentResponse);
+  // 市場セグメントを取得する。
+  rpc GetMarketSegment(GetMarketSegmentRequest) returns (GetMarketSegmentResponse);
+  // 市場セグメント一覧を取得する。
+  rpc ListMarketSegments(ListMarketSegmentsRequest) returns (ListMarketSegmentsResponse);
+  // 競合を登録する。
+  rpc CreateCompetitor(CreateCompetitorRequest) returns (CreateCompetitorResponse);
+  // 競合一覧を取得する。
+  rpc ListCompetitors(ListCompetitorsRequest) returns (ListCompetitorsResponse);
+  // ペルソナを作成する。
+  rpc CreatePersona(CreatePersonaRequest) returns (CreatePersonaResponse);
+  // ペルソナ一覧を取得する。
+  rpc ListPersonas(ListPersonasRequest) returns (ListPersonasResponse);
+  // AIによる市場分析を実行する。
+  rpc AnalyzeMarket(AnalyzeMarketRequest) returns (AnalyzeMarketResponse);
+}
+
+message CreateMarketSegmentRequest { MarketSegment segment = 1; }
+message CreateMarketSegmentResponse { MarketSegment segment = 1; }
+message GetMarketSegmentRequest { string id = 1; }
+message GetMarketSegmentResponse { MarketSegment segment = 1; }
+message ListMarketSegmentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string industry_id = 2;
+}
+message ListMarketSegmentsResponse {
+  repeated MarketSegment segments = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message CreateCompetitorRequest { Competitor competitor = 1; }
+message CreateCompetitorResponse { Competitor competitor = 1; }
+message ListCompetitorsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string market_segment_id = 2;
+}
+message ListCompetitorsResponse {
+  repeated Competitor competitors = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message CreatePersonaRequest { Persona persona = 1; }
+message CreatePersonaResponse { Persona persona = 1; }
+message ListPersonasRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string market_segment_id = 2;
+}
+message ListPersonasResponse {
+  repeated Persona personas = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message AnalyzeMarketRequest {
+  string market_segment_id = 1;
+  // AI分析の深度。
+  string analysis_depth = 2;
+}
+message AnalyzeMarketResponse {
+  string summary = 1;
+  repeated string opportunities = 2;
+  repeated string threats = 3;
+  repeated string recommendations = 4;
+}

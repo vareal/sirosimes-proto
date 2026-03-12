@@ -1,0 +1,79 @@
+// Copyright 2026 Vareal Group. All rights reserved.
+//
+// 響（Hibiki）Strategic Growth Engine — キャンペーンサービス (L3)
+// マーケティングキャンペーンの作成・実行・管理を行う。
+
+syntax = "proto3";
+
+package sirosimes.hibiki.v1;
+
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/sirosimes/hibiki/v1;hibikiv1";
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "google/protobuf/timestamp.proto";
+
+enum CampaignStatus {
+  CAMPAIGN_STATUS_UNSPECIFIED = 0;
+  CAMPAIGN_STATUS_DRAFT = 1;
+  CAMPAIGN_STATUS_SCHEDULED = 2;
+  CAMPAIGN_STATUS_RUNNING = 3;
+  CAMPAIGN_STATUS_PAUSED = 4;
+  CAMPAIGN_STATUS_COMPLETED = 5;
+  CAMPAIGN_STATUS_CANCELLED = 6;
+}
+
+enum CampaignType {
+  CAMPAIGN_TYPE_UNSPECIFIED = 0;
+  CAMPAIGN_TYPE_EMAIL = 1;
+  CAMPAIGN_TYPE_CONTENT = 2;
+  CAMPAIGN_TYPE_SOCIAL = 3;
+  CAMPAIGN_TYPE_EVENT = 4;
+  CAMPAIGN_TYPE_MULTI_CHANNEL = 5;
+}
+
+message Campaign {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string market_segment_id = 4;
+  CampaignType type = 5;
+  CampaignStatus status = 6;
+  google.protobuf.Timestamp start_date = 7;
+  google.protobuf.Timestamp end_date = 8;
+  // 予算（USD）。
+  int64 budget_usd = 9;
+  // ターゲットペルソナID。
+  repeated string target_persona_ids = 10;
+  // KPI目標。
+  map<string, double> kpi_targets = 11;
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+service CampaignService {
+  rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse);
+  rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse);
+  rpc UpdateCampaign(UpdateCampaignRequest) returns (UpdateCampaignResponse);
+  rpc ListCampaigns(ListCampaignsRequest) returns (ListCampaignsResponse);
+  rpc LaunchCampaign(LaunchCampaignRequest) returns (LaunchCampaignResponse);
+  rpc PauseCampaign(PauseCampaignRequest) returns (PauseCampaignResponse);
+}
+
+message CreateCampaignRequest { Campaign campaign = 1; }
+message CreateCampaignResponse { Campaign campaign = 1; }
+message GetCampaignRequest { string id = 1; }
+message GetCampaignResponse { Campaign campaign = 1; }
+message UpdateCampaignRequest { Campaign campaign = 1; }
+message UpdateCampaignResponse { Campaign campaign = 1; }
+message ListCampaignsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  CampaignStatus status_filter = 2;
+}
+message ListCampaignsResponse {
+  repeated Campaign campaigns = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message LaunchCampaignRequest { string id = 1; }
+message LaunchCampaignResponse { Campaign campaign = 1; }
+message PauseCampaignRequest { string id = 1; }
+message PauseCampaignResponse { Campaign campaign = 1; }

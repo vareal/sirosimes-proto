@@ -1,0 +1,87 @@
+// Copyright 2026 Vareal Group. All rights reserved.
+//
+// 響（Hibiki）Strategic Growth Engine — リードサービス (L3)
+// リード管理、スコアリング、セグメンテーションを行う。
+
+syntax = "proto3";
+
+package sirosimes.hibiki.v1;
+
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/sirosimes/hibiki/v1;hibikiv1";
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+// LeadStatus はリードのステータスを表す。
+enum LeadStatus {
+  LEAD_STATUS_UNSPECIFIED = 0;
+  LEAD_STATUS_NEW = 1;
+  LEAD_STATUS_CONTACTED = 2;
+  LEAD_STATUS_QUALIFIED = 3;
+  LEAD_STATUS_MQL = 4;
+  LEAD_STATUS_SQL = 5;
+  LEAD_STATUS_OPPORTUNITY = 6;
+  LEAD_STATUS_WON = 7;
+  LEAD_STATUS_LOST = 8;
+}
+
+// Lead はリード（見込み顧客）を表す。
+message Lead {
+  string id = 1;
+  string market_segment_id = 2;
+  string persona_id = 3;
+  string company_name = 4;
+  string contact_name = 5;
+  string email = 6;
+  string phone = 7;
+  LeadStatus status = 8;
+  // AIスコア（0-100）。
+  int32 score = 9;
+  // リードソース。
+  string source = 10;
+  // カスタム属性。
+  map<string, string> attributes = 11;
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+// LeadService はリード管理を行う。
+service LeadService {
+  rpc CreateLead(CreateLeadRequest) returns (CreateLeadResponse);
+  rpc GetLead(GetLeadRequest) returns (GetLeadResponse);
+  rpc UpdateLead(UpdateLeadRequest) returns (UpdateLeadResponse);
+  rpc ListLeads(ListLeadsRequest) returns (ListLeadsResponse);
+  rpc ScoreLead(ScoreLeadRequest) returns (ScoreLeadResponse);
+  rpc BulkImportLeads(BulkImportLeadsRequest) returns (BulkImportLeadsResponse);
+}
+
+message CreateLeadRequest { Lead lead = 1; }
+message CreateLeadResponse { Lead lead = 1; }
+message GetLeadRequest { string id = 1; }
+message GetLeadResponse { Lead lead = 1; }
+message UpdateLeadRequest { Lead lead = 1; }
+message UpdateLeadResponse { Lead lead = 1; }
+message ListLeadsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  LeadStatus status_filter = 2;
+  string market_segment_id = 3;
+  int32 min_score = 4;
+}
+message ListLeadsResponse {
+  repeated Lead leads = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message ScoreLeadRequest { string lead_id = 1; }
+message ScoreLeadResponse {
+  string lead_id = 1;
+  int32 score = 2;
+  repeated string scoring_factors = 3;
+}
+message BulkImportLeadsRequest {
+  repeated Lead leads = 1;
+  string source = 2;
+}
+message BulkImportLeadsResponse {
+  int32 imported_count = 1;
+  int32 duplicate_count = 2;
+  int32 error_count = 3;
+}

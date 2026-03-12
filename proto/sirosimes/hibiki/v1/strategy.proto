@@ -1,0 +1,109 @@
+// Copyright 2026 Vareal Group. All rights reserved.
+//
+// 響（Hibiki）Strategic Growth Engine — 産業戦略サービス (L1)
+// 設立趣意書Vision/Missionから参入産業を決定し、産業ポートフォリオを管理する。
+
+syntax = "proto3";
+
+package sirosimes.hibiki.v1;
+
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/sirosimes/hibiki/v1;hibikiv1";
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "google/protobuf/timestamp.proto";
+
+// IndustryStatus は産業の参入ステータスを表す。
+enum IndustryStatus {
+  // 未指定。
+  INDUSTRY_STATUS_UNSPECIFIED = 0;
+  // 調査中。
+  INDUSTRY_STATUS_RESEARCHING = 1;
+  // 参入決定。
+  INDUSTRY_STATUS_APPROVED = 2;
+  // 参入実行中。
+  INDUSTRY_STATUS_ACTIVE = 3;
+  // 支配的ポジション確立。
+  INDUSTRY_STATUS_DOMINANT = 4;
+  // 撤退。
+  INDUSTRY_STATUS_WITHDRAWN = 5;
+}
+
+// Industry は参入対象の産業を表す。
+message Industry {
+  // 産業の一意識別子。
+  string id = 1;
+  // 産業名（例：「農業」「エネルギー」「宇宙開発」）。
+  string name = 2;
+  // 説明。
+  string description = 3;
+  // 設立趣意書Visionとの対応（例：「2030年ヒューマノイド社会浸透」）。
+  string vision_alignment = 4;
+  // 参入ステータス。
+  IndustryStatus status = 5;
+  // 参入優先度（1が最高）。
+  int32 priority = 6;
+  // 目標参入時期。
+  google.protobuf.Timestamp target_entry_date = 7;
+  // TAM（Total Addressable Market）概算（USD）。
+  int64 tam_usd = 8;
+  // メタデータ。
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+// StrategyService は産業戦略を管理する。
+service StrategyService {
+  // 産業を登録する。
+  rpc CreateIndustry(CreateIndustryRequest) returns (CreateIndustryResponse);
+  // 産業情報を取得する。
+  rpc GetIndustry(GetIndustryRequest) returns (GetIndustryResponse);
+  // 産業情報を更新する。
+  rpc UpdateIndustry(UpdateIndustryRequest) returns (UpdateIndustryResponse);
+  // 産業一覧を取得する。
+  rpc ListIndustries(ListIndustriesRequest) returns (ListIndustriesResponse);
+  // 産業ポートフォリオ分析を実行する。
+  rpc AnalyzePortfolio(AnalyzePortfolioRequest) returns (AnalyzePortfolioResponse);
+}
+
+message CreateIndustryRequest {
+  Industry industry = 1;
+}
+message CreateIndustryResponse {
+  Industry industry = 1;
+}
+
+message GetIndustryRequest {
+  string id = 1;
+}
+message GetIndustryResponse {
+  Industry industry = 1;
+}
+
+message UpdateIndustryRequest {
+  Industry industry = 1;
+}
+message UpdateIndustryResponse {
+  Industry industry = 1;
+}
+
+message ListIndustriesRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  IndustryStatus status_filter = 2;
+}
+message ListIndustriesResponse {
+  repeated Industry industries = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message AnalyzePortfolioRequest {
+  // 分析対象の産業IDリスト（空の場合は全産業）。
+  repeated string industry_ids = 1;
+}
+message AnalyzePortfolioResponse {
+  // 産業ポートフォリオのサマリー。
+  string summary = 1;
+  // 推奨アクション。
+  repeated string recommendations = 2;
+  // 設立趣意書Visionカバレッジ率（0-100）。
+  int32 vision_coverage_percent = 3;
+}

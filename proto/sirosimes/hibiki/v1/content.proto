@@ -1,0 +1,78 @@
+// Copyright 2026 Vareal Group. All rights reserved.
+//
+// 響（Hibiki）Strategic Growth Engine — コンテンツサービス (L3)
+// AI駆動コンテンツ生成・管理・バリアント作成を行う。
+
+syntax = "proto3";
+
+package sirosimes.hibiki.v1;
+
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/sirosimes/hibiki/v1;hibikiv1";
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+
+enum ContentType {
+  CONTENT_TYPE_UNSPECIFIED = 0;
+  CONTENT_TYPE_BLOG_POST = 1;
+  CONTENT_TYPE_EMAIL = 2;
+  CONTENT_TYPE_SOCIAL_POST = 3;
+  CONTENT_TYPE_LANDING_PAGE = 4;
+  CONTENT_TYPE_WHITEPAPER = 5;
+  CONTENT_TYPE_VIDEO_SCRIPT = 6;
+  CONTENT_TYPE_AD_COPY = 7;
+}
+
+message Content {
+  string id = 1;
+  string campaign_id = 2;
+  string title = 3;
+  string body = 4;
+  ContentType type = 5;
+  // ターゲットペルソナID。
+  string persona_id = 6;
+  // 言語コード。
+  string language = 7;
+  // AIが生成したバリアント数。
+  int32 variant_count = 8;
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+service ContentService {
+  rpc CreateContent(CreateContentRequest) returns (CreateContentResponse);
+  rpc GetContent(GetContentRequest) returns (GetContentResponse);
+  rpc ListContents(ListContentsRequest) returns (ListContentsResponse);
+  rpc GenerateContent(GenerateContentRequest) returns (GenerateContentResponse);
+  rpc GenerateVariants(GenerateVariantsRequest) returns (GenerateVariantsResponse);
+}
+
+message CreateContentRequest { Content content = 1; }
+message CreateContentResponse { Content content = 1; }
+message GetContentRequest { string id = 1; }
+message GetContentResponse { Content content = 1; }
+message ListContentsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string campaign_id = 2;
+  ContentType type_filter = 3;
+}
+message ListContentsResponse {
+  repeated Content contents = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message GenerateContentRequest {
+  string campaign_id = 1;
+  ContentType type = 2;
+  string persona_id = 3;
+  string language = 4;
+  string prompt = 5;
+}
+message GenerateContentResponse {
+  Content content = 1;
+}
+message GenerateVariantsRequest {
+  string content_id = 1;
+  int32 variant_count = 2;
+}
+message GenerateVariantsResponse {
+  repeated Content variants = 1;
+}

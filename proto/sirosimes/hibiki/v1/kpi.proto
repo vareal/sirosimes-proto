@@ -1,0 +1,101 @@
+// Copyright 2026 Vareal Group. All rights reserved.
+//
+// 響（Hibiki）Strategic Growth Engine — KGI/KPIサービス (L5)
+// KGI/KPI設定・追跡・予測・アラートを管理する。
+
+syntax = "proto3";
+
+package sirosimes.hibiki.v1;
+
+option go_package = "github.com/vareal/sirosimes-proto/gen/go/sirosimes/hibiki/v1;hibikiv1";
+
+import "sirosimes/common/v1/metadata.proto";
+import "sirosimes/common/v1/pagination.proto";
+import "google/protobuf/timestamp.proto";
+
+enum KpiType {
+  KPI_TYPE_UNSPECIFIED = 0;
+  // KGI（Key Goal Indicator）。
+  KPI_TYPE_KGI = 1;
+  // KPI（Key Performance Indicator）。
+  KPI_TYPE_KPI = 2;
+}
+
+message KpiDefinition {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  KpiType type = 4;
+  // 対象産業ID（空の場合はグループ全体）。
+  string industry_id = 5;
+  // 対象市場セグメントID。
+  string market_segment_id = 6;
+  // 目標値。
+  double target_value = 7;
+  // 単位（例："USD", "%", "件"）。
+  string unit = 8;
+  // 計測期間。
+  google.protobuf.Timestamp period_start = 9;
+  google.protobuf.Timestamp period_end = 10;
+  sirosimes.common.v1.ResourceMetadata metadata = 15;
+}
+
+message KpiRecord {
+  string id = 1;
+  string kpi_definition_id = 2;
+  double actual_value = 3;
+  double achievement_rate_percent = 4;
+  google.protobuf.Timestamp recorded_at = 5;
+}
+
+service KpiService {
+  rpc CreateKpiDefinition(CreateKpiDefinitionRequest) returns (CreateKpiDefinitionResponse);
+  rpc GetKpiDefinition(GetKpiDefinitionRequest) returns (GetKpiDefinitionResponse);
+  rpc ListKpiDefinitions(ListKpiDefinitionsRequest) returns (ListKpiDefinitionsResponse);
+  rpc RecordKpi(RecordKpiRequest) returns (RecordKpiResponse);
+  rpc GetKpiHistory(GetKpiHistoryRequest) returns (GetKpiHistoryResponse);
+  rpc GetKpiDashboard(GetKpiDashboardRequest) returns (GetKpiDashboardResponse);
+  rpc ForecastKpi(ForecastKpiRequest) returns (ForecastKpiResponse);
+}
+
+message CreateKpiDefinitionRequest { KpiDefinition definition = 1; }
+message CreateKpiDefinitionResponse { KpiDefinition definition = 1; }
+message GetKpiDefinitionRequest { string id = 1; }
+message GetKpiDefinitionResponse { KpiDefinition definition = 1; }
+message ListKpiDefinitionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  KpiType type_filter = 2;
+  string industry_id = 3;
+}
+message ListKpiDefinitionsResponse {
+  repeated KpiDefinition definitions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+message RecordKpiRequest {
+  string kpi_definition_id = 1;
+  double value = 2;
+}
+message RecordKpiResponse { KpiRecord record = 1; }
+message GetKpiHistoryRequest {
+  string kpi_definition_id = 1;
+  google.protobuf.Timestamp from = 2;
+  google.protobuf.Timestamp to = 3;
+}
+message GetKpiHistoryResponse { repeated KpiRecord records = 1; }
+message GetKpiDashboardRequest {
+  string industry_id = 1;
+}
+message GetKpiDashboardResponse {
+  repeated KpiDefinition definitions = 1;
+  repeated KpiRecord latest_records = 2;
+  // 設立趣意書Vision進捗率（0-100）。
+  int32 vision_progress_percent = 3;
+}
+message ForecastKpiRequest {
+  string kpi_definition_id = 1;
+  int32 forecast_months = 2;
+}
+message ForecastKpiResponse {
+  repeated KpiRecord forecasted_records = 1;
+  double predicted_achievement_percent = 2;
+}
