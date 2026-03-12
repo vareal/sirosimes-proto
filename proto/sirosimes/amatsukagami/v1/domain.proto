@@ -13,6 +13,19 @@ import "sirosimes/amatsukagami/v1/alert.proto";
 // 8監視領域のドメイン構成・ヘルス集約・ステータスサマリーを定義する。
 // Single Pane of Glass の基盤として、全領域の一括ヘルスチェックと
 // 領域別の詳細ステータスを提供する。
+//
+// 各監視領域は DomainConfig で構成・データソースを管理し、
+// DomainHealth でリアルタイムのヘルス状態を集約する。
+// SystemOverview は全8領域の統合サマリーを提供する。
+//
+// ヘルス判定ロジック:
+//   各領域の HealthRule 群をウェイト加重平均し health_score を算出。
+//   health_score と閾値の比較で DomainHealthStatus を決定:
+//     >= 0.9: HEALTHY
+//     >= 0.7: DEGRADED
+//     >= 0.5: WARNING
+//     <  0.5: CRITICAL
+//     データ取得不可: UNKNOWN
 
 // DomainHealthStatus は監視領域のヘルス状態。
 enum DomainHealthStatus {
@@ -27,6 +40,17 @@ enum DomainHealthStatus {
   DOMAIN_HEALTH_STATUS_CRITICAL = 4;
   // 不明（データ取得不可）。
   DOMAIN_HEALTH_STATUS_UNKNOWN = 5;
+}
+
+// TrendDirection はヘルストレンドの方向。
+enum TrendDirection {
+  TREND_DIRECTION_UNSPECIFIED = 0;
+  // 改善傾向。
+  TREND_DIRECTION_IMPROVING = 1;
+  // 安定。
+  TREND_DIRECTION_STABLE = 2;
+  // 悪化傾向。
+  TREND_DIRECTION_DEGRADING = 3;
 }
 
 // DomainConfig は監視領域の設定を表す。
@@ -50,6 +74,10 @@ message DomainConfig {
   repeated string related_products = 9;
   // データソース。
   repeated DataSourceConfig data_sources = 10;
+  // アイコン名（ダッシュボードUI表示用）。
+  string icon = 11;
+  // 表示順序（ダッシュボード上の並び順、昇順）。
+  int32 display_order = 12;
 }
 
 // HealthRule はヘルス判定条件。
@@ -106,6 +134,12 @@ message DomainHealth {
   map<string, double> key_metrics = 8;
   // ステータスメッセージ。
   string status_message = 9;
+  // ヘルストレンド方向（直近の変動傾向）。
+  TrendDirection trend = 10;
+  // トレンド変化率（パーセント。正=改善、負=悪化）。
+  float trend_change_percent = 11;
+  // 前回ヘルススコア（トレンド計算の基準値）。
+  float previous_health_score = 12;
 }
 
 // SystemOverview は全領域の統合ヘルスサマリー。
@@ -122,6 +156,8 @@ message SystemOverview {
   google.protobuf.Timestamp last_updated = 5;
   // 概況メッセージ。
   string summary = 6;
+  // システム全体のトレンド方向。
+  TrendDirection overall_trend = 7;
 }
 
 // DomainService は監視領域管理・ヘルス照会サービス。
@@ -182,6 +218,10 @@ message UpdateDomainConfigRequest {
   repeated string responsible_cxo_roles = 7;
   repeated string related_products = 8;
   repeated DataSourceConfig data_sources = 9;
+  // アイコン名。
+  string icon = 10;
+  // 表示順序。
+  int32 display_order = 11;
 }
 
 message UpdateDomainConfigResponse {

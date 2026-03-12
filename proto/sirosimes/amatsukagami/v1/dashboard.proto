@@ -11,6 +11,15 @@ import "sirosimes/amatsukagami/v1/metric.proto";
 // Single Pane of Glass ダッシュボードの構成を定義する。
 // CXOプリセット（CEO/COO/CTO/CFO等のロール別デフォルトビュー）、
 // カスタムダッシュボード、パネル構成、データソース設定を含む。
+//
+// テンプレート変数:
+//   DashboardVariable によりダッシュボードにパラメータ化されたフィルタを追加可能。
+//   例: $domain で監視領域を切り替え、$service でサービス名フィルタ。
+//   パネルクエリの filters / label_filters で "${variable_name}" として参照。
+//
+// レイアウト:
+//   24カラムグリッドシステムを採用。各パネルは grid_x/y/width/height で配置。
+//   DashboardRow でパネルを論理的にグループ化し、折りたたみ可能。
 
 // PanelType はダッシュボードパネルの表示種別。
 enum PanelType {
@@ -37,6 +46,10 @@ enum PanelType {
   PANEL_TYPE_LOG = 10;
   // マークダウンテキスト。
   PANEL_TYPE_TEXT = 11;
+  // トポロジーマップ（ネットワーク・サービス依存関係図）。
+  PANEL_TYPE_TOPOLOGY = 12;
+  // フローダイアグラム（Sankey図: データフロー・コスト配分可視化）。
+  PANEL_TYPE_FLOW = 13;
 }
 
 // DashboardPreset はCXOロール別プリセットダッシュボード種別。
@@ -60,6 +73,46 @@ enum DashboardPreset {
   DASHBOARD_PRESET_CUSTOM = 8;
 }
 
+// VariableType はダッシュボード変数の種別。
+enum VariableType {
+  VARIABLE_TYPE_UNSPECIFIED = 0;
+  // 固定値リストから選択。
+  VARIABLE_TYPE_CUSTOM = 1;
+  // メトリクスラベル値から動的取得。
+  VARIABLE_TYPE_LABEL_VALUES = 2;
+  // メトリクス名一覧から動的取得。
+  VARIABLE_TYPE_METRIC_NAMES = 3;
+  // 監視領域選択。
+  VARIABLE_TYPE_DOMAIN = 4;
+  // テキスト入力。
+  VARIABLE_TYPE_TEXT = 5;
+  // 時間間隔（例: 5m, 1h, 1d）。
+  VARIABLE_TYPE_INTERVAL = 6;
+}
+
+// DashboardVariable はダッシュボードのテンプレート変数を定義する。
+// パネルクエリのフィルタで "${name}" として参照可能。
+message DashboardVariable {
+  // 変数名（パネルクエリで ${name} として参照）。
+  string name = 1;
+  // 表示ラベル。
+  string label = 2;
+  // 変数種別。
+  VariableType type = 3;
+  // デフォルト値。
+  string default_value = 4;
+  // 選択肢（VARIABLE_TYPE_CUSTOM時）。
+  repeated string options = 5;
+  // ラベルキー（VARIABLE_TYPE_LABEL_VALUES時: このラベルの値を取得）。
+  string label_key = 6;
+  // メトリクス名（VARIABLE_TYPE_LABEL_VALUES時: このメトリクスのラベル値を取得）。
+  string source_metric = 7;
+  // 複数選択可。
+  bool multi_select = 8;
+  // 「全て」オプション追加。
+  bool include_all = 9;
+}
+
 // PanelQuery はパネルのデータ取得クエリを定義する。
 message PanelQuery {
   // メトリクス名。
@@ -70,9 +123,9 @@ message PanelQuery {
   AggregationMethod aggregation = 3;
   // グループ化ラベル。
   repeated string group_by = 4;
-  // フィルタ条件。
+  // フィルタ条件。テンプレート変数は "${variable_name}" で参照可能。
   map<string, string> filters = 5;
-  // クエリ表示名（凡例）。
+  // クエリ表示名（凡例）。テンプレート変数使用可。
   string legend = 6;
 }
 
@@ -90,7 +143,7 @@ message PanelThreshold {
 message Panel {
   // パネルID（ダッシュボード内で一意）。
   string id = 1;
-  // タイトル。
+  // タイトル。テンプレート変数使用可。
   string title = 2;
   // パネル種別。
   PanelType type = 3;
@@ -106,12 +159,14 @@ message Panel {
   int32 grid_height = 8;
   // 閾値設定。
   repeated PanelThreshold thresholds = 9;
-  // テキスト内容（PANEL_TYPE_TEXT用）。
+  // テキスト内容（PANEL_TYPE_TEXT用）。マークダウン形式。
   string text_content = 10;
   // 表示単位。
   string unit = 11;
   // 小数桁数。
   int32 decimals = 12;
+  // パネル説明（ツールチップ表示用）。
+  string description = 13;
 }
 
 // DashboardRow はパネルを含む行グループ。
@@ -147,6 +202,8 @@ message Dashboard {
   repeated string favorited_by = 9;
   // タグ。
   repeated string tags = 10;
+  // テンプレート変数（パネルクエリのパラメータ化に使用）。
+  repeated DashboardVariable variables = 11;
 }
 
 // DashboardService はダッシュボード管理サービス。
@@ -197,6 +254,8 @@ message CreateDashboardRequest {
   int32 default_time_range_hours = 6;
   bool shared = 7;
   repeated string tags = 8;
+  // テンプレート変数。
+  repeated DashboardVariable variables = 9;
 }
 
 message CreateDashboardResponse {
@@ -212,6 +271,8 @@ message UpdateDashboardRequest {
   int32 default_time_range_hours = 6;
   bool shared = 7;
   repeated string tags = 8;
+  // テンプレート変数。
+  repeated DashboardVariable variables = 9;
 }
 
 message UpdateDashboardResponse {

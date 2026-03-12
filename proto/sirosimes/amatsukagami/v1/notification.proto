@@ -15,6 +15,14 @@ import "sirosimes/amatsukagami/v1/alert.proto";
 // 🟠 High: SMS+司チャット  🔴 Critical: 電話+SMS+司チャット
 // ⚫ Emergency: Video Call+電話+SMS+司チャット
 // CXO別ルーティングとエスカレーションフローを定義する。
+//
+// 通知テンプレート:
+//   NotificationTemplate でチャネル種別ごとの通知メッセージテンプレートを管理。
+//   Go template 形式で {{.AlertName}}, {{.Severity}}, {{.Value}} 等のプレースホルダ使用可。
+//
+// Quiet Hours:
+//   NotificationChannel に quiet_hours_start/end を設定し、
+//   深夜帯等の通知抑制が可能（CRITICAL/EMERGENCY は抑制対象外）。
 
 // NotificationChannelType は通知チャネルの種別。
 enum NotificationChannelType {
@@ -48,7 +56,7 @@ enum NotificationStatus {
   NOTIFICATION_STATUS_FAILED = 4;
   // 再試行中。
   NOTIFICATION_STATUS_RETRYING = 5;
-  // スキップ（抑制/重複排除）。
+  // スキップ（抑制/重複排除/Quiet Hours）。
   NOTIFICATION_STATUS_SKIPPED = 6;
 }
 
@@ -69,6 +77,15 @@ message NotificationChannel {
   repeated string cxo_roles = 7;
   // 説明。
   string description = 8;
+  // 通知テンプレートID（未設定時はデフォルトテンプレート使用）。
+  string template_id = 9;
+  // Quiet Hours 開始時刻（HH:MM形式、ローカルタイム。例: "22:00"）。
+  // この時間帯は min_severity が CRITICAL 未満の通知を抑制する。
+  string quiet_hours_start = 10;
+  // Quiet Hours 終了時刻（HH:MM形式。例: "07:00"）。
+  string quiet_hours_end = 11;
+  // Quiet Hours タイムゾーン（IANA形式。例: "Asia/Tokyo"）。
+  string quiet_hours_timezone = 12;
 }
 
 // NotificationChannelConfig はチャネル種別固有の設定。
@@ -89,6 +106,34 @@ message NotificationChannelConfig {
   bool video_auto_start = 7;
   // Twilio Account SID（暗号化参照）。
   string twilio_account_ref = 8;
+  // 最大リトライ回数（0 = リトライなし）。
+  int32 max_retries = 9;
+  // リトライ間隔（秒）。
+  int32 retry_interval_seconds = 10;
+}
+
+// NotificationTemplate は通知メッセージテンプレート。
+// チャネル種別ごとに異なるフォーマットのテンプレートを管理する。
+// Go template 形式のプレースホルダ使用:
+//   {{.AlertName}} — アラートルール名
+//   {{.Severity}} — 深刻度
+//   {{.Value}} — トリガー値
+//   {{.Threshold}} — 閾値
+//   {{.Domain}} — 監視領域名
+//   {{.Summary}} — サマリーテキスト
+//   {{.Labels}} — ラベルmap
+message NotificationTemplate {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // テンプレート名。
+  string name = 2;
+  // 対象チャネル種別。
+  NotificationChannelType channel_type = 3;
+  // 件名テンプレート（メール/プッシュ通知用）。
+  string subject_template = 4;
+  // 本文テンプレート。
+  string body_template = 5;
+  // 説明。
+  string description = 6;
 }
 
 // EscalationPolicy はエスカレーションポリシーを定義する。
@@ -199,6 +244,12 @@ message CreateNotificationChannelRequest {
   AlertSeverity min_severity = 4;
   repeated string cxo_roles = 5;
   string description = 6;
+  // 通知テンプレートID。
+  string template_id = 7;
+  // Quiet Hours設定。
+  string quiet_hours_start = 8;
+  string quiet_hours_end = 9;
+  string quiet_hours_timezone = 10;
 }
 
 message CreateNotificationChannelResponse {
@@ -213,6 +264,12 @@ message UpdateNotificationChannelRequest {
   AlertSeverity min_severity = 5;
   repeated string cxo_roles = 6;
   string description = 7;
+  // 通知テンプレートID。
+  string template_id = 8;
+  // Quiet Hours設定。
+  string quiet_hours_start = 9;
+  string quiet_hours_end = 10;
+  string quiet_hours_timezone = 11;
 }
 
 message UpdateNotificationChannelResponse {

@@ -14,8 +14,27 @@ import "sirosimes/amatsukagami/v1/metric.proto";
 // 評価エンジンは定期的にルールを評価し、条件一致時にアラートを発火する。
 // 発火したアラートは notification.proto で定義される通知チャネルに配信される。
 // 機織（Hataori）WFトリガーとの連携も定義する。
+//
+// アラートライフサイクル:
+//   OK → PENDING（条件該当、pending_duration経過待ち）
+//      → FIRING（発火、通知送信・WF起動）
+//      → ACKNOWLEDGED（担当者確認済み）
+//      → RESOLVED（解決）
+//   ※ SUPPRESSED は SuppressionWindow により一時的に発火を抑制する状態。
+//
+// 機織（Hataori）連携:
+//   AlertAction.hataori_workflow_id に機織WF IDを指定すると、
+//   アラート発火時に hataori/v1/trigger.proto の TRIGGER_TYPE_TENSHU_ALERT
+//   経由でワークフローが自動起動される。workflow_params でパラメータ渡し可能。
+//
+// エスカレーション:
+//   AlertAction に escalation_delay + escalation_channel_ids を設定すると
+//   時間ベースのエスカレーションが行われる。
+//   より複雑なエスカレーションは notification.proto の EscalationPolicy で管理。
+//   AlertRule.escalation_policy_id で EscalationPolicy を直接参照可能。
 
 // AlertSeverity はアラートの深刻度を分類する。
+// notification.proto の通知チャネル選択に直結する。
 enum AlertSeverity {
   ALERT_SEVERITY_UNSPECIFIED = 0;
   // 情報（ログ記録のみ）。
@@ -81,6 +100,7 @@ message AlertAction {
   // 通知チャネルID（notification.proto参照）。
   repeated string notification_channel_ids = 1;
   // 機織WF ID（自動実行するワークフロー）。
+  // hataori/v1/trigger.proto の TRIGGER_TYPE_TENSHU_ALERT と連動。
   string hataori_workflow_id = 2;
   // 機織WFトリガーパラメータ。
   map<string, string> workflow_params = 3;
@@ -88,6 +108,9 @@ message AlertAction {
   google.protobuf.Duration escalation_delay = 4;
   // エスカレーション先通知チャネルID。
   repeated string escalation_channel_ids = 5;
+  // 通知繰り返し間隔（アラート継続中の再通知間隔）。
+  // 未設定（0）の場合、発火時に一度だけ通知。
+  google.protobuf.Duration repeat_interval = 6;
 }
 
 // AlertRule はアラートルールを定義する。
@@ -113,6 +136,12 @@ message AlertRule {
   repeated string cxo_routing = 10;
   // ラベル（グルーピング・フィルタ用）。
   map<string, string> labels = 11;
+  // エスカレーションポリシーID（notification.proto EscalationPolicy参照）。
+  // AlertAction内のescalation_delay/escalation_channel_idsより優先される。
+  string escalation_policy_id = 12;
+  // アノテーション（アラート本文テンプレート等の補足情報）。
+  // 例: {"summary": "CPU使用率が{{value}}%に達しました", "runbook": "https://..."}
+  map<string, string> annotations = 13;
 }
 
 // AlertInstance はアラートルールの評価結果（発火インスタンス）を表す。
@@ -146,6 +175,10 @@ message AlertInstance {
   double threshold_value = 14;
   // 発火時のラベル。
   map<string, string> labels = 15;
+  // 人間可読なサマリー（アノテーションテンプレート展開結果）。
+  string summary = 16;
+  // 最終通知送信時刻（repeat_interval使用時）。
+  google.protobuf.Timestamp last_notified_at = 17;
 }
 
 // SuppressionWindow はアラート抑制ウィンドウ（メンテナンス等）。
@@ -226,6 +259,10 @@ message CreateAlertRuleRequest {
   google.protobuf.Duration pending_duration = 7;
   repeated string cxo_routing = 8;
   map<string, string> labels = 9;
+  // エスカレーションポリシーID。
+  string escalation_policy_id = 10;
+  // アノテーション。
+  map<string, string> annotations = 11;
 }
 
 message CreateAlertRuleResponse {
@@ -244,6 +281,10 @@ message UpdateAlertRuleRequest {
   bool enabled = 9;
   repeated string cxo_routing = 10;
   map<string, string> labels = 11;
+  // エスカレーションポリシーID。
+  string escalation_policy_id = 12;
+  // アノテーション。
+  map<string, string> annotations = 13;
 }
 
 message UpdateAlertRuleResponse {

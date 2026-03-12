@@ -13,21 +13,44 @@ import "sirosimes/common/v1/pagination.proto";
 // 人間の本性は善でも悪でもなく、環境・状況により不正・勘違い・怠慢を起こしうる。
 // ブラックボックスなし — 全行動の可視化を通じて、厳しさと愛情を持って導く。
 //
-// 監視カテゴリ:
-// 1. 勤怠・稼働時間  2. 業務量・タスク遂行  3. デバイス利用
-// 4. アクセスログ  5. 不正・怠慢検知  6. KPI・パフォーマンス
-// 7. 過負荷・ウェルビーイング  8. 経費利用  9. 是正フロー  10. 表彰
+// 10の監視カテゴリ:
+//   1. 勤怠・稼働時間 — AttendanceRecord
+//   2. 業務量・タスク遂行 — EmployeePerformance.tasks_completed 等
+//   3. デバイス利用 — DeviceActivity
+//   4. アクセスログ — AccessLogRecord
+//   5. 不正・怠慢検知 — EmployeeAnomaly
+//   6. KPI・パフォーマンス — EmployeePerformance.kpi_scores
+//   7. 過負荷・ウェルビーイング — EmployeePerformance.wellbeing_score
+//   8. 経費利用 — ExpenseRecord
+//   9. 是正フロー — CorrectiveAction
+//   10. 表彰 — CorrectiveAction (type=RECOGNITION) + RecognitionRecord
+//
+// 他ドメイン連携:
+//   - metric.proto: MONITORING_DOMAIN_HUMAN_EMPLOYEE として集約メトリクス提供
+//   - alert.proto: 異常検知時に AlertSeverity に応じたアラート発火
+//   - 司（Tsukasa）: employee_id は司の社員マスタを参照
 
 // AttendanceStatus は勤怠状態。
 enum AttendanceStatus {
   ATTENDANCE_STATUS_UNSPECIFIED = 0;
+  // 勤務中。
   ATTENDANCE_STATUS_WORKING = 1;
+  // 休憩中。
   ATTENDANCE_STATUS_BREAK = 2;
+  // 会議中。
   ATTENDANCE_STATUS_MEETING = 3;
+  // 欠勤。
   ATTENDANCE_STATUS_ABSENT = 4;
+  // 有給休暇。
   ATTENDANCE_STATUS_LEAVE = 5;
+  // 祝日・公休。
   ATTENDANCE_STATUS_HOLIDAY = 6;
+  // 残業中。
   ATTENDANCE_STATUS_OVERTIME = 7;
+  // リモートワーク中。
+  ATTENDANCE_STATUS_REMOTE = 8;
+  // 出張中。
+  ATTENDANCE_STATUS_BUSINESS_TRIP = 9;
 }
 
 // AnomalyType は人間社員の異常検知種別。
@@ -75,11 +98,35 @@ enum CorrectiveActionType {
 // CorrectiveActionStatus は是正措置のステータス。
 enum CorrectiveActionStatus {
   CORRECTIVE_ACTION_STATUS_UNSPECIFIED = 0;
+  // 提案済み（AI/システムが提案）。
   CORRECTIVE_ACTION_STATUS_PROPOSED = 1;
+  // 承認済み（HITL: 人間が承認）。
   CORRECTIVE_ACTION_STATUS_APPROVED = 2;
+  // 実行中。
   CORRECTIVE_ACTION_STATUS_IN_PROGRESS = 3;
+  // 完了。
   CORRECTIVE_ACTION_STATUS_COMPLETED = 4;
+  // 取消。
   CORRECTIVE_ACTION_STATUS_CANCELLED = 5;
+}
+
+// ExpenseCategory は経費カテゴリ。
+enum ExpenseCategory {
+  EXPENSE_CATEGORY_UNSPECIFIED = 0;
+  // 交通費。
+  EXPENSE_CATEGORY_TRANSPORTATION = 1;
+  // 宿泊費。
+  EXPENSE_CATEGORY_ACCOMMODATION = 2;
+  // 接待交際費。
+  EXPENSE_CATEGORY_ENTERTAINMENT = 3;
+  // 備品・消耗品。
+  EXPENSE_CATEGORY_SUPPLIES = 4;
+  // 通信費。
+  EXPENSE_CATEGORY_COMMUNICATION = 5;
+  // 研修・教育費。
+  EXPENSE_CATEGORY_TRAINING = 6;
+  // その他。
+  EXPENSE_CATEGORY_OTHER = 7;
 }
 
 // AttendanceRecord は勤怠レコード。
@@ -120,6 +167,56 @@ message DeviceActivity {
   map<string, string> details = 6;
   // リスクスコア（0.0-1.0）。
   float risk_score = 7;
+}
+
+// AccessLogRecord はシステムアクセスログ（監視カテゴリ4）。
+// 社員のシステム・リソースへのアクセスを記録する。
+message AccessLogRecord {
+  // 社員ID。
+  string employee_id = 1;
+  // アクセス対象リソース種別（file/api/database/admin_panel 等）。
+  string resource_type = 2;
+  // アクセス対象リソースID/パス。
+  string resource_id = 3;
+  // アクション（read/write/delete/export）。
+  string action = 4;
+  // タイムスタンプ。
+  google.protobuf.Timestamp timestamp = 5;
+  // アクセス元IPアドレス。
+  string source_ip = 6;
+  // ユーザーエージェント。
+  string user_agent = 7;
+  // 成功/失敗。
+  bool success = 8;
+  // 失敗理由（success=false時）。
+  string failure_reason = 9;
+  // リスクスコア（0.0-1.0、異常アクセスパターン検知時に高値）。
+  float risk_score = 10;
+}
+
+// ExpenseRecord は経費利用記録（監視カテゴリ8）。
+// 社員の経費申請・利用パターンを記録し、異常検知に活用する。
+message ExpenseRecord {
+  // 社員ID。
+  string employee_id = 1;
+  // 経費カテゴリ。
+  ExpenseCategory category = 2;
+  // 金額（円）。
+  double amount = 3;
+  // 通貨コード（ISO 4217。例: "JPY"）。
+  string currency = 4;
+  // 申請日。
+  google.protobuf.Timestamp date = 5;
+  // 説明。
+  string description = 6;
+  // 承認ステータス（pending/approved/rejected）。
+  string approval_status = 7;
+  // 承認者。
+  string approved_by = 8;
+  // 領収書添付有無。
+  bool receipt_attached = 9;
+  // リスクスコア（0.0-1.0、異常パターン検知時に高値）。
+  float risk_score = 10;
 }
 
 // EmployeeAnomaly は検知された異常。
@@ -175,6 +272,26 @@ message EmployeePerformance {
   map<string, double> kpi_scores = 12;
 }
 
+// RecognitionRecord は表彰記録（監視カテゴリ10）。
+// 優秀な業績・行動に対する表彰を記録する。
+message RecognitionRecord {
+  sirosimes.common.v1.ResourceMetadata metadata = 1;
+  // 表彰対象社員ID。
+  string employee_id = 2;
+  // 表彰タイトル。
+  string title = 3;
+  // 表彰理由。
+  string reason = 4;
+  // 表彰者（推薦者）。
+  string awarded_by = 5;
+  // 表彰日。
+  google.protobuf.Timestamp awarded_at = 6;
+  // 表彰カテゴリ（例: "月間MVP", "改善提案", "チーム貢献"）。
+  string category = 7;
+  // 関連KPI改善値（定量的評価がある場合）。
+  map<string, double> metrics = 8;
+}
+
 // CorrectiveAction は是正措置レコード。
 message CorrectiveAction {
   sirosimes.common.v1.ResourceMetadata metadata = 1;
@@ -208,6 +325,14 @@ service HumanMonitorService {
   rpc IngestDeviceActivity(IngestDeviceActivityRequest) returns (IngestDeviceActivityResponse);
   // デバイスアクティビティを照会する。
   rpc QueryDeviceActivity(QueryDeviceActivityRequest) returns (QueryDeviceActivityResponse);
+  // アクセスログを送信する。
+  rpc IngestAccessLogs(IngestAccessLogsRequest) returns (IngestAccessLogsResponse);
+  // アクセスログを照会する。
+  rpc QueryAccessLogs(QueryAccessLogsRequest) returns (QueryAccessLogsResponse);
+  // 経費レコードを送信する。
+  rpc IngestExpenses(IngestExpensesRequest) returns (IngestExpensesResponse);
+  // 経費レコードを照会する。
+  rpc QueryExpenses(QueryExpensesRequest) returns (QueryExpensesResponse);
   // 異常を一覧する。
   rpc ListAnomalies(ListAnomaliesRequest) returns (ListAnomaliesResponse);
   // 異常を取得する。
@@ -226,6 +351,10 @@ service HumanMonitorService {
   rpc ApproveCorrectiveAction(ApproveCorrectiveActionRequest) returns (ApproveCorrectiveActionResponse);
   // 是正措置を完了する。
   rpc CompleteCorrectiveAction(CompleteCorrectiveActionRequest) returns (CompleteCorrectiveActionResponse);
+  // 表彰を作成する。
+  rpc CreateRecognition(CreateRecognitionRequest) returns (CreateRecognitionResponse);
+  // 表彰を一覧する。
+  rpc ListRecognitions(ListRecognitionsRequest) returns (ListRecognitionsResponse);
 }
 
 message IngestAttendanceRequest {
@@ -267,6 +396,54 @@ message QueryDeviceActivityRequest {
 
 message QueryDeviceActivityResponse {
   repeated DeviceActivity activities = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message IngestAccessLogsRequest {
+  repeated AccessLogRecord records = 1;
+}
+
+message IngestAccessLogsResponse {
+  int32 accepted_count = 1;
+}
+
+message QueryAccessLogsRequest {
+  string employee_id = 1;
+  string resource_type = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  // 失敗のみフィルタ。
+  bool failures_only = 5;
+  // 最小リスクスコアフィルタ。
+  float min_risk_score = 6;
+  sirosimes.common.v1.PaginationRequest pagination = 7;
+}
+
+message QueryAccessLogsResponse {
+  repeated AccessLogRecord records = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
+}
+
+message IngestExpensesRequest {
+  repeated ExpenseRecord records = 1;
+}
+
+message IngestExpensesResponse {
+  int32 accepted_count = 1;
+}
+
+message QueryExpensesRequest {
+  string employee_id = 1;
+  ExpenseCategory category = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+  // 最小リスクスコアフィルタ。
+  float min_risk_score = 5;
+  sirosimes.common.v1.PaginationRequest pagination = 6;
+}
+
+message QueryExpensesResponse {
+  repeated ExpenseRecord records = 1;
   sirosimes.common.v1.PaginationResponse pagination = 2;
 }
 
@@ -363,4 +540,30 @@ message CompleteCorrectiveActionRequest {
 
 message CompleteCorrectiveActionResponse {
   CorrectiveAction action = 1;
+}
+
+message CreateRecognitionRequest {
+  string employee_id = 1;
+  string title = 2;
+  string reason = 3;
+  string awarded_by = 4;
+  string category = 5;
+  map<string, double> metrics = 6;
+}
+
+message CreateRecognitionResponse {
+  RecognitionRecord recognition = 1;
+}
+
+message ListRecognitionsRequest {
+  sirosimes.common.v1.PaginationRequest pagination = 1;
+  string employee_id = 2;
+  string category = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+}
+
+message ListRecognitionsResponse {
+  repeated RecognitionRecord recognitions = 1;
+  sirosimes.common.v1.PaginationResponse pagination = 2;
 }

@@ -13,23 +13,39 @@ import "sirosimes/common/v1/pagination.proto";
 // 統合メトリクス収集エンジンを定義する。
 // 8監視領域（ビジネス/財務/AI社員/プロダクト/セキュリティ/インフラ/物理世界/人間社員）
 // のメトリクスを単一パイプラインで収集・格納する。
+//
+// アーキテクチャ:
+//   Collector → IngestMetrics → TimeSeries DB (VictoriaMetrics等)
+//   QueryMetrics / QueryAggregatedMetrics → ダッシュボード / アラート評価
+//
+// セキュリティイベント連携:
+//   common/v1/sentinel.proto の SecurityEvent は
+//   COLLECTOR_SOURCE_SECURITY_EVENT 経由でメトリクスパイプラインに投入される。
+//   例: 認証失敗率、侵入試行数等がセキュリティ監視領域のメトリクスとして記録。
+//
+// 機織（Hataori）連携:
+//   hataori/v1/trigger.proto の TRIGGER_TYPE_TENSHU_ALERT により、
+//   メトリクス閾値超過 → アラート発火 → 機織WF自動起動 のパイプラインが構成される。
 
 // MetricType はメトリクスの種別を分類する。
 enum MetricType {
   METRIC_TYPE_UNSPECIFIED = 0;
-  // カウンター（単調増加値）。
+  // カウンター（単調増加値）。例: リクエスト総数、エラー総数。
   METRIC_TYPE_COUNTER = 1;
-  // ゲージ（瞬時値）。
+  // ゲージ（瞬時値）。例: CPU使用率、メモリ残量。
   METRIC_TYPE_GAUGE = 2;
-  // ヒストグラム（分布）。
+  // ヒストグラム（分布）。例: レイテンシ分布。histogram_buckets に境界値を格納。
   METRIC_TYPE_HISTOGRAM = 3;
-  // サマリー（パーセンタイル）。
+  // サマリー（パーセンタイル）。例: P50/P95/P99レスポンスタイム。
   METRIC_TYPE_SUMMARY = 4;
-  // ブーリアン（正常/異常）。
+  // ブーリアン（正常/異常）。例: サービスUp/Down。
   METRIC_TYPE_BOOLEAN = 5;
+  // レート（単位時間あたりの変化量）。例: requests/s, events/min。
+  METRIC_TYPE_RATE = 6;
 }
 
 // MonitoringDomain は監視領域を分類する。
+// 8領域はSirosimesアーキテクチャ設計書で定義された統合監視領域に準拠。
 enum MonitoringDomain {
   MONITORING_DOMAIN_UNSPECIFIED = 0;
   // 領域1: ビジネスメトリクス（売上・案件・KPI）。
@@ -41,27 +57,42 @@ enum MonitoringDomain {
   // 領域4: プロダクトメトリクス（可用性・レイテンシ・エラー率）。
   MONITORING_DOMAIN_PRODUCT = 4;
   // 領域5: セキュリティメトリクス（脅威検知・認証失敗・侵入試行）。
+  // common/v1/sentinel.proto SecurityEvent と連携。
   MONITORING_DOMAIN_SECURITY = 5;
   // 領域6: インフラメトリクス（CPU・メモリ・ディスク・ネットワーク）。
   MONITORING_DOMAIN_INFRASTRUCTURE = 6;
   // 領域7: 物理世界メトリクス（IoTセンサー・ロボット・環境）。
   MONITORING_DOMAIN_PHYSICAL = 7;
   // 領域8: 人間社員メトリクス（勤怠・業務量・デバイス・パフォーマンス）。
+  // human_monitor.proto の詳細データを集約。
   MONITORING_DOMAIN_HUMAN_EMPLOYEE = 8;
 }
 
 // AggregationMethod はメトリクス集約方法を定義する。
 enum AggregationMethod {
   AGGREGATION_METHOD_UNSPECIFIED = 0;
+  // 合計。
   AGGREGATION_METHOD_SUM = 1;
+  // 平均。
   AGGREGATION_METHOD_AVG = 2;
+  // 最小値。
   AGGREGATION_METHOD_MIN = 3;
+  // 最大値。
   AGGREGATION_METHOD_MAX = 4;
+  // 件数。
   AGGREGATION_METHOD_COUNT = 5;
+  // 50パーセンタイル（中央値）。
   AGGREGATION_METHOD_P50 = 6;
+  // 95パーセンタイル。
   AGGREGATION_METHOD_P95 = 7;
+  // 99パーセンタイル。
   AGGREGATION_METHOD_P99 = 8;
+  // 最新値。
   AGGREGATION_METHOD_LAST = 9;
+  // レート計算（単位時間あたりの変化率）。
+  AGGREGATION_METHOD_RATE = 10;
+  // 標準偏差。
+  AGGREGATION_METHOD_STDDEV = 11;
 }
 
 // CollectorSource はメトリクス収集ソースを分類する。
@@ -72,6 +103,8 @@ enum CollectorSource {
   // Redis Streams Consumer。
   COLLECTOR_SOURCE_REDIS_STREAM = 2;
   // SecurityEvent（sentinel.proto連携）。
+  // common/v1/sentinel.proto の SecurityEvent を受信し、
+  // セキュリティ監視領域のメトリクスとして変換・格納する。
   COLLECTOR_SOURCE_SECURITY_EVENT = 3;
   // Prometheus scrape endpoint。
   COLLECTOR_SOURCE_PROMETHEUS = 4;
@@ -88,6 +121,7 @@ enum CollectorSource {
 // MetricDataPoint は単一のメトリクスデータポイントを表す。
 message MetricDataPoint {
   // メトリクス名（例: "infra.cpu.usage", "business.revenue.monthly"）。
+  // 命名規則: "{domain}.{category}.{name}" のドット区切り。
   string name = 1;
   // メトリクス種別。
   MetricType type = 2;
@@ -95,7 +129,7 @@ message MetricDataPoint {
   MonitoringDomain domain = 3;
   // 収集タイムスタンプ。
   google.protobuf.Timestamp timestamp = 4;
-  // 数値（counter/gauge/histogram/summary）。
+  // 数値（counter/gauge/histogram/summary/rate）。
   double value = 5;
   // ブーリアン値（METRIC_TYPE_BOOLEAN時）。
   bool bool_value = 6;
@@ -107,6 +141,12 @@ message MetricDataPoint {
   string source_service = 9;
   // 単位（例: "percent", "bytes", "requests/s", "yen"）。
   string unit = 10;
+  // ヒストグラムバケット境界値（METRIC_TYPE_HISTOGRAM時）。
+  // 昇順で指定。例: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0]
+  repeated double histogram_buckets = 11;
+  // ヒストグラムバケットカウント（histogram_bucketsと同数+1）。
+  // 最後の要素は+Infバケットのカウント。
+  repeated int64 histogram_counts = 12;
 }
 
 // MetricDefinition はメトリクスの定義（スキーマ）を表す。
@@ -159,6 +199,8 @@ message AggregatedMetric {
 }
 
 // IntegrityRecord はメトリクス改ざん検知用ハッシュチェーンレコード。
+// MAS（監視・監査・監督）フレームワークに基づく、
+// メトリクスデータの完全性を保証するためのチェーン構造。
 message IntegrityRecord {
   // レコードID。
   string id = 1;
