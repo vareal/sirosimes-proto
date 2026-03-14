@@ -1,0 +1,19 @@
+name: proto-ci
+trigger:
+  branches: [main]
+  events: [push]
+stages:
+  - name: buf-lint
+    command: |
+      cd /workspace
+      buf lint
+    timeout: 3m
+  - name: buf-breaking
+    command: |
+      cd /workspace
+      buf breaking --against '.git#branch=main~1' || echo "Breaking changes detected (informational)"
+    timeout: 3m
+notifications:
+  mattermost:
+    on_success: true
+    on_failure: true
