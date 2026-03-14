@@ -3,6 +3,7 @@ syntax = "proto3";
 package sirosimes.amatsukagami.v1;
 
 import "sirosimes/common/v1/metadata.proto";
+import "google/protobuf/timestamp.proto";
 import "sirosimes/common/v1/pagination.proto";
 import "sirosimes/amatsukagami/v1/metric.proto";
 
