@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// adapter.proto — LoRA/QLoRA adapter management for Kotodama Phase 1.
+
+// AdapterStatus indicates the state of an adapter.
+enum AdapterStatus {
+  ADAPTER_STATUS_UNSPECIFIED = 0;
+  ADAPTER_STATUS_READY = 1;
+  ADAPTER_STATUS_APPLIED = 2;
+  ADAPTER_STATUS_ERROR = 3;
+}
+
+// AdapterMethod defines the adapter training method.
+enum AdapterMethod {
+  ADAPTER_METHOD_UNSPECIFIED = 0;
+  ADAPTER_METHOD_LORA = 1;
+  ADAPTER_METHOD_QLORA = 2;
+}
+
+// Adapter represents a LoRA/QLoRA adapter.
+message Adapter {
+  string id = 1;
+  string name = 2;
+  string base_model = 3;
+  string finetune_job_id = 4;
+  AdapterMethod method = 5;
+  int32 lora_rank = 6;
+  int32 lora_alpha = 7;
+  int64 file_size_bytes = 8;
+  string file_path = 9;
+  AdapterStatus status = 10;
+  string applied_model_name = 11; // Ollama model name when applied
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+// AdapterService provides adapter management.
+service AdapterService {
+  rpc ListAdapters(ListAdaptersRequest) returns (ListAdaptersResponse);
+  rpc GetAdapter(GetAdapterRequest) returns (GetAdapterResponse);
+  rpc ApplyAdapter(ApplyAdapterRequest) returns (ApplyAdapterResponse);
+  rpc DetachAdapter(DetachAdapterRequest) returns (DetachAdapterResponse);
+  rpc DeleteAdapter(DeleteAdapterRequest) returns (DeleteAdapterResponse);
+}
+
+message ListAdaptersRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+  string base_model = 3;
+}
+
+message ListAdaptersResponse {
+  repeated Adapter adapters = 1;
+  int32 total = 2;
+}
+
+message GetAdapterRequest {
+  string id = 1;
+}
+
+message GetAdapterResponse {
+  Adapter adapter = 1;
+}
+
+message ApplyAdapterRequest {
+  string id = 1;
+  string target_model_name = 2; // Optional custom name
+}
+
+message ApplyAdapterResponse {
+  Adapter adapter = 1;
+  string model_name = 2; // Resulting Ollama model name
+}
+
+message DetachAdapterRequest {
+  string id = 1;
+}
+
+message DetachAdapterResponse {
+  Adapter adapter = 1;
+}
+
+message DeleteAdapterRequest {
+  string id = 1;
+}
+
+message DeleteAdapterResponse {}

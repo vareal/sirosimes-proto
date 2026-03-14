@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// finetune.proto — Fine-tuning job management for Kotodama Phase 1.
+
+// FinetuneMethod defines the fine-tuning approach.
+enum FinetuneMethod {
+  FINETUNE_METHOD_UNSPECIFIED = 0;
+  FINETUNE_METHOD_LORA = 1;
+  FINETUNE_METHOD_QLORA = 2;
+  FINETUNE_METHOD_FULL = 3;
+}
+
+// FinetuneJobStatus indicates the lifecycle state of a fine-tuning job.
+enum FinetuneJobStatus {
+  FINETUNE_JOB_STATUS_UNSPECIFIED = 0;
+  FINETUNE_JOB_STATUS_PENDING = 1;
+  FINETUNE_JOB_STATUS_RUNNING = 2;
+  FINETUNE_JOB_STATUS_COMPLETED = 3;
+  FINETUNE_JOB_STATUS_FAILED = 4;
+  FINETUNE_JOB_STATUS_STOPPED = 5;
+}
+
+// HyperParameters defines training hyperparameters.
+message HyperParameters {
+  int32 epochs = 1;
+  double learning_rate = 2;
+  int32 batch_size = 3;
+  int32 lora_rank = 4;
+  int32 lora_alpha = 5;
+  double lora_dropout = 6;
+  int32 warmup_steps = 7;
+  int32 max_seq_length = 8;
+  double weight_decay = 9;
+  string optimizer = 10;  // e.g., "adamw_8bit"
+}
+
+// TrainingProgress tracks live training metrics.
+message TrainingProgress {
+  int32 current_epoch = 1;
+  int32 total_epochs = 2;
+  int32 current_step = 3;
+  int32 total_steps = 4;
+  double loss = 5;
+  double learning_rate = 6;
+  double progress_percent = 7;
+  int64 elapsed_seconds = 8;
+  int64 eta_seconds = 9;
+}
+
+// FinetuneJob represents a single fine-tuning job.
+message FinetuneJob {
+  string id = 1;
+  string name = 2;
+  string base_model = 3;
+  string dataset_id = 4;
+  FinetuneMethod method = 5;
+  HyperParameters hyperparameters = 6;
+  FinetuneJobStatus status = 7;
+  TrainingProgress progress = 8;
+  string adapter_id = 9;  // Set after successful completion
+  string error_message = 10;
+  string created_by = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+  google.protobuf.Timestamp started_at = 14;
+  google.protobuf.Timestamp completed_at = 15;
+}
+
+// FinetuneLogEntry is a single training log line.
+message FinetuneLogEntry {
+  int32 epoch = 1;
+  int32 step = 2;
+  double loss = 3;
+  double learning_rate = 4;
+  double grad_norm = 5;
+  google.protobuf.Timestamp timestamp = 6;
+}
+
+// FinetuneService provides fine-tuning job management.
+service FinetuneService {
+  rpc CreateJob(CreateFinetuneJobRequest) returns (CreateFinetuneJobResponse);
+  rpc ListJobs(ListFinetuneJobsRequest) returns (ListFinetuneJobsResponse);
+  rpc GetJob(GetFinetuneJobRequest) returns (GetFinetuneJobResponse);
+  rpc StartJob(StartFinetuneJobRequest) returns (StartFinetuneJobResponse);
+  rpc StopJob(StopFinetuneJobRequest) returns (StopFinetuneJobResponse);
+  rpc DeleteJob(DeleteFinetuneJobRequest) returns (DeleteFinetuneJobResponse);
+  rpc GetJobLogs(GetFinetuneJobLogsRequest) returns (stream FinetuneLogEntry);
+}
+
+message CreateFinetuneJobRequest {
+  string name = 1;
+  string base_model = 2;
+  string dataset_id = 3;
+  FinetuneMethod method = 4;
+  HyperParameters hyperparameters = 5;
+}
+
+message CreateFinetuneJobResponse {
+  FinetuneJob job = 1;
+}
+
+message ListFinetuneJobsRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+  FinetuneJobStatus status_filter = 3;
+}
+
+message ListFinetuneJobsResponse {
+  repeated FinetuneJob jobs = 1;
+  int32 total = 2;
+}
+
+message GetFinetuneJobRequest {
+  string id = 1;
+}
+
+message GetFinetuneJobResponse {
+  FinetuneJob job = 1;
+}
+
+message StartFinetuneJobRequest {
+  string id = 1;
+}
+
+message StartFinetuneJobResponse {
+  FinetuneJob job = 1;
+}
+
+message StopFinetuneJobRequest {
+  string id = 1;
+}
+
+message StopFinetuneJobResponse {
+  FinetuneJob job = 1;
+}
+
+message DeleteFinetuneJobRequest {
+  string id = 1;
+}
+
+message DeleteFinetuneJobResponse {}
+
+message GetFinetuneJobLogsRequest {
+  string id = 1;
+  int32 tail = 2; // Number of recent lines (0 = all)
+}

@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// evaluation.proto — Model evaluation and benchmarking for Kotodama Phase 1.
+
+// EvaluationStatus indicates the state of an evaluation.
+enum EvaluationStatus {
+  EVALUATION_STATUS_UNSPECIFIED = 0;
+  EVALUATION_STATUS_PENDING = 1;
+  EVALUATION_STATUS_RUNNING = 2;
+  EVALUATION_STATUS_COMPLETED = 3;
+  EVALUATION_STATUS_FAILED = 4;
+}
+
+// EvaluationMetrics contains quantitative evaluation results.
+message EvaluationMetrics {
+  double quality_score = 1;      // 0.0-1.0 overall quality
+  double avg_latency_ms = 2;     // Average inference latency
+  double token_efficiency = 3;   // Output quality per token
+  double perplexity = 4;         // Language model perplexity
+  int32 total_prompts = 5;       // Number of test prompts evaluated
+  int32 successful_prompts = 6;  // Prompts with valid output
+}
+
+// ModelComparison compares fine-tuned vs base model.
+message ModelComparison {
+  EvaluationMetrics base_metrics = 1;
+  EvaluationMetrics finetuned_metrics = 2;
+  double quality_delta = 3;     // Positive = improvement
+  double latency_delta = 4;
+  double efficiency_delta = 5;
+}
+
+// Evaluation represents a model evaluation run.
+message Evaluation {
+  string id = 1;
+  string model_name = 2;
+  string base_model = 3;
+  string adapter_id = 4;
+  string finetune_job_id = 5;
+  EvaluationStatus status = 6;
+  EvaluationMetrics metrics = 7;
+  ModelComparison comparison = 8;
+  bool promoted = 9;
+  string error_message = 10;
+  string created_by = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp completed_at = 13;
+}
+
+// EvaluationService provides model evaluation and promotion.
+service EvaluationService {
+  rpc CreateEvaluation(CreateEvaluationRequest) returns (CreateEvaluationResponse);
+  rpc ListEvaluations(ListEvaluationsRequest) returns (ListEvaluationsResponse);
+  rpc GetEvaluation(GetEvaluationRequest) returns (GetEvaluationResponse);
+  rpc PromoteModel(PromoteModelRequest) returns (PromoteModelResponse);
+}
+
+message CreateEvaluationRequest {
+  string model_name = 1;
+  string base_model = 2;
+  string adapter_id = 3;
+  string finetune_job_id = 4;
+  repeated string test_prompts = 5;  // Custom test prompts (optional)
+}
+
+message CreateEvaluationResponse {
+  Evaluation evaluation = 1;
+}
+
+message ListEvaluationsRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+  string model_name = 3;
+}
+
+message ListEvaluationsResponse {
+  repeated Evaluation evaluations = 1;
+  int32 total = 2;
+}
+
+message GetEvaluationRequest {
+  string id = 1;
+}
+
+message GetEvaluationResponse {
+  Evaluation evaluation = 1;
+}
+
+message PromoteModelRequest {
+  string evaluation_id = 1;
+}
+
+message PromoteModelResponse {
+  Evaluation evaluation = 1;
+}
