@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// code.proto — 言霊（Kotodama）コード生成特化 API。
+//
+// CodeLlama / DeepSeek-Coder 等のコード生成特化モデルを管理し、
+// コード生成・補完・レビュー・テスト生成を提供する。
+//
+// Exposure: INTERNAL
+
+// ProgrammingLanguage enumerates supported languages.
+enum ProgrammingLanguage {
+  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
+  PROGRAMMING_LANGUAGE_GO = 1;
+  PROGRAMMING_LANGUAGE_TYPESCRIPT = 2;
+  PROGRAMMING_LANGUAGE_PYTHON = 3;
+  PROGRAMMING_LANGUAGE_RUST = 4;
+  PROGRAMMING_LANGUAGE_JAVA = 5;
+  PROGRAMMING_LANGUAGE_RUBY = 6;
+  PROGRAMMING_LANGUAGE_C = 7;
+  PROGRAMMING_LANGUAGE_CPP = 8;
+  PROGRAMMING_LANGUAGE_JAVASCRIPT = 9;
+  PROGRAMMING_LANGUAGE_SQL = 10;
+  PROGRAMMING_LANGUAGE_SHELL = 11;
+  PROGRAMMING_LANGUAGE_PROTOBUF = 12;
+}
+
+// GenerateCodeRequest is the request for code generation.
+message GenerateCodeRequest {
+  // Natural language description of desired code.
+  string prompt = 1;
+  // Target programming language.
+  ProgrammingLanguage language = 2;
+  // Language name as string (for unlisted languages).
+  string language_name = 3;
+  // Model to use (empty = language-appropriate default).
+  string model = 4;
+  // Maximum tokens for generation.
+  int32 max_tokens = 5;
+  // Temperature for generation.
+  double temperature = 6;
+  // Additional context (existing code, requirements).
+  string context = 7;
+}
+
+// GenerateCodeResponse is the response from code generation.
+message GenerateCodeResponse {
+  string code = 1;
+  string language = 2;
+  string model = 3;
+  int64 processing_ms = 4;
+  int32 input_tokens = 5;
+  int32 output_tokens = 6;
+  // Optional explanation.
+  string explanation = 7;
+}
+
+// CompleteCodeRequest is the request for code completion (FIM).
+message CompleteCodeRequest {
+  // Code before the cursor.
+  string prefix = 1;
+  // Code after the cursor.
+  string suffix = 2;
+  ProgrammingLanguage language = 3;
+  string language_name = 4;
+  string model = 5;
+  int32 max_tokens = 6;
+  double temperature = 7;
+}
+
+// CompleteCodeResponse is the response from code completion.
+message CompleteCodeResponse {
+  string completion = 1;
+  string model = 2;
+  int64 processing_ms = 3;
+}
+
+// ReviewCodeRequest is the request for code review.
+message ReviewCodeRequest {
+  string code = 1;
+  ProgrammingLanguage language = 2;
+  string language_name = 3;
+  string model = 4;
+  // Focus areas: "security", "performance", "style", "bugs".
+  repeated string focus_areas = 5;
+}
+
+// CodeSuggestion is a single review suggestion.
+message CodeSuggestion {
+  string severity = 1; // "critical", "warning", "info"
+  int32 line = 2;
+  string message = 3;
+  string suggested_fix = 4;
+  string category = 5;
+}
+
+// ReviewCodeResponse is the response from code review.
+message ReviewCodeResponse {
+  string review = 1;
+  repeated CodeSuggestion suggestions = 2;
+  double quality_score = 3; // 0-100
+  string model = 4;
+  int64 processing_ms = 5;
+}
+
+// GenerateTestRequest is the request for test generation.
+message GenerateTestRequest {
+  string code = 1;
+  ProgrammingLanguage language = 2;
+  string language_name = 3;
+  string model = 4;
+  // Test framework preference (e.g., "testing", "pytest", "jest").
+  string framework = 5;
+}
+
+// GenerateTestResponse is the response from test generation.
+message GenerateTestResponse {
+  string test_code = 1;
+  string framework = 2;
+  int32 test_count = 3;
+  string model = 4;
+  int64 processing_ms = 5;
+}
+
+// CodeModelInfo describes an available code model.
+message CodeModelInfo {
+  string name = 1;
+  repeated string supported_languages = 2;
+  bool fim_capable = 3; // Fill-in-the-Middle
+  bool available = 4;
+  int64 parameter_count = 5;
+}
+
+// ListCodeModelsRequest is empty.
+message ListCodeModelsRequest {}
+
+// ListCodeModelsResponse lists available code models.
+message ListCodeModelsResponse {
+  repeated CodeModelInfo models = 1;
+}
+
+// CodeConfig holds code generation configuration.
+message CodeConfig {
+  string default_model = 1;
+  // Language-specific model mappings.
+  map<string, string> language_models = 2;
+  double default_temperature = 3;
+  int32 default_max_tokens = 4;
+  int32 max_input_length = 5;
+}
+
+// UpdateCodeConfigRequest updates code generation configuration.
+message UpdateCodeConfigRequest {
+  CodeConfig config = 1;
+}
+
+// UpdateCodeConfigResponse returns updated configuration.
+message UpdateCodeConfigResponse {
+  CodeConfig config = 1;
+}
+
+// CodeService provides code generation capabilities.
+service CodeService {
+  rpc GenerateCode(GenerateCodeRequest) returns (GenerateCodeResponse);
+  rpc CompleteCode(CompleteCodeRequest) returns (CompleteCodeResponse);
+  rpc ReviewCode(ReviewCodeRequest) returns (ReviewCodeResponse);
+  rpc GenerateTest(GenerateTestRequest) returns (GenerateTestResponse);
+  rpc ListModels(ListCodeModelsRequest) returns (ListCodeModelsResponse);
+  rpc GetConfig(ListCodeModelsRequest) returns (UpdateCodeConfigResponse);
+  rpc UpdateConfig(UpdateCodeConfigRequest) returns (UpdateCodeConfigResponse);
+}

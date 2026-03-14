@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// multimodal.proto — 言霊（Kotodama）マルチモーダル入出力 API。
+//
+// 音声・画像・コードを含むマルチモーダル推論・RAG対応。
+// 複数モダリティを統合した入力→推論→出力パイプラインを管理する。
+//
+// Exposure: INTERNAL
+
+// ModalityType classifies the type of content modality.
+enum ModalityType {
+  MODALITY_TYPE_UNSPECIFIED = 0;
+  MODALITY_TYPE_TEXT = 1;
+  MODALITY_TYPE_AUDIO = 2;
+  MODALITY_TYPE_IMAGE = 3;
+  MODALITY_TYPE_CODE = 4;
+  MODALITY_TYPE_VIDEO = 5;
+}
+
+// MultimodalAssetStatus tracks the processing state.
+enum MultimodalAssetStatus {
+  MULTIMODAL_ASSET_STATUS_UNSPECIFIED = 0;
+  MULTIMODAL_ASSET_STATUS_PENDING = 1;
+  MULTIMODAL_ASSET_STATUS_PROCESSING = 2;
+  MULTIMODAL_ASSET_STATUS_READY = 3;
+  MULTIMODAL_ASSET_STATUS_ERROR = 4;
+}
+
+// MultimodalAsset represents an uploaded multimodal asset.
+message MultimodalAsset {
+  string id = 1;
+  ModalityType modality = 2;
+  string filename = 3;
+  string mime_type = 4;
+  int64 size_bytes = 5;
+  string storage_path = 6;
+  MultimodalAssetStatus status = 7;
+  // Extracted text content (from STT, OCR, or code parsing).
+  string extracted_text = 8;
+  // Processing metadata (model used, duration, etc.).
+  map<string, string> metadata = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+// MultimodalInput is a single input in a multimodal request.
+message MultimodalInput {
+  ModalityType modality = 1;
+  // For text input.
+  string text = 2;
+  // For binary input (audio, image).
+  bytes data = 3;
+  // Reference to an existing asset.
+  string asset_id = 4;
+  // MIME type for binary data.
+  string mime_type = 5;
+}
+
+// MultimodalInferenceRequest processes multimodal inputs.
+message MultimodalInferenceRequest {
+  repeated MultimodalInput inputs = 1;
+  string model = 2;
+  int32 max_tokens = 3;
+  double temperature = 4;
+  // System prompt.
+  string system = 5;
+  // Whether to stream the response.
+  bool stream = 6;
+}
+
+// MultimodalInferenceResponse returns the inference result.
+message MultimodalInferenceResponse {
+  string text = 1;
+  string model = 2;
+  int64 processing_ms = 3;
+  int32 input_tokens = 4;
+  int32 output_tokens = 5;
+  // Asset IDs created from binary inputs.
+  repeated string asset_ids = 6;
+}
+
+// MultimodalRAGIndexRequest adds a multimodal asset to the RAG index.
+message MultimodalRAGIndexRequest {
+  string asset_id = 1;
+  // Additional metadata for RAG indexing.
+  map<string, string> metadata = 2;
+}
+
+// MultimodalRAGIndexResponse confirms RAG indexing.
+message MultimodalRAGIndexResponse {
+  string document_id = 1;
+  int32 chunk_count = 2;
+  string status = 3;
+}
+
+// MultimodalRAGSearchRequest extends RAG search with modality filter.
+message MultimodalRAGSearchRequest {
+  string query = 1;
+  repeated float embedding = 2;
+  int32 top_k = 3;
+  double min_score = 4;
+  // Filter by modality types.
+  repeated ModalityType modalities = 5;
+}
+
+// MultimodalRAGSearchResult is a search result with modality info.
+message MultimodalRAGSearchResult {
+  string chunk_id = 1;
+  string document_id = 2;
+  string document_title = 3;
+  string content = 4;
+  double score = 5;
+  int32 chunk_index = 6;
+  ModalityType source_modality = 7;
+  string source_type = 8;
+}
+
+// MultimodalRAGSearchResponse returns search results.
+message MultimodalRAGSearchResponse {
+  repeated MultimodalRAGSearchResult results = 1;
+  int32 total = 2;
+  int64 search_time_ms = 3;
+}
+
+// MultimodalService provides multimodal processing capabilities.
+service MultimodalService {
+  // Infer processes multimodal inputs through LLM.
+  rpc Infer(MultimodalInferenceRequest) returns (MultimodalInferenceResponse);
+  // IndexAsset adds a multimodal asset to the RAG pipeline.
+  rpc IndexAsset(MultimodalRAGIndexRequest) returns (MultimodalRAGIndexResponse);
+  // Search performs multimodal RAG search.
+  rpc Search(MultimodalRAGSearchRequest) returns (MultimodalRAGSearchResponse);
+}

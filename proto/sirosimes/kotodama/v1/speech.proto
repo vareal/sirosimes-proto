@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// speech.proto — 言霊（Kotodama）音声処理 API。
+//
+// STT（Speech-to-Text）/ TTS（Text-to-Speech）処理を管理する。
+// ローカル Whisper 互換エンジン + 玉響（Tamayura）連携対応。
+//
+// Exposure: INTERNAL
+
+// SpeechEngine selects the speech processing engine.
+enum SpeechEngine {
+  SPEECH_ENGINE_UNSPECIFIED = 0;
+  // AUTO — select best available engine.
+  SPEECH_ENGINE_AUTO = 1;
+  // LOCAL — use local whisper.cpp / Piper TTS.
+  SPEECH_ENGINE_LOCAL = 2;
+  // TAMAYURA — delegate to Tamayura API.
+  SPEECH_ENGINE_TAMAYURA = 3;
+}
+
+// AudioFormat enumerates supported audio formats.
+enum AudioFormat {
+  AUDIO_FORMAT_UNSPECIFIED = 0;
+  AUDIO_FORMAT_WAV = 1;
+  AUDIO_FORMAT_MP3 = 2;
+  AUDIO_FORMAT_OGG = 3;
+  AUDIO_FORMAT_WEBM = 4;
+  AUDIO_FORMAT_FLAC = 5;
+}
+
+// VoiceId identifies a TTS voice.
+enum VoiceId {
+  VOICE_ID_UNSPECIFIED = 0;
+  VOICE_ID_JA_FEMALE = 1;
+  VOICE_ID_JA_MALE = 2;
+  VOICE_ID_EN_FEMALE = 3;
+  VOICE_ID_EN_MALE = 4;
+}
+
+// TranscribeRequest is the request for speech-to-text conversion.
+message TranscribeRequest {
+  // Raw audio bytes.
+  bytes audio = 1;
+  // Audio format hint.
+  AudioFormat format = 2;
+  // BCP-47 language code (e.g., "ja", "en"). Empty = auto-detect.
+  string language = 3;
+  // Which engine to use.
+  SpeechEngine engine = 4;
+  // Model name override (engine-specific).
+  string model = 5;
+}
+
+// TranscribeResponse is the response from speech-to-text conversion.
+message TranscribeResponse {
+  // Transcribed text.
+  string text = 1;
+  // Detected language (BCP-47).
+  string language = 2;
+  // Audio duration in milliseconds.
+  int64 duration_ms = 3;
+  // Engine that was used.
+  SpeechEngine engine = 4;
+  // Model that was used.
+  string model = 5;
+  // Segments with timestamps.
+  repeated TranscriptSegment segments = 6;
+  // Processing time in milliseconds.
+  int64 processing_ms = 7;
+}
+
+// TranscriptSegment is a timed segment of a transcription.
+message TranscriptSegment {
+  string text = 1;
+  int64 start_ms = 2;
+  int64 end_ms = 3;
+  double confidence = 4;
+}
+
+// SynthesizeRequest is the request for text-to-speech conversion.
+message SynthesizeRequest {
+  // Text to synthesize.
+  string text = 1;
+  // Voice selection.
+  VoiceId voice = 2;
+  // Custom voice name (alternative to enum).
+  string voice_name = 3;
+  // Output audio format.
+  AudioFormat format = 4;
+  // Speech rate multiplier (1.0 = normal).
+  double speed = 5;
+  // Pitch multiplier (1.0 = normal).
+  double pitch = 6;
+  // Volume multiplier (1.0 = normal).
+  double volume = 7;
+  // Which engine to use.
+  SpeechEngine engine = 8;
+  // Stream audio in chunks.
+  bool stream = 9;
+}
+
+// SynthesizeResponse is the response from text-to-speech conversion.
+message SynthesizeResponse {
+  // Generated audio bytes.
+  bytes audio = 1;
+  // Audio format.
+  AudioFormat format = 2;
+  // Duration in milliseconds.
+  int64 duration_ms = 3;
+  // Engine used.
+  SpeechEngine engine = 4;
+  // Processing time in milliseconds.
+  int64 processing_ms = 5;
+}
+
+// SpeechModelInfo describes an available speech model.
+message SpeechModelInfo {
+  string name = 1;
+  string engine = 2;
+  string type = 3; // "stt" or "tts"
+  repeated string languages = 4;
+  bool available = 5;
+}
+
+// ListSpeechModelsRequest is empty — lists all speech models.
+message ListSpeechModelsRequest {}
+
+// ListSpeechModelsResponse lists available speech models.
+message ListSpeechModelsResponse {
+  repeated SpeechModelInfo models = 1;
+}
+
+// SpeechConfig holds the speech processing configuration.
+message SpeechConfig {
+  SpeechEngine default_stt_engine = 1;
+  SpeechEngine default_tts_engine = 2;
+  string default_stt_model = 3;
+  string default_tts_model = 4;
+  VoiceId default_voice = 5;
+  string tamayura_url = 6;
+  int32 max_audio_size_mb = 7;
+  int32 max_text_length = 8;
+}
+
+// UpdateSpeechConfigRequest updates speech configuration.
+message UpdateSpeechConfigRequest {
+  SpeechConfig config = 1;
+}
+
+// UpdateSpeechConfigResponse returns updated configuration.
+message UpdateSpeechConfigResponse {
+  SpeechConfig config = 1;
+}
+
+// StreamTranscribeRequest is a chunk in a streaming STT session.
+message StreamTranscribeRequest {
+  // Audio chunk bytes.
+  bytes audio_chunk = 1;
+  // Is this the final chunk?
+  bool is_final = 2;
+  // Language hint.
+  string language = 3;
+  // Engine preference.
+  SpeechEngine engine = 4;
+}
+
+// StreamTranscribeResponse is an interim or final transcription.
+message StreamTranscribeResponse {
+  string text = 1;
+  bool is_final = 2;
+  double confidence = 3;
+  string language = 4;
+}
+
+// SpeechService provides speech processing capabilities.
+service SpeechService {
+  // Transcribe converts audio to text.
+  rpc Transcribe(TranscribeRequest) returns (TranscribeResponse);
+  // Synthesize converts text to audio.
+  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse);
+  // StreamTranscribe performs real-time streaming STT.
+  rpc StreamTranscribe(stream StreamTranscribeRequest) returns (stream StreamTranscribeResponse);
+  // ListModels lists available speech models.
+  rpc ListModels(ListSpeechModelsRequest) returns (ListSpeechModelsResponse);
+  // GetConfig returns the current speech configuration.
+  rpc GetConfig(ListSpeechModelsRequest) returns (UpdateSpeechConfigResponse);
+  // UpdateConfig updates the speech configuration.
+  rpc UpdateConfig(UpdateSpeechConfigRequest) returns (UpdateSpeechConfigResponse);
+}

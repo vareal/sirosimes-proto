@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package sirosimes.kotodama.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// vision.proto — 言霊（Kotodama）画像理解 API。
+//
+// マルチモーダルLLM（LLaVA等）による画像分析、OCR、画像埋め込みを提供する。
+//
+// Exposure: INTERNAL
+
+// ImageFormat enumerates supported image formats.
+enum ImageFormat {
+  IMAGE_FORMAT_UNSPECIFIED = 0;
+  IMAGE_FORMAT_JPEG = 1;
+  IMAGE_FORMAT_PNG = 2;
+  IMAGE_FORMAT_GIF = 3;
+  IMAGE_FORMAT_WEBP = 4;
+  IMAGE_FORMAT_SVG = 5;
+}
+
+// AnalyzeImageRequest is the request for image analysis.
+message AnalyzeImageRequest {
+  // Raw image bytes.
+  bytes image = 1;
+  // Image format hint.
+  ImageFormat format = 2;
+  // Text prompt to accompany the image.
+  string prompt = 3;
+  // Model to use (empty = default).
+  string model = 4;
+  // Maximum response tokens.
+  int32 max_tokens = 5;
+  // Temperature for generation.
+  double temperature = 6;
+}
+
+// AnalyzeImageResponse is the response from image analysis.
+message AnalyzeImageResponse {
+  // Generated description / answer.
+  string description = 1;
+  // Model used.
+  string model = 2;
+  // Processing time in milliseconds.
+  int64 processing_ms = 3;
+  // Input tokens consumed.
+  int32 input_tokens = 4;
+  // Output tokens generated.
+  int32 output_tokens = 5;
+}
+
+// OCRRequest is the request for OCR text extraction.
+message OCRRequest {
+  bytes image = 1;
+  ImageFormat format = 2;
+  // Language hint for OCR.
+  string language = 3;
+  // Model to use.
+  string model = 4;
+}
+
+// OCRResponse is the response from OCR text extraction.
+message OCRResponse {
+  // Extracted text.
+  string text = 1;
+  // Confidence score (0-1).
+  double confidence = 2;
+  // Text regions detected.
+  repeated TextRegion regions = 3;
+  // Processing time in milliseconds.
+  int64 processing_ms = 4;
+}
+
+// TextRegion is a detected text region in an image.
+message TextRegion {
+  string text = 1;
+  // Bounding box: [x, y, width, height] normalized 0-1.
+  repeated double bbox = 2;
+  double confidence = 3;
+}
+
+// ImageEmbedRequest generates an embedding for an image.
+message ImageEmbedRequest {
+  bytes image = 1;
+  ImageFormat format = 2;
+  string model = 3;
+}
+
+// ImageEmbedResponse contains the image embedding vector.
+message ImageEmbedResponse {
+  repeated float embedding = 1;
+  int32 dimension = 2;
+  string model = 3;
+  int64 processing_ms = 4;
+}
+
+// VisionModelInfo describes an available vision model.
+message VisionModelInfo {
+  string name = 1;
+  repeated string capabilities = 2; // "analyze", "ocr", "embed"
+  bool available = 3;
+  int64 parameter_count = 4;
+}
+
+// ListVisionModelsRequest is empty.
+message ListVisionModelsRequest {}
+
+// ListVisionModelsResponse lists available vision models.
+message ListVisionModelsResponse {
+  repeated VisionModelInfo models = 1;
+}
+
+// VisionConfig holds vision processing configuration.
+message VisionConfig {
+  string default_model = 1;
+  string ocr_model = 2;
+  string embed_model = 3;
+  int32 max_image_size_mb = 4;
+  double default_temperature = 5;
+  int32 default_max_tokens = 6;
+}
+
+// UpdateVisionConfigRequest updates vision configuration.
+message UpdateVisionConfigRequest {
+  VisionConfig config = 1;
+}
+
+// UpdateVisionConfigResponse returns updated configuration.
+message UpdateVisionConfigResponse {
+  VisionConfig config = 1;
+}
+
+// VisionService provides image understanding capabilities.
+service VisionService {
+  rpc AnalyzeImage(AnalyzeImageRequest) returns (AnalyzeImageResponse);
+  rpc OCR(OCRRequest) returns (OCRResponse);
+  rpc EmbedImage(ImageEmbedRequest) returns (ImageEmbedResponse);
+  rpc ListModels(ListVisionModelsRequest) returns (ListVisionModelsResponse);
+  rpc GetConfig(ListVisionModelsRequest) returns (UpdateVisionConfigResponse);
+  rpc UpdateConfig(UpdateVisionConfigRequest) returns (UpdateVisionConfigResponse);
+}
